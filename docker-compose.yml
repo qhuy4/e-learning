@@ -1,0 +1,28 @@
+services:
+  fe:
+    build:
+      context: ./fe
+      dockerfile: Dockerfile
+    container_name: e-learning-fe
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./fe:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - be
+
+  be:
+    build:
+      context: ./be
+      dockerfile: Dockerfile
+    container_name: e-learning-be
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./be:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
