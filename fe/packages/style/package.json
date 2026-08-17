@@ -1,0 +1,7 @@
+{
+  "name": "@fe/style",
+  "private": true,
+  "exports": {
+    "./global.css": "./global.css"
+  }
+}

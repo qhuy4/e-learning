@@ -3,5 +3,20 @@
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
-  ]
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+
+      "@fe/components": ["./packages/components"],
+      "@fe/components/*": ["./packages/components/*"],
+
+      "@fe/lib": ["./packages/lib"],
+      "@fe/lib/*": ["./packages/lib/*"],
+
+      "@fe/style": ["./packages/style"],
+      "@fe/style/*": ["./packages/style/*"]
+    }
+  }
 }

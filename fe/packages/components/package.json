@@ -1,0 +1,7 @@
+{
+  "name": "@fe/components",
+  "private": true,
+  "dependencies": {
+    "@fe/lib": "*"
+  }
+}
