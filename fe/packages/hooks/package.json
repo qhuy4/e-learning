@@ -1,0 +1,7 @@
+{
+  "name": "@fe/hooks",
+  "private": true,
+  "dependencies": {
+    "@fe/hooks": "*"
+  }
+}
