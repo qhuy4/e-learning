@@ -10,12 +10,16 @@
   },
   "dependencies": {
     "@fe/components": "*",
+    "@fe/hooks": "*",
     "@fe/lib": "*",
     "@fe/style": "*",
+    "@tabler/icons-react": "^3.46.0",
     "@tailwindcss/vite": "^4.3.3",
+    "@tanstack/react-table": "^9.1.2",
     "caniuse-lite": "^1.0.30001809",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
