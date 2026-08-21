@@ -1,5 +1,6 @@
-import {Controller, Get, Param} from "@nestjs/common";
+import {Controller, Get, Param, Query} from "@nestjs/common";
 import {UserService} from "./user.service";
+import {PaginationDto} from "../../common/pagination/pagination.dto";
 
 @Controller('users')
 export class UsersController {
@@ -8,8 +9,8 @@ export class UsersController {
     ) {
     }
     @Get("all")
-    async getAll() {
-        return this.usersService.getAll()
+    async getAll(@Query() pagination: PaginationDto) {
+        return this.usersService.getAll(pagination)
     }
 
     @Get(':id')
