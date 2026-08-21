@@ -1,6 +1,6 @@
 "use client"
 
-import { useTable, type ColumnDef, type RowData } from "@tanstack/react-table"
+import {useTable, type ColumnDef, type RowData} from "@tanstack/react-table"
 
 import {
     Table,
@@ -11,22 +11,36 @@ import {
     TableRow,
 } from "@/components/ui/table"
 
-import { features, type DataTableFeatures } from "@/components/common/data-table/data-table-features.ts"
+import {features, type DataTableFeatures} from "@/components/common/data-table/data-table-features.ts"
 import {Button} from "@fe/components/ui/button.tsx";
+import {Skeleton} from "@fe/components/ui/skeleton.tsx";
 
 interface DataTableProps<TData extends RowData> {
     columns: ColumnDef<DataTableFeatures, TData>[]
     data: TData[]
     onRowClick?: (row: TData) => void
+    page: number
+    pageSize: number
+    totalPages: number
+    onPageChange: (page: number) => void
+    loading?: boolean
 }
 
-export function DataTable<TData extends RowData>({columns, data,onRowClick}: DataTableProps<TData>) {
+export function DataTable<TData extends RowData>({
+    columns, data,
+    onRowClick,
+    page,
+    totalPages,
+    onPageChange,
+    pageSize,
+    loading = false,
+}: DataTableProps<TData>) {
+
     const table = useTable({
         features,
         data,
         columns,
     })
-
     return (
 
         <div className="overflow-hidden rounded-md border">
@@ -38,7 +52,7 @@ export function DataTable<TData extends RowData>({columns, data,onRowClick}: Dat
                                 return (
                                     <TableHead key={header.id}>
                                         {header.isPlaceholder ? null : (
-                                            <table.FlexRender header={header} />
+                                            <table.FlexRender header={header}/>
                                         )}
                                     </TableHead>
                                 )
@@ -47,50 +61,92 @@ export function DataTable<TData extends RowData>({columns, data,onRowClick}: Dat
                     ))}
                 </TableHeader>
                 <TableBody>
-                    {table.getRowModel().rows?.length ? (
-                        table.getRowModel().rows.map((row) => (
-                            <TableRow
-                                key={row.id}
-                                data-state={row.getIsSelected() && "selected"}
-                                className={
-                                    onRowClick
-                                        ? "cursor-pointer"
-                                        : undefined
-                                }
-                                onClick={() =>
-                                    onRowClick?.(row.original)
-                                }
-                            >
-                                {row.getVisibleCells().map((cell) => (
-                                    <TableCell key={cell.id}>
-                                        <table.FlexRender cell={cell} />
+                    {loading ? (
+                        Array.from({length: pageSize}).map((_, index) => (
+                            <TableRow key={`skeleton-${index}`} className="h-12">
+                                {columns.map((_, columnIndex) => (
+                                    <TableCell key={columnIndex}>
+                                        <Skeleton className="h-5 w-full"/>
                                     </TableCell>
                                 ))}
                             </TableRow>
                         ))
+                    ) : table.getRowModel().rows?.length ? (
+                        <>
+                            {table.getRowModel().rows.map((row) => (
+                                <TableRow
+                                    key={row.id}
+                                    data-state={row.getIsSelected() && "selected"}
+                                    className={
+                                        onRowClick
+                                            ? "cursor-pointer h-12"
+                                            : "h-12"
+                                    }
+                                    onClick={() => onRowClick?.(row.original)}
+                                >
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                            <table.FlexRender cell={cell}/>
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))}
+
+                            {Array.from({
+                                length: Math.max(0,
+                                    pageSize - table.getRowModel().rows.length
+                                ),
+                            }).map((_, index) => (
+                                <TableRow key={`empty-${index}`} className="h-12">
+                                    {columns.map((_, columnIndex) => (
+                                        <TableCell key={columnIndex}/>
+                                    ))}
+                                </TableRow>
+                            ))}
+                        </>
                     ) : (
                         <TableRow>
-                            <TableCell colSpan={columns.length} className="h-24 text-center">
+                            <TableCell
+                                colSpan={columns.length}
+                                className="h-24 text-center"
+                            >
                                 No results.
                             </TableCell>
                         </TableRow>
                     )}
                 </TableBody>
             </Table>
-            <div className="flex items-center justify-end space-x-2 py-4">
+            <div className="flex items-center justify-end gap-1 py-4 pe-2">
                 <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
+                    disabled={page === 1}
+                    onClick={() => onPageChange(page - 1)}
                 >
                     Previous
                 </Button>
+
+                {Array.from({length: totalPages}, (_, index) => {
+                    const pageNumber = index + 1
+
+                    return (
+                        <Button
+                            disabled={loading}
+                            key={pageNumber}
+                            variant={pageNumber === page ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => onPageChange(pageNumber)}
+                        >
+                            {pageNumber}
+                        </Button>
+                    )
+                })}
+
                 <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
+                    disabled={page === totalPages}
+                    onClick={() => onPageChange(page + 1)}
                 >
                     Next
                 </Button>

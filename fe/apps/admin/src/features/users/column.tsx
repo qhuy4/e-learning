@@ -3,13 +3,8 @@
 import { createColumnHelper } from "@tanstack/react-table"
 
 import { type DataTableFeatures } from "@/components/common/data-table/data-table-features.ts"
+import type {User} from "@/features/users/service.ts";
 
-
-export type User = {
-    id: number
-    email: string
-    name: string
-}
 
 const columnHelper = createColumnHelper<DataTableFeatures, User>()
 
