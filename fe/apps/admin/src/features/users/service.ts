@@ -1,4 +1,5 @@
-import { api } from "@fe/lib/axios.ts";
+import {api} from "@fe/lib/axios.ts";
+import type {PaginationResponse} from "@/types/pagination.ts";
 
 export interface User {
     id: number;
@@ -7,9 +8,15 @@ export interface User {
 }
 
 export const userService = {
-    async getUsers(): Promise<User[]> {
-        const response = await api.get<User[]>("/users/all");
-        console.log(response.data);
+    async getUsers(page: number,
+                   limit: number,
+    ): Promise<PaginationResponse<User>> {
+        const response = await api.get<PaginationResponse<User>>("/users/all", {
+            params:{
+                page,
+                limit,
+            }
+        });
         return response.data;
     },
 
