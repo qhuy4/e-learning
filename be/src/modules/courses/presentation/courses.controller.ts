@@ -1,28 +1,36 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 
-import { QueryBus } from '@nestjs/cqrs';
+import { FileInterceptor } from '@nestjs/platform-express';
+
+import { QueryBus, CommandBus } from '@nestjs/cqrs';
 
 import { GetCoursesDto } from './dto/get-courses.dto';
-
 import { GetCoursesQuery } from '../application/query/get-courses.query';
 
-// import { GetCourseByIdQuery } from '../application/query/get-course-by-id.query';
-
 import { GetCourseBySlugQuery } from '../application/query/get-course-by-slug.query';
+
 import { CourseResponseDto } from './dto/course-response.dto';
 import { CourseDetailResponseDto } from './dto/course-detail-response.dto';
 
+import { CreateCourseDto } from './dto/create-course.dto';
+import { CreateCourseCommand } from '../application/command/create-course.command';
+
 @Controller('courses')
 export class CoursesController {
-  constructor(private readonly queryBus: QueryBus) {}
+  constructor(
+    private readonly queryBus: QueryBus,
+    private readonly commandBus: CommandBus,
+  ) {}
 
-  /**
-   * GET /courses
-   *
-   * GET /courses?page=1&limit=12
-   * GET /courses?level=1
-   * GET /courses?keyword=nestjs
-   */
   @Get()
   async findAll(@Query() query: GetCoursesDto) {
     return this.queryBus.execute<GetCoursesQuery, CourseResponseDto[]>(
@@ -35,9 +43,6 @@ export class CoursesController {
     );
   }
 
-  /**
-   * GET /courses/slug/nestjs-for-beginners
-   */
   @Get(':slug')
   async findBySlug(@Param('slug') slug: string) {
     return this.queryBus.execute<GetCourseBySlugQuery, CourseDetailResponseDto>(
@@ -45,13 +50,24 @@ export class CoursesController {
     );
   }
 
-  /**
-   * GET /courses/123
-   */
-  // @Get(':id')
-  // async findById(@Param('id') id: string) {
-  //   return this.queryBus.execute<GetCourseByIdQuery, CourseResponseDto>(
-  //     new GetCourseByIdQuery(id),
-  //   );
-  // }
+  @Post()
+  @UseInterceptors(FileInterceptor('thumbnail'))
+  async create(
+    @Body() dto: CreateCourseDto,
+
+    @UploadedFile()
+    thumbnail: Express.Multer.File,
+  ) {
+    return this.commandBus.execute(
+      new CreateCourseCommand(
+        1,
+        dto.title,
+        dto.description,
+        thumbnail,
+        dto.level,
+        dto.price,
+        dto.parentId,
+      ),
+    );
+  }
 }

@@ -6,10 +6,13 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 
-import { CourseOrmEntity } from './course.orm-entity';
-import { LessonOrmEntity } from './lesson.orm-entity';
+import { CourseOrmEntity } from '../../../courses/infrastructure/entity/course.orm-entity';
+import { LessonOrmEntity } from '../../../lessons/infrastructure/entity/lesson.orm-entity';
 
 @Entity({
   name: 'sections',
@@ -39,13 +42,13 @@ export class SectionOrmEntity {
   @Column({ type: 'varchar', length: 255 })
   slug: string;
 
-  @Column({ name: 'created_at', type: 'timestamp', nullable: true })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp', nullable: true })
   createdAt: Date | null;
 
-  @Column({ name: 'updated_at', type: 'timestamp', nullable: true })
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamp', nullable: true })
   updatedAt: Date | null;
 
-  @Column({ name: 'deleted_at', type: 'timestamp', nullable: true })
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp', nullable: true })
   deletedAt: Date | null;
 
   @ManyToOne(() => CourseOrmEntity, (course) => course.sections)

@@ -1,4 +1,4 @@
-import { CourseOrmEntity } from '../../domain/entity/course.orm-entity';
+import { CourseOrmEntity } from '../../infrastructure/entity/course.orm-entity';
 
 export class CourseDetailResponseDto {
   id: string;

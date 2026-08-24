@@ -5,9 +5,12 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 
-import { SectionOrmEntity } from './section.orm-entity';
+import { SectionOrmEntity } from '../../../sections/infrastructure/entity/section.orm-entity';
 
 @Entity({
   name: 'lessons',
@@ -65,13 +68,13 @@ export class LessonOrmEntity {
   @Column({ name: 'is_preview', type: 'boolean', default: false })
   isPreview: boolean;
 
-  @Column({ name: 'created_at', type: 'timestamp', nullable: true })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp', nullable: true })
   createdAt: Date | null;
 
-  @Column({ name: 'updated_at', type: 'timestamp', nullable: true })
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamp', nullable: true })
   updatedAt: Date | null;
 
-  @Column({ name: 'deleted_at', type: 'timestamp', nullable: true })
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp', nullable: true })
   deletedAt: Date | null;
 
   @ManyToOne(() => SectionOrmEntity, (section) => section.lessons)

@@ -13,7 +13,7 @@ export class GetCourseBySlugHandler implements IQueryHandler<GetCourseBySlugQuer
   constructor(private readonly courseRepository: CourseRepository) {}
 
   async execute(query: GetCourseBySlugQuery) {
-    const course = await this.courseRepository.findPublishedBySlug(query.slug);
+    const course = await this.courseRepository.getCourseDetail(query.slug);
     if (!course) {
       throw new NotFoundException('Course not found');
     }
