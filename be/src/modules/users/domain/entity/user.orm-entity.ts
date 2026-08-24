@@ -5,11 +5,14 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
-  OneToMany,
+  OneToOne,
 } from 'typeorm';
+import { UserRole } from '@/modules/users/domain/enum/user.role';
+import { UserStatus } from '@/modules/users/domain/enum/user.status';
+import { UserProfileOrmEntity } from '@/modules/users/domain/entity/user-profile.orm.entity';
 
 @Entity('users')
-export class User {
+export class UserOrmEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -22,11 +25,11 @@ export class User {
   @Column({ type: 'varchar' })
   password: string;
 
-  @Column({ type: 'smallint', default: 1 })
-  status: number;
+  @Column({ type: 'enum', enum: UserStatus, default: UserStatus.PENDING })
+  status: UserStatus;
 
-  @Column({ type: 'smallint', default: 3 })
-  role: number;
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.STUDENT })
+  role: UserRole;
 
   @Column({ type: 'varchar', nullable: true })
   block_reason: string | null;
@@ -42,4 +45,7 @@ export class User {
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deleted_at: Date | null;
+
+  @OneToOne(() => UserProfileOrmEntity, (profile) => profile.user)
+  profile: UserProfileOrmEntity;
 }

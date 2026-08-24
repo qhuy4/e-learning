@@ -9,6 +9,7 @@ import { CoursesModule } from './modules/courses/courses.module';
 import { SectionsModule } from './modules/sections/sections.module';
 import { LessonsModule } from './modules/lessons/lessons.module';
 import { StorageModule } from './common/storage/storage.module';
+import { AuthModule } from '@/modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { StorageModule } from './common/storage/storage.module';
       },
     }),
     UserModule,
+    AuthModule,
     CoursesModule,
     SectionsModule,
     LessonsModule,
