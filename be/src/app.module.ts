@@ -6,6 +6,9 @@ import { databaseConfig } from './database/database';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from './modules/users/user.module';
 import { CoursesModule } from './modules/courses/courses.module';
+import { SectionsModule } from './modules/sections/sections.module';
+import { LessonsModule } from './modules/lessons/lessons.module';
+import { StorageModule } from './common/storage/storage.module';
 
 @Module({
   imports: [
@@ -21,6 +24,9 @@ import { CoursesModule } from './modules/courses/courses.module';
     }),
     UserModule,
     CoursesModule,
+    SectionsModule,
+    LessonsModule,
+    StorageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

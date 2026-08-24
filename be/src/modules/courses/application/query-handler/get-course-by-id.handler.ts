@@ -14,7 +14,7 @@ export class GetCourseByIdHandler implements IQueryHandler<GetCourseByIdQuery> {
   constructor(private readonly courseRepository: CourseRepository) {}
 
   async execute(query: GetCourseByIdQuery) {
-    const course = await this.courseRepository.findPublishedById(query.id);
+    const course = await this.courseRepository.findCourseOrmEntityPublishedById(Number(query.id));
 
     if (!course) {
       throw new NotFoundException('Course not found');

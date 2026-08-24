@@ -1,7 +1,5 @@
-import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
-import { OneToMany } from 'typeorm';
-import { SectionOrmEntity } from './section.orm-entity';
-
+import { Column, Entity, Index, PrimaryColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, OneToMany } from 'typeorm';
+import { SectionOrmEntity } from '../../../sections/infrastructure/entity/section.orm-entity';
 @Entity({
   name: 'courses',
   schema: 'public',
@@ -58,13 +56,13 @@ export class CourseOrmEntity {
   @Column({ type: 'integer', default: 1 })
   version: number;
 
-  @Column({ name: 'created_at', type: 'timestamp', nullable: true })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp', nullable: true })
   createdAt: Date | null;
 
-  @Column({ name: 'updated_at', type: 'timestamp', nullable: true })
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamp', nullable: true })
   updatedAt: Date | null;
 
-  @Column({ name: 'deleted_at', type: 'timestamp', nullable: true })
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp', nullable: true })
   deletedAt: Date | null;
 
   @OneToMany(() => SectionOrmEntity, (section) => section.course)

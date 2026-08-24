@@ -1,41 +1,52 @@
 import { Module } from '@nestjs/common';
+
 import { CqrsModule } from '@nestjs/cqrs';
+
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { CourseOrmEntity } from './domain/entity/course.orm-entity';
-import { InstructorProfileOrmEntity } from '../instructors/domain/entity/instructor-profile.orm-entity';
+import { StorageModule } from '../../common/storage/storage.module';
+
+import { CourseOrmEntity } from './infrastructure/entity/course.orm-entity';
 
 import { CourseRepository } from './infrastructure/repository/course.repository';
 
+import { COURSE_REPOSITORY } from './domain/repository/course.repository';
+
 import { CoursesController } from './presentation/courses.controller';
 
+import { CreateCourseHandler } from './application/command-handler/create-course.command.handler';
+
+// các handler query hiện tại
 import { GetCoursesHandler } from './application/query-handler/get-courses.handler';
 
-import { GetCourseByIdHandler } from './application/query-handler/get-course-by-id.handler';
-
 import { GetCourseBySlugHandler } from './application/query-handler/get-course-by-slug.handler';
-import { SectionOrmEntity } from './domain/entity/section.orm-entity';
-import { LessonOrmEntity } from './domain/entity/lesson.orm-entity';
-const queryHandlers = [
-  GetCoursesHandler,
-  GetCourseByIdHandler,
-  GetCourseBySlugHandler,
-];
 
 @Module({
   imports: [
     CqrsModule,
 
-    TypeOrmModule.forFeature([
-      CourseOrmEntity,
-      InstructorProfileOrmEntity,
-      SectionOrmEntity,
-      LessonOrmEntity,
-    ]),
+    StorageModule,
+
+    TypeOrmModule.forFeature([CourseOrmEntity]),
   ],
 
   controllers: [CoursesController],
 
-  providers: [CourseRepository, ...queryHandlers],
+  providers: [
+    CourseRepository,
+
+    {
+      provide: COURSE_REPOSITORY,
+
+      useExisting: CourseRepository,
+    },
+
+    CreateCourseHandler,
+
+    GetCoursesHandler,
+
+    GetCourseBySlugHandler,
+  ],
+  exports: [COURSE_REPOSITORY],
 })
 export class CoursesModule {}
