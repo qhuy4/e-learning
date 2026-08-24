@@ -9,7 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@fe/components/ui/sidebar.tsx"
-import type {NavItem} from "@/types/navigation.ts";
+import type {NavItem} from "@/shared/types/navigation.ts";
 
 export function NavSecondary({
   groups,

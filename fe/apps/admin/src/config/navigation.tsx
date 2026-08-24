@@ -3,7 +3,7 @@ import {
     Users,
     Settings, ChartBar,
 } from "lucide-react"
-import type { NavGroup,NavItem } from "@/types/navigation"
+import type { NavGroup,NavItem } from "@/shared/types/navigation"
 type Navigation = {
     main: NavGroup[]
     secondary: NavItem[]

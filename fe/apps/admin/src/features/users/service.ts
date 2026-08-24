@@ -1,5 +1,5 @@
 import {api} from "@fe/lib/axios.ts";
-import type {PaginationResponse} from "@/types/pagination.ts";
+import type {PaginationResponse} from "@/shared/types/pagination.ts";
 
 export interface User {
     id: number;

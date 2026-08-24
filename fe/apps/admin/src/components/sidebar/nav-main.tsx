@@ -7,7 +7,7 @@ import {
     SidebarMenuItem,
 } from "@fe/components/ui/sidebar.tsx"
 import {CirclePlusIcon,MailIcon} from "lucide-react"
-import type {NavGroup} from "@/types/navigation.ts";
+import type {NavGroup} from "@/shared/types/navigation.ts";
 import { NavLink } from "react-router";
 
 export function NavMain({ groups }: {
