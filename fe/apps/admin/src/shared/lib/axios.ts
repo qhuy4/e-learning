@@ -1,6 +1,7 @@
 import { createApi } from "@fe/lib/axios.v.ts";
 import { store } from "@/shared/stores/store.ts";
 
-export const axios = createApi(() => {
-    return store.getState().auth.token;
-});
+export const adminApi = createApi(
+    () => store.getState().auth.token,
+    '/admin',
+);
