@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { UserOrmEntity } from './user.orm-entity';
+import { UserOrmEntity } from './user.orm.entity';
 
 @Entity('user_profiles')
 export class UserProfileOrmEntity {

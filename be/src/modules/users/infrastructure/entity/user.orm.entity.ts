@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { UserRole } from '@/modules/users/domain/enum/user.role';
 import { UserStatus } from '@/modules/users/domain/enum/user.status';
-import { UserProfileOrmEntity } from '@/modules/users/domain/entity/user-profile.orm.entity';
+import { UserProfileOrmEntity } from '@/modules/users/infrastructure/entity/user-profile.orm.entity';
 
 @Entity('users')
 export class UserOrmEntity {

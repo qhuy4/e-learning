@@ -34,7 +34,13 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
         401,
       );
     }
-
+    if (!command.allowedRoles.includes(user.role)) {
+      throw new AppException(
+        ErrorCode.INVALID_PASSWORD,
+        'Invalid Permission',
+        403,
+      );
+    }
     // Migrate Password From Laravel
     let hash = user.password;
     if (hash.startsWith('$2y$')) {
@@ -53,6 +59,14 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
         401,
       );
     }
+    if (user.id === null) {
+      throw new AppException(
+        ErrorCode.INTERNAL_SERVER_ERROR,
+        'Missing UserId',
+        401,
+      );
+    }
+
     const userProfile = await this.userProfileRepository.findByUserId(user.id);
     const accessToken = this.tokenService.generateAccessToken(user.id);
     return {

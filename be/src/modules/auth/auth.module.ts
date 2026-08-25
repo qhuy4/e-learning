@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from '@/modules/auth/presentation/auth.controller';
+import { AdminAuthController } from '@/modules/auth/presentation/controllers/admin-auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { TokenService } from '@/modules/auth/service/token.service';
 import { LoginHandler } from '@/modules/auth/application/command-handler/login.handler';
@@ -22,7 +22,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       }),
     }),
   ],
-  controllers: [AuthController],
+  controllers: [AdminAuthController,],
   providers: [TokenService, LoginHandler],
 })
 export class AuthModule {}
