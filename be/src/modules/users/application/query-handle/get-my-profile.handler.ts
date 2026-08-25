@@ -6,6 +6,7 @@ import { UserProfileRepository } from '@/modules/users/infrastructure/repository
 import { GetMyProfileResponse } from '@/modules/users/presentation/dto/get-my-profile.response';
 import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';
+import { HttpStatus } from '@nestjs/common';
 
 @QueryHandler(GetMyProfileQuery)
 export class GetMyProfileHandler implements IQueryHandler<
@@ -21,13 +22,12 @@ export class GetMyProfileHandler implements IQueryHandler<
     const user = await this.userRepository.findById(query.userId);
 
     if (!user) {
-      throw new AppException(ErrorCode.USER_NOT_FOUND, 'User Not Found', 400);
+      throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
     if (user.id === null) {
       throw new AppException(
         ErrorCode.INTERNAL_SERVER_ERROR,
-        'Missing UserId',
-        401,
+        HttpStatus.UNAUTHORIZED,
       );
     }
     const profile = await this.userProfileRepository.findByUserId(query.userId);

@@ -16,7 +16,7 @@ export class UserOrmEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', unique: true })
+  @Column({ type: 'varchar' })
   name: string;
 
   @Column({ type: 'varchar', unique: true })

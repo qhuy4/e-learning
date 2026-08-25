@@ -41,10 +41,12 @@ export class UserRepository implements IUserRepository {
     return UserMapper.toDomain(entity);
   }
 
-  async save(user: User): Promise<void> {
+  async save(user: User): Promise<User> {
     const entity = UserMapper.toPersistence(user);
 
-    await this.repository.save(entity);
+    const savedEntity = await this.repository.save(entity);
+
+    return UserMapper.toDomain(savedEntity);
   }
 
   async delete(user: User): Promise<void> {
@@ -53,5 +55,12 @@ export class UserRepository implements IUserRepository {
     }
 
     await this.repository.softDelete(user.id);
+  }
+  async create(user: User): Promise<User> {
+    const entity = UserMapper.toPersistence(user);
+
+    const savedEntity = await this.repository.save(entity);
+
+    return UserMapper.toDomain(savedEntity);
   }
 }

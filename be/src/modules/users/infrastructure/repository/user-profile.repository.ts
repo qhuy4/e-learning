@@ -21,4 +21,12 @@ export class UserProfileRepository implements IUserProfileRepository {
     }
     return UserProfileMapper.toDomain(entity);
   }
+
+  async create(userProfile: UserProfile): Promise<UserProfile> {
+    const entity = UserProfileMapper.toPersistence(userProfile);
+
+    const savedEntity = await this.repository.save(entity);
+
+    return UserProfileMapper.toDomain(savedEntity);
+  }
 }
