@@ -1,13 +1,14 @@
 import { ErrorCode } from '../enum/error-code.enum';
+import { HttpStatus } from '@nestjs/common';
+import { ERROR_MESSAGES } from '@/common/constants/error.message';
 
 export class AppException extends Error {
   constructor(
     public readonly code: ErrorCode,
-    message: string,
-    public readonly statusCode: number,
+    public readonly statusCode: HttpStatus,
     public readonly details?: unknown,
   ) {
-    super(message);
+    super(ERROR_MESSAGES[code]);
 
     this.name = 'AppException';
 
