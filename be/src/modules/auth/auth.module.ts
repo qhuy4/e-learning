@@ -6,6 +6,9 @@ import { LoginHandler } from '@/modules/auth/application/command-handler/login.h
 import { CqrsModule } from '@nestjs/cqrs';
 import { UserModule } from '@/modules/users/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UsersController } from '@/modules/users/presentation/user.controller';
+import { RegisterHandler } from '@/modules/auth/application/command-handler/register.handler';
+import { PasswordService } from '@/modules/auth/service/password.service';
 
 @Module({
   imports: [
@@ -22,7 +25,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       }),
     }),
   ],
-  controllers: [AdminAuthController,],
-  providers: [TokenService, LoginHandler],
+  controllers: [AdminAuthController, UsersController],
+  providers: [TokenService, LoginHandler, RegisterHandler, PasswordService],
 })
 export class AuthModule {}

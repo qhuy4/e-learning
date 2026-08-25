@@ -8,6 +8,7 @@ import { ErrorCode } from '@/common/enum/error-code.enum';
 import { TokenService } from '@/modules/auth/service/token.service';
 import { LoginResponse } from '@/modules/auth/application/command/login.response';
 import { UserProfileRepository } from '@/modules/users/infrastructure/repository/user-profile.repository';
+import { HttpStatus } from '@nestjs/common';
 
 @CommandHandler(LoginCommand)
 export class LoginHandler implements ICommandHandler<LoginCommand> {
@@ -28,18 +29,10 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
     const user = await this.userRepository.findByEmail(command.email);
 
     if (!user) {
-      throw new AppException(
-        ErrorCode.USER_NOT_FOUND,
-        'Invalid email or password',
-        401,
-      );
+      throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
     if (!command.allowedRoles.includes(user.role)) {
-      throw new AppException(
-        ErrorCode.INVALID_PASSWORD,
-        'Invalid Permission',
-        403,
-      );
+      throw new AppException(ErrorCode.INVALID_PASSWORD, HttpStatus.FORBIDDEN);
     }
     // Migrate Password From Laravel
     let hash = user.password;
@@ -53,17 +46,12 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
     );
 
     if (!isPasswordValid) {
-      throw new AppException(
-        ErrorCode.INVALID_PASSWORD,
-        'Invalid email or password',
-        401,
-      );
+      throw new AppException(ErrorCode.INVALID_PASSWORD, HttpStatus.FORBIDDEN);
     }
     if (user.id === null) {
       throw new AppException(
         ErrorCode.INTERNAL_SERVER_ERROR,
-        'Missing UserId',
-        401,
+        HttpStatus.UNAUTHORIZED,
       );
     }
 
