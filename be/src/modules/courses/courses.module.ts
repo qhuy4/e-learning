@@ -14,12 +14,16 @@ import { COURSE_REPOSITORY } from './domain/repository/course.repository';
 
 import { CoursesController } from './presentation/courses.controller';
 
+// Command handlers
 import { CreateCourseHandler } from './application/command-handler/create-course.command.handler';
+import { UpdateCourseHandler } from './application/command-handler/update-course.command.handler';
+import { DeleteCourseHandler } from './application/command-handler/delete-course.command.handler';
 
-// các handler query hiện tại
+// Query handlers
 import { GetCoursesHandler } from './application/query-handler/get-courses.handler';
 
 import { GetCourseBySlugHandler } from './application/query-handler/get-course-by-slug.handler';
+import { GetCourseByIdHandler } from './application/query-handler/get-course-by-id.handler';
 
 @Module({
   imports: [
@@ -41,11 +45,16 @@ import { GetCourseBySlugHandler } from './application/query-handler/get-course-b
       useExisting: CourseRepository,
     },
 
+    // Command handlers
     CreateCourseHandler,
+    UpdateCourseHandler,
+    DeleteCourseHandler,
 
+    // Query handlers
     GetCoursesHandler,
 
     GetCourseBySlugHandler,
+    GetCourseByIdHandler,
   ],
   exports: [COURSE_REPOSITORY],
 })

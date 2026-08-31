@@ -11,6 +11,7 @@ export class UpdateLessonCommand {
       position?: number;
       status?: number;
       isPreview?: boolean;
+      video?: Express.Multer.File;
     },
   ) {}
 }

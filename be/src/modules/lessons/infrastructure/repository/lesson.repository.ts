@@ -13,7 +13,7 @@ export class LessonRepository implements ILessonRepository {
     @InjectRepository(LessonOrmEntity)
     private readonly repository: Repository<LessonOrmEntity>,
   ) {}
-  
+
   async findById(id: number): Promise<Lesson | null> {
     const entity = await this.repository.findOne({
       where: {
@@ -93,7 +93,6 @@ export class LessonRepository implements ILessonRepository {
   async delete(id: number): Promise<void> {
     await this.repository.softDelete(id);
   }
-
 
   private toDomain(entity: LessonOrmEntity): Lesson {
     return Lesson.restore({

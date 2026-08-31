@@ -9,6 +9,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 
 import { CourseOrmEntity } from '../../../courses/infrastructure/entity/course.orm-entity';
@@ -21,7 +22,9 @@ import { LessonOrmEntity } from '../../../lessons/infrastructure/entity/lesson.o
 @Index('idx_sections_course_id', ['courseId'])
 @Index('idx_sections_slug', ['slug'])
 export class SectionOrmEntity {
-  @PrimaryColumn({ type: 'bigint' })
+  @PrimaryGeneratedColumn({
+    type: 'bigint',
+  })
   id: string;
 
   @Column({ name: 'course_id', type: 'bigint' })

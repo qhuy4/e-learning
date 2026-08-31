@@ -1,8 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
+  ParseIntPipe,
+  Patch,
   Post,
   Query,
   UploadedFile,
@@ -23,6 +26,11 @@ import { CourseDetailResponseDto } from './dto/course-detail-response.dto';
 
 import { CreateCourseDto } from './dto/create-course.dto';
 import { CreateCourseCommand } from '../application/command/create-course.command';
+import { GetCourseByIdQuery } from '../application/query/get-course-by-id.query';
+
+import { UpdateCourseDto } from './dto/update-course.dto';
+import { UpdateCourseCommand } from '../application/command/update-course.command';
+import { DeleteCourseCommand } from '../application/command/delete-course.command';
 
 @Controller('courses')
 export class CoursesController {
@@ -39,7 +47,15 @@ export class CoursesController {
         query.limit ?? 10,
         query.level,
         query.keyword,
+        query.status,
       ),
+    );
+  }
+
+  @Get('id/:id')
+  async findById(@Param('id') id: string) {
+    return this.queryBus.execute<GetCourseByIdQuery, CourseDetailResponseDto>(
+      new GetCourseByIdQuery(id),
     );
   }
 
@@ -69,5 +85,30 @@ export class CoursesController {
         dto.parentId,
       ),
     );
+  }
+
+  @Patch(':id')
+  @UseInterceptors(FileInterceptor('thumbnail'))
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateCourseDto,
+    @UploadedFile() thumbnail?: Express.Multer.File,
+  ) {
+    return this.commandBus.execute(
+      new UpdateCourseCommand(id, {
+        title: dto.title,
+        description: dto.description,
+        thumbnailFile: thumbnail,
+        level: dto.level,
+        price: dto.price,
+        status: dto.status,
+        parentId: dto.parentId,
+      }),
+    );
+  }
+
+  @Delete(':id')
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return this.commandBus.execute(new DeleteCourseCommand(id));
   }
 }

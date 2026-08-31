@@ -1,3 +1,5 @@
+import { Lesson } from '@/modules/lessons/domain/entity/lesson.entity';
+
 export class Section {
   private constructor(
     public id: number | null,
@@ -10,6 +12,7 @@ export class Section {
     public createdAt: Date | null,
     public updatedAt: Date | null,
     public deletedAt: Date | null,
+    public lessons?: Lesson[] | null,
   ) {}
 
   static create(params: {
@@ -45,6 +48,7 @@ export class Section {
     createdAt: Date | null;
     updatedAt: Date | null;
     deletedAt: Date | null;
+    lessons?: Lesson[] | null;
   }): Section {
     return new Section(
       params.id,
@@ -57,6 +61,7 @@ export class Section {
       params.createdAt,
       params.updatedAt,
       params.deletedAt,
+      params.lessons ?? [],
     );
   }
 

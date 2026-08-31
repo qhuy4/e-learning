@@ -18,10 +18,10 @@ export class CreateCourseDto {
   @IsString()
   description?: string;
 
-  @IsOptional()
-  @IsString()
-  @MaxLength(255)
-  thumbnail?: string;
+  // @IsOptional()
+  // @IsString()
+  // @MaxLength(255)
+  // thumbnail?: string;
 
   @IsOptional()
   @Transform(({ value }) => (value === '' || value == null ? undefined : Number(value)))

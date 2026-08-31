@@ -14,13 +14,15 @@ import { DeleteLessonHandler } from './application/command-handler/delete-lesson
 
 import { LessonController } from './presentation/lesson.controller';
 
+import { GetLessonByIdHandler } from './application/query-handler/get-lesson-by-id.handler';
+
 const CommandHandlers = [
   CreateLessonHandler,
   UpdateLessonHandler,
   DeleteLessonHandler,
 ];
 
-// const QueryHandlers = [GetLessonByIdHandler, GetLessonsBySectionHandler];
+const QueryHandlers = [GetLessonByIdHandler];
 
 import { SectionsModule } from '../sections/sections.module';
 import { StorageModule } from '../../common/storage/storage.module';
@@ -44,7 +46,7 @@ import { StorageModule } from '../../common/storage/storage.module';
     },
 
     ...CommandHandlers,
-    // ...QueryHandlers,
+    ...QueryHandlers,
   ],
 
   exports: [LESSON_REPOSITORY],
