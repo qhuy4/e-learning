@@ -13,25 +13,31 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@fe/components/ui/sidebar.tsx"
+import { GraduationCap } from "lucide-react"
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-    const user=
-        {
-            name: "Users",
-            email: "Users",
-            avatar: "/users",
-        }
+    const user = {
+        name: "Nguyễn Văn A",
+        email: "Giảng viên",
+        avatar: "https://i.pravatar.cc/150?img=11",
+    }
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
-      <SidebarHeader>
+      <SidebarHeader className="border-b border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
-              render={<a href="#" />}
+              className="data-[slot=sidebar-menu-button]:p-1.5! my-1 h-12 hover:bg-sidebar-accent"
+              render={<a href="/" />}
             >
-
-              <span className="text-base font-semibold">Acme Inc.</span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 shadow-sm shrink-0">
+                <GraduationCap className="h-4.5 w-4.5 text-white" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[15px] font-bold leading-none text-foreground">EduPro</span>
+                <span className="text-[11px] font-medium text-muted-foreground leading-none mt-1">Cổng giảng viên</span>
+              </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

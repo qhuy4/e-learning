@@ -3,9 +3,6 @@ import axios from "axios";
 export const createApi = (getToken: () => string | null, prefix = '') => {
     const api = axios.create({
         baseURL: `${import.meta.env.VITE_API_URL}${prefix}` || "http://localhost:3001",
-        headers: {
-            "Content-Type": "application/json",
-        },
     });
 
     api.interceptors.request.use((config) => {

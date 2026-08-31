@@ -7,12 +7,14 @@ const root = document.documentElement;
 import { Provider } from "react-redux";
 import {store} from "@/shared/stores/store.ts";
 
-root.classList.add("dark");
+import { ThemeProvider } from "@/components/theme-provider";
+
 createRoot(document.getElementById('root')!).render(
-    <StrictMode >
+    <StrictMode>
         <Provider store={store}>
-        <RouterProvider router={router} >
-        </RouterProvider>
+            <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+                <RouterProvider router={router} />
+            </ThemeProvider>
         </Provider>
     </StrictMode>,
 )

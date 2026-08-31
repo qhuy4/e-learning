@@ -1,13 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
-
 import { CourseOrmEntity } from '../entity/course.orm-entity';
-
 import { Course } from '../../domain/entity/course.entity';
 import { CourseStatus } from '../../domain/enum/course-status.enum';
-
 import { ICourseRepository } from '../../domain/repository/course.repository';
+import { CourseMapper } from '../mapper/course.mapper';
 
 export interface FindCoursesOptions {
   page: number;
@@ -71,7 +69,7 @@ export class CourseRepository implements ICourseRepository {
       return null;
     }
 
-    return this.toDomain(entity);
+    return CourseMapper.toDomain(entity);
   }
 
   async getCourseDetail(slug: string): Promise<CourseOrmEntity | null> {
@@ -97,21 +95,37 @@ export class CourseRepository implements ICourseRepository {
       return null;
     }
 
-    return this.toDomain(entity);
+    return CourseMapper.toDomain(entity);
   }
 
   async findById(id: number): Promise<Course | null> {
-    const entity = await this.repository.findOne({
-      where: {
-        id: id.toString(),
-      },
-    });
+    const entity = await this.findOrmEntityById(id);
 
     if (!entity) {
       return null;
     }
 
-    return this.toDomain(entity);
+    return CourseMapper.toDomain(entity);
+  }
+
+  private async findOrmEntityById(id: number): Promise<CourseOrmEntity | null> {
+    return this.repository
+      .createQueryBuilder('course')
+      .leftJoinAndSelect(
+        'course.sections',
+        'section',
+        'section.deletedAt IS NULL AND section.isActive = true',
+      )
+      .leftJoinAndSelect(
+        'section.lessons',
+        'lesson',
+        'lesson.deletedAt IS NULL',
+      )
+      .where('course.id = :id', { id })
+      .andWhere('course.deletedAt IS NULL')
+      .orderBy('section.position', 'ASC')
+      .addOrderBy('lesson.position', 'ASC')
+      .getOne();
   }
 
   async findBySlug(slug: string): Promise<Course | null> {
@@ -125,7 +139,7 @@ export class CourseRepository implements ICourseRepository {
       return null;
     }
 
-    return this.toDomain(entity);
+    return CourseMapper.toDomain(entity);
   }
 
   async create(course: Course): Promise<Course> {
@@ -148,35 +162,32 @@ export class CourseRepository implements ICourseRepository {
 
     const saved = await this.repository.save(entity);
 
-    return this.toDomain(saved);
+    return CourseMapper.toDomain(saved);
   }
 
   async update(course: Course): Promise<Course> {
-    const entity = await this.repository.preload({
-      id: course.id!.toString(),
-      instructorId: course.instructorId.toString(),
-      title: course.title,
-      slug: course.slug,
-      description: course.description,
-      thumbnail: course.thumbnail,
-      level: course.level,
-      price: course.price.toString(),
-      status: course.status,
-      reviewedBy: course.reviewedBy?.toString(),
-      reviewedAt: course.reviewedAt,
-      publishedAt: course.publishedAt,
-      rejectReason: course.rejectReason,
-      parentId: course.parentId?.toString(),
-      version: course.version,
-    });
+    await this.repository.update(
+      { id: course.id!.toString() },
+      {
+        title: course.title,
+        slug: course.slug,
+        description: course.description,
+        thumbnail: course.thumbnail,
+        level: course.level,
+        price: course.price.toString(),
+        status: course.status,
+        reviewedBy: course.reviewedBy?.toString() ?? null,
+        reviewedAt: course.reviewedAt,
+        publishedAt: course.publishedAt,
+        rejectReason: course.rejectReason,
+        parentId: course.parentId?.toString() ?? null,
+        version: course.version,
+      },
+    );
+    const updated = await this.findOrmEntityById(Number(course.id));
+    if (!updated) throw new Error('Course not found after update');
 
-    if (!entity) {
-      throw new Error('Course not found');
-    }
-
-    const saved = await this.repository.save(entity);
-
-    return this.toDomain(saved);
+    return CourseMapper.toDomain(updated);
   }
 
   async delete(id: number): Promise<void> {
@@ -192,26 +203,37 @@ export class CourseRepository implements ICourseRepository {
       .andWhere('course.deletedAt IS NULL');
   }
 
-  private toDomain(entity: CourseOrmEntity): Course {
-    return Course.restore({
-      id: Number(entity.id),
-      instructorId: Number(entity.instructorId),
-      title: entity.title,
-      slug: entity.slug,
-      description: entity.description,
-      thumbnail: entity.thumbnail,
-      level: entity.level,
-      price: Number(entity.price),
-      status: entity.status,
-      reviewedBy: entity.reviewedBy ? Number(entity.reviewedBy) : null,
-      reviewedAt: entity.reviewedAt,
-      publishedAt: entity.publishedAt,
-      rejectReason: entity.rejectReason,
-      parentId: entity.parentId ? Number(entity.parentId) : null,
-      version: entity.version,
-      createdAt: entity.createdAt,
-      updatedAt: entity.updatedAt,
-      deletedAt: entity.deletedAt,
-    });
+  async findAllCourses(options: FindCoursesOptions & { status?: number }) {
+    const { page, limit, level, keyword, status } = options;
+
+    const query = this.repository
+      .createQueryBuilder('course')
+      .where('course.deletedAt IS NULL');
+
+    if (level) {
+      query.andWhere('course.level = :level', { level });
+    }
+    if (status) {
+      query.andWhere('course.status = :status', { status });
+    }
+
+    if (keyword) {
+      query.andWhere(
+        new Brackets((qb) => {
+          qb.where('course.title ILIKE :keyword', {
+            keyword: `%${keyword}%`,
+          }).orWhere('course.description ILIKE :keyword', {
+            keyword: `%${keyword}%`,
+          });
+        }),
+      );
+    }
+
+    query
+      .orderBy('course.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    return query.getManyAndCount();
   }
 }

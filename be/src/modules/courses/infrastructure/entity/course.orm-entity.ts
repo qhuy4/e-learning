@@ -1,4 +1,13 @@
-import { Column, Entity, Index, PrimaryColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { SectionOrmEntity } from '../../../sections/infrastructure/entity/section.orm-entity';
 @Entity({
   name: 'courses',
@@ -9,7 +18,7 @@ import { SectionOrmEntity } from '../../../sections/infrastructure/entity/sectio
 @Index('idx_courses_instructor_id', ['instructorId'])
 @Index('idx_courses_deleted_at', ['deletedAt'])
 export class CourseOrmEntity {
-  @PrimaryColumn({
+  @PrimaryGeneratedColumn({
     type: 'bigint',
   })
   id: string;

@@ -5,8 +5,10 @@ export class UpdateCourseCommand {
       title?: string;
       description?: string | null;
       thumbnail?: string | null;
+      thumbnailFile?: Express.Multer.File;
       level?: number;
       price?: number;
+      status?: number;
       parentId?: number | null;
     },
   ) {}

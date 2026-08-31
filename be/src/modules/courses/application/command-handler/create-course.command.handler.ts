@@ -21,7 +21,7 @@ export class CreateCourseHandler implements ICommandHandler<CreateCourseCommand>
   constructor(
     @Inject(COURSE_REPOSITORY)
     private readonly courseRepository: ICourseRepository,
-    
+
     @Inject(FILE_STORAGE)
     private readonly storage: FileStorage,
   ) {}
@@ -65,7 +65,13 @@ export class CreateCourseHandler implements ICommandHandler<CreateCourseCommand>
         parentId: command.parentId,
       });
 
-      return await this.courseRepository.create(course);
+      const createdCourse = await this.courseRepository.create(course);
+
+      return {
+        id: createdCourse.id,
+        slug: createdCourse.slug,
+        title: createdCourse.title,
+      };
     } catch (error) {
       if (key) {
         await this.storage.delete(key);

@@ -1,3 +1,4 @@
+import { Section } from '@/modules/sections/domain/entity/section.entity';
 export class Course {
   private constructor(
     public id: number | null,
@@ -18,6 +19,7 @@ export class Course {
     public createdAt: Date | null,
     public updatedAt: Date | null,
     public deletedAt: Date | null,
+    public sections?: Section[] | null, // 💡 Thêm thuộc tính chứa danh sách Sections
   ) {}
 
   static create(params: {
@@ -50,6 +52,7 @@ export class Course {
       null,
       null,
       null,
+      [], // Trống khi mới khởi tạo
     );
   }
 
@@ -72,6 +75,7 @@ export class Course {
     createdAt: Date | null;
     updatedAt: Date | null;
     deletedAt: Date | null;
+    sections?: Section[] | null; // 💡 Nhận mảng sections khi khôi phục từ DB
   }): Course {
     return new Course(
       params.id,
@@ -92,6 +96,7 @@ export class Course {
       params.createdAt,
       params.updatedAt,
       params.deletedAt,
+      params.sections ?? [],
     );
   }
 
@@ -102,6 +107,7 @@ export class Course {
     thumbnail?: string | null;
     level?: number;
     price?: number;
+    status?: number;
     parentId?: number | null;
   }): void {
     if (params.title !== undefined) {
@@ -128,10 +134,15 @@ export class Course {
       this.price = params.price;
     }
 
+    if (params.status !== undefined) {
+      this.status = params.status;
+    }
+
     if (params.parentId !== undefined) {
       this.parentId = params.parentId;
     }
 
     this.version += 1;
+    this.updatedAt = new Date();
   }
 }

@@ -4,5 +4,6 @@ export class GetCoursesQuery {
     public readonly limit: number = 10,
     public readonly level?: number,
     public readonly keyword?: string,
+    public readonly status?: number,
   ) {}
 }

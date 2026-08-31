@@ -1,48 +1,71 @@
 import {
     LayoutDashboard,
     Users,
-    Settings, ChartBar,
+    Settings, 
+    LogOut,
+    BookOpen,
+    DollarSign,
+    Star
 } from "lucide-react"
 import type { NavGroup,NavItem } from "@/shared/types/navigation"
 type Navigation = {
     main: NavGroup[]
     secondary: NavItem[]
 }
-export const navigation : Navigation = {
+export const navigation: Navigation = {
     main: [
         {
-            label: "Overview",
+            label: "Quản lý chung",
             items: [
                 {
-                    title: "Dashboard",
+                    title: "Tổng quan",
                     url: "/",
                     icon: LayoutDashboard,
                 },
+            ],
+        },
+        {
+            label: "Học tập",
+            items: [
                 {
-                    title: "Analytics",
-                    url: "/analytics",
-                    icon: ChartBar,
+                    title: "Khóa học của tôi",
+                    url: "/courses",
+                    icon: BookOpen,
+                },
+                {
+                    title: "Học viên",
+                    url: "/students",
+                    icon: Users,
+                },
+                {
+                    title: "Đánh giá",
+                    url: "/reviews",
+                    icon: Star,
                 },
             ],
         },
         {
-            label: "Management",
+            label: "Tài chính",
             items: [
                 {
-                    title: "Users",
-                    url: "/users",
-                    icon: Users,
+                    title: "Doanh thu",
+                    url: "/earnings",
+                    icon: DollarSign,
                 },
             ],
         },
-
     ],
 
     secondary: [
         {
-            title: "Settings",
+            title: "Cài đặt",
             url: "/settings",
             icon: Settings,
+        },
+        {
+            title: "Đăng xuất",
+            url: "/logout",
+            icon: LogOut,
         },
     ],
 }
