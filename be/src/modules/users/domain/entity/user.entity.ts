@@ -1,5 +1,6 @@
-import { UserRole } from '../enum/user.role';
-import { UserStatus } from '../enum/user.status';
+import { UserStatus } from '@/modules/users/domain/enum/user.status';
+import { UserRole } from '@/modules/users/domain/enum/user.role';
+import { UserProfile } from '@/modules/users/domain/entity/user-profile.entity';
 
 export class User {
   private constructor(
@@ -14,6 +15,7 @@ export class User {
     public createdAt: Date | null,
     public updatedAt: Date | null,
     public deletedAt: Date | null,
+    public profile: UserProfile | null,
   ) {}
 
   static create(params: {
@@ -35,6 +37,7 @@ export class User {
       null,
       null,
       null,
+      null,
     );
   }
 
@@ -47,9 +50,10 @@ export class User {
     role: UserRole;
     blockReason: string | null;
     blockedAt: Date | null;
-    createdAt: Date | null;
-    updatedAt: Date | null;
+    createdAt: Date;
+    updatedAt: Date;
     deletedAt: Date | null;
+    profile: UserProfile | null;
   }): User {
     return new User(
       params.id,
@@ -63,10 +67,16 @@ export class User {
       params.createdAt,
       params.updatedAt,
       params.deletedAt,
+      params.profile,
     );
   }
 
-  update(params: { name?: string; email?: string; password?: string }): void {
+  update(params: {
+    name?: string;
+    email?: string;
+    password?: string;
+    role?: UserRole;
+  }): void {
     if (params.name !== undefined) {
       this.name = params.name;
     }
@@ -79,6 +89,9 @@ export class User {
       this.password = params.password;
     }
 
+    if (params.role !== undefined) {
+      this.role = params.role;
+    }
     this.updatedAt = new Date();
   }
 

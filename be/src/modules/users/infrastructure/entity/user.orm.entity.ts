@@ -25,10 +25,10 @@ export class UserOrmEntity {
   @Column({ type: 'varchar' })
   password: string;
 
-  @Column({ type: 'enum', enum: UserStatus, default: UserStatus.PENDING })
+  @Column({ type: 'int', enum: UserStatus, default: UserStatus.PENDING })
   status: UserStatus;
 
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.STUDENT })
+  @Column({ type: 'int', enum: UserRole, default: UserRole.STUDENT })
   role: UserRole;
 
   @Column({ type: 'varchar', nullable: true })
@@ -46,6 +46,8 @@ export class UserOrmEntity {
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deleted_at: Date | null;
 
-  @OneToOne(() => UserProfileOrmEntity, (profile) => profile.user)
-  profile: UserProfileOrmEntity;
+  @OneToOne(() => UserProfileOrmEntity, (profile) => profile.user, {
+    cascade: true,
+  })
+  profile: UserProfileOrmEntity | null;
 }

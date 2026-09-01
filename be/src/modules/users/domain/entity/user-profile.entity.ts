@@ -1,9 +1,11 @@
+import { Gender } from '@/modules/users/domain/enum/user.gender';
+
 export class UserProfile {
   private constructor(
     public id: number | null,
     public userId: number,
     public avatarUrl: string | null,
-    public gender: number | null,
+    public gender: Gender,
     public firstName: string | null,
     public lastName: string | null,
     public phone: string | null,
@@ -20,7 +22,7 @@ export class UserProfile {
   static create(params: {
     userId: number;
     avatarUrl?: string | null;
-    gender?: number | null;
+    gender?: Gender;
     firstName?: string | null;
     lastName?: string | null;
     phone?: string | null;
@@ -35,7 +37,7 @@ export class UserProfile {
       null,
       params.userId,
       params.avatarUrl ?? null,
-      params.gender ?? null,
+      params.gender ?? Gender.OTHER,
       params.firstName ?? null,
       params.lastName ?? null,
       params.phone ?? null,
@@ -54,7 +56,7 @@ export class UserProfile {
     id: number;
     userId: number;
     avatarUrl: string | null;
-    gender: number | null;
+    gender: Gender;
     firstName: string | null;
     lastName: string | null;
     phone: string | null;
@@ -64,8 +66,8 @@ export class UserProfile {
     city: string | null;
     occupation: string | null;
     bio: string | null;
-    createdAt: Date | null;
-    updatedAt: Date | null;
+    createdAt: Date;
+    updatedAt: Date;
   }): UserProfile {
     return new UserProfile(
       params.id,
@@ -88,7 +90,7 @@ export class UserProfile {
 
   update(params: {
     avatarUrl?: string | null;
-    gender?: number | null;
+    gender?: Gender;
     firstName?: string | null;
     lastName?: string | null;
     phone?: string | null;
