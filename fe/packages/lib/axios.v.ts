@@ -1,22 +1,22 @@
-import axios from "axios";
+import axios from "axios"
 
-export const createApi = (getToken: () => string | null, prefix = '') => {
+export const createApi = (
+    getToken: () => string | null,
+    prefix = "",
+) => {
     const api = axios.create({
-        baseURL: `${import.meta.env.VITE_API_URL}${prefix}` || "http://localhost:3001",
-        headers: {
-            "Content-Type": "application/json",
-        },
-    });
+        baseURL: `${import.meta.env.VITE_API_URL}${prefix}`,
+    })
 
     api.interceptors.request.use((config) => {
-        const token = getToken();
+        const token = getToken()
 
         if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
+            config.headers.Authorization = `Bearer ${token}`
         }
 
-        return config;
-    });
+        return config
+    })
 
-    return api;
-};
+    return api
+}

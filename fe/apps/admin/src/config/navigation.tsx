@@ -1,7 +1,7 @@
 import {
     LayoutDashboard,
     Users,
-    Settings, ChartBar,
+    Settings, ChartBar, GraduationCap, UserRound,
 } from "lucide-react"
 import type { NavGroup,NavItem } from "@/shared/types/navigation"
 type Navigation = {
@@ -32,6 +32,16 @@ export const navigation : Navigation = {
                     title: "Users",
                     url: "/users",
                     icon: Users,
+                },
+                {
+                    title: "Teachers",
+                    url: "/teachers",
+                    icon: GraduationCap,
+                },
+                {
+                    title: "Students",
+                    url: "/sttudents",
+                    icon: UserRound,
                 },
             ],
         },

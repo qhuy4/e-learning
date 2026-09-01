@@ -1,18 +1,34 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
+import {StrictMode} from 'react'
+import {createRoot} from 'react-dom/client'
 import "@fe/style/global.css"
 import {router} from "@/router";
 import {RouterProvider} from "react-router";
+import {Toaster} from "sonner";
+
 const root = document.documentElement;
-import { Provider } from "react-redux";
+import {Provider} from "react-redux";
 import {store} from "@/shared/stores/store.ts";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: 30_000,
+            retry: 1,
+        },
+    },
+});
 
 root.classList.add("dark");
 createRoot(document.getElementById('root')!).render(
-    <StrictMode >
+    <StrictMode>
         <Provider store={store}>
-        <RouterProvider router={router} >
-        </RouterProvider>
+            <QueryClientProvider client={queryClient}>
+                <RouterProvider router={router}>
+                </RouterProvider>
+                <Toaster richColors position="top-right" />
+            </QueryClientProvider>
+
         </Provider>
     </StrictMode>,
 )
