@@ -30,6 +30,26 @@ export const navigation: Navigation = {
             ],
         },
         {
+            label: "Management",
+            items: [
+                {
+                    title: "Users",
+                    url: "/users",
+                    icon: Users,
+                },
+                {
+                    title: "Teachers",
+                    url: "/teachers",
+                    icon: GraduationCap,
+                },
+                {
+                    title: "Students",
+                    url: "/sttudents",
+                    icon: UserRound,
+                },
+            ],
+        },
+        {
             label: "Học tập",
             items: [
                 {
