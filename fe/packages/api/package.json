@@ -1,0 +1,7 @@
+{
+  "name": "@fe/api",
+  "private": true,
+  "dependencies": {
+    "@fe/api": "*"
+  }
+}
