@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 
 import { UserOrmEntity } from './user.orm.entity';
+import { Gender } from '@/modules/users/domain/enum/user.gender';
 
 @Entity('user_profiles')
 export class UserProfileOrmEntity {
@@ -32,8 +33,8 @@ export class UserProfileOrmEntity {
   })
   avatarUrl: string | null;
 
-  @Column({ type: 'int', nullable: true })
-  gender: number | null;
+  @Column({ type: 'int', enum: Gender, default: Gender.OTHER })
+  gender: Gender;
 
   @Column({
     type: 'varchar',

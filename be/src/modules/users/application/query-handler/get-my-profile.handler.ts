@@ -3,7 +3,7 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetMyProfileQuery } from '../query/get-my-profile.query';
 import { UserRepository } from '@/modules/users/infrastructure/repository/user.repository';
 import { UserProfileRepository } from '@/modules/users/infrastructure/repository/user-profile.repository';
-import { GetMyProfileResponse } from '@/modules/users/presentation/dto/get-my-profile.response';
+import { GetMyProfileResponse } from '@/modules/users/presentation/dto/admin/get-my-profile.response';
 import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';
 import { HttpStatus } from '@nestjs/common';

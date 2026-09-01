@@ -5,7 +5,7 @@ import { LoginCommand } from '../command/login.command';
 import { UserRepository } from '@/modules/users/infrastructure/repository/user.repository';
 import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';
-import { TokenService } from '@/modules/auth/service/token.service';
+import { TokenService } from '@/common/service/token.service';
 import { LoginResponse } from '@/modules/auth/application/command/login.response';
 import { UserProfileRepository } from '@/modules/users/infrastructure/repository/user-profile.repository';
 import { HttpStatus } from '@nestjs/common';

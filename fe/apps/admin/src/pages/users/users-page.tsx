@@ -1,34 +1,76 @@
-import {DataTable} from "@/components/common/data-table/data-table"
-import {columns, type User} from "@/features/users/column"
-import {useNavigate} from "react-router";
-import {useEffect, useState} from "react";
-import {userService} from "@/features/users/service.ts";
-import type {PaginationResponse} from "@/shared/types/pagination.ts";
+import { useEffect, useState } from "react"
+import { useNavigate } from "react-router"
+import { Plus } from "lucide-react"
+
+import { DataTable } from "@/components/common/data-table/data-table"
+import { createUserColumns } from "@/features/users/column"
+import type { User } from "@/features/users/types/user.type"
+import { Button } from "@fe/components/ui/button"
+import {useUsers} from "@/features/users/hook/use-user.ts";
+import {DeleteConfirmDialog} from "@/features/users/components/delete-confirm-diialog.tsx";
+
+const columns = createUserColumns()
 
 export default function UsersPage() {
     const navigate = useNavigate()
-
     const [page, setPage] = useState(1)
-    const [limit] = useState(10)
-    const [result, setResult] =
-        useState<PaginationResponse<User>>()
-    const [loading, setLoading] = useState(false)
+    const [limit, setLimit] = useState(10)
+    const [search, setSearch] = useState("")
+    const [debouncedSearch, setDebouncedSearch] = useState("")
+    const [sortBy, setSortBy] = useState("id")
+    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
+
+    const [deleteOpen, setDeleteOpen] = useState(false)
+    const [deletingUser, setDeletingUser] = useState<User | null>(null)
 
     useEffect(() => {
-        setLoading(true)
+        const timer = setTimeout(() => {
+            setDebouncedSearch(search)
+            setPage(1)
+        }, 300)
+        return () => clearTimeout(timer)
+    }, [search])
 
-        userService.getUsers(page, limit)
-            .then(setResult).finally(() => setLoading(false))
-    }, [page, limit])
+    const { data: result, isLoading: loading } = useUsers(
+        page,
+        limit,
+        debouncedSearch || undefined,
+        sortBy,
+        sortOrder
+    )
 
     const totalPages = result
         ? Math.ceil(result.meta.total / result.meta.limit)
         : 0
+
+    const handleSortChange = (newSortBy: string, newSortOrder: "asc" | "desc") => {
+        setSortBy(newSortBy)
+        setSortOrder(newSortOrder)
+        setPage(1)
+    }
+
+    const handleCreate = () => {
+        navigate("/users/create")
+    }
+
+    const handleEdit = (user: User) => {
+        navigate(`/users/${user.id}/edit`)
+    }
+
+    const handleDelete = (user: User) => {
+        setDeletingUser(user)
+        setDeleteOpen(true)
+    }
+
     return (
         <div className="p-6">
-            <h1 className="mb-4 text-2xl font-bold">
-                Users
-            </h1>
+            <div className="mb-4 flex items-center justify-between">
+                <h1 className="text-2xl font-bold">Users</h1>
+                <Button onClick={handleCreate}>
+                    <Plus className="size-4" />
+                    Create User
+                </Button>
+            </div>
 
             <DataTable
                 columns={columns}
@@ -38,9 +80,24 @@ export default function UsersPage() {
                 loading={loading}
                 pageSize={limit}
                 onPageChange={setPage}
-                onRowClick={(user) =>
-                    navigate(`/users/${user.id}`)
-                }
+                onRowClick={(user) => navigate(`/users/${user.id}`)}
+                search={search}
+                onSearchChange={setSearch}
+                onPageSizeChange={(newLimit) => {
+                    setLimit(newLimit)
+                    setPage(1)
+                }}
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                onSortChange={handleSortChange}
+                tableMeta={{ onEdit: handleEdit, onDelete: handleDelete }}
+            />
+
+            <DeleteConfirmDialog
+                open={deleteOpen}
+                onOpenChange={setDeleteOpen}
+                user={deletingUser}
+                onSuccess={() => {}}
             />
         </div>
     )
