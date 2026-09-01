@@ -1,5 +1,6 @@
 import {DataTable} from "@/components/common/data-table/data-table"
-import {columns, type User} from "@/features/users/column"
+import {columns} from "@/features/users/column"
+import type {User} from "@/features/users/service"
 import {useNavigate} from "react-router";
 import {useEffect, useState} from "react";
 import {userService} from "@/features/users/service.ts";

@@ -5,7 +5,7 @@ import {
 
 } from "lucide-react"
 
-const userMenu = [
+export const userMenu = [
     {
         label: "Account",
         icon: CircleUserRound,

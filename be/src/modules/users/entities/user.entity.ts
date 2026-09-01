@@ -8,6 +8,8 @@ import {
   OneToMany,
 } from 'typeorm';
 
+import { Role } from '../../../common/enum/role.enum';
+
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
@@ -25,8 +27,8 @@ export class User {
   @Column({ type: 'smallint', default: 1 })
   status: number;
 
-  @Column({ type: 'smallint', default: 3 })
-  role: number;
+  @Column({ type: 'smallint', default: Role.STUDENT })
+  role: Role;
 
   @Column({ type: 'varchar', nullable: true })
   block_reason: string | null;

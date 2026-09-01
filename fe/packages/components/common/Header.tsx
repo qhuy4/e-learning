@@ -41,9 +41,18 @@ export const Header = () => {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-4">
-          <button className="text-sm font-medium text-slate-600 hover:text-slate-900 px-4 py-2 transition-colors">
+          <a
+            href="/teach"
+            className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition-colors"
+          >
+            Trở thành Giảng viên
+          </a>
+          <a
+            href="/login"
+            className="text-sm font-medium text-slate-600 hover:text-slate-900 px-4 py-2 transition-colors inline-block"
+          >
             Log In
-          </button>
+          </a>
           <button className="bg-rose-400 hover:bg-rose-500 text-white text-sm font-medium px-6 py-2 rounded-full transition-colors">
             Sign Up
           </button>

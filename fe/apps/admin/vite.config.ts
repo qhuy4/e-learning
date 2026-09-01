@@ -8,10 +8,14 @@ import path from "node:path";
 // https://vite.dev/config/
 export default defineConfig({
   envDir: '../../',
+  server: {
+    port: 5174,
+    strictPort: true,
+  },
   plugins: [
     react(),
     tailwindcss(),
-    babel({ presets: [reactCompilerPreset()] })
+    babel({ presets: [reactCompilerPreset({})] })
   ],
   resolve: {
     alias: {

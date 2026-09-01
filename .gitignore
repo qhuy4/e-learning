@@ -10,6 +10,10 @@ build/
 .next/
 out/
 
+# Uploaded files
+uploads/
+be/uploads/
+
 
 coverage/
 .nyc_output/

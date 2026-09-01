@@ -33,6 +33,11 @@ export const navigation : Navigation = {
                     url: "/users",
                     icon: Users,
                 },
+                {
+                    title: "Duyệt Giảng Viên (eKYC)",
+                    url: "/instructors/approvals",
+                    icon: Users,
+                },
             ],
         },
 
