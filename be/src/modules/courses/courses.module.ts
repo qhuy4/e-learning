@@ -1,41 +1,61 @@
 import { Module } from '@nestjs/common';
+
 import { CqrsModule } from '@nestjs/cqrs';
+
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { CourseOrmEntity } from './domain/entity/course.orm-entity';
-import { InstructorProfileOrmEntity } from '../instructors/domain/entity/instructor-profile.orm-entity';
+import { StorageModule } from '../../common/storage/storage.module';
+
+import { CourseOrmEntity } from './infrastructure/entity/course.orm-entity';
 
 import { CourseRepository } from './infrastructure/repository/course.repository';
 
+import { COURSE_REPOSITORY } from './domain/repository/course.repository';
+
 import { CoursesController } from './presentation/courses.controller';
 
+// Command handlers
+import { CreateCourseHandler } from './application/command-handler/create-course.command.handler';
+import { UpdateCourseHandler } from './application/command-handler/update-course.command.handler';
+import { DeleteCourseHandler } from './application/command-handler/delete-course.command.handler';
+
+// Query handlers
 import { GetCoursesHandler } from './application/query-handler/get-courses.handler';
 
-import { GetCourseByIdHandler } from './application/query-handler/get-course-by-id.handler';
-
 import { GetCourseBySlugHandler } from './application/query-handler/get-course-by-slug.handler';
-import { SectionOrmEntity } from './domain/entity/section.orm-entity';
-import { LessonOrmEntity } from './domain/entity/lesson.orm-entity';
-const queryHandlers = [
-  GetCoursesHandler,
-  GetCourseByIdHandler,
-  GetCourseBySlugHandler,
-];
+import { GetCourseByIdHandler } from './application/query-handler/get-course-by-id.handler';
 
 @Module({
   imports: [
     CqrsModule,
 
-    TypeOrmModule.forFeature([
-      CourseOrmEntity,
-      InstructorProfileOrmEntity,
-      SectionOrmEntity,
-      LessonOrmEntity,
-    ]),
+    StorageModule,
+
+    TypeOrmModule.forFeature([CourseOrmEntity]),
   ],
 
   controllers: [CoursesController],
 
-  providers: [CourseRepository, ...queryHandlers],
+  providers: [
+    CourseRepository,
+
+    {
+      provide: COURSE_REPOSITORY,
+
+      useExisting: CourseRepository,
+    },
+
+    // Command handlers
+    CreateCourseHandler,
+    UpdateCourseHandler,
+    DeleteCourseHandler,
+
+    // Query handlers
+    GetCoursesHandler,
+
+    GetCourseBySlugHandler,
+    GetCourseByIdHandler,
+  ],
+  exports: [COURSE_REPOSITORY],
 })
 export class CoursesModule {}

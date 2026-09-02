@@ -28,4 +28,9 @@ export class GetCoursesDto {
   @IsOptional()
   @IsString()
   keyword?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  status?: number;
 }

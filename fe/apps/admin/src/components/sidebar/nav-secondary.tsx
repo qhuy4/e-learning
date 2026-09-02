@@ -9,7 +9,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@fe/components/ui/sidebar.tsx"
-import type {NavItem} from "@/types/navigation.ts";
+import type {NavItem} from "@/shared/types/navigation.ts";
+import { NavLink } from "react-router";
 
 export function NavSecondary({
   groups,
@@ -25,9 +26,9 @@ export function NavSecondary({
             const Icon = item.icon
             return (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton tooltip={item.title}>
+                  <SidebarMenuButton tooltip={item.title} render={<NavLink to={item.url} />}>
                     {Icon && <Icon />}
-                    <span>{item.title}</span>
+                    <span className="text-sm font-medium">{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
             )

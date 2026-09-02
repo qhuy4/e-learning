@@ -4,7 +4,7 @@ import type {User} from "@/features/users/service"
 import {useNavigate} from "react-router";
 import {useEffect, useState} from "react";
 import {userService} from "@/features/users/service.ts";
-import type {PaginationResponse} from "@/types/pagination.ts";
+import type {PaginationResponse} from "@/shared/types/pagination.ts";
 
 export default function UsersPage() {
     const navigate = useNavigate()

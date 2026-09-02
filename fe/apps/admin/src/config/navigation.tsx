@@ -1,37 +1,56 @@
 import {
     LayoutDashboard,
     Users,
-    Settings, ChartBar,
+    Settings, 
+    LogOut,
+    BookOpen,
+    DollarSign,
+    Star
 } from "lucide-react"
-import type { NavGroup,NavItem } from "@/types/navigation"
+import type { NavGroup,NavItem } from "@/shared/types/navigation"
 type Navigation = {
     main: NavGroup[]
     secondary: NavItem[]
 }
-export const navigation : Navigation = {
+export const navigation: Navigation = {
     main: [
         {
-            label: "Overview",
+            label: "Quản lý chung",
             items: [
                 {
-                    title: "Dashboard",
+                    title: "Tổng quan",
                     url: "/",
                     icon: LayoutDashboard,
-                },
-                {
-                    title: "Analytics",
-                    url: "/analytics",
-                    icon: ChartBar,
                 },
             ],
         },
         {
-            label: "Management",
+            label: "Học tập",
             items: [
                 {
-                    title: "Users",
-                    url: "/users",
+                    title: "Khóa học của tôi",
+                    url: "/courses",
+                    icon: BookOpen,
+                },
+                {
+                    title: "Học viên",
+                    url: "/students",
                     icon: Users,
+                },
+                {
+                    title: "Đánh giá",
+                    url: "/reviews",
+                    icon: Star,
+                },
+            ],
+        },
+        {
+            label: "Tài chính",
+            items: [
+                {
+                    title: "Doanh thu",
+                    url: "/earnings",
+                    icon: DollarSign,
                 },
                 {
                     title: "Duyệt Giảng Viên (eKYC)",
@@ -40,14 +59,18 @@ export const navigation : Navigation = {
                 },
             ],
         },
-
     ],
 
     secondary: [
         {
-            title: "Settings",
+            title: "Cài đặt",
             url: "/settings",
             icon: Settings,
+        },
+        {
+            title: "Đăng xuất",
+            url: "/logout",
+            icon: LogOut,
         },
     ],
 }

@@ -1,11 +1,6 @@
 import {api} from "@fe/lib/axios.ts";
-import type {PaginationResponse} from "@/types/pagination.ts";
-
-export interface User {
-    id: number;
-    name: string;
-    email: string;
-}
+import type {PaginationResponse} from "@/shared/types/pagination.ts";
+import type {User} from "@/features/users/types/user.type.ts";
 
 export const userService = {
     async getUsers(page: number,

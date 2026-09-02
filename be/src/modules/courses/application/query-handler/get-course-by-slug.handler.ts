@@ -2,10 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { GetCourseBySlugQuery } from '../query/get-course-by-slug.query';
-
 import { CourseRepository } from '../../infrastructure/repository/course.repository';
-
-import { CourseDetailResponseDto } from '../../presentation/dto/course-detail-response.dto';
+import { CourseDtoMapper } from '../../presentation/mappers/course-dto.mapper';
 
 @QueryHandler(GetCourseBySlugQuery)
 @Injectable()
@@ -18,6 +16,6 @@ export class GetCourseBySlugHandler implements IQueryHandler<GetCourseBySlugQuer
       throw new NotFoundException('Course not found');
     }
 
-    return CourseDetailResponseDto.fromEntity(course);
+    return CourseDtoMapper.toDetailDto(course);
   }
 }

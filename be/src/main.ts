@@ -1,6 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { ResponseInterceptor } from '@/common/exception/response.interceptor';
+import { GlobalExceptionFilter } from '@/common/exception/global.exception';
 
 import { DataSource } from 'typeorm';
 import { initDatabaseTables } from './database/init-db';
@@ -14,7 +16,6 @@ async function bootstrap() {
   const dataSource = app.get(DataSource);
   await initDatabaseTables(dataSource);
 
-  // Phục vụ tĩnh thư mục uploads để hiển thị ảnh CCCD và bằng cấp
   app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
   app.useGlobalPipes(
@@ -24,6 +25,8 @@ async function bootstrap() {
     }),
   );
 
+  app.useGlobalInterceptors(new ResponseInterceptor());
+  app.useGlobalFilters(new GlobalExceptionFilter());
   app.enableCors({
     origin: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
@@ -31,4 +34,5 @@ async function bootstrap() {
   });
   await app.listen(process.env.PORT ?? 3001);
 }
+
 bootstrap();

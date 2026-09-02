@@ -8,6 +8,9 @@ import { UserModule } from './modules/users/user.module';
 import { CoursesModule } from './modules/courses/courses.module';
 import { TeacherModule } from './modules/teacher/teacher.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { SectionsModule } from './modules/sections/sections.module';
+import { LessonsModule } from './modules/lessons/lessons.module';
+import { StorageModule } from './common/storage/storage.module';
 
 @Module({
   imports: [
@@ -23,8 +26,12 @@ import { AuthModule } from './modules/auth/auth.module';
     }),
     AuthModule,
     UserModule,
+    AuthModule,
     CoursesModule,
     TeacherModule,
+    SectionsModule,
+    LessonsModule,
+    StorageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

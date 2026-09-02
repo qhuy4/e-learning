@@ -19,17 +19,21 @@ import {
   useSidebar,
 } from "@fe/components/ui/sidebar.tsx"
 import { EllipsisVerticalIcon, CircleUserRoundIcon, CreditCardIcon, BellIcon, LogOutIcon } from "lucide-react"
+import {useNavigate} from "react-router";
+import { useDispatch } from "react-redux";
+import  {logout} from "@/features/auth/store/authSlice.ts";
+import {useAuth} from "@/features/auth/hook/useAuth.ts";
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string
-    email: string
-    avatar: string
-  }
-}) {
+export function NavUser() {
   const { isMobile } = useSidebar()
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const {user} = useAuth()
+  const handleLogout = ()=>{
+    dispatch(logout());
+    localStorage.removeItem("accessToken");
+    navigate("/login", { replace: true });
+  }
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -41,7 +45,7 @@ export function NavUser({
           >
             <Avatar className="size-8 rounded-lg grayscale">
               <AvatarImage src={user.avatar} alt={user.name} />
-              <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-medium">{user.name}</span>
@@ -78,24 +82,24 @@ export function NavUser({
               <DropdownMenuItem>
                 <CircleUserRoundIcon
                 />
-                Account
+                Tài khoản
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <CreditCardIcon
                 />
-                Billing
+                Thanh toán
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <BellIcon
                 />
-                Notifications
+                Thông báo
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOutIcon
               />
-              Log out
+              Đăng xuất
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
