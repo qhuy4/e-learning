@@ -56,7 +56,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
           message = responseBody.message ?? 'Request failed';
         }
       }
-
       code = this.getHttpErrorCode(status);
     }
 

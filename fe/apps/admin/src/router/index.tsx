@@ -11,10 +11,13 @@ import {PublicRoute} from "@/router/publishRoute.tsx";
 import { CreateCoursePage } from "@/pages/courses/create-course-page";
 import { CoursesListPage } from "@/pages/courses/courses-list-page";
 import { CreateLessonPage } from "@/features/lessons/pages/create-lesson-page";
+import {UserEditPage} from "@/pages/users/user-edit-page.tsx";
+import {UserCreatePage} from "@/pages/users/user-create-page.tsx";
+
 
 export const router = createBrowserRouter([
     {
-        element: <ProtectedRoute />,
+        element: <ProtectedRoute/>,
         children: [
             {
                 path: "/",
@@ -26,11 +29,24 @@ export const router = createBrowserRouter([
                     },
                     {
                         path: "users",
-                        element: <UsersPage />,
-                    },
-                    {
-                        path: "users/:id",
-                        element: <UserDetailPage />,
+                        children: [
+                            {
+                                index: true,
+                                element: <UsersPage />,
+                            },
+                            {
+                                path: "create",
+                                element: <UserCreatePage />,
+                            },
+                            {
+                                path: ":id",
+                                element: <UserDetailPage />,
+                            },
+                            {
+                                path: ":id/edit",
+                                element: <UserEditPage />,
+                            },
+                        ],
                     },
                     {
                         path: "courses",

@@ -1,5 +1,6 @@
 import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
 import { User } from '@/modules/users/domain/entity/user.entity';
+import { UserProfileMapper } from '@/modules/users/infrastructure/mapper/user-profile.mapper';
 
 export class UserMapper {
   static toDomain(entity: UserOrmEntity): User {
@@ -15,6 +16,9 @@ export class UserMapper {
       createdAt: entity.created_at,
       updatedAt: entity.updated_at,
       deletedAt: entity.deleted_at,
+      profile: entity.profile
+        ? UserProfileMapper.toDomain(entity.profile)
+        : null,
     });
   }
 
@@ -34,7 +38,9 @@ export class UserMapper {
     entity.created_at = domain.createdAt ?? new Date();
     entity.updated_at = domain.updatedAt ?? new Date();
     entity.deleted_at = domain.deletedAt;
-
+    entity.profile = domain.profile
+      ? UserProfileMapper.toPersistence(domain.profile)
+      : null;
     return entity;
   }
 }

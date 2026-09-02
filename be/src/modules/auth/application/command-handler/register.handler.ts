@@ -5,7 +5,7 @@ import { UserRepository } from '@/modules/users/infrastructure/repository/user.r
 import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';
 import { RegisterCommand } from '@/modules/auth/application/command/register.command';
-import { PasswordService } from '@/modules/auth/service/password.service';
+import { PasswordService } from '@/common/service/password.service';
 import { User } from '@/modules/users/domain/entity/user.entity';
 import { UserProfile } from '@/modules/users/domain/entity/user-profile.entity';
 import { HttpStatus } from '@nestjs/common';

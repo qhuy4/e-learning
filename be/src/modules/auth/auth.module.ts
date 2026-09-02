@@ -10,15 +10,17 @@ import { AuthController } from './auth.controller';
 import { MailService } from './services/mail.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { AdminAuthController } from '@/modules/auth/presentation/controllers/admin-auth.controller';
-import { TokenService } from '@/modules/auth/service/token.service';
+// import { TokenService } from '@/modules/auth/service/token.service';
+import { TokenService } from '@/common/service/token.service';
 import { LoginHandler } from '@/modules/auth/application/command-handler/login.handler';
 import { CqrsModule } from '@nestjs/cqrs';
 import { UserModule } from '@/modules/users/user.module';
 import { UsersController } from '@/modules/users/presentation/user.controller';
 import { RegisterHandler } from '@/modules/auth/application/command-handler/register.handler';
-import { PasswordService } from '@/modules/auth/service/password.service';
-// import { User } from '../users/domain/entity/user.entity';
+// import { PasswordService } from '@/modules/auth/service/password.service';
 import { UserOrmEntity } from '../users/infrastructure/entity/user.orm.entity';
+import { PasswordService } from '@/common/service/password.service';
+import { ServiceModule } from '@/common/service/service.module';
 
 @Module({
   imports: [
@@ -27,6 +29,7 @@ import { UserOrmEntity } from '../users/infrastructure/entity/user.orm.entity';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     UserModule,
     CqrsModule,
+    ServiceModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

@@ -11,6 +11,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { SectionsModule } from './modules/sections/sections.module';
 import { LessonsModule } from './modules/lessons/lessons.module';
 import { StorageModule } from './common/storage/storage.module';
+import { InstructorProfileModule } from '@/modules/instructors/instructor-profile.module';
+import { LocationModule } from '@/modules/locations/location.module';
 
 @Module({
   imports: [
@@ -24,9 +26,10 @@ import { StorageModule } from './common/storage/storage.module';
         return databaseConfig(config);
       },
     }),
-    AuthModule,
+    LocationModule,
     UserModule,
     AuthModule,
+    InstructorProfileModule,
     CoursesModule,
     TeacherModule,
     SectionsModule,

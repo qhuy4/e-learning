@@ -1,7 +1,7 @@
 import {
     LayoutDashboard,
     Users,
-    Settings, 
+    Settings, ChartBar, GraduationCap, UserRound,
     LogOut,
     BookOpen,
     DollarSign,
@@ -22,6 +22,31 @@ export const navigation: Navigation = {
                     url: "/",
                     icon: LayoutDashboard,
                 },
+                {
+                    title: "Analytics",
+                    url: "/analytics",
+                    icon: ChartBar,
+                },
+            ],
+        },
+        {
+            label: "Management",
+            items: [
+                {
+                    title: "Users",
+                    url: "/users",
+                    icon: Users,
+                },
+                {
+                    title: "Teachers",
+                    url: "/teachers",
+                    icon: GraduationCap,
+                },
+                {
+                    title: "Students",
+                    url: "/sttudents",
+                    icon: UserRound,
+                },
             ],
         },
         {
@@ -36,6 +61,16 @@ export const navigation: Navigation = {
                     title: "Học viên",
                     url: "/students",
                     icon: Users,
+                },
+                {
+                    title: "Teachers",
+                    url: "/teachers",
+                    icon: GraduationCap,
+                },
+                {
+                    title: "Students",
+                    url: "/sttudents",
+                    icon: UserRound,
                 },
                 {
                     title: "Đánh giá",
