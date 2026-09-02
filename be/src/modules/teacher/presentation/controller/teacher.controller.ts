@@ -13,6 +13,7 @@ import {
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+// import { extname, join, relative, sep } from 'path';
 import { extname, join } from 'path';
 import * as fs from 'fs';
 import { randomUUID } from 'crypto';
@@ -28,6 +29,12 @@ import { JwtAuthGuard } from '../../../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../../../common/decorators/current-user.decorator';
 
 const UPLOAD_ROOT = join(process.cwd(), 'uploads', 'teachers');
+// const UPLOADS_DIR = join(process.cwd(), 'uploads');
+
+// function toPublicUploadUrl(absolutePath: string): string {
+//   const relativePath = relative(UPLOADS_DIR, absolutePath).split(sep).join('/');
+//   return `/uploads/${relativePath}`;
+// }
 
 const imageFileFilter = (
   _req: unknown,
@@ -130,6 +137,7 @@ export class TeacherController {
         issuedAt: cert.issuedAt,
         expiresAt: cert.expiresAt,
         filePath: certificateFiles[index].path,
+        // filePath: toPublicUploadUrl(certificateFiles[index].path),
       }));
 
     const command = new RegisterTeacherCommand(
@@ -139,9 +147,14 @@ export class TeacherController {
       dto.websiteUrl,
       dto.socialLinks,
       dto.identityNumber,
+
       identityFront.path,
       identityBack.path,
       selfie.path,
+      // toPublicUploadUrl(identityFront.path),
+      // toPublicUploadUrl(identityBack.path),
+      // toPublicUploadUrl(selfie.path),
+
       certificates,
     );
 

@@ -12,6 +12,18 @@ import { InstructorProfileEntity } from '../../infrastructure/entity/instructor-
 import { FptEkycService } from '../../infrastructure/integration/fpt-ekyc/fpt-ekyc.service';
 import { InstructorProfileRepository } from '../../infrastructure/repository/instructor-profile.repository';
 import { RegisterTeacherCommand } from '../command/register-teacher.command';
+import { join, relative, sep } from 'path';
+
+const UPLOADS_DIR = join(process.cwd(), 'uploads');
+
+/** Chuyển đường dẫn tuyệt đối trên ổ đĩa (do Multer sinh ra khi upload) thành
+ *  URL công khai, khớp với static file server đã mount ở '/uploads' trong
+ *  main.ts. Chỉ dùng khi LƯU vào DB — không dùng cho fs.readFile ở trên,
+ *  vì đọc file từ đĩa vẫn cần đường dẫn tuyệt đối. */
+function toPublicUploadUrl(absolutePath: string): string {
+  const relativePath = relative(UPLOADS_DIR, absolutePath).split(sep).join('/');
+  return `/uploads/${relativePath}`;
+}
 
 @CommandHandler(RegisterTeacherCommand)
 export class RegisterTeacherHandler
@@ -83,9 +95,14 @@ export class RegisterTeacherHandler
           userId: command.userId,
           kycStatus,
           identityNumber: command.identityNumber,
-          identityFront: command.identityFrontPath,
-          identityBack: command.identityBackPath,
-          selfieWithId: command.selfiePath,
+
+          // identityFront: command.identityFrontPath,
+          // identityBack: command.identityBackPath,
+          // selfieWithId: command.selfiePath,
+          identityFront: toPublicUploadUrl(command.identityFrontPath),
+          identityBack: toPublicUploadUrl(command.identityBackPath),
+          selfieWithId: toPublicUploadUrl(command.selfiePath),
+
           ocrVerified: ekycResult.ocrVerified,
           faceVerified: ekycResult.faceVerified,
           ocrData: ekycResult.ocrData,

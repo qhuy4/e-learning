@@ -17,11 +17,13 @@ import { UserModule } from '@/modules/users/user.module';
 import { UsersController } from '@/modules/users/presentation/user.controller';
 import { RegisterHandler } from '@/modules/auth/application/command-handler/register.handler';
 import { PasswordService } from '@/modules/auth/service/password.service';
-import { User } from '../users/domain/entity/user.entity';
+// import { User } from '../users/domain/entity/user.entity';
+import { UserOrmEntity } from '../users/infrastructure/entity/user.orm.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, InstructorInviteEntity]),
+    // TypeOrmModule.forFeature([User, InstructorInviteEntity]),
+    TypeOrmModule.forFeature([UserOrmEntity, InstructorInviteEntity]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     UserModule,
     CqrsModule,
@@ -39,7 +41,7 @@ import { User } from '../users/domain/entity/user.entity';
       }),
     }),
   ],
-  controllers: [AuthController, UsersController],
+  controllers: [AuthController, AdminAuthController, UsersController],
   providers: [AuthService, MailService, JwtStrategy, TokenService, LoginHandler, RegisterHandler, PasswordService],
   exports: [AuthService, JwtModule, PassportModule],
 })

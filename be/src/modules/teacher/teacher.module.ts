@@ -14,7 +14,8 @@ import { InstructorKycRepository } from './infrastructure/repository/instructor-
 import { InstructorProfileRepository } from './infrastructure/repository/instructor-profile.repository';
 import { TeacherController } from './presentation/controller/teacher.controller';
 import { AdminTeacherController } from './presentation/controller/admin-teacher.controller';
-import { User } from '../users/entities/user.entity';
+// import { User } from '../users/domain/entity/user.entity'
+import { UserOrmEntity } from '../users/infrastructure/entity/user.orm.entity';
 
 const commandHandlers = [RegisterTeacherHandler];
 const queryHandlers = [GetTeacherRegistrationStatusHandler];
@@ -31,7 +32,8 @@ const repositories = [
       InstructorProfileEntity,
       InstructorKycEntity,
       InstructorCertificateEntity,
-      User,
+      UserOrmEntity,
+      // User,
     ]),
     HttpModule.register({
       timeout: 20000, // eKYC OCR/face-match có thể mất vài giây

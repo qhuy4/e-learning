@@ -10,21 +10,25 @@ import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
-import { User } from '../users/entities/user.entity';
+// import { User } from '../users/domain/entity/user.entity'
+import { UserOrmEntity } from '../users/infrastructure/entity/user.orm.entity';
 import { Role } from '../../common/enum/role.enum';
 import { InstructorInviteEntity } from './entities/instructor-invite.entity';
 import { MailService } from './services/mail.service';
 import { SendInstructorInviteDto } from './dto/send-instructor-invite.dto';
 import { RegisterInstructorDto } from './dto/register-instructor.dto';
 import { LoginDto } from './dto/login.dto';
+import { UserRole } from '../users/domain/enum/user.role';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    // @InjectRepository(User)
+    // private readonly userRepository: Repository<User>,
+    @InjectRepository(UserOrmEntity)
+    private readonly userRepository: Repository<UserOrmEntity>,
     @InjectRepository(InstructorInviteEntity)
     private readonly inviteRepository: Repository<InstructorInviteEntity>,
     private readonly jwtService: JwtService,
@@ -40,7 +44,7 @@ export class AuthService {
     });
 
     if (existingUser) {
-      if (existingUser.role === Role.INSTRUCTOR) {
+      if (existingUser.role === UserRole.INSTRUCTOR) {
         throw new ConflictException(
           'Email này đã là tài khoản Giảng viên trong hệ thống. Vui lòng đăng nhập.',
         );
@@ -142,7 +146,7 @@ export class AuthService {
       email: invite.email,
       name: dto.name,
       password: hashedPassword,
-      role: Role.INSTRUCTOR,
+      role: UserRole.INSTRUCTOR,
       status: 1, // ACTIVE
     });
 

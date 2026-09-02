@@ -2,7 +2,8 @@ import axios from "axios";
 
 export const createApi = (getToken: () => string | null, prefix = '') => {
     const api = axios.create({
-        baseURL: `${import.meta.env.VITE_API_URL}${prefix}` || "http://localhost:3001",
+        // baseURL: `${import.meta.env.VITE_API_URL}${prefix}` || "http://localhost:3001",
+        baseURL: `${import.meta.env.VITE_API_URL || "http://localhost:3001"}${prefix}`,
     });
 
     api.interceptors.request.use((config) => {

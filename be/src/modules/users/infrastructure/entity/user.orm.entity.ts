@@ -10,8 +10,7 @@ import {
 import { UserRole } from '@/modules/users/domain/enum/user.role';
 import { UserStatus } from '@/modules/users/domain/enum/user.status';
 import { UserProfileOrmEntity } from '@/modules/users/infrastructure/entity/user-profile.orm.entity';
-
-import { Role } from '../../../common/enum/role.enum';
+import { Role } from '@/common/enum/role.enum';
 
 @Entity('users')
 export class UserOrmEntity {

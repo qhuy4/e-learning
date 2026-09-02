@@ -14,9 +14,10 @@ import { Repository } from 'typeorm';
 import { InstructorProfileEntity } from '../../infrastructure/entity/instructor-profile.entity';
 import { InstructorKycEntity } from '../../infrastructure/entity/instructor-kyc.entity';
 import { InstructorCertificateEntity } from '../../infrastructure/entity/instructor-certificate.entity';
-import { User } from '../../../users/entities/user.entity';
+// import { User } from '../../../users/domain/entity/user.entity';
 import { ApprovalStatus } from '../../domain/enum/approval-status.enum';
 import { ReviewTeacherProfileDto } from '../dto/review-teacher-profile.dto';
+import { UserOrmEntity } from '../../../users/infrastructure/entity/user.orm.entity';
 
 @Controller('admin/teachers')
 export class AdminTeacherController {
@@ -27,8 +28,10 @@ export class AdminTeacherController {
     private readonly kycRepo: Repository<InstructorKycEntity>,
     @InjectRepository(InstructorCertificateEntity)
     private readonly certRepo: Repository<InstructorCertificateEntity>,
-    @InjectRepository(User)
-    private readonly userRepo: Repository<User>,
+    @InjectRepository(UserOrmEntity)
+    private readonly userRepo: Repository<UserOrmEntity>,
+    // @InjectRepository(User)
+    // private readonly userRepo: Repository<User>,
   ) {}
 
   /**
