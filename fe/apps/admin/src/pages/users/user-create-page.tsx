@@ -18,12 +18,6 @@ import {useCreateForm} from "@/features/users/hook/use-create-form.ts";
 import {useEffect, useState} from "react";
 import {locationService} from "@/shared/service/location.service.ts";
 import type {City, Country} from "@fe/api/location";
-import {Field, FieldLabel} from "@fe/components/ui/field.tsx";
-import {Popover, PopoverContent, PopoverTrigger} from "@fe/components/ui/popover.tsx";
-import {Calendar} from "@fe/components/ui/calendar.tsx";
-import {formatDate} from "@/features/users/utils/ultis.ts";
-
-
 
 function emptyForm() {
     return {
@@ -87,7 +81,6 @@ export function UserCreatePage() {
     const createUser = useCreateUser()
     const [countries, setCountries] = useState<Country[]>([])
     const [cities, setCities] = useState<City[]>([])
-    const [open, setOpen] = useState(false)
 
 
     const { form, errors, setField, handleSubmit } = useCreateForm({
@@ -95,7 +88,7 @@ export function UserCreatePage() {
         validate,
         buildOutput: buildWriteInput,
         create: (data) => createUser.mutateAsync(data),
-        successMessage: "User created successfully",
+        successMessage: "Tạo người dùng thành công",
         redirectTo: "/users",
     })
     useEffect(() => {
@@ -119,14 +112,14 @@ export function UserCreatePage() {
         <div className="p-6  mx-auto space-y-6">
             <Button variant="ghost" size="sm" onClick={() => navigate("/users")} className="-ml-2">
                 <ArrowLeft className="size-4" />
-                Back to Users
+                Quay lại danh sách
             </Button>
 
             <div className="rounded-xl border bg-card">
                 <div className="px-6 py-4 border-b">
-                    <h1 className="text-xl font-bold">Create User</h1>
+                    <h1 className="text-xl font-bold">Tạo người dùng mới</h1>
                     <p className="text-sm text-muted-foreground mt-1">
-                        Fill in the details to create a new user account.
+                        Nhập thông tin để tạo tài khoản người dùng mới.
                     </p>
                 </div>
 
@@ -135,20 +128,20 @@ export function UserCreatePage() {
                         {/* Account Section */}
                         <div className="space-y-4 grow-1">
                             <div className="flex items-center gap-3">
-                                <h3 className="text-sm font-semibold text-foreground">Account</h3>
+                                <h3 className="text-sm font-semibold text-foreground">Tài khoản</h3>
                                 <Separator className="flex-1" />
                             </div>
 
                             <div className="grid grid-cols-1 gap-3">
                                 <div className="space-y-1.5">
                                     <label className="text-sm font-medium" htmlFor="user-name">
-                                        Name <span className="text-destructive">*</span>
+                                        Họ và tên <span className="text-destructive">*</span>
                                     </label>
                                     <Input
                                         id="user-name"
                                         value={form.name}
                                         onChange={(e) => setField("name", e.target.value)}
-                                        placeholder="Full name"
+                                        placeholder="Họ và tên đầy đủ"
                                         aria-invalid={!!errors.name}
                                     />
                                     {errors.name && (
@@ -175,14 +168,14 @@ export function UserCreatePage() {
 
                                 <div className="space-y-1.5">
                                     <label className="text-sm font-medium" htmlFor="user-password">
-                                        Password <span className="text-destructive">*</span>
+                                        Mật khẩu <span className="text-destructive">*</span>
                                     </label>
                                     <Input
                                         id="user-password"
                                         type="password"
                                         value={form.password}
                                         onChange={(e) => setField("password", e.target.value)}
-                                        placeholder="Enter password"
+                                        placeholder="Nhập mật khẩu"
                                         aria-invalid={!!errors.password}
                                     />
                                     {errors.password && (
@@ -192,7 +185,7 @@ export function UserCreatePage() {
 
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="space-y-1.5">
-                                        <label className="text-sm font-medium">Status</label>
+                                        <label className="text-sm font-medium">Trạng thái</label>
                                         <Select
                                             disabled
                                             value={form.status}
@@ -212,7 +205,7 @@ export function UserCreatePage() {
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <label className="text-sm font-medium">Role</label>
+                                        <label className="text-sm font-medium">Vai trò</label>
                                         <Select
                                             value={form.role}
                                             onValueChange={(val) => setField("role", val as UserRole)}
@@ -234,13 +227,13 @@ export function UserCreatePage() {
                                 {form.status === UserStatus.BLOCKED && (
                                     <div className="space-y-1.5">
                                         <label className="text-sm font-medium" htmlFor="user-block-reason">
-                                            Block Reason <span className="text-destructive">*</span>
+                                            Lý do chặn <span className="text-destructive">*</span>
                                         </label>
                                         <Input
                                             id="user-block-reason"
                                             value={form.block_reason}
                                             onChange={(e) => setField("block_reason", e.target.value)}
-                                            placeholder="Reason for blocking this user"
+                                            placeholder="Lý do chặn người dùng này"
                                             aria-invalid={!!errors.block_reason}
                                         />
                                         {errors.block_reason && (
@@ -251,219 +244,7 @@ export function UserCreatePage() {
                             </div>
                         </div>
 
-                        {/* Profile Section */}
-                        {/*<div className="space-y-4 grow-1">*/}
-                        {/*    <div className="flex items-center gap-3">*/}
-                        {/*        <h3 className="text-sm font-semibold text-foreground">Profile</h3>*/}
-                        {/*        <Separator className="flex-1" />*/}
-                        {/*    </div>*/}
-                        
-                        {/*    <div className="grid grid-cols-1 gap-3">*/}
-                        {/*        <div className="grid grid-cols-2 gap-3">*/}
-                        {/*            <div className="space-y-1.5">*/}
-                        {/*                <label className="text-sm font-medium" htmlFor="user-firstName">*/}
-                        {/*                    First Name*/}
-                        {/*                </label>*/}
-                        {/*                <Input*/}
-                        {/*                    id="user-firstName"*/}
-                        {/*                    value={form.firstName}*/}
-                        {/*                    onChange={(e) => setField("firstName", e.target.value)}*/}
-                        {/*                    placeholder="First"*/}
-                        {/*                />*/}
-                        {/*            </div>*/}
-                        {/*            <div className="space-y-1.5">*/}
-                        {/*                <label className="text-sm font-medium" htmlFor="user-lastName">*/}
-                        {/*                    Last Name*/}
-                        {/*                </label>*/}
-                        {/*                <Input*/}
-                        {/*                    id="user-lastName"*/}
-                        {/*                    value={form.lastName}*/}
-                        {/*                    onChange={(e) => setField("lastName", e.target.value)}*/}
-                        {/*                    placeholder="Last"*/}
-                        {/*                />*/}
-                        {/*            </div>*/}
-                        {/*        </div>*/}
-                        
-                        {/*        <div className="space-y-1.5">*/}
-                        {/*            <label className="text-sm font-medium">Gender <span className="text-destructive">*</span></label>*/}
-                        {/*            <Select*/}
-                        {/*                value={form.gender}*/}
-                        {/*                onValueChange={(val) => setField("gender", val ?? "")}*/}
-                        {/*            >*/}
-                        {/*                <SelectTrigger className="w-full">*/}
-                        {/*                    <SelectValue placeholder="Select gender" />*/}
-                        {/*                </SelectTrigger>*/}
-                        {/*                <SelectContent>*/}
-                        {/*                    {Object.entries(genderLabel).map(([val, label]) => (*/}
-                        {/*                        <SelectItem key={val} value={val}>*/}
-                        {/*                            {label}*/}
-                        {/*                        </SelectItem>*/}
-                        {/*                    ))}*/}
-                        {/*                </SelectContent>*/}
-                        {/*            </Select>*/}
-                        {/*            {errors.gender && (*/}
-                        {/*                <p className="text-xs text-destructive">{errors.gender}</p>*/}
-                        {/*            )}*/}
-                        {/*        </div>*/}
-                        
-                        {/*        <div className="space-y-1.5">*/}
-                        {/*            <label className="text-sm font-medium" htmlFor="user-phone">*/}
-                        {/*                Phone*/}
-                        {/*            </label>*/}
-                        {/*            <Input*/}
-                        {/*                id="user-phone"*/}
-                        {/*                value={form.phone}*/}
-                        {/*                onChange={(e) => setField("phone", e.target.value)}*/}
-                        {/*                placeholder="+84 900 000 000"*/}
-                        {/*            />*/}
-                        {/*        </div>*/}
-                        
-                        {/*        <div className="space-y-1.5">*/}
-                        {/*            <Field className="">*/}
-                        {/*                <FieldLabel htmlFor="date">Date of birth</FieldLabel>*/}
-                        {/*                <Popover open={open} onOpenChange={setOpen}>*/}
-                        {/*                    <PopoverTrigger*/}
-                        {/*                        render={*/}
-                        {/*                            <Button*/}
-                        {/*                                variant="outline"*/}
-                        {/*                                id="date"*/}
-                        {/*                                className="justify-start font-normal"*/}
-                        {/*                            >*/}
-                        {/*                                {form.dateOfBirth*/}
-                        {/*                                    ? new Date(form.dateOfBirth).toLocaleDateString()*/}
-                        {/*                                    : "Select date"}*/}
-                        {/*                            </Button>*/}
-                        {/*                        }*/}
-                        {/*                    /> <PopoverContent className="w-auto overflow-hidden p-0" align="start">*/}
-                        {/*                    <Calendar*/}
-                        {/*                        mode="single"*/}
-                        {/*                        selected={formatDate(form.dateOfBirth)}*/}
-                        {/*                        defaultMonth={formatDate(form.dateOfBirth)}*/}
-                        {/*                        captionLayout="dropdown"*/}
-                        {/*                        onSelect={(date) => {*/}
-                        {/*                            setField(*/}
-                        {/*                                "dateOfBirth",*/}
-                        {/*                                date ? date.toISOString().split("T")[0] : ""*/}
-                        {/*                            )*/}
-                        {/*                            setOpen(false)*/}
-                        {/*                        }}*/}
-                        {/*                    />*/}
-                        {/*                </PopoverContent>*/}
-                        {/*                </Popover>*/}
-                        {/*            </Field>*/}
-                        {/*        </div>*/}
-                        
-                        {/*        <div className="space-y-1.5">*/}
-                        {/*            <label className="text-sm font-medium" htmlFor="user-occupation">*/}
-                        {/*                Occupation*/}
-                        {/*            </label>*/}
-                        {/*            <Input*/}
-                        {/*                id="user-occupation"*/}
-                        {/*                value={form.occupation}*/}
-                        {/*                onChange={(e) => setField("occupation", e.target.value)}*/}
-                        {/*                placeholder="e.g. Software Engineer"*/}
-                        {/*            />*/}
-                        {/*        </div>*/}
-                        
-                        {/*        <div className="space-y-1.5">*/}
-                        {/*            <label className="text-sm font-medium" htmlFor="user-bio">*/}
-                        {/*                Bio*/}
-                        {/*            </label>*/}
-                        {/*            <textarea*/}
-                        {/*                id="user-bio"*/}
-                        {/*                value={form.bio}*/}
-                        {/*                onChange={(e) => setField("bio", e.target.value)}*/}
-                        {/*                placeholder="Short bio..."*/}
-                        {/*                rows={3}*/}
-                        {/*                className="w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 resize-none dark:bg-input/30"*/}
-                        {/*            />*/}
-                        {/*        </div>*/}
-                        
-                        {/*        <div className="space-y-1.5">*/}
-                        {/*            <label className="text-sm font-medium" htmlFor="user-address">*/}
-                        {/*                Address*/}
-                        {/*            </label>*/}
-                        {/*            <Input*/}
-                        {/*                id="user-address"*/}
-                        {/*                value={form.address}*/}
-                        {/*                onChange={(e) => setField("address", e.target.value)}*/}
-                        {/*                placeholder="Street address"*/}
-                        {/*            />*/}
-                        {/*        </div>*/}
-                        
-                        {/*        <div className="grid grid-cols-2 gap-3">*/}
-                        {/*            /!* City *!/*/}
-                        {/*            <div className="space-y-1.5">*/}
-                        {/*                <label className="text-sm font-medium">*/}
-                        {/*                    City*/}
-                        {/*                </label>*/}
-                        
-                        {/*                <Select*/}
-                        {/*                    value={form.city}*/}
-                        {/*                    onValueChange={(value) => setField("city", value)}*/}
-                        {/*                    disabled={!form.country}*/}
-                        {/*                >*/}
-                        {/*                    <SelectTrigger className="w-full">*/}
-                        {/*                        <SelectValue placeholder="Select city"/>*/}
-                        {/*                    </SelectTrigger>*/}
-                        
-                        {/*                    <SelectContent>*/}
-                        {/*                        {cities.map((city) => (*/}
-                        {/*                            <SelectItem*/}
-                        {/*                                key={city.id}*/}
-                        {/*                                value={city.name}*/}
-                        {/*                            >*/}
-                        {/*                                {city.name}*/}
-                        {/*                            </SelectItem>*/}
-                        {/*                        ))}*/}
-                        {/*                    </SelectContent>*/}
-                        {/*                </Select>*/}
-                        {/*            </div>*/}
-                        
-                        {/*            /!* Country *!/*/}
-                        {/*            <div className="space-y-1.5">*/}
-                        {/*                <label className="text-sm font-medium">*/}
-                        {/*                    Country*/}
-                        {/*                </label>*/}
-                        
-                        {/*                <Select*/}
-                        {/*                    value={form.country}*/}
-                        {/*                    onValueChange={(value) => {*/}
-                        {/*                        setField("country", value)*/}
-                        {/*                        setField("city", "")*/}
-                        {/*                    }}*/}
-                        {/*                >*/}
-                        {/*                    <SelectTrigger className="w-full">*/}
-                        {/*                        <SelectValue placeholder="Select country"/>*/}
-                        {/*                    </SelectTrigger>*/}
-                        
-                        {/*                    <SelectContent>*/}
-                        {/*                        {countries.map((country) => (*/}
-                        {/*                            <SelectItem*/}
-                        {/*                                key={country.id}*/}
-                        {/*                                value={country.code}*/}
-                        {/*                            >*/}
-                        {/*                                {country.name}*/}
-                        {/*                            </SelectItem>*/}
-                        {/*                        ))}*/}
-                        {/*                    </SelectContent>*/}
-                        {/*                </Select>*/}
-                        {/*            </div>*/}
-                        {/*        </div>*/}
-                        
-                        {/*        <div className="space-y-1.5">*/}
-                        {/*            <label className="text-sm font-medium" htmlFor="user-avatarUrl">*/}
-                        {/*                Avatar URL*/}
-                        {/*            </label>*/}
-                        {/*            <Input*/}
-                        {/*                id="user-avatarUrl"*/}
-                        {/*                value={form?.avatarUrl}*/}
-                        {/*                onChange={(e) => setField("avatarUrl", e.target.value)}*/}
-                        {/*                placeholder="https://..."*/}
-                        {/*            />*/}
-                        {/*        </div>*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
+                        {/* Profile Section (commented out in original) */}
                     </div>
 
 
@@ -480,10 +261,10 @@ export function UserCreatePage() {
                             onClick={() => navigate("/users")}
                             disabled={createUser.isPending}
                         >
-                            Cancel
+                            Hủy
                         </Button>
                         <Button type="submit" disabled={createUser.isPending}>
-                            {createUser.isPending ? "Creating..." : "Create User"}
+                            {createUser.isPending ? "Đang tạo..." : "Tạo người dùng"}
                         </Button>
                     </div>
                 </form>

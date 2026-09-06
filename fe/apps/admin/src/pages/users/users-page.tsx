@@ -53,11 +53,11 @@ export default function UsersPage() {
     }
     const columns = createUserColumns(() => [
         {
-            label: "Edit",
+            label: "Sửa",
             onClick: handleEdit,
         },
         {
-            label: "Delete",
+            label: "Xóa",
             variant: "destructive",
             onClick: handleDelete,
         },
@@ -65,10 +65,10 @@ export default function UsersPage() {
     return (
         <div className="p-6">
             <div className="mb-4 flex items-center justify-between">
-                <h1 className="text-2xl font-bold">Users</h1>
+                <h1 className="text-2xl font-bold">Người dùng</h1>
                 <Button onClick={handleCreate}>
                     <Plus className="size-4"/>
-                    Create User
+                    Tạo người dùng
                 </Button>
             </div>
 
@@ -93,6 +93,15 @@ export default function UsersPage() {
                 sortOrder={sortOrder}
                 onSortChange={handleSortChange}
                 tableMeta={{onEdit: handleEdit, onDelete: handleDelete}}
+                text={{
+                    searchPlaceholder: "Tìm kiếm...",
+                    reload: "Tải lại",
+                    rowsPerPage: "Dòng trên trang",
+                    noResults: "Không có kết quả.",
+                    pageOf: (p, tp) => `Trang ${p} / ${tp || 1}`,
+                    previous: "Trước",
+                    next: "Sau",
+                }}
             />
 
             <DeleteConfirmDialog
