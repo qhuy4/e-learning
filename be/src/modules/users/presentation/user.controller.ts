@@ -43,6 +43,8 @@ export class UsersController {
       page: query.page,
       limit: query.limit,
       keyword,
+      sortBy: query.sortBy,
+      sortOrder: query.sortOrder,
     };
 
     return this.queryBus.execute(new GetUsersQuery(data));

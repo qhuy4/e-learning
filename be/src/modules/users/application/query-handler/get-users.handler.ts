@@ -13,18 +13,20 @@ export class GetUsersHandler implements IQueryHandler<
   constructor(private readonly userRepository: UserRepository) {}
 
   async execute(query: GetUsersQuery): Promise<GetUsersResponse> {
-    const { page, limit, keyword } = query.data;
+    const { page, limit, keyword, sortBy, sortOrder } = query.data;
     const { users, total } = await this.userRepository.findAll({
-      page: page,
-      limit: limit,
-      keyword: keyword,
+      page,
+      limit,
+      keyword,
+      sortBy,
+      sortOrder,
     });
 
     return {
       data: users.map((user) => UserResponseMapper.toListItem(user)),
       meta: {
-        page: page,
-        limit: limit,
+        page,
+        limit,
         total,
         totalPages: Math.ceil(total / limit),
       },

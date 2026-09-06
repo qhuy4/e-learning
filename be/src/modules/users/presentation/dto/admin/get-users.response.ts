@@ -1,6 +1,8 @@
 import { PaginationMeta } from '@/common/pagination/pagination.meta';
-import { UserRoleApi, UserStatusApi } from '@/modules/users/presentation/mapper/enum.mapper';
-
+import {
+  UserRoleApi,
+  UserStatusApi,
+} from '@/modules/users/presentation/mapper/enum.mapper';
 
 export interface GetUsersResponse {
   data: {
