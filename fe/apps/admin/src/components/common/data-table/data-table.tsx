@@ -1,7 +1,7 @@
 "use client"
 
 import {useTable, type ColumnDef, type RowData} from "@tanstack/react-table"
-import { Search } from "lucide-react"
+import { RefreshCw, Search } from "lucide-react"
 
 import {
     Table,
@@ -34,6 +34,10 @@ interface DataTableProps<TData extends RowData> {
     onPageChange: (page: number) => void
     loading?: boolean
 
+    // Reload support
+    refetch?: () => void
+    isFetching?: boolean
+
     // Search and filtering
     search?: string
     onSearchChange?: (search: string) => void
@@ -59,6 +63,8 @@ export function DataTable<TData extends RowData>({
     onPageChange,
     pageSize,
     loading = false,
+    refetch,
+    isFetching = false,
     search,
     onSearchChange,
     onPageSizeChange,
@@ -80,10 +86,12 @@ export function DataTable<TData extends RowData>({
         },
     })
 
+    const isLoading = loading || isFetching
+
     return (
         <div className="space-y-4">
             {/* Top Toolbar */}
-            {(onSearchChange || onPageSizeChange) && (
+            {(onSearchChange || onPageSizeChange || refetch) && (
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     {onSearchChange && (
                         <div className="relative flex-1 max-w-sm">
@@ -97,28 +105,41 @@ export function DataTable<TData extends RowData>({
                         </div>
                     )}
 
-                    {onPageSizeChange && (
-                        <div className="flex items-center gap-2 sm:ml-auto">
-                            <span className="text-sm text-muted-foreground whitespace-nowrap">
-                                Rows per page
-                            </span>
-                            <Select
-                                value={String(pageSize)}
-                                onValueChange={(val) => onPageSizeChange(Number(val))}
+                    <div className="flex items-center gap-2 sm:ml-auto">
+                        {refetch && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => refetch()}
+                                disabled={isFetching}
                             >
-                                <SelectTrigger className="h-9 w-[80px]">
-                                    <SelectValue placeholder={String(pageSize)} />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {[5, 10, 20, 50].map((size) => (
-                                        <SelectItem key={size} value={String(size)}>
-                                            {size}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    )}
+                                <RefreshCw className={`size-4 ${isFetching ? "animate-spin" : ""}`}/>
+                                Reload
+                            </Button>
+                        )}
+                        {onPageSizeChange && (
+                            <>
+                                <span className="text-sm text-muted-foreground whitespace-nowrap">
+                                    Rows per page
+                                </span>
+                                <Select
+                                    value={String(pageSize)}
+                                    onValueChange={(val) => onPageSizeChange(Number(val))}
+                                >
+                                    <SelectTrigger className="h-9 w-[80px]">
+                                        <SelectValue placeholder={String(pageSize)} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {[5, 10, 20, 50].map((size) => (
+                                            <SelectItem key={size} value={String(size)}>
+                                                {size}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </>
+                        )}
+                    </div>
                 </div>
             )}
 
@@ -142,7 +163,7 @@ export function DataTable<TData extends RowData>({
                             ))}
                         </TableHeader>
                         <TableBody>
-                            {loading ? (
+                            {isLoading ? (
                                 Array.from({length: pageSize}).map((_, index) => (
                                     <TableRow key={`skeleton-${index}`} className="h-12">
                                         {columns.map((_, columnIndex) => (
@@ -209,7 +230,7 @@ export function DataTable<TData extends RowData>({
                     <Button
                         variant="outline"
                         size="sm"
-                        disabled={page === 1 || loading}
+                        disabled={page === 1 || isLoading}
                         onClick={() => onPageChange(page - 1)}
                     >
                         Previous
@@ -220,7 +241,7 @@ export function DataTable<TData extends RowData>({
 
                         return (
                             <Button
-                                disabled={loading}
+                                disabled={isLoading}
                                 key={pageNumber}
                                 variant={pageNumber === page ? "default" : "outline"}
                                 size="sm"
@@ -234,7 +255,7 @@ export function DataTable<TData extends RowData>({
                     <Button
                         variant="outline"
                         size="sm"
-                        disabled={page === totalPages || totalPages === 0 || loading}
+                        disabled={page === totalPages || totalPages === 0 || isLoading}
                         onClick={() => onPageChange(page + 1)}
                     >
                         Next

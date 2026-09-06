@@ -11,7 +11,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { SectionsModule } from './modules/sections/sections.module';
 import { LessonsModule } from './modules/lessons/lessons.module';
 import { StorageModule } from './common/storage/storage.module';
-import { InstructorProfileModule } from '@/modules/instructors/instructor-profile.module';
+import { InstructorModule } from '@/modules/instructors/instructor.module';
 import { LocationModule } from '@/modules/locations/location.module';
 import { LessonProgressModule } from './modules/lesson-progress/lesson-progress.module';
 
@@ -30,7 +30,7 @@ import { LessonProgressModule } from './modules/lesson-progress/lesson-progress.
     LocationModule,
     UserModule,
     AuthModule,
-    InstructorProfileModule,
+    InstructorModule,
     CoursesModule,
     TeacherModule,
     SectionsModule,

@@ -2,17 +2,26 @@ import { createBrowserRouter } from "react-router";
 
 import App from "@/App";
 import DashboardPage from "@/pages/dashboard/dashboard-page";
+
 import UsersPage from "@/pages/users/users-page";
 import { UserDetailPage } from "@/pages/users/user-detail-page";
 import { UserEditPage } from "@/pages/users/user-edit-page.tsx";
 import { UserCreatePage } from "@/pages/users/user-create-page.tsx";
+
+import InstructorsPage from "@/pages/instructors/instructors-page.tsx";
+import { InstructorDetailPage } from "@/pages/instructors/instructor-detail-page.tsx";
+import { InstructorEditPage } from "@/pages/instructors/instructor-edit-page.tsx";
 import { InstructorApprovalsPage } from "@/pages/instructors/instructor-approvals-page";
+
 import LoginPage from "@/pages/authen/login-page.tsx";
+
 import { ProtectedRoute } from "@/router/protectedRoute.tsx";
 import { PublicRoute } from "@/router/publishRoute.tsx";
+
 import { CreateCoursePage } from "@/pages/courses/create-course-page";
 import { CoursesListPage } from "@/pages/courses/courses-list-page";
 import { AdminCoursesListPage } from "@/pages/admin-courses/admin-courses-list-page";
+
 import { CreateLessonPage } from "@/features/lessons/pages/create-lesson-page";
 
 export const router = createBrowserRouter([
@@ -27,6 +36,8 @@ export const router = createBrowserRouter([
             index: true,
             element: <DashboardPage />,
           },
+
+          // Users
           {
             path: "users",
             children: [
@@ -48,18 +59,28 @@ export const router = createBrowserRouter([
               },
             ],
           },
+
+          // Courses
           {
             path: "courses",
             element: <CoursesListPage />,
           },
           {
-            path: "courses/:courseId",
-            element: <CreateCoursePage />,
-          },
-          {
             path: "courses/create",
             element: <CreateCoursePage />,
           },
+          {
+            path: "courses/:courseId",
+            element: <CreateCoursePage />,
+          },
+
+          // Admin Courses
+          {
+            path: "admin-courses",
+            element: <AdminCoursesListPage />,
+          },
+
+          // Lessons
           {
             path: "lessons/create",
             element: <CreateLessonPage />,
@@ -68,18 +89,41 @@ export const router = createBrowserRouter([
             path: "lessons/:id/edit",
             element: <CreateLessonPage />,
           },
+
+          // Instructors
+          {
+            path: "instructors",
+            children: [
+              {
+                index: true,
+                element: <InstructorsPage />,
+              },
+              {
+                path: "create",
+                element: <UserCreatePage />,
+              },
+              {
+                path: ":id",
+                element: <InstructorDetailPage />,
+              },
+              {
+                path: ":id/edit",
+                element: <InstructorEditPage />,
+              },
+            ],
+          },
+
+          // Instructor approvals
           {
             path: "instructors/approvals",
             element: <InstructorApprovalsPage />,
-          },
-          {
-            path: "admin-courses",
-            element: <AdminCoursesListPage />,
           },
         ],
       },
     ],
   },
+
+  // Public routes
   {
     element: <PublicRoute />,
     children: [

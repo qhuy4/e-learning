@@ -34,6 +34,7 @@ export const navigation: Navigation = {
         },
       ],
     },
+
     {
       label: "Management",
       items: [
@@ -59,6 +60,7 @@ export const navigation: Navigation = {
         },
       ],
     },
+
     {
       label: "Học tập",
       items: [
@@ -73,14 +75,9 @@ export const navigation: Navigation = {
           icon: Users,
         },
         {
-          title: "Teachers",
-          url: "/teachers",
+          title: "Giảng viên",
+          url: "/instructors",
           icon: GraduationCap,
-        },
-        {
-          title: "Students",
-          url: "/students",
-          icon: UserRound,
         },
         {
           title: "Đánh giá",
@@ -89,6 +86,7 @@ export const navigation: Navigation = {
         },
       ],
     },
+
     {
       label: "Tài chính",
       items: [
