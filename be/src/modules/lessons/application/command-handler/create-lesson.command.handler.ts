@@ -1,6 +1,6 @@
 import { ConflictException, Inject, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import slugify from 'slugify';
+import { SlugUtil } from '../../../../common/utils/slug.util';
 import { extname } from 'path';
 import { randomUUID } from 'crypto';
 
@@ -39,11 +39,7 @@ export class CreateLessonHandler implements ICommandHandler<CreateLessonCommand>
       throw new NotFoundException('Section not found');
     }
 
-    const slug = slugify(command.title, {
-      lower: true,
-      strict: true,
-      trim: true,
-    });
+    const slug = SlugUtil.generate(command.title);
 
     const existingLesson = await this.lessonRepository.findBySlug(
       command.sectionId,

@@ -13,6 +13,7 @@ import { LessonsModule } from './modules/lessons/lessons.module';
 import { StorageModule } from './common/storage/storage.module';
 import { InstructorModule } from '@/modules/instructors/instructor.module';
 import { LocationModule } from '@/modules/locations/location.module';
+import { LessonProgressModule } from './modules/lesson-progress/lesson-progress.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { LocationModule } from '@/modules/locations/location.module';
     SectionsModule,
     LessonsModule,
     StorageModule,
+    LessonProgressModule,
   ],
   controllers: [AppController],
   providers: [AppService],

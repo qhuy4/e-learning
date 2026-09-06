@@ -13,8 +13,11 @@ import { UpdateLessonHandler } from './application/command-handler/update-lesson
 import { DeleteLessonHandler } from './application/command-handler/delete-lesson.command.handler';
 
 import { LessonController } from './presentation/lesson.controller';
+import { LessonPublicController } from './presentation/lesson-public.controller';
 
 import { GetLessonByIdHandler } from './application/query-handler/get-lesson-by-id.handler';
+import { GetLessonBySlugHandler } from './application/query-handler/get-lesson-by-slug.handler';
+import { PreviewLessonHandler } from './application/query-handler/preview-lesson.handler';
 
 const CommandHandlers = [
   CreateLessonHandler,
@@ -22,20 +25,29 @@ const CommandHandlers = [
   DeleteLessonHandler,
 ];
 
-const QueryHandlers = [GetLessonByIdHandler];
+const QueryHandlers = [
+  GetLessonByIdHandler,
+  GetLessonBySlugHandler,
+  PreviewLessonHandler,
+];
 
+import { forwardRef } from '@nestjs/common';
 import { SectionsModule } from '../sections/sections.module';
+import { CoursesModule } from '../courses/courses.module';
 import { StorageModule } from '../../common/storage/storage.module';
+import { ServiceModule } from '@/common/service/service.module';
 
 @Module({
   imports: [
     CqrsModule,
     TypeOrmModule.forFeature([LessonOrmEntity]),
     SectionsModule,
+    forwardRef(() => CoursesModule),
     StorageModule,
+    ServiceModule,
   ],
 
-  controllers: [LessonController],
+  controllers: [LessonController, LessonPublicController],
 
   providers: [
     LessonRepository,

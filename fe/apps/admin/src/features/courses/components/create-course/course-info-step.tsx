@@ -11,9 +11,10 @@ import { CourseLevel } from "../../types/course.types";
 interface CourseInfoStepProps {
   data: Course;
   updateData: (data: Partial<Course>) => void;
+  readOnly?: boolean;
 }
 
-export function CourseInfoStep({ data, updateData }: CourseInfoStepProps) {
+export function CourseInfoStep({ data, updateData, readOnly = false }: CourseInfoStepProps) {
   const benefits = data.benefits || [""];
 
   const getInitialPreview = () => {
@@ -132,6 +133,7 @@ export function CourseInfoStep({ data, updateData }: CourseInfoStepProps) {
                   id="title"
                   placeholder="VD: Lập trình ReactJS cơ bản..."
                   value={data.title}
+                  disabled={readOnly}
                   onChange={(e) =>
                     updateData({
                       title: e.target.value,
@@ -156,7 +158,8 @@ export function CourseInfoStep({ data, updateData }: CourseInfoStepProps) {
 
                 <textarea
                   id="description"
-                  className="flex min-h-[140px] w-full rounded-sm border border-input bg-transparent px-3 py-2 pl-10 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors"
+                  disabled={readOnly}
+                  className="flex min-h-[140px] w-full rounded-sm border border-input bg-transparent px-3 py-2 pl-10 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                   placeholder="Học viên sẽ học được những gì từ khóa học này?"
                   value={data.description || ""}
                   onChange={(e) =>
@@ -175,16 +178,18 @@ export function CourseInfoStep({ data, updateData }: CourseInfoStepProps) {
                   Những điều học được
                 </Label>
 
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={addBenefit}
-                  className="h-8 rounded-sm px-2 text-emerald-600 dark:text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950"
-                >
-                  <Plus className="w-4 h-4 mr-1" />
-                  Thêm mục
-                </Button>
+                {!readOnly && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={addBenefit}
+                    className="h-8 rounded-sm px-2 text-emerald-600 dark:text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950"
+                  >
+                    <Plus className="w-4 h-4 mr-1" />
+                    Thêm mục
+                  </Button>
+                )}
               </div>
 
               <div className="space-y-3">
@@ -196,12 +201,13 @@ export function CourseInfoStep({ data, updateData }: CourseInfoStepProps) {
                       <Input
                         placeholder={`Mục tiêu số ${index + 1}...`}
                         value={benefit}
+                        disabled={readOnly}
                         onChange={(e) => updateBenefit(index, e.target.value)}
                         className="h-11 pl-10 rounded-sm"
                       />
                     </div>
 
-                    {benefits.length > 1 && (
+                    {!readOnly && benefits.length > 1 && (
                       <Button
                         type="button"
                         variant="ghost"
@@ -237,18 +243,41 @@ export function CourseInfoStep({ data, updateData }: CourseInfoStepProps) {
               <select
                 id="level"
                 value={data.level ?? CourseLevel.BEGINNER}
+                disabled={readOnly}
                 onChange={(e) =>
                   updateData({
                     level: Number(e.target.value) as CourseLevel,
                   })
                 }
-                className="flex h-11 w-full rounded-sm border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                className="flex h-11 w-full rounded-sm border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <option value={CourseLevel.BEGINNER}>Người mới bắt đầu</option>
 
                 <option value={CourseLevel.INTERMEDIATE}>Trung cấp</option>
 
                 <option value={CourseLevel.ADVANCED}>Nâng cao</option>
+              </select>
+            </div>
+
+            {/* CATEGORY */}
+            <div className="space-y-2">
+              <Label htmlFor="categoryId" className="font-medium">
+                Danh mục
+              </Label>
+
+              <select
+                id="categoryId"
+                value={data.categoryId ?? 1}
+                disabled={readOnly}
+                onChange={(e) =>
+                  updateData({
+                    categoryId: Number(e.target.value),
+                  })
+                }
+                className="flex h-11 w-full rounded-sm border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <option value={1}>Mặc định</option>
+                {/* Additional categories can be added here later */}
               </select>
             </div>
 
@@ -271,6 +300,7 @@ export function CourseInfoStep({ data, updateData }: CourseInfoStepProps) {
                   min="0"
                   placeholder="500000"
                   value={data.price ?? ""}
+                  disabled={readOnly}
                   onChange={(e) =>
                     updateData({
                       price: e.target.value === "" ? 0 : Number(e.target.value),
@@ -293,23 +323,26 @@ export function CourseInfoStep({ data, updateData }: CourseInfoStepProps) {
                     className="w-full h-full object-cover"
                   />
 
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
-                    onClick={handleRemoveImage}
-                    className="absolute top-2 right-2 h-8 w-8 rounded-full shadow-md hover:scale-105 transition-transform"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
+                  {!readOnly && (
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      onClick={handleRemoveImage}
+                      className="absolute top-2 right-2 h-8 w-8 rounded-full shadow-md hover:scale-105 transition-transform"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  )}
                 </div>
               ) : (
-                <div className="relative border-2 border-dashed border-input rounded-md p-6 flex flex-col items-center justify-center gap-3 bg-muted/30 hover:bg-muted/50 hover:border-emerald-500/50 transition-colors cursor-pointer group">
+                <div className={`relative border-2 border-dashed border-input rounded-md p-6 flex flex-col items-center justify-center gap-3 bg-muted/30 transition-colors ${readOnly ? "opacity-60 cursor-not-allowed" : "hover:bg-muted/50 hover:border-emerald-500/50 cursor-pointer group"}`}>
                   <input
                     type="file"
                     accept="image/png,image/jpeg,image/webp"
+                    disabled={readOnly}
                     onChange={handleImageChange}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10 disabled:cursor-not-allowed"
                   />
 
                   <div className="p-3 bg-background rounded-full shadow-sm group-hover:scale-110 transition-transform">

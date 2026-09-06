@@ -1,22 +1,26 @@
 import { PlayCircle } from "lucide-react";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@fe/components/ui/accordion";
-
+import { formatDuration } from "@fe/lib/utils";
 import type { CourseDetail } from "../../types/course.type";
 
 interface CourseContentProps {
   course?: CourseDetail;
 }
 
-
-
 export const CourseContent = ({ course }: CourseContentProps) => {
+  const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  const tokenFromUrl = searchParams.get("previewToken");
+  const previewToken = tokenFromUrl || (window.location.pathname.includes('/courses/preview') ? id : null);
+
   const sections = course?.sections || [];
-console.log(course)
+
   const totalLessons = sections.reduce(
     (total, section) => total + (section.lessons?.length || 0),
     0,
@@ -31,18 +35,6 @@ console.log(course)
       ),
     0,
   );
-
-  const formatDuration = (seconds: number) => {
-    if (!seconds || seconds <= 0) return "0 phút";
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-
-    if (hours > 0) {
-      return `${hours} giờ ${minutes} phút`;
-    }
-
-    return `${minutes} phút`;
-  };
 
   if (!course) return null;
 
@@ -60,13 +52,14 @@ console.log(course)
       </div>
 
       <Accordion
-        defaultValue={sections.length > 0 ? [sections[0].id] : []}
+        type="multiple"
+        defaultValue={sections.length > 0 ? [String(sections[0].id)] : []}
         className="space-y-4"
       >
         {sections.map((section) => (
           <AccordionItem
             key={section.id}
-            value={section.id}
+            value={String(section.id)}
             className="border border-slate-200 rounded-xl px-4 bg-white"
           >
             <AccordionTrigger className="hover:no-underline py-4">
@@ -83,20 +76,28 @@ console.log(course)
               <AccordionContent className="pt-2 pb-4">
                 <div className="space-y-1">
                   {section.lessons.map((lesson) => (
-                    <div
+                    <Link
+                      to={`/learning/${course.slug || course.id}/${lesson.slug}${previewToken ? `?previewToken=${previewToken}` : ''}`}
                       key={lesson.id}
-                      className="flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 transition-colors"
+                      className="flex items-center justify-between p-3 rounded-lg hover:bg-emerald-50/50 hover:border-emerald-200 border border-transparent transition-all group"
                     >
                       <div className="flex items-center gap-3">
-                        <PlayCircle className="w-4 h-4 text-slate-400" />
-                        <span className="text-sm text-slate-700">
+                        <PlayCircle className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 transition-colors" />
+                        <span className="text-sm text-slate-700 group-hover:text-emerald-700 font-medium transition-colors">
                           {lesson.title}
                         </span>
                       </div>
-                      <span className="text-xs text-slate-500">
-                        {formatDuration(lesson.duration)}
-                      </span>
-                    </div>
+                      <div className="flex items-center gap-3">
+                        {(previewToken || lesson.isPreview) && (
+                          <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                            Học thử
+                          </span>
+                        )}
+                        <span className="text-xs text-slate-500">
+                          {formatDuration(lesson.duration || 0)}
+                        </span>
+                      </div>
+                    </Link>
                   ))}
                 </div>
               </AccordionContent>

@@ -1,4 +1,5 @@
 import { Section } from '@/modules/sections/domain/entity/section.entity';
+import { CourseStatus } from '../enum/course-status.enum';
 export class Course {
   private constructor(
     public id: number | null,
@@ -9,7 +10,7 @@ export class Course {
     public thumbnail: string | null,
     public level: number,
     public price: number,
-    public status: number,
+    public status: CourseStatus,
     public reviewedBy: number | null,
     public reviewedAt: Date | null,
     public publishedAt: Date | null,
@@ -19,7 +20,7 @@ export class Course {
     public createdAt: Date | null,
     public updatedAt: Date | null,
     public deletedAt: Date | null,
-    public sections?: Section[] | null, // 💡 Thêm thuộc tính chứa danh sách Sections
+    public sections?: Section[] | null,
   ) {}
 
   static create(params: {
@@ -32,6 +33,7 @@ export class Course {
     price?: number;
     status?: number;
     parentId?: number | null;
+    version?: number | null;
   }): Course {
     return new Course(
       null,
@@ -48,11 +50,11 @@ export class Course {
       null,
       null,
       params.parentId ?? null,
-      1,
+      params.version ?? 1,
+      new Date(),
       null,
       null,
-      null,
-      [], // Trống khi mới khởi tạo
+      [],
     );
   }
 
@@ -75,7 +77,7 @@ export class Course {
     createdAt: Date | null;
     updatedAt: Date | null;
     deletedAt: Date | null;
-    sections?: Section[] | null; // 💡 Nhận mảng sections khi khôi phục từ DB
+    sections?: Section[] | null;
   }): Course {
     return new Course(
       params.id,
@@ -142,7 +144,39 @@ export class Course {
       this.parentId = params.parentId;
     }
 
-    this.version += 1;
     this.updatedAt = new Date();
+  }
+  clone(data: {
+    title: string;
+    description: string | null;
+    thumbnail: string | null;
+    level: number;
+    price: number;
+    status: CourseStatus;
+    parentId: number;
+    version: number;
+    slug: string;
+  }): Course {
+    return new Course(
+      null,
+      this.instructorId,
+      data.title,
+      data.slug,
+      data.description,
+      data.thumbnail,
+      data.level,
+      data.price,
+      data.status,
+      null,
+      null,
+      new Date(),
+      null,
+      data.parentId,
+      data.version,
+      new Date(),
+      null,
+      null,
+      [],
+    );
   }
 }

@@ -9,6 +9,7 @@ interface SortableLessonProps {
   index: number;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  readOnly?: boolean;
 }
 
 export function SortableLesson({
@@ -16,6 +17,7 @@ export function SortableLesson({
   index,
   onEdit,
   onDelete,
+  readOnly = false,
 }: SortableLessonProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({
@@ -34,13 +36,15 @@ export function SortableLesson({
       style={style}
       className="flex items-center gap-3 p-3 border border-border rounded-lg bg-card hover:border-emerald-200 dark:hover:border-emerald-800 hover:shadow-sm transition-all"
     >
-      <div
-        {...attributes}
-        {...listeners}
-        className="cursor-grab hover:bg-muted p-1.5 rounded-sm text-muted-foreground hover:text-foreground transition-colors"
-      >
-        <GripVertical className="h-4 w-4" />
-      </div>
+      {!readOnly && (
+        <div
+          {...attributes}
+          {...listeners}
+          className="cursor-grab hover:bg-muted p-1.5 rounded-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <GripVertical className="h-4 w-4" />
+        </div>
+      )}
 
       <div className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">
         <Video className="h-4 w-4" />
@@ -52,23 +56,27 @@ export function SortableLesson({
         </p>
       </div>
 
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-8 w-8 text-muted-foreground hover:text-blue-600"
-        onClick={() => onEdit(lesson.id)}
-      >
-        <Edit className="h-4 w-4" />
-      </Button>
+      {!readOnly && (
+        <>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-muted-foreground hover:text-blue-600"
+            onClick={() => onEdit(lesson.id)}
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
 
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-8 w-8 text-muted-foreground hover:text-destructive"
-        onClick={() => onDelete(lesson.id)}
-      >
-        <Trash2 className="h-4 w-4" />
-      </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-muted-foreground hover:text-destructive"
+            onClick={() => onDelete(lesson.id)}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </>
+      )}
     </div>
   );
 }

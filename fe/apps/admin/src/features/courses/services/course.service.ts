@@ -52,8 +52,7 @@ export const courseService = {
   updateCourse: async (id: string | number, data: Partial<Course>) => {
     const formData = new FormData();
 
-    // Primitive fields to include
-    const primitiveKeys = ["title", "description", "price", "level", "parentId", "status"];
+    const primitiveKeys = ["title", "description", "price", "level", "parentId", "status", "categoryId"];
 
     Object.entries(data).forEach(([key, value]) => {
       if (!primitiveKeys.includes(key)) return;
@@ -61,7 +60,6 @@ export const courseService = {
       formData.append(key, String(value));
     });
 
-    // Only append thumbnail if it's a new File (not a URL)
     if (data.thumbnail instanceof File) {
       formData.append("thumbnail", data.thumbnail);
     }
@@ -108,5 +106,25 @@ export const courseService = {
   getCourses: async (params?: { page?: number; limit?: number; level?: string; keyword?: string; status?: string }) => {
     const response = await api.get('/courses', { params });
     return response.data;
+  },
+
+  getMyCourses: async (params?: { page?: number; limit?: number; level?: string; keyword?: string; status?: string }) => {
+    const response = await api.get('/courses/my', { params });
+    return response.data;
+  },
+
+  cloneCourse: async (id: string | number) => {
+    const response = await api.post(`/courses/${id}/clone`);
+    return response.data;
+  },
+
+  cancelReview: async (id: string | number) => {
+    const response = await api.post(`/courses/${id}/cancel-review`);
+    return response.data;
+  },
+
+  getPreviewToken: async (id: string | number): Promise<{ token: string }> => {
+    const response = await api.post<{ token: string }>(`/courses/${id}/preview-token`);
+    return (response.data as any)?.data || response.data;
   },
 };

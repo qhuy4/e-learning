@@ -12,4 +12,6 @@ export interface ISectionRepository {
   update(section: Section): Promise<Section>;
 
   delete(id: number): Promise<void>;
+
+  findByCourseId(courseId: number): Promise<Section[]>;
 }

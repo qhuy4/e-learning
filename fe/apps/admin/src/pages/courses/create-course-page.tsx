@@ -8,6 +8,8 @@ import {
   SendHorizonal,
   Clock,
   CheckCircle2,
+  RotateCcw,
+  AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -18,7 +20,9 @@ import {
   useCreateCourse,
   useGetCourseDetail,
   useUpdateCourse,
+  useCancelReviewCourse,
 } from "@/features/courses/hook/use-courses";
+import { validateCourse, validateCourseEdit } from "@/features/courses/schemas/course.schema";
 
 import { Button } from "@fe/components/ui/button";
 import { Badge } from "@fe/components/ui/badge";
@@ -31,7 +35,6 @@ const STATUS_CONFIG: Record<
 > = {
   1: { label: "Bản nháp",    variant: "secondary"   },
   2: { label: "Chờ duyệt",  variant: "outline"     },
-  3: { label: "Đã duyệt",   variant: "default"     },
   4: { label: "Bị từ chối", variant: "destructive" },
   5: { label: "Đã xuất bản",variant: "default"     },
   6: { label: "Lưu trữ",    variant: "secondary"   },
@@ -44,9 +47,10 @@ export function CreateCoursePage() {
 
   const { mutate: createCourse, isPending: isCreating } = useCreateCourse();
   const { mutate: updateCourse, isPending: isUpdating } = useUpdateCourse();
+  const { mutate: cancelReview, isPending: isCancelingReview } = useCancelReviewCourse();
   const { data: courseResponse } = useGetCourseDetail(courseId, { enabled: isEditMode });
 
-  const isBusy = isCreating || isUpdating;
+  const isBusy = isCreating || isUpdating || isCancelingReview;
 
   const [courseData, setCourseData] = useState<Course>({
     title: "",
@@ -55,6 +59,7 @@ export function CreateCoursePage() {
     level: 1,
     thumbnail: undefined,
     sections: [],
+    categoryId: 1,
   });
 
   useEffect(() => {
@@ -67,12 +72,26 @@ export function CreateCoursePage() {
 
   const currentStatus = courseData.status ?? 1;
   const statusCfg = STATUS_CONFIG[currentStatus];
+  const isPendingReview = isEditMode && currentStatus === 2;
 
   // ─── Handlers ─────────────────────────────────────────────────────────────
 
+  const handleCancelReview = () => {
+    if (!courseId) return;
+    const tid = toast.loading("Đang hủy yêu cầu duyệt...");
+    cancelReview(courseId, {
+      onSuccess: () => {
+        toast.success("Đã hủy yêu cầu duyệt. Khóa học đã chuyển về bản nháp!", { id: tid });
+        setCourseData((prev) => ({ ...prev, status: 1 }));
+      },
+      onError: () => toast.error("Có lỗi xảy ra khi hủy yêu cầu duyệt, vui lòng thử lại.", { id: tid }),
+    });
+  };
+
   const handleCreateDraft = () => {
-    if (!courseData.title.trim()) {
-      toast.error("Vui lòng nhập tên khóa học!");
+    const error = validateCourse(courseData);
+    if (error) {
+      toast.error(error);
       return;
     }
     const tid = toast.loading("Đang lưu nháp...");
@@ -86,8 +105,9 @@ export function CreateCoursePage() {
   };
 
   const handleCreateAndSubmit = () => {
-    if (!courseData.title.trim()) {
-      toast.error("Vui lòng nhập tên khóa học!");
+    const error = validateCourse(courseData);
+    if (error) {
+      toast.error(error);
       return;
     }
     const tid = toast.loading("Đang gửi yêu cầu duyệt...");
@@ -101,6 +121,11 @@ export function CreateCoursePage() {
   };
 
   const handleSaveChanges = () => {
+    const error = validateCourseEdit(courseData);
+    if (error) {
+      toast.error(error);
+      return;
+    }
     const tid = toast.loading("Đang lưu thay đổi...");
     updateCourse({ id: courseId!, data: courseData }, {
       onSuccess: () => toast.success("Đã lưu thay đổi!", { id: tid }),
@@ -109,6 +134,11 @@ export function CreateCoursePage() {
   };
 
   const handleSubmitForReview = () => {
+    const error = validateCourseEdit(courseData);
+    if (error) {
+      toast.error(error);
+      return;
+    }
     const tid = toast.loading("Đang gửi yêu cầu duyệt...");
     updateCourse({ id: courseId!, data: { ...courseData, status: 2 } }, {
       onSuccess: () => {
@@ -140,6 +170,26 @@ export function CreateCoursePage() {
       );
     }
 
+    if (isPendingReview) {
+      return (
+        <>
+          <Badge variant="outline" className="h-9 px-4 gap-1.5 text-amber-600 border-amber-300 dark:border-amber-700">
+            <Clock className="w-3.5 h-3.5" />
+            Đang chờ admin duyệt
+          </Badge>
+          <Button
+            variant="outline"
+            onClick={handleCancelReview}
+            disabled={isBusy}
+            className="px-4 text-amber-600 border-amber-300 hover:bg-amber-50 hover:text-amber-700 dark:border-amber-800 dark:hover:bg-amber-950/40"
+          >
+            <RotateCcw className="w-4 h-4 mr-2" />
+            {isCancelingReview ? "Đang hủy..." : "Hủy duyệt để chỉnh sửa"}
+          </Button>
+        </>
+      );
+    }
+
     return (
       <>
         <Button variant="outline" onClick={handleSaveChanges} disabled={isBusy} className="px-5">
@@ -156,13 +206,6 @@ export function CreateCoursePage() {
             <SendHorizonal className="w-4 h-4 mr-2" />
             {currentStatus === 4 ? "Gửi duyệt lại" : "Gửi duyệt"}
           </Button>
-        )}
-
-        {currentStatus === 2 && (
-          <Badge variant="outline" className="h-9 px-4 gap-1.5 text-amber-600 border-amber-300 dark:border-amber-700">
-            <Clock className="w-3.5 h-3.5" />
-            Đang chờ admin duyệt
-          </Badge>
         )}
 
         {currentStatus === 5 && (
@@ -195,6 +238,11 @@ export function CreateCoursePage() {
             {isEditMode && statusCfg && (
               <Badge variant={statusCfg.variant} className="text-xs">{statusCfg.label}</Badge>
             )}
+            {courseData.parentId && (
+              <Badge variant="outline" className="text-xs text-blue-600 border-blue-300 dark:text-blue-400 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                Đang cập nhật phiên bản mới
+              </Badge>
+            )}
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
             {isEditMode
@@ -207,6 +255,27 @@ export function CreateCoursePage() {
           {renderActions()}
         </div>
       </div>
+
+      {isPendingReview && (
+        <div className="mb-6 p-4 rounded-lg bg-amber-50 border border-amber-200 dark:bg-amber-950/30 dark:border-amber-800/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-sm text-amber-800 dark:text-amber-300 shadow-sm">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 shrink-0 text-amber-600 dark:text-amber-400" />
+            <span>
+              Khóa học này đang ở trạng thái <strong>chờ admin duyệt</strong> nên không thể chỉnh sửa nội dung. Bạn có thể hủy duyệt để chuyển về bản nháp và tiếp tục chỉnh sửa.
+            </span>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleCancelReview}
+            disabled={isCancelingReview}
+            className="shrink-0 bg-white dark:bg-amber-900/40 border-amber-300 text-amber-700 hover:bg-amber-100 dark:text-amber-200"
+          >
+            <RotateCcw className="w-4 h-4 mr-1.5" />
+            Hủy duyệt ngay
+          </Button>
+        </div>
+      )}
 
       <Separator className="mb-6" />
 
@@ -231,11 +300,11 @@ export function CreateCoursePage() {
         </TabsList>
 
         <TabsContent value="info" className="m-0 focus-visible:outline-none focus-visible:ring-0">
-          <CourseInfoStep data={courseData} updateData={updateCourseData} />
+          <CourseInfoStep data={courseData} updateData={updateCourseData} readOnly={isPendingReview} />
         </TabsContent>
 
         <TabsContent value="chapters" className="m-0 focus-visible:outline-none focus-visible:ring-0">
-          <CourseContentStep data={courseData} updateData={updateCourseData} />
+          <CourseContentStep data={courseData} updateData={updateCourseData} readOnly={isPendingReview} />
         </TabsContent>
       </Tabs>
     </div>

@@ -2,7 +2,7 @@ import { ConflictException, Inject, NotFoundException } from '@nestjs/common';
 
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import slugify from 'slugify';
+import { SlugUtil } from '../../../../common/utils/slug.util';
 
 import { CreateSectionCommand } from '../command/create-section.command';
 
@@ -35,11 +35,7 @@ export class CreateSectionHandler implements ICommandHandler<CreateSectionComman
       throw new NotFoundException('Course not found');
     }
 
-    const slug = slugify(command.title, {
-      lower: true,
-      strict: true,
-      trim: true,
-    });
+    const slug = SlugUtil.generate(command.title);
 
     const existingSection = await this.sectionRepository.findBySlug(
       command.courseId,

@@ -1,117 +1,136 @@
-import { createBrowserRouter } from "react-router"
+import { createBrowserRouter } from "react-router";
 
-import App from "@/App"
-import DashboardPage from "@/pages/dashboard/dashboard-page"
-import UsersPage from "@/pages/users/users-page"
-import { UserDetailPage } from "@/pages/users/user-detail-page"
-import { InstructorApprovalsPage } from "@/pages/instructors/instructor-approvals-page"
+import App from "@/App";
+import DashboardPage from "@/pages/dashboard/dashboard-page";
+
+import UsersPage from "@/pages/users/users-page";
+import { UserDetailPage } from "@/pages/users/user-detail-page";
+import { UserEditPage } from "@/pages/users/user-edit-page.tsx";
+import { UserCreatePage } from "@/pages/users/user-create-page.tsx";
+
+import InstructorsPage from "@/pages/instructors/instructors-page.tsx";
+import { InstructorDetailPage } from "@/pages/instructors/instructor-detail-page.tsx";
+import { InstructorEditPage } from "@/pages/instructors/instructor-edit-page.tsx";
+import { InstructorApprovalsPage } from "@/pages/instructors/instructor-approvals-page";
+
 import LoginPage from "@/pages/authen/login-page.tsx";
-import {ProtectedRoute} from "@/router/protectedRoute.tsx";
-import {PublicRoute} from "@/router/publishRoute.tsx";
+
+import { ProtectedRoute } from "@/router/protectedRoute.tsx";
+import { PublicRoute } from "@/router/publishRoute.tsx";
+
 import { CreateCoursePage } from "@/pages/courses/create-course-page";
 import { CoursesListPage } from "@/pages/courses/courses-list-page";
-import { CreateLessonPage } from "@/features/lessons/pages/create-lesson-page";
-import {UserEditPage} from "@/pages/users/user-edit-page.tsx";
-import {UserCreatePage} from "@/pages/users/user-create-page.tsx";
-import InstructorsPage from "@/pages/instructors/instructors-page.tsx";
-import {InstructorDetailPage} from "@/pages/instructors/instructor-detail-page.tsx";
-import {InstructorEditPage} from "@/pages/instructors/instructor-edit-page.tsx";
+import { AdminCoursesListPage } from "@/pages/admin-courses/admin-courses-list-page";
 
+import { CreateLessonPage } from "@/features/lessons/pages/create-lesson-page";
 
 export const router = createBrowserRouter([
-    {
-        element: <ProtectedRoute/>,
+  {
+    element: <ProtectedRoute />,
+    children: [
+      {
+        path: "/",
+        element: <App />,
         children: [
-            {
-                path: "/",
-                element: <App />,
-                children: [
-                    {
-                        index: true,
-                        element: <DashboardPage />,
-                    },
-                    {
-                        path: "users",
-                        children: [
-                            {
-                                index: true,
-                                element: <UsersPage />,
-                            },
-                            {
-                                path: "create",
-                                element: <UserCreatePage />,
-                            },
-                            {
-                                path: ":id",
-                                element: <UserDetailPage />,
-                            },
-                            {
-                                path: ":id/edit",
-                                element: <UserEditPage />,
-                            },
-                        ],
-                    },
-                    {
-                        path: "courses",
-                        element: <CoursesListPage />,
-                    },
-                     {
-                        path: "courses/:courseId",
-                        element: <CreateCoursePage />,
-                    },
-                    {
-                        path: "courses/create",
-                        element: <CreateCoursePage />,
-                    },
-                    {
-                        path: "lessons/create",
-                        element: <CreateLessonPage />,
-                    },
-                    {
-                        path: "lessons/:id/edit",
-                        element: <CreateLessonPage />,
-                    },
-                    {
-                        path: "instructors/approvals",
-                        element: <InstructorApprovalsPage />,
-                    },
-                    {
-                        path: ":id",
-                        element: <UserDetailPage />,
-                    },
-                    {
-                        path: "instructors",
-                        children: [
-                            {
-                                index: true,
-                                element: <InstructorsPage />,
-                            },
-                            {
-                                path: "create",
-                                element: <UserCreatePage />,
-                            },
-                            {
-                                path: ":id",
-                                element: <InstructorDetailPage />,
-                            },
-                            {
-                                path: ":id/edit",
-                                element: <InstructorEditPage />,
-                            },
-                        ],
-                    },
-                ],
-            },
-        ],
-    },
+          {
+            index: true,
+            element: <DashboardPage />,
+          },
 
-    {
-        element: <PublicRoute />,
-        children: [
-            {
-                path: "/login",
-                element: <LoginPage />,
-            },
+          // Users
+          {
+            path: "users",
+            children: [
+              {
+                index: true,
+                element: <UsersPage />,
+              },
+              {
+                path: "create",
+                element: <UserCreatePage />,
+              },
+              {
+                path: ":id",
+                element: <UserDetailPage />,
+              },
+              {
+                path: ":id/edit",
+                element: <UserEditPage />,
+              },
+            ],
+          },
+
+          // Courses
+          {
+            path: "courses",
+            element: <CoursesListPage />,
+          },
+          {
+            path: "courses/create",
+            element: <CreateCoursePage />,
+          },
+          {
+            path: "courses/:courseId",
+            element: <CreateCoursePage />,
+          },
+
+          // Admin Courses
+          {
+            path: "admin-courses",
+            element: <AdminCoursesListPage />,
+          },
+
+          // Lessons
+          {
+            path: "lessons/create",
+            element: <CreateLessonPage />,
+          },
+          {
+            path: "lessons/:id/edit",
+            element: <CreateLessonPage />,
+          },
+
+          // Instructors
+          {
+            path: "instructors",
+            children: [
+              {
+                index: true,
+                element: <InstructorsPage />,
+              },
+              {
+                path: "create",
+                element: <UserCreatePage />,
+              },
+              {
+                path: ":id",
+                element: <InstructorDetailPage />,
+              },
+              {
+                path: ":id/edit",
+                element: <InstructorEditPage />,
+              },
+            ],
+          },
+
+          // Instructor approvals
+          {
+            path: "instructors/approvals",
+            element: <InstructorApprovalsPage />,
+          },
         ],
-    },
+      },
+    ],
+  },
+
+  // Public routes
+  {
+    element: <PublicRoute />,
+    children: [
+      {
+        path: "/login",
+        element: <LoginPage />,
+      },
+    ],
+  },
 ]);

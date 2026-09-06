@@ -1,4 +1,4 @@
-import { Inject, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import slugify from 'slugify';
 import { extname } from 'path';
@@ -14,6 +14,8 @@ import {
   FileStorage,
 } from '../../../../common/storage/domain/interface/file-storage.interface';
 import { AdminCourseDtoMapper } from '../../presentation/mappers/admin-course-dto.mapper';
+import { CourseStatus } from '../../domain/enum/course-status.enum';
+import { AppException } from '@/common/exception/app.exception';
 
 @CommandHandler(UpdateCourseCommand)
 export class UpdateCourseHandler implements ICommandHandler<UpdateCourseCommand> {
@@ -32,6 +34,12 @@ export class UpdateCourseHandler implements ICommandHandler<UpdateCourseCommand>
 
     if (!course) {
       throw new NotFoundException('Course not found');
+    }
+
+    if (course.status === CourseStatus.PENDING_REVIEW) {
+      throw new BadRequestException(
+        'Khóa học đang trong trạng thái chờ duyệt, không thể chỉnh sửa. Vui lòng hủy yêu cầu duyệt trước khi chỉnh sửa.',
+      );
     }
 
     const slug =

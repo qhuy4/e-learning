@@ -16,3 +16,19 @@ export const useCourseBySlug = (slug: string) => {
     enabled: !!slug,
   });
 };
+
+export const useCourseById = (id: string | number) => {
+  return useQuery({
+    queryKey: ['course', 'id', id],
+    queryFn: () => courseService.getCourseById(id),
+    enabled: !!id,
+  });
+};
+
+export const usePreviewCourse = (token: string) => {
+  return useQuery({
+    queryKey: ['course', 'preview', token],
+    queryFn: () => courseService.previewCourse(token),
+    enabled: !!token,
+  });
+};

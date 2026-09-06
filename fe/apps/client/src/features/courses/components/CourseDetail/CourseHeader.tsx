@@ -22,12 +22,13 @@ export const CourseHeader = ({ course }: CourseHeaderProps) => {
 
         <div className="max-w-3xl">
           <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 leading-tight">
-            {course.title}
+            {course?.title}
           </h1>
-          <p className="text-slate-600 text-lg mb-6">
-            Học cách thiết kế giao diện người dùng đẹp mắt và trải nghiệm người
-            dùng tuyệt vời với công cụ Figma phổ biến nhất hiện nay.
-          </p>
+          {course?.description && (
+            <p className="text-slate-600 text-lg mb-6 line-clamp-3">
+              {course.description}
+            </p>
+          )}
 
           <div className="flex flex-wrap items-center gap-4 md:gap-6 text-sm text-slate-600 mb-6">
             <div className="flex items-center gap-1">
