@@ -85,6 +85,15 @@ export default function InstructorsPage() {
                 sortOrder={sortOrder}
                 onSortChange={handleSortChange}
                 tableMeta={{onEdit: handleEdit, onDelete: handleDelete}}
+                text={{
+                    searchPlaceholder: "Tìm kiếm...",
+                    reload: "Tải lại",
+                    rowsPerPage: "Dòng trên trang",
+                    noResults: "Không có kết quả.",
+                    pageOf: (p, tp) => `Trang ${p} / ${tp || 1}`,
+                    previous: "Trước",
+                    next: "Sau",
+                }}
             />
 
             <DeleteConfirmDialog

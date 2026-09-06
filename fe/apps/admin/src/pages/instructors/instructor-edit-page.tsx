@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react"
 import {useParams, useNavigate} from "react-router"
-import {ArrowLeft} from "lucide-react"
+import {ArrowLeft, Plus, Trash2} from "lucide-react"
 
 import {Button} from "@fe/components/ui/button"
 import {Input} from "@fe/components/ui/input"
@@ -17,6 +17,20 @@ import {useInstructor, useUpdateInstructor} from "@/features/instructors/hook/us
 import type {Instructor} from "@/features/instructors/type/instructor.ts";
 import {PageSkeleton} from "@/features/users/components/skeleton.tsx";
 
+const SOCIAL_PLATFORMS = [
+    {value: "facebook", label: "Facebook"},
+    {value: "linkedin", label: "LinkedIn"},
+    {value: "twitter", label: "Twitter / X"},
+    {value: "youtube", label: "YouTube"},
+    {value: "instagram", label: "Instagram"},
+    {value: "github", label: "GitHub"},
+    {value: "website", label: "Website"},
+] as const;
+
+interface SocialLinkItem {
+    platform: string
+    url: string
+}
 
 interface FormState {
     name: string
@@ -25,7 +39,18 @@ interface FormState {
     headline: string
     bio: string
     websiteUrl: string
-    socialLinks: string
+    socialLinks: SocialLinkItem[]
+}
+
+function socialLinksToItems(links: Record<string, string> | null | undefined): SocialLinkItem[] {
+    if (!links || typeof links !== "object") return []
+    return Object.entries(links).map(([platform, url]) => ({platform, url}))
+}
+
+function itemsToSocialLinks(items: SocialLinkItem[]): Record<string, string> | null {
+    const filtered = items.filter((item) => item.platform && item.url.trim())
+    if (filtered.length === 0) return null
+    return Object.fromEntries(filtered.map((item) => [item.platform, item.url.trim()]))
 }
 
 function instructorToForm(instructor: Instructor): FormState {
@@ -37,20 +62,11 @@ function instructorToForm(instructor: Instructor): FormState {
         headline: p?.headline ?? "",
         bio: p?.bio ?? "",
         websiteUrl: p?.websiteUrl ?? "",
-        socialLinks: p?.socialLinks ? JSON.stringify(p.socialLinks, null, 2) : "",
+        socialLinks: socialLinksToItems(p?.socialLinks),
     }
 }
 
 function buildUpdateInput(form: FormState) {
-    let parsedSocialLinks: Record<string, string> | null = null
-    if (form.socialLinks.trim()) {
-        try {
-            parsedSocialLinks = JSON.parse(form.socialLinks)
-        } catch {
-            // keep null on parse error
-        }
-    }
-
     return {
         name: form.name.trim(),
         email: form.email.trim(),
@@ -58,7 +74,7 @@ function buildUpdateInput(form: FormState) {
         headline: form.headline.trim() || null,
         bio: form.bio.trim() || null,
         websiteUrl: form.websiteUrl.trim() || null,
-        socialLinks: parsedSocialLinks,
+        socialLinks: itemsToSocialLinks(form.socialLinks),
     }
 }
 
@@ -85,14 +101,48 @@ export function InstructorEditPage() {
         }
     }
 
+    function addSocialLink() {
+        setForm((prev) => {
+            if (!prev) return prev
+            const usedPlatforms = prev.socialLinks.map((l) => l.platform)
+            const available = SOCIAL_PLATFORMS.find((p) => !usedPlatforms.includes(p.value))
+            return {
+                ...prev,
+                socialLinks: [
+                    ...prev.socialLinks,
+                    {platform: available?.value ?? "", url: ""},
+                ],
+            }
+        })
+    }
+
+    function removeSocialLink(index: number) {
+        setForm((prev) => {
+            if (!prev) return prev
+            return {
+                ...prev,
+                socialLinks: prev.socialLinks.filter((_, i) => i !== index),
+            }
+        })
+    }
+
+    function updateSocialLink(index: number, field: "platform" | "url", value: string) {
+        setForm((prev) => {
+            if (!prev) return prev
+            const updated = [...prev.socialLinks]
+            updated[index] = {...updated[index], [field]: value}
+            return {...prev, socialLinks: updated}
+        })
+    }
+
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
 
         if (!form || !instructor) return
 
         const fieldErrors: Record<string, string | undefined> = {}
-        if (!form.name.trim()) fieldErrors.name = "Name is required"
-        if (!form.email.trim()) fieldErrors.email = "Email is required"
+        if (!form.name.trim()) fieldErrors.name = "Tên không được để trống"
+        if (!form.email.trim()) fieldErrors.email = "Email không được để trống"
 
         if (Object.keys(fieldErrors).length > 0) {
             setErrors(fieldErrors)
@@ -115,7 +165,7 @@ export function InstructorEditPage() {
                 submit:
                     err instanceof Error
                         ? err.message
-                        : "An unexpected error occurred",
+                        : "Đã xảy ra lỗi không mong muốn",
             })
         }
     }
@@ -127,15 +177,15 @@ export function InstructorEditPage() {
             <div className="p-6 max-w-3xl mx-auto">
                 <Button variant="ghost" size="sm" onClick={() => navigate("/instructors")} className="mb-6 -ml-2">
                     <ArrowLeft className="size-4"/>
-                    Back to Instructors
+                    Quay lại danh sách
                 </Button>
                 <div className="flex flex-col items-center justify-center py-24 text-center">
-                    <h2 className="text-lg font-semibold">Instructor not found</h2>
+                    <h2 className="text-lg font-semibold">Không tìm thấy giảng viên</h2>
                     <p className="text-sm text-muted-foreground mt-1">
-                        The instructor you are trying to edit does not exist.
+                        Giảng viên bạn đang chỉnh sửa không tồn tại.
                     </p>
                     <Button className="mt-6" onClick={() => navigate("/instructors")}>
-                        Back to Instructors
+                        Quay lại danh sách
                     </Button>
                 </div>
             </div>
@@ -148,14 +198,14 @@ export function InstructorEditPage() {
         <div className="p-6 mx-auto space-y-6">
             <Button variant="ghost" size="sm" onClick={() => navigate(`/instructors/${instructor.id}`)} className="-ml-2">
                 <ArrowLeft className="size-4"/>
-                Back to Instructor
+                Quay lại giảng viên
             </Button>
 
             <div className="rounded-xl border bg-card">
                 <div className="px-6 py-4 border-b">
-                    <h1 className="text-xl font-bold">Edit Instructor</h1>
+                    <h1 className="text-xl font-bold">Chỉnh sửa giảng viên</h1>
                     <p className="text-sm text-muted-foreground mt-1">
-                        Update the instructor's account and profile information.
+                        Cập nhật thông tin tài khoản và hồ sơ giảng viên.
                     </p>
                 </div>
 
@@ -164,20 +214,20 @@ export function InstructorEditPage() {
                         {/* Account Section */}
                         <div className="space-y-4 grow-1">
                             <div className="flex items-center gap-3">
-                                <h3 className="text-sm font-semibold text-foreground">Account</h3>
+                                <h3 className="text-sm font-semibold text-foreground">Tài khoản</h3>
                                 <Separator className="flex-1"/>
                             </div>
 
                             <div className="grid grid-cols-1 gap-3">
                                 <div className="space-y-1.5">
                                     <label className="text-sm font-medium" htmlFor="instructor-name">
-                                        Name
+                                        Họ và tên
                                     </label>
                                     <Input
                                         id="instructor-name"
                                         value={form.name}
                                         onChange={(e) => setField("name", e.target.value)}
-                                        placeholder="Full name"
+                                        placeholder="Họ và tên đầy đủ"
                                         aria-invalid={!!errors.name}
                                     />
                                     {errors.name && (
@@ -203,7 +253,7 @@ export function InstructorEditPage() {
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <label className="text-sm font-medium">Status</label>
+                                    <label className="text-sm font-medium">Trạng thái</label>
                                     <Select
                                         value={form.status}
                                         onValueChange={(val) => setField("status", val as UserStatus)}
@@ -226,26 +276,26 @@ export function InstructorEditPage() {
                         {/* Instructor Profile Section */}
                         <div className="space-y-4 grow-1">
                             <div className="flex items-center gap-3">
-                                <h3 className="text-sm font-semibold text-foreground">Instructor Profile</h3>
+                                <h3 className="text-sm font-semibold text-foreground">Hồ sơ giảng viên</h3>
                                 <Separator className="flex-1"/>
                             </div>
 
                             <div className="grid grid-cols-1 gap-3">
                                 <div className="space-y-1.5">
                                     <label className="text-sm font-medium" htmlFor="instructor-headline">
-                                        Headline
+                                        Tiêu đề
                                     </label>
                                     <Input
                                         id="instructor-headline"
                                         value={form.headline}
                                         onChange={(e) => setField("headline", e.target.value)}
-                                        placeholder="e.g. Senior Software Engineer"
+                                        placeholder="VD: Kỹ sư phần mềm cấp cao"
                                     />
                                 </div>
 
                                 <div className="space-y-1.5">
                                     <label className="text-sm font-medium" htmlFor="instructor-websiteUrl">
-                                        Website URL
+                                        URL Website
                                     </label>
                                     <Input
                                         id="instructor-websiteUrl"
@@ -257,30 +307,64 @@ export function InstructorEditPage() {
 
                                 <div className="space-y-1.5">
                                     <label className="text-sm font-medium" htmlFor="instructor-bio">
-                                        Bio
+                                        Giới thiệu
                                     </label>
                                     <textarea
                                         id="instructor-bio"
                                         value={form.bio}
                                         onChange={(e) => setField("bio", e.target.value)}
-                                        placeholder="Short bio..."
+                                        placeholder="Giới thiệu ngắn..."
                                         rows={4}
                                         className="w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 resize-none dark:bg-input/30"
                                     />
                                 </div>
 
-                                <div className="space-y-1.5">
-                                    <label className="text-sm font-medium" htmlFor="instructor-socialLinks">
-                                        Social Links (JSON)
-                                    </label>
-                                    <textarea
-                                        id="instructor-socialLinks"
-                                        value={form.socialLinks}
-                                        onChange={(e) => setField("socialLinks", e.target.value)}
-                                        placeholder={'{"facebook": "https://...", "linkedin": "https://..."}'}
-                                        rows={3}
-                                        className="w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm font-mono transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 resize-none dark:bg-input/30"
-                                    />
+                                {/* Social Links */}
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Liên kết mạng xã hội</label>
+                                    {form.socialLinks.map((link, index) => (
+                                        <div key={index} className="flex items-center gap-2">
+                                            <Select
+                                                value={link.platform}
+                                                onValueChange={(val) => updateSocialLink(index, "platform", val)}
+                                            >
+                                                <SelectTrigger className="w-[140px] shrink-0">
+                                                    <SelectValue placeholder="Nền tảng"/>
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {SOCIAL_PLATFORMS.map((p) => (
+                                                        <SelectItem key={p.value} value={p.value}>
+                                                            {p.label}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <Input
+                                                value={link.url}
+                                                onChange={(e) => updateSocialLink(index, "url", e.target.value)}
+                                                placeholder="https://..."
+                                                className="flex-1"
+                                            />
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon-sm"
+                                                onClick={() => removeSocialLink(index)}
+                                            >
+                                                <Trash2 className="size-4 text-destructive"/>
+                                            </Button>
+                                        </div>
+                                    ))}
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={addSocialLink}
+                                        disabled={form.socialLinks.length >= SOCIAL_PLATFORMS.length}
+                                    >
+                                        <Plus className="size-4 mr-1"/>
+                                        Thêm liên kết
+                                    </Button>
                                 </div>
                             </div>
                         </div>
@@ -299,10 +383,10 @@ export function InstructorEditPage() {
                             onClick={() => navigate(`/instructors/${instructor.id}`)}
                             disabled={submitting}
                         >
-                            Cancel
+                            Hủy
                         </Button>
                         <Button type="submit" disabled={submitting}>
-                            {submitting ? "Saving..." : "Save Changes"}
+                            {submitting ? "Đang lưu..." : "Lưu thay đổi"}
                         </Button>
                     </div>
                 </form>

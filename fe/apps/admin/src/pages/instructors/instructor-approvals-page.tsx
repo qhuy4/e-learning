@@ -262,7 +262,7 @@ export const InstructorApprovalsPage: React.FC = () => {
                 <p className="text-sm font-semibold text-indigo-600 truncate">
                   {selectedProfile.websiteUrl || "Không có"}
                 </p>
-              </div>
+              </div>S
               <div className="md:col-span-2">
                 <p className="text-xs text-gray-500">Tiểu sử (Bio):</p>
                 <p className="text-sm text-gray-700 mt-1">
