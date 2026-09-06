@@ -5,12 +5,14 @@
   "workspaces": [
     "apps/admin",
     "apps/client",
+    "apps/instructor",
     "packages/*"
   ],
   "scripts": {
     "dev:admin": "npm run dev --workspace=admin",
     "dev:client": "npm run dev --workspace=client",
-    "dev": "concurrently \"npm run dev:admin\" \"npm run dev:client\"",
+    "dev:instructor": "npm run dev --workspace=instructor",
+    "dev": "concurrently \"npm run dev:admin\" \"npm run dev:client\" \"npm run dev:instructor\"",
     "build": "npm run build --workspaces"
   },
   "devDependencies": {
