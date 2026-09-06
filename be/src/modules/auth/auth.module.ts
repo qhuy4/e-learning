@@ -10,6 +10,7 @@ import { AuthController } from './auth.controller';
 import { MailService } from './services/mail.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { AdminAuthController } from '@/modules/auth/presentation/controllers/admin-auth.controller';
+import { InstructorAuthController } from '@/modules/auth/presentation/controllers/instructor-auth.controller';
 // import { TokenService } from '@/modules/auth/service/token.service';
 import { TokenService } from '@/common/service/token.service';
 import { LoginHandler } from '@/modules/auth/application/command-handler/login.handler';
@@ -44,7 +45,7 @@ import { ServiceModule } from '@/common/service/service.module';
       }),
     }),
   ],
-  controllers: [AuthController, AdminAuthController, UsersController],
+  controllers: [AuthController, AdminAuthController, InstructorAuthController, UsersController],
   providers: [AuthService, MailService, JwtStrategy, TokenService, LoginHandler, RegisterHandler, PasswordService],
   exports: [AuthService, JwtModule, PassportModule],
 })
