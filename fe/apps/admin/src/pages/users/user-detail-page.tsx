@@ -11,6 +11,7 @@ import {
     User as UserIcon,
     Pencil,
     Trash2, CheckCircle, Ban,
+    RefreshCw,
 } from "lucide-react"
 
 import {Button} from "@fe/components/ui/button"
@@ -25,6 +26,7 @@ import {toast} from "sonner";
 import {BlockReasonDialog} from "@/features/users/components/block-reason-dialog.tsx";
 import {DeleteConfirmDialog} from "@/features/users/components/delete-confirm-diialog.tsx";
 import {PageSkeleton} from "@/features/users/components/skeleton.tsx";
+import {ReloadingOverlay} from "@/components/common/page/reloading-overlay.tsx";
 
 function statusVariant(status: UserStatus) {
     if (status === UserStatus.ACTIVE) return "default" as const
@@ -63,7 +65,7 @@ export function UserDetailPage() {
     const navigate = useNavigate()
     const userId = Number(id)
 
-    const {data: user, isLoading, isError} = useUser(userId)
+    const {data: user, isLoading, isError, refetch, isFetching} = useUser(userId)
 
     const [deleteOpen, setDeleteOpen] = useState(false)
     const [blockOpen, setBlockOpen] = useState(false)
@@ -80,8 +82,7 @@ export function UserDetailPage() {
         })
     }
 
-    if (isLoading) return <PageSkeleton/>
-
+    if (isLoading) return <PageSkeleton withAvatar/>
 
     if (isError || !user) {
         return (
@@ -108,7 +109,9 @@ export function UserDetailPage() {
     const isBlocked = user.status === UserStatus.BLOCKED
 
     return (
-        <div className="p-6 mx-auto space-y-6">
+        <div className="p-6 mx-auto space-y-6 relative">
+            <ReloadingOverlay isFetching={isFetching}/>
+
             {/* Back */}
             <Button variant="ghost" size="sm" onClick={() => navigate("/users")} className="-ml-2">
                 <ArrowLeft className="size-4"/>
@@ -148,6 +151,15 @@ export function UserDetailPage() {
 
             {/* Actions */}
             <div className="flex items-center gap-2 shrink-0">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => refetch()}
+                    disabled={isFetching}
+                >
+                    <RefreshCw className={`size-3.5 ${isFetching ? "animate-spin" : ""}`}/>
+                    Reload
+                </Button>
                 <Button
                     variant="outline"
                     size="sm"

@@ -13,6 +13,9 @@ import { CoursesListPage } from "@/pages/courses/courses-list-page";
 import { CreateLessonPage } from "@/features/lessons/pages/create-lesson-page";
 import {UserEditPage} from "@/pages/users/user-edit-page.tsx";
 import {UserCreatePage} from "@/pages/users/user-create-page.tsx";
+import InstructorsPage from "@/pages/instructors/instructors-page.tsx";
+import {InstructorDetailPage} from "@/pages/instructors/instructor-detail-page.tsx";
+import {InstructorEditPage} from "@/pages/instructors/instructor-edit-page.tsx";
 
 
 export const router = createBrowserRouter([
@@ -75,7 +78,28 @@ export const router = createBrowserRouter([
                     {
                         path: ":id",
                         element: <UserDetailPage />,
-                    }
+                    },
+                    {
+                        path: "instructors",
+                        children: [
+                            {
+                                index: true,
+                                element: <InstructorsPage />,
+                            },
+                            {
+                                path: "create",
+                                element: <UserCreatePage />,
+                            },
+                            {
+                                path: ":id",
+                                element: <InstructorDetailPage />,
+                            },
+                            {
+                                path: ":id/edit",
+                                element: <InstructorEditPage />,
+                            },
+                        ],
+                    },
                 ],
             },
         ],

@@ -5,11 +5,17 @@ import {adminApi} from "@/shared/lib/axios.ts";
 export const userService = {
     async getUsers(page: number,
         limit: number,
+        search?: string,
+        sortBy?: string,
+        sortOrder?: string,
     ): Promise<PaginationResponse<User>> {
         const response = await adminApi.get<PaginationResponse<User>>("/users/", {
             params: {
                 page,
                 limit,
+                ...(search && {search}),
+                ...(sortBy && {sortBy}),
+                ...(sortOrder && {sortOrder}),
             }
         });
         return response.data;
