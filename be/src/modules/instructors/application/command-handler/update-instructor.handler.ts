@@ -5,6 +5,13 @@ import { Repository } from 'typeorm';
 import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
 import { InstructorProfileTypeOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-profile.orm.entity';
 import { NotFoundException } from '@nestjs/common';
+import { UserStatus } from '@/modules/users/domain/enum/user.status';
+
+const statusMap: Record<string, UserStatus> = {
+  ACTIVE: UserStatus.ACTIVE,
+  BLOCKED: UserStatus.BLOCKED,
+  PENDING: UserStatus.PENDING,
+};
 
 @CommandHandler(UpdateInstructorCommand)
 export class UpdateInstructorHandler implements ICommandHandler<UpdateInstructorCommand> {
@@ -33,7 +40,7 @@ export class UpdateInstructorHandler implements ICommandHandler<UpdateInstructor
       const userUpdate: Partial<UserOrmEntity> = {};
       if (name !== undefined) userUpdate.name = name;
       if (email !== undefined) userUpdate.email = email;
-      if (status !== undefined) userUpdate.status = status as any;
+      if (status !== undefined) userUpdate.status = statusMap[status] ?? UserStatus.ACTIVE;
 
       await this.userRepository.update(id, userUpdate);
     }

@@ -6,10 +6,15 @@ import { CourseOrmEntity } from './infrastructure/entity/course.orm-entity';
 import { CourseRepository } from './infrastructure/repository/course.repository';
 import { COURSE_REPOSITORY } from './domain/repository/course.repository';
 import { CoursesController } from './presentation/courses.controller';
+import { InstructorCoursesController } from './presentation/instructor-courses.controller';
+
+// Command handlers
 import { CreateCourseHandler } from './application/command-handler/create-course.command.handler';
 import { UpdateCourseHandler } from './application/command-handler/update-course.command.handler';
 import { DeleteCourseHandler } from './application/command-handler/delete-course.command.handler';
 import { GetCoursesHandler } from './application/query-handler/get-courses.handler';
+import { GetInstructorCoursesHandler } from './application/query-handler/get-instructor-courses.handler';
+
 import { GetAdminCoursesHandler } from './application/query-handler/get-admin-courses.handler';
 import { GetCourseBySlugHandler } from './application/query-handler/get-course-by-slug.handler';
 import { GetCourseByIdHandler } from './application/query-handler/get-course-by-id.handler';
@@ -33,16 +38,18 @@ import { ServiceModule } from '@/common/service/service.module';
     ServiceModule,
   ],
 
-  controllers: [CoursesController],
+  controllers: [CoursesController, InstructorCoursesController],
 
   providers: [
     CourseRepository,
 
     {
       provide: COURSE_REPOSITORY,
+
       useExisting: CourseRepository,
     },
 
+    // Command handlers
     CreateCourseHandler,
     UpdateCourseHandler,
     DeleteCourseHandler,
@@ -54,6 +61,8 @@ import { ServiceModule } from '@/common/service/service.module';
 
     GetCoursesHandler,
     GetAdminCoursesHandler,
+    GetInstructorCoursesHandler,
+
     GetCourseBySlugHandler,
     GetCourseByIdHandler,
     PreviewCourseQueryHandler,

@@ -22,7 +22,6 @@ import {Avatar, AvatarFallback, AvatarImage} from "@fe/components/ui/avatar"
 import {Separator} from "@fe/components/ui/separator"
 import {UserStatus} from "@/features/users/constants/users.constants.ts";
 import {useInstructor} from "@/features/instructors/hook/use-instructors.ts";
-import {getAvatarUrl} from "@/features/users/utils/ultis.ts";
 import {formatDate} from "@/features/instructors/utils.ts";
 import {PageSkeleton} from "@/features/users/components/skeleton.tsx";
 import {ReloadingOverlay} from "@/components/common/page/reloading-overlay.tsx";
@@ -81,16 +80,16 @@ export function InstructorDetailPage() {
             <div className="p-6 mx-auto">
                 <Button variant="ghost" size="sm" onClick={() => navigate("/instructors")} className="mb-6 -ml-2">
                     <ArrowLeft className="size-4"/>
-                    Back to Instructors
+                    Quay lại danh sách
                 </Button>
                 <div className="flex flex-col items-center justify-center py-24 text-center">
                     <UserIcon className="size-12 text-muted-foreground mb-4"/>
-                    <h2 className="text-lg font-semibold">Instructor not found</h2>
+                    <h2 className="text-lg font-semibold">Không tìm thấy giảng viên</h2>
                     <p className="text-sm text-muted-foreground mt-1">
-                        The instructor you are looking for does not exist or has been removed.
+                        Giảng viên bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.
                     </p>
                     <Button className="mt-6" onClick={() => navigate("/instructors")}>
-                        Back to Instructors
+                        Quay lại danh sách
                     </Button>
                 </div>
             </div>
@@ -107,7 +106,7 @@ export function InstructorDetailPage() {
             {/* Back */}
             <Button variant="ghost" size="sm" onClick={() => navigate("/instructors")} className="-ml-2">
                 <ArrowLeft className="size-4"/>
-                Back to Instructors
+                Quay lại danh sách
             </Button>
 
             <div className="flex gap-5 justify-between">
@@ -148,7 +147,7 @@ export function InstructorDetailPage() {
                                 disabled={isFetching}
                             >
                                 <RefreshCw className={`size-3.5 ${isFetching ? "animate-spin" : ""}`}/>
-                                Reload
+                                Tải lại
                             </Button>
                             <Button
                                 variant="outline"
@@ -156,7 +155,7 @@ export function InstructorDetailPage() {
                                 onClick={() => navigate(`/instructors/${instructor.id}/edit`)}
                             >
                                 <Pencil className="size-3.5"/>
-                                Edit
+                                Sửa
                             </Button>
                             {isBlocked ? (
                                 <Button
@@ -165,7 +164,7 @@ export function InstructorDetailPage() {
                                     disabled
                                 >
                                     <CheckCircle className="size-3.5"/>
-                                    Unblock
+                                    Bỏ chặn
                                 </Button>
                             ) : (
                                 <Button
@@ -174,7 +173,7 @@ export function InstructorDetailPage() {
                                     disabled
                                 >
                                     <Ban className="size-3.5"/>
-                                    Block
+                                    Chặn
                                 </Button>
                             )}
                             <Button
@@ -183,7 +182,7 @@ export function InstructorDetailPage() {
                                 onClick={() => setDeleteOpen(true)}
                             >
                                 <Trash2 className="size-3.5"/>
-                                Delete
+                                Xóa
                             </Button>
                         </div>
                     </div>
@@ -199,7 +198,7 @@ export function InstructorDetailPage() {
 
                 {/* Account & Approval Details */}
                 <div className="rounded-xl border bg-card p-6 space-y-4 grow-1">
-                    <h2 className="text-sm font-semibold">Account Details</h2>
+                    <h2 className="text-sm font-semibold">Thông tin tài khoản</h2>
                     <Separator/>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <DetailRow
@@ -211,7 +210,7 @@ export function InstructorDetailPage() {
                             <>
                                 <DetailRow
                                     icon={<Award className="size-3.5"/>}
-                                    label="Approval Status"
+                                    label="Trạng thái duyệt"
                                     value={
                                         <Badge className={approvalStatusClassName[p.approvalStatus]}>
                                             {approvalStatusLabel[p.approvalStatus]}
@@ -220,32 +219,32 @@ export function InstructorDetailPage() {
                                 />
                                 <DetailRow
                                     icon={<Calendar className="size-3.5"/>}
-                                    label="Approved At"
+                                    label="Ngày duyệt"
                                     value={formatDate(p.approvedAt)}
                                 />
                                 <DetailRow
                                     icon={<Star className="size-3.5"/>}
-                                    label="Average Rating"
+                                    label="Đánh giá trung bình"
                                     value={p.avgRating != null ? `${Number(p.avgRating).toFixed(1)}/5` : "—"}
                                 />
                                 <DetailRow
                                     icon={<Users className="size-3.5"/>}
-                                    label="Total Students"
+                                    label="Tổng học viên"
                                     value={p.totalStudents != null ? Number(p.totalStudents) : 0}
                                 />
                                 <DetailRow
                                     icon={<DollarSign className="size-3.5"/>}
-                                    label="Revenue Share"
+                                    label="Phần trăm chia sẻ"
                                     value={p.revenueSharePct ? `${Number(p.revenueSharePct)}%` : "—"}
                                 />
                                 <DetailRow
                                     icon={<DollarSign className="size-3.5"/>}
-                                    label="Total Earned"
+                                    label="Tổng thu nhập"
                                     value={p.totalEarned ? `$${Number(p.totalEarned).toLocaleString()}` : "$0"}
                                 />
                                 <DetailRow
                                     icon={<DollarSign className="size-3.5"/>}
-                                    label="Pending Payout"
+                                    label="Chờ thanh toán"
                                     value={p.pendingPayout ? `$${Number(p.pendingPayout).toLocaleString()}` : "$0"}
                                 />
                             </>

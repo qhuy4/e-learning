@@ -4,6 +4,7 @@ import {Upload, X, Link, ImageIcon} from "lucide-react"
 import {Button} from "@fe/components/ui/button"
 import {Input} from "@fe/components/ui/input"
 import {cn} from "@fe/lib/utils"
+import {getAvatarUrl} from "@/features/users/utils/ultis.ts";
 
 interface AvatarUploadProps {
     value: string

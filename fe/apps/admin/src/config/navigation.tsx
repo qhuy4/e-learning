@@ -18,92 +18,78 @@ type Navigation = {
 };
 
 export const navigation: Navigation = {
-  main: [
-    {
-      label: "Quản lý chung",
-      items: [
+    main: [
         {
-          title: "Tổng quan",
-          url: "/",
-          icon: LayoutDashboard,
+            label: "Quản lý chung",
+            items: [
+                {
+                    title: "Tổng quan",
+                    url: "/",
+                    icon: LayoutDashboard,
+                },
+                {
+                    title: "Analytics",
+                    url: "/analytics",
+                    icon: ChartBar,
+                },
+            ],
         },
         {
-          title: "Analytics",
-          url: "/analytics",
-          icon: ChartBar,
-        },
-      ],
-    },
-
-    {
-      label: "Management",
-      items: [
-        {
-          title: "Users",
-          url: "/users",
-          icon: Users,
-        },
-        {
-          title: "Teachers",
-          url: "/teachers",
-          icon: GraduationCap,
+            label: "Management",
+            items: [
+                {
+                    title: "Users",
+                    url: "/users",
+                    icon: Users,
+                },
+                {
+                    title: "Teachers",
+                    url: "/teachers",
+                    icon: GraduationCap,
+                },
+            ],
         },
         {
-          title: "Students",
-          url: "/students",
-          icon: UserRound,
+            label: "Học tập",
+            items: [
+                {
+                    title: "Khóa học của tôi",
+                    url: "/courses",
+                    icon: BookOpen,
+                },
+                {
+                    title: "Học viên",
+                    url: "/students",
+                    icon: UserRound,
+                },
+                {
+                    title: "Giảng viên",
+                    url: "/instructors",
+                    icon: GraduationCap,
+                },
+                {
+                    title: "Đánh giá",
+                    url: "/reviews",
+                    icon: Star,
+                },
+            ],
         },
         {
-          title: "Quản lý khóa học",
-          url: "/admin-courses",
-          icon: BookOpen,
+            label: "Tài chính",
+            items: [
+                {
+                    title: "Doanh thu",
+                    url: "/earnings",
+                    icon: DollarSign,
+                },
+                {
+                    title: "Duyệt Giảng Viên (eKYC)",
+                    url: "/instructors/approvals",
+                    icon: Users,
+                },
+            ],
         },
-      ],
-    },
-
-    {
-      label: "Học tập",
-      items: [
-        {
-          title: "Khóa học của tôi",
-          url: "/courses",
-          icon: BookOpen,
-        },
-        {
-          title: "Học viên",
-          url: "/students",
-          icon: Users,
-        },
-        {
-          title: "Giảng viên",
-          url: "/instructors",
-          icon: GraduationCap,
-        },
-        {
-          title: "Đánh giá",
-          url: "/reviews",
-          icon: Star,
-        },
-      ],
-    },
-
-    {
-      label: "Tài chính",
-      items: [
-        {
-          title: "Doanh thu",
-          url: "/earnings",
-          icon: DollarSign,
-        },
-        {
-          title: "Duyệt Giảng Viên (eKYC)",
-          url: "/instructors/approvals",
-          icon: Users,
-        },
-      ],
-    },
-  ],
-
+    ],
   secondary: [
     {
       title: "Cài đặt",

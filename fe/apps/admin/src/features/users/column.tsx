@@ -108,8 +108,8 @@ function createActionsColumn<T>(
         id: "actions",
 
         header: () => (
-            <span className="sr-only">
-                Actions
+                <span className="sr-only">
+                Thao tác
             </span>
         ),
 
@@ -188,7 +188,7 @@ export function createUserColumns(
         columnHelper.accessor("name", {
             header: (info) => (
                 <SortHeader
-                    label="User"
+                    label="Người dùng"
                     columnId="name"
                     info={info}
                 />
@@ -239,7 +239,7 @@ export function createUserColumns(
         columnHelper.accessor("role", {
             header: (info) => (
                 <SortHeader
-                    label="Role"
+                    label="Vai trò"
                     columnId="role"
                     info={info}
                 />
@@ -259,7 +259,7 @@ export function createUserColumns(
         columnHelper.accessor("status", {
             header: (info) => (
                 <SortHeader
-                    label="Status"
+                    label="Trạng thái"
                     columnId="status"
                     info={info}
                 />
@@ -279,7 +279,7 @@ export function createUserColumns(
         columnHelper.accessor("createdAt", {
             header: (info) => (
                 <SortHeader
-                    label="Created"
+                    label="Ngày tạo"
                     columnId="createdAt"
                     info={info}
                 />

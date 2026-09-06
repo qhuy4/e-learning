@@ -14,6 +14,7 @@ import { StorageModule } from './common/storage/storage.module';
 import { InstructorModule } from '@/modules/instructors/instructor.module';
 import { LocationModule } from '@/modules/locations/location.module';
 import { LessonProgressModule } from './modules/lesson-progress/lesson-progress.module';
+import { ReviewsModule } from '@/modules/reviews/reviews.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { LessonProgressModule } from './modules/lesson-progress/lesson-progress.
       },
     }),
     LocationModule,
+    ReviewsModule,
     UserModule,
     AuthModule,
     InstructorModule,

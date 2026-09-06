@@ -6,6 +6,7 @@ export class GetUsersQuery {
       keyword?: string;
       sortBy?: string;
       sortOrder?: "asc" | "desc";
+      role?: number;
     },
   ) {}
 }

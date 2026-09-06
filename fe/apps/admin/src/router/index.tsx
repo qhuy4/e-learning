@@ -14,15 +14,19 @@ import { InstructorEditPage } from "@/pages/instructors/instructor-edit-page.tsx
 import { InstructorApprovalsPage } from "@/pages/instructors/instructor-approvals-page";
 
 import LoginPage from "@/pages/authen/login-page.tsx";
-
-import { ProtectedRoute } from "@/router/protectedRoute.tsx";
-import { PublicRoute } from "@/router/publishRoute.tsx";
-
+import {ProtectedRoute} from "@/router/protectedRoute.tsx";
+import {PublicRoute} from "@/router/publishRoute.tsx";
 import { CreateCoursePage } from "@/pages/courses/create-course-page";
 import { CoursesListPage } from "@/pages/courses/courses-list-page";
 import { AdminCoursesListPage } from "@/pages/admin-courses/admin-courses-list-page";
 
 import { CreateLessonPage } from "@/features/lessons/pages/create-lesson-page";
+import {UserEditPage} from "@/pages/users/user-edit-page.tsx";
+import {UserCreatePage} from "@/pages/users/user-create-page.tsx";
+import InstructorsPage from "@/pages/instructors/instructors-page.tsx";
+import {InstructorDetailPage} from "@/pages/instructors/instructor-detail-page.tsx";
+import {InstructorEditPage} from "@/pages/instructors/instructor-edit-page.tsx";
+
 
 export const router = createBrowserRouter([
   {
