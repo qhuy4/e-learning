@@ -13,6 +13,7 @@ import { LessonsModule } from './modules/lessons/lessons.module';
 import { StorageModule } from './common/storage/storage.module';
 import { InstructorModule } from '@/modules/instructors/instructor.module';
 import { LocationModule } from '@/modules/locations/location.module';
+import { ReviewsModule } from '@/modules/reviews/reviews.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { LocationModule } from '@/modules/locations/location.module';
       },
     }),
     LocationModule,
+    ReviewsModule,
     UserModule,
     AuthModule,
     InstructorModule,

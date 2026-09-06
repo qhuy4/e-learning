@@ -12,6 +12,7 @@ export interface FindUsersOptions {
   keyword?: string;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  role?: number;
 }
 
 @Injectable()
@@ -84,7 +85,7 @@ export class UserRepository implements IUserRepository {
   async findAll(
     options: FindUsersOptions,
   ): Promise<{ users: User[]; total: number }> {
-    const { page, limit, keyword, sortBy, sortOrder } = options;
+    const { page, limit, keyword, sortBy, sortOrder, role } = options;
     const query = this.repository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.profile', 'profile')
@@ -94,6 +95,10 @@ export class UserRepository implements IUserRepository {
         'profile.first_name',
         'profile.last_name',
       ]);
+
+    if (role !== undefined && role !== null) {
+      query.andWhere('user.role = :role', { role });
+    }
 
     if (keyword) {
       query.andWhere(
