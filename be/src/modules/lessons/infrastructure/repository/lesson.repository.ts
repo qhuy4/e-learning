@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { LessonOrmEntity } from '../entity/lesson.orm-entity';
+import { LessonMapper } from '../mapper/lesson.mapper';
 
 import { Lesson } from '../../domain/entity/lesson.entity';
 import { ILessonRepository } from '../../domain/repository/lesson.repository';
@@ -25,7 +26,7 @@ export class LessonRepository implements ILessonRepository {
       return null;
     }
 
-    return this.toDomain(entity);
+    return LessonMapper.toDomain(entity);
   }
 
   async findBySlug(sectionId: number, slug: string): Promise<Lesson | null> {
@@ -40,7 +41,21 @@ export class LessonRepository implements ILessonRepository {
       return null;
     }
 
-    return this.toDomain(entity);
+    return LessonMapper.toDomain(entity);
+  }
+
+  async findGlobalBySlug(slug: string): Promise<Lesson | null> {
+    const entity = await this.repository.findOne({
+      where: {
+        slug,
+      },
+    });
+
+    if (!entity) {
+      return null;
+    }
+
+    return LessonMapper.toDomain(entity);
   }
 
   async create(lesson: Lesson): Promise<Lesson> {
@@ -61,7 +76,7 @@ export class LessonRepository implements ILessonRepository {
 
     const saved = await this.repository.save(entity);
 
-    return this.toDomain(saved);
+    return LessonMapper.toDomain(saved);
   }
 
   async update(lesson: Lesson): Promise<Lesson> {
@@ -87,31 +102,23 @@ export class LessonRepository implements ILessonRepository {
 
     const saved = await this.repository.save(entity);
 
-    return this.toDomain(saved);
+    return LessonMapper.toDomain(saved);
   }
 
   async delete(id: number): Promise<void> {
     await this.repository.softDelete(id);
   }
 
-  private toDomain(entity: LessonOrmEntity): Lesson {
-    return Lesson.restore({
-      id: Number(entity.id),
-      sectionId: Number(entity.sectionId),
-      title: entity.title,
-      slug: entity.slug,
-      type: entity.type,
-      videoProvider: entity.videoProvider,
-      videoSource: entity.videoSource,
-      duration: entity.duration,
-      content: entity.content,
-      position: entity.position,
-      publishedAt: entity.publishedAt,
-      status: entity.status,
-      isPreview: entity.isPreview,
-      createdAt: entity.createdAt,
-      updatedAt: entity.updatedAt,
-      deletedAt: entity.deletedAt,
+  async findBySectionId(sectionId: number): Promise<Lesson[]> {
+    const entities = await this.repository.find({
+      where: {
+        sectionId: sectionId.toString(),
+      },
+      order: {
+        position: 'ASC',
+      },
     });
+
+    return entities.map((entity) => LessonMapper.toDomain(entity));
   }
 }

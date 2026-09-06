@@ -141,4 +141,19 @@ export class Lesson {
       this.isPreview = params.isPreview;
     }
   }
+  clone(sectionId: number): Lesson {
+    return Lesson.create({
+      sectionId,
+      title: this.title,
+      slug: this.slug,
+      type: this.type,
+      videoProvider: this.videoProvider,
+      videoSource: this.videoSource,
+      duration: this.duration,
+      content: this.content,
+      position: this.position,
+      status: this.status,
+      isPreview: this.isPreview,
+    });
+  }
 }

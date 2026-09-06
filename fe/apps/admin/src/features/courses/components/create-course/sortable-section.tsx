@@ -27,6 +27,7 @@ interface SortableSectionProps {
   data: Course;
   updateData: (data: Partial<Course>) => void;
   courseId?: string | number;
+  readOnly?: boolean;
 }
 
 export function SortableSection({
@@ -34,6 +35,7 @@ export function SortableSection({
   data,
   updateData,
   courseId,
+  readOnly = false,
 }: SortableSectionProps) {
   const navigate = useNavigate();
 
@@ -175,13 +177,15 @@ export function SortableSection({
       >
         {/* Section header */}
         <div className="flex items-center gap-3 p-4 bg-muted/30 border-b border-border">
-          <div
-            {...attributes}
-            {...listeners}
-            className="cursor-grab hover:bg-muted p-1.5 rounded-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <GripVertical className="h-5 w-5" />
-          </div>
+          {!readOnly && (
+            <div
+              {...attributes}
+              {...listeners}
+              className="cursor-grab hover:bg-muted p-1.5 rounded-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <GripVertical className="h-5 w-5" />
+            </div>
+          )}
 
           <button
             type="button"
@@ -205,13 +209,15 @@ export function SortableSection({
 
           <Input
             value={editingTitle}
+            disabled={readOnly}
+            readOnly={readOnly}
             onChange={(e) => setEditingTitle(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") handleSaveTitle(); }}
-            className="flex-1 h-9 bg-transparent border-transparent hover:border-input focus:bg-background transition-colors font-medium text-foreground"
+            className={`flex-1 h-9 bg-transparent border-transparent font-medium text-foreground ${readOnly ? "cursor-default" : "hover:border-input focus:bg-background transition-colors"}`}
           />
 
-          {/* Save title button — only visible when title changed */}
-          {titleChanged && (
+          {/* Save title button — only visible when title changed and not readOnly */}
+          {!readOnly && titleChanged && (
             <Button
               variant="ghost"
               size="sm"
@@ -224,24 +230,28 @@ export function SortableSection({
             </Button>
           )}
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate(`/lessons/create?sectionId=${section.id}`)}
-            className="rounded-md text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 shadow-sm"
-          >
-            <Plus className="h-4 w-4 mr-1.5" />
-            Thêm bài học
-          </Button>
+          {!readOnly && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate(`/lessons/create?sectionId=${section.id}`)}
+                className="rounded-md text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 shadow-sm"
+              >
+                <Plus className="h-4 w-4 mr-1.5" />
+                Thêm bài học
+              </Button>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setConfirmDeleteSection(true)}
-            className="rounded-md text-destructive hover:text-destructive hover:bg-destructive/10"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setConfirmDeleteSection(true)}
+                className="rounded-md text-destructive hover:text-destructive hover:bg-destructive/10"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Lessons list */}
@@ -267,6 +277,7 @@ export function SortableSection({
                         key={lesson.id}
                         lesson={lesson}
                         index={index}
+                        readOnly={readOnly}
                         onEdit={(id) => navigate(`/lessons/${id}/edit`)}
                         onDelete={(id) => setDeletingLessonId(id)}
                       />

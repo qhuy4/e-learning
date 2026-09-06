@@ -1,111 +1,121 @@
 import {
-    LayoutDashboard,
-    Users,
-    Settings, ChartBar, GraduationCap, UserRound,
-    LogOut,
-    BookOpen,
-    DollarSign,
-    Star
-} from "lucide-react"
-import type { NavGroup,NavItem } from "@/shared/types/navigation"
-type Navigation = {
-    main: NavGroup[]
-    secondary: NavItem[]
-}
-export const navigation: Navigation = {
-    main: [
-        {
-            label: "Quản lý chung",
-            items: [
-                {
-                    title: "Tổng quan",
-                    url: "/",
-                    icon: LayoutDashboard,
-                },
-                {
-                    title: "Analytics",
-                    url: "/analytics",
-                    icon: ChartBar,
-                },
-            ],
-        },
-        {
-            label: "Management",
-            items: [
-                {
-                    title: "Users",
-                    url: "/users",
-                    icon: Users,
-                },
-                {
-                    title: "Teachers",
-                    url: "/teachers",
-                    icon: GraduationCap,
-                },
-                {
-                    title: "Students",
-                    url: "/sttudents",
-                    icon: UserRound,
-                },
-            ],
-        },
-        {
-            label: "Học tập",
-            items: [
-                {
-                    title: "Khóa học của tôi",
-                    url: "/courses",
-                    icon: BookOpen,
-                },
-                {
-                    title: "Học viên",
-                    url: "/students",
-                    icon: Users,
-                },
-                {
-                    title: "Teachers",
-                    url: "/teachers",
-                    icon: GraduationCap,
-                },
-                {
-                    title: "Students",
-                    url: "/sttudents",
-                    icon: UserRound,
-                },
-                {
-                    title: "Đánh giá",
-                    url: "/reviews",
-                    icon: Star,
-                },
-            ],
-        },
-        {
-            label: "Tài chính",
-            items: [
-                {
-                    title: "Doanh thu",
-                    url: "/earnings",
-                    icon: DollarSign,
-                },
-                {
-                    title: "Duyệt Giảng Viên (eKYC)",
-                    url: "/instructors/approvals",
-                    icon: Users,
-                },
-            ],
-        },
-    ],
+  LayoutDashboard,
+  Users,
+  Settings,
+  ChartBar,
+  GraduationCap,
+  UserRound,
+  LogOut,
+  BookOpen,
+  DollarSign,
+  Star,
+} from "lucide-react";
+import type { NavGroup, NavItem } from "@/shared/types/navigation";
 
-    secondary: [
+type Navigation = {
+  main: NavGroup[];
+  secondary: NavItem[];
+};
+
+export const navigation: Navigation = {
+  main: [
+    {
+      label: "Quản lý chung",
+      items: [
         {
-            title: "Cài đặt",
-            url: "/settings",
-            icon: Settings,
+          title: "Tổng quan",
+          url: "/",
+          icon: LayoutDashboard,
         },
         {
-            title: "Đăng xuất",
-            url: "/logout",
-            icon: LogOut,
+          title: "Analytics",
+          url: "/analytics",
+          icon: ChartBar,
         },
-    ],
-}
+      ],
+    },
+    {
+      label: "Management",
+      items: [
+        {
+          title: "Users",
+          url: "/users",
+          icon: Users,
+        },
+        {
+          title: "Teachers",
+          url: "/teachers",
+          icon: GraduationCap,
+        },
+        {
+          title: "Students",
+          url: "/students",
+          icon: UserRound,
+        },
+        {
+          title: "Quản lý khóa học",
+          url: "/admin-courses",
+          icon: BookOpen,
+        },
+      ],
+    },
+    {
+      label: "Học tập",
+      items: [
+        {
+          title: "Khóa học của tôi",
+          url: "/courses",
+          icon: BookOpen,
+        },
+        {
+          title: "Học viên",
+          url: "/students",
+          icon: Users,
+        },
+        {
+          title: "Teachers",
+          url: "/teachers",
+          icon: GraduationCap,
+        },
+        {
+          title: "Students",
+          url: "/students",
+          icon: UserRound,
+        },
+        {
+          title: "Đánh giá",
+          url: "/reviews",
+          icon: Star,
+        },
+      ],
+    },
+    {
+      label: "Tài chính",
+      items: [
+        {
+          title: "Doanh thu",
+          url: "/earnings",
+          icon: DollarSign,
+        },
+        {
+          title: "Duyệt Giảng Viên (eKYC)",
+          url: "/instructors/approvals",
+          icon: Users,
+        },
+      ],
+    },
+  ],
+
+  secondary: [
+    {
+      title: "Cài đặt",
+      url: "/settings",
+      icon: Settings,
+    },
+    {
+      title: "Đăng xuất",
+      url: "/logout",
+      icon: LogOut,
+    },
+  ],
+};

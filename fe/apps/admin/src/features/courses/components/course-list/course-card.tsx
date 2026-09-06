@@ -1,5 +1,6 @@
 import { Button } from "@fe/components/ui/button";
-import { Edit, Trash2, BookOpen } from "lucide-react";
+import { Edit, Trash2, BookOpen, Eye, RotateCcw } from "lucide-react";
+import { courseService } from "../../services/course.service";
 
 export const LEVEL_LABELS: Record<number, string> = {
   1: "Cơ bản",
@@ -10,7 +11,7 @@ export const LEVEL_LABELS: Record<number, string> = {
 export const STATUS_CONFIG: Record<number, { label: string; className: string }> = {
   1: { label: "Bản nháp", className: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300" },
   2: { label: "Chờ duyệt", className: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" },
-  3: { label: "Đã duyệt", className: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" },
+  4: { label: "Bị từ chối", className: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" },
   5: { label: "Đã xuất bản", className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" },
   6: { label: "Lưu trữ", className: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400" },
 };
@@ -24,14 +25,37 @@ interface CourseCardProps {
     level: number;
     price: number;
     status: number;
+    slug?: string;
+    parentId?: number | null;
   };
-  onEdit: (id: string) => void;
+  onEdit: (course: any) => void;
   onDelete: (id: string) => void;
   isDeleting?: boolean;
+  onCancelReview?: (course: any) => void;
+  isCancelingReview?: boolean;
 }
 
-export function CourseCard({ course, onEdit, onDelete, isDeleting }: CourseCardProps) {
+export function CourseCard({
+  course,
+  onEdit,
+  onDelete,
+  isDeleting,
+  onCancelReview,
+  isCancelingReview,
+}: CourseCardProps) {
   const statusInfo = STATUS_CONFIG[course.status];
+  const isPendingReview = course.status === 2;
+
+  const handlePreview = async () => {
+    try {
+      const res = await courseService.getPreviewToken(course.id);
+      if (res?.token) {
+        window.open(`http://localhost:5173/courses/preview/${res.token}`, '_blank');
+      }
+    } catch (error) {
+      console.error('Lỗi lấy preview token:', error);
+    }
+  };
 
   return (
     <div className="group bg-card rounded-xl border border-border shadow-sm hover:shadow-lg transition-all duration-200 overflow-hidden flex flex-col">
@@ -61,15 +85,39 @@ export function CourseCard({ course, onEdit, onDelete, isDeleting }: CourseCardP
 
         {/* Quick action on hover */}
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+          {/* Nút Xem thử luôn hiển thị */}
           <Button
             size="sm"
             variant="secondary"
-            onClick={() => onEdit(course.id)}
-            className="shadow-md"
+            onClick={handlePreview}
+            className="shadow-md bg-white/90 text-emerald-700 hover:text-emerald-800 hover:bg-white dark:bg-zinc-800/90 dark:text-emerald-400"
           >
-            <Edit className="h-4 w-4 mr-1.5" />
-            Chỉnh sửa
+            <Eye className="h-4 w-4 mr-1.5" />
+            Xem thử
           </Button>
+
+          {isPendingReview ? (
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => onCancelReview?.(course)}
+              disabled={isCancelingReview}
+              className="shadow-md bg-white/90 text-amber-600 hover:text-amber-700 hover:bg-white dark:bg-zinc-800/90 dark:text-amber-400"
+            >
+              <RotateCcw className="h-4 w-4 mr-1.5" />
+              Hủy duyệt
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => onEdit(course)}
+              className="shadow-md bg-white/90 text-slate-700 hover:text-slate-900 hover:bg-white dark:bg-zinc-800/90 dark:text-slate-300"
+            >
+              <Edit className="h-4 w-4 mr-1.5" />
+              Chỉnh sửa
+            </Button>
+          )}
         </div>
       </div>
 
@@ -81,13 +129,18 @@ export function CourseCard({ course, onEdit, onDelete, isDeleting }: CourseCardP
           </h3>
         </div>
 
-        {statusInfo && (
-          <div className="mb-3">
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          {statusInfo && (
             <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusInfo.className}`}>
               {statusInfo.label}
             </span>
-          </div>
-        )}
+          )}
+          {course.parentId && (
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+              Đang cập nhật phiên bản mới
+            </span>
+          )}
+        </div>
 
         <p className="text-sm text-muted-foreground line-clamp-2 mb-4 flex-1">
           {course.description || "Chưa có mô tả cho khóa học này."}
@@ -102,15 +155,42 @@ export function CourseCard({ course, onEdit, onDelete, isDeleting }: CourseCardP
           </div>
 
           <div className="flex gap-1">
+            {/* Nút Xem thử — màu xanh emerald */}
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => onEdit(course.id)}
-              className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg"
-              title="Chỉnh sửa"
+              onClick={handlePreview}
+              className="h-8 w-8 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 rounded-lg"
+              title="Xem thử"
             >
-              <Edit className="h-4 w-4" />
+              <Eye className="h-4 w-4" />
             </Button>
+
+            {/* Nút Hủy duyệt hoặc Chỉnh sửa — màu đồng nhất (primary) */}
+            {isPendingReview ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onCancelReview?.(course)}
+                disabled={isCancelingReview}
+                className="h-8 w-8 text-amber-600 hover:text-amber-700 hover:bg-amber-100 dark:text-amber-400 dark:hover:bg-amber-950/50 rounded-lg"
+                title="Hủy duyệt để chỉnh sửa"
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onEdit(course)}
+                className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg"
+                title="Chỉnh sửa"
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+            )}
+
+            {/* Nút Xóa — màu đỏ */}
             <Button
               variant="ghost"
               size="icon"

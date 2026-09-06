@@ -2,7 +2,7 @@ import { Inject, NotFoundException } from '@nestjs/common';
 
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import slugify from 'slugify';
+import { SlugUtil } from '../../../../common/utils/slug.util';
 
 import { UpdateSectionCommand } from '../command/update-section.command';
 
@@ -26,11 +26,7 @@ export class UpdateSectionHandler implements ICommandHandler<UpdateSectionComman
     }
 
     const slug = command.data.title
-      ? slugify(command.data.title, {
-          lower: true,
-          strict: true,
-          trim: true,
-        })
+      ? SlugUtil.generate(command.data.title)
       : undefined;
 
     section.update({

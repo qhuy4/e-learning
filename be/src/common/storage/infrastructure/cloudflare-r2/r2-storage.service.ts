@@ -23,6 +23,12 @@ import {
 export class R2StorageService implements FileStorage {
   private readonly client: S3Client;
   private readonly bucketName: string;
+  /**
+   * URL gốc của server (APP_URL).
+   * Dùng để build storage proxy URL: {appUrl}/storage/{key}
+   * Proxy tự generate signed URL → redirect → browser tải ảnh từ R2 private bucket.
+   */
+  private readonly appUrl: string;
 
   constructor(private readonly configService: ConfigService) {
     this.bucketName = this.configService.getOrThrow<string>('r2.bucketName');
@@ -34,6 +40,9 @@ export class R2StorageService implements FileStorage {
     const secretAccessKey =
       this.configService.getOrThrow<string>('r2.secretAccessKey');
 
+    this.appUrl =
+      this.configService.get<string>('r2.appUrl') ?? 'http://localhost:3001';
+
     this.client = new S3Client({
       region: 'auto',
 
@@ -44,6 +53,17 @@ export class R2StorageService implements FileStorage {
         secretAccessKey,
       },
     });
+  }
+
+  /**
+   * Trả về URL qua BE storage proxy: {appUrl}/storage/{key}
+   * - FE request URL này → BE `/storage/*` handler generate signed URL → redirect → load ảnh
+   * - Hoạt động với bucket PRIVATE, không cần public access
+   * - Không bao giờ expire (luôn generate fresh signed URL per request)
+   */
+  getPublicUrl(key: string): string | null {
+    if (!key) return null;
+    return `${this.appUrl.replace(/\/$/, '')}/storage/${key}`;
   }
 
   async upload(input: UploadFileInput): Promise<void> {

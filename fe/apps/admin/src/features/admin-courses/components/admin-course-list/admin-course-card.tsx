@@ -1,0 +1,161 @@
+import { Button } from "@fe/components/ui/button";
+import { Eye, CheckCircle, XCircle, BookOpen } from "lucide-react";
+import { adminCourseService } from "../../services/admin-course.service";
+
+export const LEVEL_LABELS: Record<number, string> = {
+  1: "Cơ bản",
+  2: "Trung bình",
+  3: "Nâng cao",
+};
+
+export const STATUS_CONFIG: Record<number, { label: string; className: string }> = {
+  1: { label: "Bản nháp", className: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300" },
+  2: { label: "Chờ duyệt", className: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" },
+  4: { label: "Từ chối", className: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" },
+  5: { label: "Đã xuất bản", className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" },
+  6: { label: "Lưu trữ", className: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400" },
+};
+
+interface AdminCourseCardProps {
+  course: {
+    id: string;
+    title: string;
+    description: string | null;
+    thumbnail: string | null;
+    level: number;
+    price: number;
+    status: number;
+    slug?: string;
+    parentId?: number | null;
+  };
+  onPreview: (course: any) => void;
+  onApprove: (id: string) => void;
+  onReject: (id: string) => void;
+  isProcessing?: boolean;
+}
+
+export function AdminCourseCard({ course, onPreview, onApprove, onReject, isProcessing }: AdminCourseCardProps) {
+  const statusInfo = STATUS_CONFIG[course.status];
+
+  return (
+    <div className="group bg-card rounded-xl border border-border shadow-sm hover:shadow-lg transition-all duration-200 overflow-hidden flex flex-col">
+      {/* Thumbnail */}
+      <div className="aspect-video bg-muted relative overflow-hidden">
+        {course.thumbnail ? (
+          <img
+            src={course.thumbnail}
+            alt={course.title}
+            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+          />
+        ) : (
+          <div className="flex flex-col items-center justify-center w-full h-full gap-2 text-muted-foreground">
+            <BookOpen className="h-8 w-8 opacity-40" />
+            <span className="text-xs opacity-60">Chưa có ảnh</span>
+          </div>
+        )}
+
+        {/* Level badge */}
+        {course.level && (
+          <div className="absolute top-2 left-2">
+            <span className="px-2 py-0.5 text-xs font-semibold bg-background/90 backdrop-blur-sm rounded-md shadow-sm border border-border/50">
+              {LEVEL_LABELS[course.level] ?? course.level}
+            </span>
+          </div>
+        )}
+
+        {/* Quick action on hover */}
+        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+          <Button 
+            size="sm" 
+            variant="secondary" 
+            onClick={async () => {
+              try {
+                const res = await adminCourseService.getPreviewToken(course.id);
+                if (res?.token) {
+                  window.open(`http://localhost:5173/courses/preview/${res.token}`, '_blank');
+                }
+              } catch (error) {
+                console.error('Lỗi lấy preview token:', error);
+              }
+            }} 
+            className="shadow-md"
+          >
+            <BookOpen className="h-4 w-4 mr-1.5" />
+            Xem chi tiết
+          </Button>
+        </div>
+      </div>
+
+      {/* Card body */}
+      <div className="p-5 flex flex-col flex-1">
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <h3 className="font-semibold text-base line-clamp-2 leading-snug group-hover:text-primary transition-colors flex-1">
+            {course.title}
+          </h3>
+        </div>
+
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          {statusInfo && (
+            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusInfo.className}`}>
+              {statusInfo.label}
+            </span>
+          )}
+          {course.parentId && (
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+              Cập nhật phiên bản
+            </span>
+          )}
+        </div>
+
+        <p className="text-sm text-muted-foreground line-clamp-2 mb-4 flex-1">
+          {course.description || "Chưa có mô tả cho khóa học này."}
+        </p>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between pt-4 border-t border-border">
+          <div className="font-bold text-primary text-base">
+            {course.price > 0
+              ? `${Number(course.price).toLocaleString("vi-VN")} đ`
+              : "Miễn phí"}
+          </div>
+
+          <div className="flex gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onPreview(course)}
+              className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg"
+              title="Xem trước"
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
+            {course.status === 2 && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onApprove(course.id)}
+                  disabled={isProcessing}
+                  className="h-8 w-8 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-100 rounded-lg"
+                  title="Duyệt"
+                >
+                  <CheckCircle className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onReject(course.id)}
+                  disabled={isProcessing}
+                  className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg"
+                  title="Từ chối"
+                >
+                  <XCircle className="h-4 w-4" />
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

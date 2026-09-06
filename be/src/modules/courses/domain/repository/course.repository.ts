@@ -16,4 +16,6 @@ export interface ICourseRepository {
   update(course: Course): Promise<Course>;
 
   delete(id: number): Promise<void>;
+
+  findUnpublishedClone(parentId: number): Promise<Course | null>;
 }

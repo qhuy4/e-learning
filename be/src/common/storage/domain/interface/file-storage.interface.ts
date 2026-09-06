@@ -25,6 +25,9 @@ export interface FileStorage {
 
   createDownloadUrl(input: CreateDownloadUrlInput): Promise<string>;
 
+  /** Trả về public URL trực tiếp (không cần signed, không expire) nếu bucket public */
+  getPublicUrl(key: string): string | null;
+
   delete(key: string): Promise<void>;
 
   exists(key: string): Promise<boolean>;

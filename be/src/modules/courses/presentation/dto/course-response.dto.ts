@@ -2,14 +2,12 @@ import { Course } from '../../domain/entity/course.entity';
 import { CourseOrmEntity } from '../../infrastructure/entity/course.orm-entity';
 import { FileStorage } from '../../../../common/storage/domain/interface/file-storage.interface';
 
-// Download URL expires in 1 hour
-const DOWNLOAD_EXPIRES_IN = 3600;
+const DOWNLOAD_EXPIRES_IN = 600;
 
 function resolveThumbnailKey(thumbnail: string | null): string | null {
   if (!thumbnail) return null;
-  // If it's already a full URL (old data or external), extract the key or return as-is
-  // Keys are stored as short form: "courses/thumbnails/uuid.ext"
-  if (thumbnail.startsWith('http')) return null; // can't generate signed URL from full URL
+
+  if (thumbnail.startsWith('http')) return null;
   return thumbnail;
 }
 
@@ -24,6 +22,8 @@ export class CourseResponseDto {
   status: number;
   publishedAt: Date | null;
   createdAt: Date | null;
+  parentId: string | null;
+  version: number | null;
 
   static async fromEntity(
     entity: CourseOrmEntity,
@@ -41,7 +41,8 @@ export class CourseResponseDto {
     dto.status = entity.status;
     dto.publishedAt = entity.publishedAt;
     dto.createdAt = entity.createdAt;
-
+    dto.parentId = entity.parentId;
+    dto.version = entity.version;
     return dto;
   }
 
@@ -61,21 +62,33 @@ export class CourseResponseDto {
     dto.status = course.status;
     dto.publishedAt = course.publishedAt;
     dto.createdAt = course.createdAt;
+    dto.parentId = course.parentId ? String(course.parentId) : null;
 
     return dto;
   }
 }
 
+/**
+ * Tạo signed URL từ R2 storage key.
+ * - Key lưu trong DB: "courses/thumbnails/xxx.jpg"
+ * - Trả về: signed URL có thời hạn (600s theo config)
+ * - Nếu là URL đầy đủ rồi: trả về nguyên
+ * - Nếu null: trả về null
+ */
 export async function resolveSignedUrl(
   thumbnail: string | null,
   storage: FileStorage,
 ): Promise<string | null> {
   const key = resolveThumbnailKey(thumbnail);
-  if (!key) return thumbnail; // null or already full URL
+  if (!key) return thumbnail; // null hoặc đã là full URL
 
   try {
-    return await storage.createDownloadUrl({ key, expiresIn: DOWNLOAD_EXPIRES_IN });
+    return await storage.createDownloadUrl({
+      key,
+      expiresIn: DOWNLOAD_EXPIRES_IN,
+    });
   } catch {
+    // Nếu R2 fail, trả về null thay vì crash
     return null;
   }
 }

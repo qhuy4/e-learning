@@ -26,10 +26,11 @@ import {
 
 import { VideoUploader } from "./video-uploader";
 import { ThumbnailUploader } from "./thumbnail-uploader";
+import { validateLesson } from "../schemas/lesson.schema";
 
 interface LessonFormData {
   title: string;
-  slug: string;
+  slug?: string;
   type: "video";
   duration?: number;
   position?: number;
@@ -49,7 +50,6 @@ export function LessonForm({ initialData, onSave, onCancel }: LessonFormProps) {
   const isEditing = Boolean(initialData?.id);
 
   const [title, setTitle] = useState("");
-  const [slug, setSlug] = useState("");
   const [duration, setDuration] = useState("");
   const [content, setContent] = useState("");
   const [isPreview, setIsPreview] = useState(false);
@@ -60,7 +60,6 @@ export function LessonForm({ initialData, onSave, onCancel }: LessonFormProps) {
   useEffect(() => {
     if (!initialData) return;
     setTitle(initialData.title ?? "");
-    setSlug(initialData.slug ?? "");
     setDuration(initialData.duration ? String(initialData.duration) : "");
     setContent(initialData.content ?? "");
     setIsPreview(initialData.isPreview ?? false);
@@ -71,8 +70,13 @@ export function LessonForm({ initialData, onSave, onCancel }: LessonFormProps) {
   }, [initialData]);
 
   const handleSubmit = () => {
-    if (!title.trim()) {
-      toast.error("Vui lòng nhập tên bài học.");
+    const error = validateLesson({
+      title: title.trim(),
+      duration: duration ? Number(duration) : undefined,
+    });
+    
+    if (error) {
+      toast.error(error);
       return;
     }
 
@@ -84,7 +88,6 @@ export function LessonForm({ initialData, onSave, onCancel }: LessonFormProps) {
 
     onSave({
       title: title.trim(),
-      slug: slug.trim(),
       type: "video",
       duration: duration ? Number(duration) : undefined,
       position: position ? Number(position) : undefined,
@@ -128,22 +131,6 @@ export function LessonForm({ initialData, onSave, onCancel }: LessonFormProps) {
               </div>
             </div>
 
-            {/* SLUG */}
-            <div className="space-y-2">
-              <Label htmlFor="slug" className="font-medium">
-                Đường dẫn (Slug)
-              </Label>
-              <div className="relative">
-                <LinkIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="slug"
-                  placeholder="vd: huong-dan-cai-dat"
-                  className="pl-10 h-11 font-mono text-sm"
-                  value={slug}
-                  onChange={(e) => setSlug(e.target.value)}
-                />
-              </div>
-            </div>
 
             {/* VIDEO */}
             <div className="space-y-2 pt-2">

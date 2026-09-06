@@ -21,6 +21,9 @@ export const useUpdateCourse = () => {
       queryClient.invalidateQueries({
         queryKey: ["courses"],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["my-courses"],
+      });
     },
   });
 };
@@ -37,6 +40,13 @@ export const useGetCourses = (params?: { page?: number; limit?: number; level?: 
   return useQuery({
     queryKey: ["courses", params],
     queryFn: () => courseService.getCourses(params),
+  });
+};
+
+export const useGetMyCourses = (params?: { page?: number; limit?: number; level?: string; keyword?: string; status?: string }) => {
+  return useQuery({
+    queryKey: ["my-courses", params],
+    queryFn: () => courseService.getMyCourses(params),
   });
 };
 
@@ -77,6 +87,9 @@ export const useDeleteCourse = () => {
       queryClient.invalidateQueries({
         queryKey: ["courses"],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["my-courses"],
+      });
     },
   });
 };
@@ -92,4 +105,47 @@ export const useDeleteSection = () => {
       });
     },
   });
-};
+};
+
+export const useCloneCourse = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: courseService.cloneCourse,
+    onSuccess: async () => {
+      await queryClient.refetchQueries({
+        queryKey: ["my-courses"],
+      });
+      await queryClient.refetchQueries({
+        queryKey: ["courses"],
+      });
+    },
+    onError: (error: any) => {
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        'Không thể tạo bản sao khóa học';
+      throw new Error(message);
+    },
+  });
+};
+
+
+export const useCancelReviewCourse = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string | number) => courseService.cancelReview(id),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({
+        queryKey: ["course", String(id)],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["courses"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["my-courses"],
+      });
+    },
+  });
+};

@@ -33,4 +33,9 @@ export class GetCoursesDto {
   @Type(() => Number)
   @IsInt()
   status?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  instructorId?: number;
 }

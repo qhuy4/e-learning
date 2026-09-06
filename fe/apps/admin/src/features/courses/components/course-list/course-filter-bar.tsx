@@ -39,10 +39,12 @@ export function CourseFilterBar({
 
       <Select value={level} onValueChange={onLevelChange}>
         <SelectTrigger className="h-10 min-w-[160px]">
-          <SelectValue placeholder="Tất cả cấp độ" />
+          <SelectValue placeholder="Tất cả cấp độ">
+            {level === "1" ? "Cơ bản" : level === "2" ? "Trung bình" : level === "3" ? "Nâng cao" : "Tất cả cấp độ"}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">Tất cả cấp độ</SelectItem>
+          <SelectItem value="all">Tất cả cấp độ</SelectItem>
           <SelectItem value="1">Cơ bản</SelectItem>
           <SelectItem value="2">Trung bình</SelectItem>
           <SelectItem value="3">Nâng cao</SelectItem>
@@ -51,13 +53,15 @@ export function CourseFilterBar({
 
       <Select value={status} onValueChange={onStatusChange}>
         <SelectTrigger className="h-10 min-w-[160px]">
-          <SelectValue placeholder="Tất cả trạng thái" />
+          <SelectValue placeholder="Tất cả trạng thái">
+             {status === "1" ? "Bản nháp" : status === "2" ? "Chờ duyệt" : status === "4" ? "Bị từ chối" : status === "5" ? "Đã xuất bản" : status === "6" ? "Lưu trữ" : "Tất cả trạng thái"}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">Tất cả trạng thái</SelectItem>
+          <SelectItem value="all">Tất cả trạng thái</SelectItem>
           <SelectItem value="1">Bản nháp</SelectItem>
           <SelectItem value="2">Chờ duyệt</SelectItem>
-          <SelectItem value="3">Đã duyệt</SelectItem>
+          <SelectItem value="4">Bị từ chối</SelectItem>
           <SelectItem value="5">Đã xuất bản</SelectItem>
           <SelectItem value="6">Lưu trữ</SelectItem>
         </SelectContent>

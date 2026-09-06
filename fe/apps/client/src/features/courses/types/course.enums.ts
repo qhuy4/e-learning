@@ -9,9 +9,10 @@ export type CourseLevel = typeof CourseLevel[keyof typeof CourseLevel];
 export const CourseStatus = {
   DRAFT: 1,
   PENDING_REVIEW: 2,
-  PUBLISHED: 3,
+  APPROVED: 3,
   REJECTED: 4,
-  ARCHIVED: 5,
+  PUBLISHED: 5,
+  ARCHIVED: 6,
 } as const;
 
 export type CourseStatus = typeof CourseStatus[keyof typeof CourseStatus];

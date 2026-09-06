@@ -5,5 +5,6 @@ export class GetCoursesQuery {
     public readonly level?: number,
     public readonly keyword?: string,
     public readonly status?: number,
+    public readonly instructorId?: number,
   ) {}
 }

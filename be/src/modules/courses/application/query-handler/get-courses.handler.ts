@@ -25,10 +25,13 @@ export class GetCoursesHandler implements IQueryHandler<GetCoursesQuery> {
       level: query.level,
       keyword: query.keyword,
       status: query.status,
+      instructorId: query.instructorId,
     });
 
     const data = await Promise.all(
-      courses.map((entity) => CourseResponseDto.fromEntity(entity, this.storage)),
+      courses.map((entity) =>
+        CourseResponseDto.fromEntity(entity, this.storage),
+      ),
     );
 
     return {

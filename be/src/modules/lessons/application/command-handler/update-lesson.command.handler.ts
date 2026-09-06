@@ -1,6 +1,6 @@
 import { Inject, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import slugify from 'slugify';
+import { SlugUtil } from '../../../../common/utils/slug.util';
 import { extname } from 'path';
 import { randomUUID } from 'crypto';
 
@@ -32,11 +32,7 @@ export class UpdateLessonHandler implements ICommandHandler<UpdateLessonCommand>
     }
 
     const slug = command.data.title
-      ? slugify(command.data.title, {
-          lower: true,
-          strict: true,
-          trim: true,
-        })
+      ? SlugUtil.generate(command.data.title)
       : undefined;
 
     let videoSource = command.data.videoSource ?? lesson.videoSource;

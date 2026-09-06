@@ -12,6 +12,7 @@ export interface FindCoursesOptions {
   limit: number;
   level?: number;
   keyword?: string;
+  instructorId?: number;
 }
 
 @Injectable()
@@ -45,7 +46,7 @@ export class CourseRepository implements ICourseRepository {
     }
 
     query
-      .orderBy('course.publishedAt', 'DESC')
+      .orderBy('course.updatedAt', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
 
@@ -203,17 +204,47 @@ export class CourseRepository implements ICourseRepository {
       .andWhere('course.deletedAt IS NULL');
   }
 
+  async findUnpublishedClone(parentId: number): Promise<Course | null> {
+    const entity = await this.repository
+      .createQueryBuilder('course')
+      .where('course.parent_id = :parentId', { parentId })
+      .andWhere('course.status != :published', {
+        published: CourseStatus.PUBLISHED,
+      })
+      .andWhere('course.deletedAt IS NULL')
+      .getOne();
+
+    if (!entity) return null;
+    return CourseMapper.toDomain(entity);
+  }
+
   async findAllCourses(options: FindCoursesOptions & { status?: number }) {
-    const { page, limit, level, keyword, status } = options;
+    const { page, limit, level, keyword, status, instructorId } = options;
 
     const query = this.repository
       .createQueryBuilder('course')
-      .where('course.deletedAt IS NULL');
+      .where('course.deletedAt IS NULL')
+      .andWhere((qb) => {
+        const subQuery = qb
+          .subQuery()
+          .select('1')
+          .from('courses', 'child')
+          .where('child.parent_id = course.id')
+          .andWhere('child.deleted_at IS NULL')
+          .getQuery();
+
+        return `NOT EXISTS ${subQuery}`;
+      });
+
+    if (instructorId) {
+      query.andWhere('course.instructorId = :instructorId', { instructorId });
+    }
 
     if (level) {
       query.andWhere('course.level = :level', { level });
     }
-    if (status) {
+
+    if (status !== undefined) {
       query.andWhere('course.status = :status', { status });
     }
 
@@ -230,7 +261,50 @@ export class CourseRepository implements ICourseRepository {
     }
 
     query
-      .orderBy('course.createdAt', 'DESC')
+      .orderBy('course.updatedAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    return query.getManyAndCount();
+  }
+
+  /**
+   * Dành cho trang duyệt khóa học của admin.
+   * Hiện TẤT CẢ version, không filter NOT EXISTS child.
+   */
+  async findAllCoursesForAdmin(options: FindCoursesOptions & { status?: number }) {
+    const { page, limit, level, keyword, status, instructorId } = options;
+
+    const query = this.repository
+      .createQueryBuilder('course')
+      .where('course.deletedAt IS NULL');
+
+    if (instructorId) {
+      query.andWhere('course.instructorId = :instructorId', { instructorId });
+    }
+
+    if (level) {
+      query.andWhere('course.level = :level', { level });
+    }
+
+    if (status !== undefined) {
+      query.andWhere('course.status = :status', { status });
+    }
+
+    if (keyword) {
+      query.andWhere(
+        new Brackets((qb) => {
+          qb.where('course.title ILIKE :keyword', {
+            keyword: `%${keyword}%`,
+          }).orWhere('course.description ILIKE :keyword', {
+            keyword: `%${keyword}%`,
+          });
+        }),
+      );
+    }
+
+    query
+      .orderBy('course.updatedAt', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
 

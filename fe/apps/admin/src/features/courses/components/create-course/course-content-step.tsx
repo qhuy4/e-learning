@@ -29,15 +29,18 @@ import {
 import { SortableSection } from "./sortable-section"; 
 
 import { useCreateSection, useUpdateSection } from "../../hook/use-courses";
+import { validateSection } from "../../schemas/section.schema";
 
 interface CourseContentStepProps {
   data: Course;
   updateData: (data: Partial<Course>) => void;
+  readOnly?: boolean;
 }
 
 export function CourseContentStep({
   data,
   updateData,
+  readOnly = false,
 }: CourseContentStepProps) {
   const [newSectionTitle, setNewSectionTitle] = useState("");
 
@@ -48,8 +51,11 @@ export function CourseContentStep({
 
   const addSection = () => {
     const title = newSectionTitle.trim();
-
-    if (!title) return;
+    const error = validateSection({ title });
+    if (error) {
+      toast.error(error);
+      return;
+    }
 
     if (!data.id) {
       alert("Không tìm thấy ID khóa học.");
@@ -146,35 +152,37 @@ export function CourseContentStep({
       </div>
 
       <div className="space-y-6 bg-card border border-border shadow-sm rounded-md p-6">
-        <div className="flex gap-3 items-center bg-muted/20 p-2 rounded-md border border-border">
-          <div className="relative flex-1">
-            <div className="absolute left-3 top-3.5 text-muted-foreground">
-              <ListTree className="w-4 h-4" />
+        {!readOnly && (
+          <div className="flex gap-3 items-center bg-muted/20 p-2 rounded-md border border-border">
+            <div className="relative flex-1">
+              <div className="absolute left-3 top-3.5 text-muted-foreground">
+                <ListTree className="w-4 h-4" />
+              </div>
+
+              <Input
+                placeholder="Nhập tên chương mới..."
+                value={newSectionTitle}
+                onChange={(e) => setNewSectionTitle(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    addSection();
+                  }
+                }}
+                className="h-11 pl-10 bg-background rounded-sm border-transparent focus-visible:ring-1 focus-visible:border-input shadow-sm"
+              />
             </div>
 
-            <Input
-              placeholder="Nhập tên chương mới..."
-              value={newSectionTitle}
-              onChange={(e) => setNewSectionTitle(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  addSection();
-                }
-              }}
-              className="h-11 pl-10 bg-background rounded-sm border-transparent focus-visible:ring-1 focus-visible:border-input shadow-sm"
-            />
+            <Button
+              onClick={addSection}
+              disabled={isPending}
+              className="h-11 shrink-0 px-6 rounded-sm shadow-sm bg-primary/90 hover:bg-primary"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+
+              {isPending ? "Đang thêm..." : "Thêm chương"}
+            </Button>
           </div>
-
-          <Button
-            onClick={addSection}
-            disabled={isPending}
-            className="h-11 shrink-0 px-6 rounded-sm shadow-sm bg-primary/90 hover:bg-primary"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-
-            {isPending ? "Đang thêm..." : "Thêm chương"}
-          </Button>
-        </div>
+        )}
 
         <DndContext
           sensors={sensors}
@@ -193,6 +201,7 @@ export function CourseContentStep({
                   data={data}
                   updateData={updateData}
                   courseId={data.id}
+                  readOnly={readOnly}
                 />
               ))}
             </div>

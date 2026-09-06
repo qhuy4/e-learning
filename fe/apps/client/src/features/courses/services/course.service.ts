@@ -16,4 +16,15 @@ export const courseService = {
     return response.data;
   },
   
+  getCourseById: async (id: string | number): Promise<CourseDetail> => {
+    const response = await api.get<CourseDetail>(`/courses/id/${id}`);
+    return response.data;
+  },
+
+  previewCourse: async (token: string): Promise<CourseDetail> => {
+    const response = await api.get<CourseDetail>("/courses/preview", {
+      params: { token },
+    });
+    return response.data;
+  },
 };
