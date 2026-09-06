@@ -1,47 +1,11 @@
 import { api } from "@fe/lib/axios";
+import type {PendingInstructorProfile} from "@/features/instructors/type/pending-instructor.ts";
+import type {PaginationResponse} from "@/shared/types/pagination.ts";
+import type {User} from "@/features/users/types/user.type.ts";
+import {adminApi} from "@/shared/lib/axios.ts";
+import type {Instructor} from "@/features/instructors/type/instructor.ts";
 
-export interface PendingInstructorProfile {
-  profileId: number;
-  userId: number;
-  user: {
-    id: number;
-    name: string;
-    email: string;
-    joinedAt: string;
-  } | null;
-  headline: string | null;
-  bio: string | null;
-  websiteUrl: string | null;
-  socialLinks: Record<string, string> | null;
-  approvalStatus: number;
-  createdAt: string;
-  kyc: {
-    id: number;
-    kycStatus: number;
-    identityNumber: string;
-    identityFront: string;
-    identityBack: string;
-    selfieWithId: string;
-    ocrVerified: boolean;
-    faceVerified: boolean;
-    ocrData: Record<string, any> | null;
-    faceData: {
-      similarity?: number;
-      isLive?: boolean;
-      isMatch?: boolean;
-    } | null;
-    rejectReason: string | null;
-  } | null;
-  certificates: {
-    id: number;
-    certificateName: string;
-    issuer: string | null;
-    filePath: string;
-    issuedAt: string | null;
-    expiresAt: string | null;
-    status: number;
-  }[];
-}
+
 
 export const adminInstructorService = {
   getPendingProfiles: async (status?: number): Promise<PendingInstructorProfile[]> => {
@@ -59,5 +23,41 @@ export const adminInstructorService = {
       rejectReason,
     });
     return response.data?.data ?? response.data;
+  },
+
+  async getInstructors(page: number,
+      limit: number,
+      search?: string,
+      sortBy?: string,
+      sortOrder?: string,
+  ): Promise<PaginationResponse<User>> {
+    const response = await adminApi.get<PaginationResponse<User>>("/instructors/", {
+      params: {
+        page,
+        limit,
+        ...(search && {search}),
+        ...(sortBy && {sortBy}),
+        ...(sortOrder && {sortOrder}),
+      }
+    });
+    return response.data;
+  },
+
+  async getInstructor(id: number): Promise<Instructor> {
+    const response = await adminApi.get<{data: Instructor}>(`/instructors/${id}`);
+    return response.data.data;
+  },
+
+  async updateInstructor(id: number, data: {
+    name?: string;
+    email?: string;
+    status?: string;
+    headline?: string;
+    bio?: string;
+    websiteUrl?: string;
+    socialLinks?: Record<string, string> | null;
+  }): Promise<Instructor> {
+    const response = await adminApi.patch<{data: Instructor}>(`/instructors/${id}`, data);
+    return response.data.data;
   },
 };

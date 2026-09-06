@@ -63,8 +63,8 @@ export const navigation: Navigation = {
                     icon: Users,
                 },
                 {
-                    title: "Teachers",
-                    url: "/teachers",
+                    title: "Giảng viên",
+                    url: "/instructors",
                     icon: GraduationCap,
                 },
                 {
