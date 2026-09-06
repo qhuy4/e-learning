@@ -42,11 +42,6 @@ export const navigation: Navigation = {
                     url: "/teachers",
                     icon: GraduationCap,
                 },
-                {
-                    title: "Students",
-                    url: "/sttudents",
-                    icon: UserRound,
-                },
             ],
         },
         {
@@ -66,11 +61,6 @@ export const navigation: Navigation = {
                     title: "Giảng viên",
                     url: "/instructors",
                     icon: GraduationCap,
-                },
-                {
-                    title: "Students",
-                    url: "/sttudents",
-                    icon: UserRound,
                 },
                 {
                     title: "Đánh giá",
