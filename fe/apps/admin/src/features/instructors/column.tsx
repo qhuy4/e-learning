@@ -146,7 +146,7 @@ export function createInstructorColumns() {
         }),
         columnHelper.display({
             id: "actions",
-            header: () => <span className="sr-only">Actions</span>,
+            header: () => <span className="sr-only">Thao tác</span>,
             cell: (info) => {
                 const instructor = info.row.original
                 const meta = info.table.options.meta as TableMetaType | undefined
@@ -166,13 +166,13 @@ export function createInstructorColumns() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                                 <DropdownMenuItem onClick={() => meta?.onEdit?.(instructor)}>
-                                    Edit
+                                    Sửa
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     variant="destructive"
                                     onClick={() => meta?.onDelete?.(instructor)}
                                 >
-                                    Delete
+                                    Xóa
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
