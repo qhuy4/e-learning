@@ -13,6 +13,7 @@ import { CourseRepository } from './infrastructure/repository/course.repository'
 import { COURSE_REPOSITORY } from './domain/repository/course.repository';
 
 import { CoursesController } from './presentation/courses.controller';
+import { InstructorCoursesController } from './presentation/instructor-courses.controller';
 
 // Command handlers
 import { CreateCourseHandler } from './application/command-handler/create-course.command.handler';
@@ -21,6 +22,7 @@ import { DeleteCourseHandler } from './application/command-handler/delete-course
 
 // Query handlers
 import { GetCoursesHandler } from './application/query-handler/get-courses.handler';
+import { GetInstructorCoursesHandler } from './application/query-handler/get-instructor-courses.handler';
 
 import { GetCourseBySlugHandler } from './application/query-handler/get-course-by-slug.handler';
 import { GetCourseByIdHandler } from './application/query-handler/get-course-by-id.handler';
@@ -34,7 +36,7 @@ import { GetCourseByIdHandler } from './application/query-handler/get-course-by-
     TypeOrmModule.forFeature([CourseOrmEntity]),
   ],
 
-  controllers: [CoursesController],
+  controllers: [CoursesController, InstructorCoursesController],
 
   providers: [
     CourseRepository,
@@ -52,6 +54,7 @@ import { GetCourseByIdHandler } from './application/query-handler/get-course-by-
 
     // Query handlers
     GetCoursesHandler,
+    GetInstructorCoursesHandler,
 
     GetCourseBySlugHandler,
     GetCourseByIdHandler,

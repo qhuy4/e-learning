@@ -203,6 +203,46 @@ export class CourseRepository implements ICourseRepository {
       .andWhere('course.deletedAt IS NULL');
   }
 
+  async findCoursesByInstructorId(
+    instructorId: number,
+    options: FindCoursesOptions & { status?: number },
+  ) {
+    const { page, limit, level, keyword, status } = options;
+
+    const query = this.repository
+      .createQueryBuilder('course')
+      .where('course.instructorId = :instructorId', {
+        instructorId: instructorId.toString(),
+      })
+      .andWhere('course.deletedAt IS NULL');
+
+    if (level) {
+      query.andWhere('course.level = :level', { level });
+    }
+    if (status) {
+      query.andWhere('course.status = :status', { status });
+    }
+
+    if (keyword) {
+      query.andWhere(
+        new Brackets((qb) => {
+          qb.where('course.title ILIKE :keyword', {
+            keyword: `%${keyword}%`,
+          }).orWhere('course.description ILIKE :keyword', {
+            keyword: `%${keyword}%`,
+          });
+        }),
+      );
+    }
+
+    query
+      .orderBy('course.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    return query.getManyAndCount();
+  }
+
   async findAllCourses(options: FindCoursesOptions & { status?: number }) {
     const { page, limit, level, keyword, status } = options;
 
