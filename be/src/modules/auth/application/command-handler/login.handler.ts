@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import bcrypt from 'bcrypt';
 
-import { LoginCommand } from '../command/login.command';
+import { LoginCommand } from '@/modules/auth/application/command/login.command';
 import { UserRepository } from '@/modules/users/infrastructure/repository/user.repository';
 import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';

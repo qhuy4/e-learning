@@ -10,7 +10,7 @@ import { Request, Response } from 'express';
 import {
   FILE_STORAGE,
   FileStorage,
-} from '../domain/interface/file-storage.interface';
+} from '@/common/storage/domain/interface/file-storage.interface';
 
 @Controller('storage')
 export class StorageController {

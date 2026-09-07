@@ -1,8 +1,8 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 
-import { LoginDto } from '../dto/login.dto';
-import { LoginCommand } from '../../application/command/login.command';
+import { LoginDto } from '@/modules/auth/presentation/dto/login.dto';
+import { LoginCommand } from '@/modules/auth/application/command/login.command';
 import { LoginResponse } from '@/modules/auth/application/command/login.response';
 import { INSTRUCTOR_LOGIN_ROLES } from '@/common/constants/allow-role';
 

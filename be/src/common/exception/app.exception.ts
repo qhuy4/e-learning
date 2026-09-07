@@ -1,4 +1,4 @@
-import { ErrorCode } from '../enum/error-code.enum';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 import { HttpStatus } from '@nestjs/common';
 import { ERROR_MESSAGES } from '@/common/constants/error.message';
 

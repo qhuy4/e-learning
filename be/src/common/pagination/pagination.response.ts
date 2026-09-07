@@ -1,4 +1,4 @@
-import { PaginationMeta } from './pagination.meta';
+import { PaginationMeta } from '@/common/pagination/pagination.meta';
 
 export interface PaginationResponse<T> {
     data: T[];
