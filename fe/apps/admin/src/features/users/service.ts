@@ -8,6 +8,7 @@ export const userService = {
         search?: string,
         sortBy?: string,
         sortOrder?: string,
+        role?: string,
     ): Promise<PaginationResponse<User>> {
         const response = await adminApi.get<PaginationResponse<User>>("/users/", {
             params: {
@@ -16,6 +17,7 @@ export const userService = {
                 ...(search && {search}),
                 ...(sortBy && {sortBy}),
                 ...(sortOrder && {sortOrder}),
+                ...(role && {role}),
             }
         });
         return response.data;
