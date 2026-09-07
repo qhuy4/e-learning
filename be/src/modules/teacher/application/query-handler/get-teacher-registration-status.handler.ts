@@ -1,9 +1,9 @@
 import { NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { InstructorCertificateRepository } from '../../infrastructure/repository/instructor-certificate.repository';
-import { InstructorKycRepository } from '../../infrastructure/repository/instructor-kyc.repository';
-import { InstructorProfileRepository } from '../../infrastructure/repository/instructor-profile.repository';
-import { GetTeacherRegistrationStatusQuery } from '../query/get-teacher-registration-status.query';
+import { InstructorCertificateRepository } from '@/modules/teacher/infrastructure/repository/instructor-certificate.repository';
+import { InstructorKycRepository } from '@/modules/teacher/infrastructure/repository/instructor-kyc.repository';
+import { InstructorProfileRepository } from '@/modules/teacher/infrastructure/repository/instructor-profile.repository';
+import { GetTeacherRegistrationStatusQuery } from '@/modules/teacher/application/query/get-teacher-registration-status.query';
 
 export interface TeacherRegistrationStatusView {
   profileId: number;

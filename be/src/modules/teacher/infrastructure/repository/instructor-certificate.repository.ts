@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
-import { InstructorCertificateEntity } from '../entity/instructor-certificate.entity';
+import { InstructorCertificateEntity } from '@/modules/teacher/infrastructure/entity/instructor-certificate.entity';
 
 @Injectable()
 export class InstructorCertificateRepository {
