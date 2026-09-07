@@ -1,13 +1,13 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { GetCourseByIdQuery } from '../query/get-course-by-id.query';
-import { CourseRepository } from '../../infrastructure/repository/course.repository';
-import { AdminCourseDtoMapper } from '../../presentation/mappers/admin-course-dto.mapper';
+import { GetCourseByIdQuery } from '@/modules/courses/application/query/get-course-by-id.query';
+import { CourseRepository } from '@/modules/courses/infrastructure/repository/course.repository';
+import { AdminCourseDtoMapper } from '@/modules/courses/presentation/mappers/admin-course-dto.mapper';
 import {
   FILE_STORAGE,
   FileStorage,
-} from '../../../../common/storage/domain/interface/file-storage.interface';
+} from '@/common/storage/domain/interface/file-storage.interface';
 
 @QueryHandler(GetCourseByIdQuery)
 @Injectable()

@@ -16,21 +16,21 @@ import { FileInterceptor } from '@nestjs/platform-express';
 
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
 
-import { GetCoursesDto } from './dto/get-courses.dto';
-import { GetCoursesQuery } from '../application/query/get-courses.query';
+import { GetCoursesDto } from '@/modules/courses/presentation/dto/get-courses.dto';
+import { GetCoursesQuery } from '@/modules/courses/application/query/get-courses.query';
 
-import { GetCourseBySlugQuery } from '../application/query/get-course-by-slug.query';
+import { GetCourseBySlugQuery } from '@/modules/courses/application/query/get-course-by-slug.query';
 
-import { CourseResponseDto } from './dto/course-response.dto';
-import { CourseDetailResponseDto } from './dto/course-detail-response.dto';
+import { CourseResponseDto } from '@/modules/courses/presentation/dto/course-response.dto';
+import { CourseDetailResponseDto } from '@/modules/courses/presentation/dto/course-detail-response.dto';
 
-import { CreateCourseDto } from './dto/create-course.dto';
-import { CreateCourseCommand } from '../application/command/create-course.command';
-import { GetCourseByIdQuery } from '../application/query/get-course-by-id.query';
+import { CreateCourseDto } from '@/modules/courses/presentation/dto/create-course.dto';
+import { CreateCourseCommand } from '@/modules/courses/application/command/create-course.command';
+import { GetCourseByIdQuery } from '@/modules/courses/application/query/get-course-by-id.query';
 
-import { UpdateCourseDto } from './dto/update-course.dto';
-import { UpdateCourseCommand } from '../application/command/update-course.command';
-import { DeleteCourseCommand } from '../application/command/delete-course.command';
+import { UpdateCourseDto } from '@/modules/courses/presentation/dto/update-course.dto';
+import { UpdateCourseCommand } from '@/modules/courses/application/command/update-course.command';
+import { DeleteCourseCommand } from '@/modules/courses/application/command/delete-course.command';
 
 @Controller('courses')
 export class CoursesController {

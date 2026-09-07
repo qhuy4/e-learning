@@ -8,7 +8,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { SectionOrmEntity } from '../../../sections/infrastructure/entity/section.orm-entity';
+import { SectionOrmEntity } from '@/modules/sections/infrastructure/entity/section.orm-entity';
 @Entity({
   name: 'courses',
   schema: 'public',

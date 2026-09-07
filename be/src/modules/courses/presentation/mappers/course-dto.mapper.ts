@@ -1,5 +1,5 @@
-import { Course } from '../../domain/entity/course.entity';
-import { CourseDetailResponseDto } from '../dto/course-detail-response.dto';
+import { Course } from '@/modules/courses/domain/entity/course.entity';
+import { CourseDetailResponseDto } from '@/modules/courses/presentation/dto/course-detail-response.dto';
 
 export class CourseDtoMapper {
   static toDetailDto(course: Course): CourseDetailResponseDto {

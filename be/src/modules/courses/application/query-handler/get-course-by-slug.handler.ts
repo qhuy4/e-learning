@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { GetCourseBySlugQuery } from '../query/get-course-by-slug.query';
-import { CourseRepository } from '../../infrastructure/repository/course.repository';
-import { CourseDtoMapper } from '../../presentation/mappers/course-dto.mapper';
+import { GetCourseBySlugQuery } from '@/modules/courses/application/query/get-course-by-slug.query';
+import { CourseRepository } from '@/modules/courses/infrastructure/repository/course.repository';
+import { CourseDtoMapper } from '@/modules/courses/presentation/mappers/course-dto.mapper';
 
 @QueryHandler(GetCourseBySlugQuery)
 @Injectable()

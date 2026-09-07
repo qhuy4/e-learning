@@ -1,13 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { GetInstructorCoursesQuery } from '../query/get-instructor-courses.query';
-import { CourseRepository } from '../../infrastructure/repository/course.repository';
-import { CourseResponseDto } from '../../presentation/dto/course-response.dto';
+import { GetInstructorCoursesQuery } from '@/modules/courses/application/query/get-instructor-courses.query';
+import { CourseRepository } from '@/modules/courses/infrastructure/repository/course.repository';
+import { CourseResponseDto } from '@/modules/courses/presentation/dto/course-response.dto';
 import {
   FILE_STORAGE,
   FileStorage,
-} from '../../../../common/storage/domain/interface/file-storage.interface';
+} from '@/common/storage/domain/interface/file-storage.interface';
 
 @QueryHandler(GetInstructorCoursesQuery)
 @Injectable()

@@ -1,7 +1,7 @@
-import { Course } from '../../domain/entity/course.entity';
-import { AdminCourseDetailResponseDto } from '../dto/admin-course-detail-response.dto';
-import { FileStorage } from '../../../../common/storage/domain/interface/file-storage.interface';
-import { resolveSignedUrl } from '../dto/course-response.dto';
+import { Course } from '@/modules/courses/domain/entity/course.entity';
+import { AdminCourseDetailResponseDto } from '@/modules/courses/presentation/dto/admin-course-detail-response.dto';
+import { FileStorage } from '@/common/storage/domain/interface/file-storage.interface';
+import { resolveSignedUrl } from '@/modules/courses/presentation/dto/course-response.dto';
 
 export class AdminCourseDtoMapper {
   static async toDetailDto(
@@ -57,6 +57,7 @@ export class AdminCourseDtoMapper {
         position: lesson.position,
         isPreview: lesson.isPreview,
         videoUrl: lesson.videoSource ?? null,
+        content: lesson.content ?? null,
         isActive: lesson.status === 1,
         createdAt: lesson.createdAt,
         deletedAt: lesson.deletedAt,
