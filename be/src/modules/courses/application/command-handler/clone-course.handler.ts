@@ -13,11 +13,11 @@ import {
   LESSON_REPOSITORY,
   ILessonRepository,
 } from '@/modules/lessons/domain/repository/lesson.repository';
-import { Course } from '../../domain/entity/course.entity';
 import { Section } from '@/modules/sections/domain/entity/section.entity';
 import { Lesson } from '@/modules/lessons/domain/entity/lesson.entity';
-import { CourseStatus } from '../../domain/enum/course-status.enum';
 import { SlugUtil } from '@/common/utils/slug.util';
+import { Course } from '@/modules/courses/domain/entity/course.entity';
+import { CourseStatus } from '@/modules/courses/domain/enum/course-status.enum';
 
 @CommandHandler(CloneCourseCommand)
 export class CloneCourseHandler implements ICommandHandler<CloneCourseCommand> {

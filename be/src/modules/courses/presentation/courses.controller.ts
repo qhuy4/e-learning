@@ -71,13 +71,14 @@ export class CoursesController {
     @Query() query: GetCoursesDto,
   ): Promise<CourseResponseDto[]> {
     return this.queryBus.execute<GetAdminCoursesQuery, CourseResponseDto[]>(
-      new GetAdminCoursesQuery(
-        query.page ?? 1,
-        query.limit ?? 10,
-        query.level,
-        query.keyword,
-        query.status,
-      ),
+      new GetAdminCoursesQuery({
+        page: query.page ?? 1,
+        limit: query.limit ?? 12,
+        level: query.level,
+        keyword: query.keyword,
+        status: query.status,
+        instructorId: query.instructorId,
+      }),
     );
   }
 
@@ -173,8 +174,11 @@ export class CoursesController {
   }
 
   @Post(':id/clone')
-  async clone(@Param('id', ParseIntPipe) id: number): Promise<Course> {
-    return this.commandBus.execute(new CloneCourseCommand(id));
+  async clone(
+    @CurrentUser('id') instructorId: number,
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<Course> {
+    return this.commandBus.execute(new CloneCourseCommand(id, instructorId));
   }
 
   @Post(':id/approve')

@@ -6,9 +6,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { StorageModule } from '@/common/storage/storage.module';
 
 import { CourseOrmEntity } from '@/modules/courses/infrastructure/entity/course.orm-entity';
-import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
-import { SectionOrmEntity } from '@/modules/sections/infrastructure/entity/section.orm-entity';
-import { LessonOrmEntity } from '@/modules/lessons/infrastructure/entity/lesson.orm-entity';
 
 import { CourseRepository } from '@/modules/courses/infrastructure/repository/course.repository';
 import { AdminCourseRepository } from '@/modules/courses/infrastructure/repository/admin-course.repository';
@@ -30,7 +27,6 @@ import { CloneCourseHandler } from '@/modules/courses/application/command-handle
 import { GetCoursesHandler } from '@/modules/courses/application/query-handler/get-courses.handler';
 import { GetInstructorCoursesHandler } from '@/modules/courses/application/query-handler/get-instructor-courses.handler';
 import { GetAdminCoursesHandler } from '@/modules/courses/application/query-handler/get-admin-courses.handler';
-import { GetAdminCourseByIdHandler } from '@/modules/courses/application/query-handler/get-admin-course-by-id.handler';
 
 import { GetCourseBySlugHandler } from '@/modules/courses/application/query-handler/get-course-by-slug.handler';
 import { GetCourseByIdHandler } from '@/modules/courses/application/query-handler/get-course-by-id.handler';
@@ -42,19 +38,31 @@ import { RejectCourseHandler } from '@/modules/courses/application/command-handl
 import { CancelReviewCourseHandler } from '@/modules/courses/application/command-handler/cancel-review-course.handler';
 import { CreatePreviewTokenHandler } from '@/modules/courses/application/command-handler/create-preview-token.handler';
 import { PreviewCourseQueryHandler } from '@/modules/courses/application/query-handler/preview-course-query.hanlder';
+import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
+import { LessonOrmEntity } from '@/modules/lessons/infrastructure/entity/lesson.orm-entity';
+import { SectionOrmEntity } from '@/modules/sections/infrastructure/entity/section.orm-entity';
 
 @Module({
   imports: [
     CqrsModule,
 
     StorageModule,
-    TypeOrmModule.forFeature([CourseOrmEntity]),
+    TypeOrmModule.forFeature([
+      CourseOrmEntity,
+      UserOrmEntity,
+      LessonOrmEntity,
+      SectionOrmEntity,
+    ]),
     forwardRef(() => SectionsModule),
     LessonsModule,
     ServiceModule,
   ],
 
-  controllers: [CoursesController, InstructorCoursesController, AdminCoursesController],
+  controllers: [
+    CoursesController,
+    InstructorCoursesController,
+    AdminCoursesController,
+  ],
 
   providers: [
     CourseRepository,

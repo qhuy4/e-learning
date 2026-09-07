@@ -25,7 +25,7 @@ export class AdminCoursesController {
     @Query() query: PaginationDto,
     @Query('keyword') keyword?: string,
     @Query('status') status?: number,
-    @Query('instructorId') instructorId?: string,
+    @Query('instructorId') instructorId?: number,
   ) {
     return this.queryBus.execute(new GetAdminCoursesQuery({
       page: query.page,

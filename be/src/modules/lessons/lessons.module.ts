@@ -16,6 +16,14 @@ import { LessonController } from '@/modules/lessons/presentation/lesson.controll
 
 import { GetLessonByIdHandler } from '@/modules/lessons/application/query-handler/get-lesson-by-id.handler';
 
+import { SectionsModule } from '@/modules/sections/sections.module';
+import { StorageModule } from '@/common/storage/storage.module';
+import { GetLessonBySlugHandler } from '@/modules/lessons/application/query-handler/get-lesson-by-slug.handler';
+import { PreviewLessonHandler } from '@/modules/lessons/application/query-handler/preview-lesson.handler';
+import { ServiceModule } from '@/common/service/service.module';
+import { CoursesModule } from '@/modules/courses/courses.module';
+import { LessonPublicController } from '@/modules/lessons/presentation/lesson-public.controller';
+
 const CommandHandlers = [
   CreateLessonHandler,
   UpdateLessonHandler,
@@ -27,14 +35,6 @@ const QueryHandlers = [
   GetLessonBySlugHandler,
   PreviewLessonHandler,
 ];
-
-import { SectionsModule } from '@/modules/sections/sections.module';
-import { StorageModule } from '@/common/storage/storage.module';
-import { GetLessonBySlugHandler } from '@/modules/lessons/application/query-handler/get-lesson-by-slug.handler';
-import { PreviewLessonHandler } from '@/modules/lessons/application/query-handler/preview-lesson.handler';
-import { ServiceModule } from '@/common/service/service.module';
-import { CoursesModule } from '@/modules/courses/courses.module';
-import { LessonPublicController } from '@/modules/lessons/presentation/lesson-public.controller';
 
 @Module({
   imports: [

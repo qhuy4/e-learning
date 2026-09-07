@@ -3,9 +3,10 @@ export class GetAdminCoursesQuery {
     public readonly data: {
       page: number;
       limit: number;
+      level?: number;
       keyword?: string;
       status?: number;
-      instructorId?: string;
+      instructorId?: number;
       sortBy?: string;
       sortOrder?: 'asc' | 'desc';
     },
