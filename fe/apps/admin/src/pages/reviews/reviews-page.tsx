@@ -4,6 +4,7 @@ import type {Review} from "@/features/reviews/types/review";
 import {useReviews, useUpdateReviewStatus} from "@/features/reviews/hook/use-review.ts";
 import {useListPage} from "@/components/common/page/use-list-page.ts";
 import {toast} from "sonner";
+import {useNavigate} from "react-router";
 
 export default function ReviewsPage() {
     const {
@@ -18,6 +19,8 @@ export default function ReviewsPage() {
         setSearch,
         handleSortChange,
     } = useListPage()
+
+    const navigate = useNavigate()
 
     const {data: result, isLoading: loading, refetch, isFetching} = useReviews(
         page,
@@ -65,6 +68,7 @@ export default function ReviewsPage() {
                 refetch={refetch}
                 pageSize={limit}
                 onPageChange={setPage}
+                onRowClick={(review) => navigate(`/reviews/${review.id}`)}
                 search={search}
                 onSearchChange={setSearch}
                 onPageSizeChange={(newLimit) => {

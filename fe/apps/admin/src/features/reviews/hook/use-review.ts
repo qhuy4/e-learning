@@ -6,6 +6,8 @@ export const reviewKeys = {
     lists: () => [...reviewKeys.all, "list"] as const,
     list: (page: number, limit: number, search?: string, sortBy?: string, sortOrder?: string) =>
         [...reviewKeys.lists(), {page, limit, search, sortBy, sortOrder}] as const,
+    details: () => [...reviewKeys.all, "detail"] as const,
+    detail: (id: string) => [...reviewKeys.details(), id] as const,
 }
 
 export function useReviews(
@@ -21,14 +23,23 @@ export function useReviews(
     })
 }
 
+export function useReview(id: string) {
+    return useQuery({
+        queryKey: reviewKeys.detail(id),
+        queryFn: () => reviewService.getReview(id),
+        enabled: !!id,
+    })
+}
+
 export function useUpdateReviewStatus() {
     const queryClient = useQueryClient()
 
     return useMutation({
         mutationFn: ({id, status}: {id: string; status: number}) =>
             reviewService.updateStatus(id, status),
-        onSuccess: () => {
+        onSuccess: (_data, variables) => {
             void queryClient.invalidateQueries({queryKey: reviewKeys.lists()})
+            void queryClient.invalidateQueries({queryKey: reviewKeys.detail(variables.id)})
         },
     })
 }
