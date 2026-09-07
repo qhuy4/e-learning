@@ -8,6 +8,7 @@ import {
   SendHorizonal,
   Clock,
   CheckCircle2,
+  Ban,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -27,15 +28,18 @@ import { Separator } from "@fe/components/ui/separator";
 
 const STATUS_CONFIG: Record<
   number,
-  { label: string; variant: "default" | "secondary" | "destructive" | "outline" }
+  { label: string; variant: "default" | "secondary" | "destructive" | "outline"; icon?: React.ReactNode }
 > = {
-  1: { label: "Bản nháp",    variant: "secondary"   },
-  2: { label: "Chờ duyệt",  variant: "outline"     },
-  3: { label: "Đã duyệt",   variant: "default"     },
-  4: { label: "Bị từ chối", variant: "destructive" },
-  5: { label: "Đã xuất bản",variant: "default"     },
-  6: { label: "Lưu trữ",    variant: "secondary"   },
+  1: { label: "Bản nháp",    variant: "secondary" },
+  2: { label: "Chờ duyệt",   variant: "outline",   icon: <Clock className="w-3.5 h-3.5" /> },
+  3: { label: "Đã duyệt",    variant: "default",   icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
+  4: { label: "Bị từ chối",  variant: "destructive", icon: <Ban className="w-3.5 h-3.5" /> },
+  5: { label: "Đã xuất bản", variant: "default",   icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
 };
+
+function isEditable(status: number) {
+  return status === 1 || status === 4;
+}
 
 export default function CreateCoursePage() {
   const navigate = useNavigate();
@@ -67,6 +71,20 @@ export default function CreateCoursePage() {
 
   const currentStatus = courseData.status ?? 1;
   const statusCfg = STATUS_CONFIG[currentStatus];
+  const canEdit = !isEditMode || isEditable(currentStatus);
+
+  const createFormData = (data: Course): FormData => {
+    const formData = new FormData();
+    formData.append("title", data.title);
+    if (data.description) formData.append("description", data.description);
+    if (data.level) formData.append("level", String(data.level));
+    if (data.price !== undefined) formData.append("price", String(data.price));
+    if (data.status) formData.append("status", String(data.status));
+    if (data.thumbnail instanceof File) {
+      formData.append("thumbnail", data.thumbnail);
+    }
+    return formData;
+  };
 
   const handleCreateDraft = () => {
     if (!courseData.title.trim()) {
@@ -84,22 +102,6 @@ export default function CreateCoursePage() {
     });
   };
 
-  const handleCreateAndSubmit = () => {
-    if (!courseData.title.trim()) {
-      toast.error("Vui lòng nhập tên khóa học!");
-      return;
-    }
-    const tid = toast.loading("Đang gửi yêu cầu duyệt...");
-    const formData = createFormData({ ...courseData, status: 2 });
-    createCourse(formData, {
-      onSuccess: (res) => {
-        toast.success("Đã gửi duyệt thành công!", { id: tid });
-        navigate(`/courses/${res.data.id}`, { replace: true });
-      },
-      onError: () => toast.error("Có lỗi xảy ra, vui lòng thử lại.", { id: tid }),
-    });
-  };
-
   const handleSaveChanges = () => {
     const tid = toast.loading("Đang lưu thay đổi...");
     const formData = createFormData(courseData);
@@ -110,6 +112,19 @@ export default function CreateCoursePage() {
   };
 
   const handleSubmitForReview = () => {
+    const sections = courseData.sections ?? [];
+    const hasSections = sections.length > 0;
+    const hasLessons = sections.some((s) => (s.lessons ?? []).length > 0);
+
+    if (!hasSections) {
+      toast.error("Khóa học phải có ít nhất một chương trước khi gửi duyệt.");
+      return;
+    }
+    if (!hasLessons) {
+      toast.error("Khóa học phải có ít nhất một bài học trước khi gửi duyệt.");
+      return;
+    }
+
     const tid = toast.loading("Đang gửi yêu cầu duyệt...");
     const formData = createFormData({ ...courseData, status: 2 });
     updateCourse({ id: courseId!, data: formData }, {
@@ -117,51 +132,30 @@ export default function CreateCoursePage() {
         toast.success("Đã gửi yêu cầu duyệt thành công!", { id: tid });
         navigate("/courses");
       },
-      onError: () => toast.error("Lỗi khi gửi yêu cầu, vui lòng thử lại.", { id: tid }),
+      onError: (err: any) => {
+        const msg = err?.response?.data?.message;
+        toast.error(Array.isArray(msg) ? msg[0] : (msg || "Lỗi khi gửi yêu cầu, vui lòng thử lại."), { id: tid });
+      },
     });
-  };
-
-  const createFormData = (data: Course): FormData => {
-    const formData = new FormData();
-    formData.append("title", data.title);
-    if (data.description) formData.append("description", data.description);
-    if (data.level) formData.append("level", String(data.level));
-    if (data.price !== undefined) formData.append("price", String(data.price));
-    if (data.status) formData.append("status", String(data.status));
-    if (data.thumbnail instanceof File) {
-      formData.append("thumbnail", data.thumbnail);
-    }
-    return formData;
   };
 
   const renderActions = () => {
     if (!isEditMode) {
       return (
-        <>
-          <Button variant="outline" onClick={handleCreateDraft} disabled={isBusy} className="px-5">
-            <Save className="w-4 h-4 mr-2" />
-            {isCreating ? "Đang lưu..." : "Lưu nháp"}
-          </Button>
-          <Button
-            onClick={handleCreateAndSubmit}
-            disabled={isBusy}
-            className="px-5 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white border-0"
-          >
-            <SendHorizonal className="w-4 h-4 mr-2" />
-            {isCreating ? "Đang gửi..." : "Gửi duyệt"}
-          </Button>
-        </>
+        <Button variant="outline" onClick={handleCreateDraft} disabled={isBusy} className="px-5">
+          <Save className="w-4 h-4 mr-2" />
+          {isCreating ? "Đang lưu..." : "Tạo khóa học"}
+        </Button>
       );
     }
 
-    return (
-      <>
-        <Button variant="outline" onClick={handleSaveChanges} disabled={isBusy} className="px-5">
-          <Save className="w-4 h-4 mr-2" />
-          {isUpdating ? "Đang lưu..." : "Lưu thay đổi"}
-        </Button>
-
-        {(currentStatus === 1 || currentStatus === 4) && (
+    if (canEdit) {
+      return (
+        <>
+          <Button variant="outline" onClick={handleSaveChanges} disabled={isBusy} className="px-5">
+            <Save className="w-4 h-4 mr-2" />
+            {isUpdating ? "Đang lưu..." : "Lưu thay đổi"}
+          </Button>
           <Button
             onClick={handleSubmitForReview}
             disabled={isBusy}
@@ -170,23 +164,11 @@ export default function CreateCoursePage() {
             <SendHorizonal className="w-4 h-4 mr-2" />
             {currentStatus === 4 ? "Gửi duyệt lại" : "Gửi duyệt"}
           </Button>
-        )}
+        </>
+      );
+    }
 
-        {currentStatus === 2 && (
-          <Badge variant="outline" className="h-9 px-4 gap-1.5 text-amber-600 border-amber-300 dark:border-amber-700">
-            <Clock className="w-3.5 h-3.5" />
-            Đang chờ admin duyệt
-          </Badge>
-        )}
-
-        {currentStatus === 5 && (
-          <Badge className="h-9 px-4 gap-1.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200">
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            Đã xuất bản
-          </Badge>
-        )}
-      </>
-    );
+    return null;
   };
 
   return (
@@ -207,13 +189,29 @@ export default function CreateCoursePage() {
               {isEditMode ? "Chỉnh sửa khóa học" : "Tạo khóa học mới"}
             </h1>
             {isEditMode && statusCfg && (
-              <Badge variant={statusCfg.variant} className="text-xs">{statusCfg.label}</Badge>
+              <Badge
+                variant={statusCfg.variant}
+                className={`text-xs gap-1.5 ${
+                  currentStatus === 2 ? "text-amber-600 border-amber-300 dark:border-amber-700" :
+                  currentStatus === 5 ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200" :
+                  ""
+                }`}
+              >
+                {statusCfg.icon}
+                {statusCfg.label}
+              </Badge>
             )}
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {isEditMode
-              ? "Cập nhật thông tin và nội dung khóa học của bạn."
-              : "Điền thông tin để tạo khóa học mới. Sau khi tạo bạn có thể thêm bài học."}
+            {!isEditMode
+              ? "Điền thông tin để tạo khóa học mới. Sau khi tạo bạn có thể thêm bài học."
+              : canEdit
+                ? "Cập nhật thông tin và nội dung khóa học của bạn."
+                : currentStatus === 2
+                  ? "Khóa học đang chờ admin duyệt. Bạn không thể chỉnh sửa trong lúc này."
+                  : currentStatus === 5
+                    ? "Khóa học đã được xuất bản. Liên hệ admin nếu cần chỉnh sửa."
+                    : ""}
           </p>
         </div>
 
@@ -245,11 +243,11 @@ export default function CreateCoursePage() {
         </TabsList>
 
         <TabsContent value="info" className="m-0 focus-visible:outline-none focus-visible:ring-0">
-          <CourseInfoStep data={courseData} updateData={updateCourseData} />
+          <CourseInfoStep data={courseData} updateData={canEdit ? updateCourseData : () => {}} />
         </TabsContent>
 
         <TabsContent value="chapters" className="m-0 focus-visible:outline-none focus-visible:ring-0">
-          <CourseContentStep data={courseData} updateData={updateCourseData} />
+          <CourseContentStep data={courseData} updateData={canEdit ? updateCourseData : () => {}} />
         </TabsContent>
       </Tabs>
     </div>

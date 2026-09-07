@@ -4,15 +4,15 @@ import { SlugUtil } from '../../../../common/utils/slug.util';
 import { extname } from 'path';
 import { randomUUID } from 'crypto';
 
-import { UpdateLessonCommand } from '../command/update-lesson.command';
+import { UpdateLessonCommand } from '@/modules/lessons/application/command/update-lesson.command';
 import {
   LESSON_REPOSITORY,
   ILessonRepository,
-} from '../../domain/repository/lesson.repository';
+} from '@/modules/lessons/domain/repository/lesson.repository';
 import {
   FILE_STORAGE,
   FileStorage,
-} from '../../../../common/storage/domain/interface/file-storage.interface';
+} from '@/common/storage/domain/interface/file-storage.interface';
 
 @CommandHandler(UpdateLessonCommand)
 export class UpdateLessonHandler implements ICommandHandler<UpdateLessonCommand> {

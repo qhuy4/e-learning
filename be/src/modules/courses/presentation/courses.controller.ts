@@ -12,34 +12,37 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+
 import { FileInterceptor } from '@nestjs/platform-express';
+
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
 
-import { GetCoursesDto } from './dto/get-courses.dto';
-import { GetCoursesQuery } from '../application/query/get-courses.query';
-import { GetAdminCoursesQuery } from '../application/query/get-admin-courses.query';
-import { GetCourseBySlugQuery } from '../application/query/get-course-by-slug.query';
-import { GetCourseByIdQuery } from '../application/query/get-course-by-id.query';
+import { GetCoursesDto } from '@/modules/courses/presentation/dto/get-courses.dto';
+import { GetCoursesQuery } from '@/modules/courses/application/query/get-courses.query';
 
-import { CourseResponseDto } from './dto/course-response.dto';
-import { CourseDetailResponseDto } from './dto/course-detail-response.dto';
-import { CreateCourseDto } from './dto/create-course.dto';
-import { UpdateCourseDto } from './dto/update-course.dto';
+import { GetCourseBySlugQuery } from '@/modules/courses/application/query/get-course-by-slug.query';
 
-import { CreateCourseCommand } from '../application/command/create-course.command';
-import { UpdateCourseCommand } from '../application/command/update-course.command';
-import { DeleteCourseCommand } from '../application/command/delete-course.command';
+import { CourseResponseDto } from '@/modules/courses/presentation/dto/course-response.dto';
+import { CourseDetailResponseDto } from '@/modules/courses/presentation/dto/course-detail-response.dto';
 
-import { Course } from '../domain/entity/course.entity';
-import { CloneCourseCommand } from '../application/command/clone-course.command';
-import { ApproveCourseCommand } from '../application/command/approve-course.command';
-import { RejectCourseCommand } from '../application/command/reject-course.command';
-import { CancelReviewCourseCommand } from '../application/command/cancel-review-course.command';
-import { CreatePreviewTokenCommand } from '../application/command/create-preview-token.command';
+import { CreateCourseDto } from '@/modules/courses/presentation/dto/create-course.dto';
+import { CreateCourseCommand } from '@/modules/courses/application/command/create-course.command';
+import { GetCourseByIdQuery } from '@/modules/courses/application/query/get-course-by-id.query';
+
+import { UpdateCourseDto } from '@/modules/courses/presentation/dto/update-course.dto';
+import { UpdateCourseCommand } from '@/modules/courses/application/command/update-course.command';
+import { DeleteCourseCommand } from '@/modules/courses/application/command/delete-course.command';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { GetAdminCoursesQuery } from '@/modules/courses/application/query/get-admin-courses.query';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { PreviewCourseQuery } from '@/modules/courses/application/query/preview-course.query';
 import { User } from '@/modules/users/domain/entity/user.entity';
-import { PreviewCourseQuery } from '../application/query/preview-course.query';
+import { CreatePreviewTokenCommand } from '@/modules/courses/application/command/create-preview-token.command';
+import { CloneCourseCommand } from '@/modules/courses/application/command/clone-course.command';
+import { Course } from '@/modules/courses/domain/entity/course.entity';
+import { RejectCourseCommand } from '@/modules/courses/application/command/reject-course.command';
+import { ApproveCourseCommand } from '@/modules/courses/application/command/approve-course.command';
+import { CancelReviewCourseCommand } from '@/modules/courses/application/command/cancel-review-course.command';
 
 @Controller('courses')
 export class CoursesController {

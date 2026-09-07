@@ -12,8 +12,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-import { CourseOrmEntity } from '../../../courses/infrastructure/entity/course.orm-entity';
-import { LessonOrmEntity } from '../../../lessons/infrastructure/entity/lesson.orm-entity';
+import { CourseOrmEntity } from '@/modules/courses/infrastructure/entity/course.orm-entity';
+import { LessonOrmEntity } from '@/modules/lessons/infrastructure/entity/lesson.orm-entity';
 
 @Entity({
   name: 'sections',

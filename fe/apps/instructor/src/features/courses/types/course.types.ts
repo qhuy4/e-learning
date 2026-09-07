@@ -2,6 +2,12 @@ export interface Lesson {
   id: string;
   title: string;
   type: "video" | "document" | "quiz";
+  duration?: number;
+  position?: number;
+  isPreview?: boolean;
+  content?: string;
+  videoSource?: File;
+  thumbnail?: File;
 }
 
 export interface Section {

@@ -20,13 +20,13 @@ import { randomUUID } from 'crypto';
 import {
   RegisterTeacherCertificateInput,
   RegisterTeacherCommand,
-} from '../../application/command/register-teacher.command';
-import { GetTeacherRegistrationStatusQuery } from '../../application/query/get-teacher-registration-status.query';
-import { TeacherRegistrationStatusView } from '../../application/query-handler/get-teacher-registration-status.handler';
-import { TeacherRegistrationResult } from '../../domain/entity/teacher-registration-result.model';
-import { RegisterTeacherDto } from '../dto/register-teacher.dto';
-import { JwtAuthGuard } from '../../../../common/guards/jwt-auth.guard';
-import { CurrentUser } from '../../../../common/decorators/current-user.decorator';
+} from '@/modules/teacher/application/command/register-teacher.command';
+import { GetTeacherRegistrationStatusQuery } from '@/modules/teacher/application/query/get-teacher-registration-status.query';
+import { TeacherRegistrationStatusView } from '@/modules/teacher/application/query-handler/get-teacher-registration-status.handler';
+import { TeacherRegistrationResult } from '@/modules/teacher/domain/entity/teacher-registration-result.model';
+import { RegisterTeacherDto } from '@/modules/teacher/presentation/dto/register-teacher.dto';
+import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { CurrentUser } from '@/common/decorators/current-user.decorator';
 
 const UPLOAD_ROOT = join(process.cwd(), 'uploads', 'teachers');
 // const UPLOADS_DIR = join(process.cwd(), 'uploads');

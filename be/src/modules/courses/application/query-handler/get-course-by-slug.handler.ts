@@ -4,10 +4,7 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetCourseBySlugQuery } from '../query/get-course-by-slug.query';
 import { CourseRepository } from '../../infrastructure/repository/course.repository';
 import { CourseDtoMapper } from '../../presentation/mappers/course-dto.mapper';
-import {
-  FILE_STORAGE,
-  FileStorage,
-} from '../../../../common/storage/domain/interface/file-storage.interface';
+import { FILE_STORAGE,FileStorage } from '@/common/storage/domain/interface/file-storage.interface';
 
 @QueryHandler(GetCourseBySlugQuery)
 @Injectable()

@@ -8,7 +8,9 @@ import CreateCoursePage from "@/pages/courses/create-course-page"
 import StudentsPage from "@/pages/students/students-page"
 import RevenuePage from "@/pages/revenue/revenue-page"
 import ProfilePage from "@/pages/profile/profile-page"
+import AvailabilityPage from "@/pages/availability/availability-page"
 import LoginPage from "@/pages/authen/login-page"
+import { CreateLessonPage } from "@/features/lessons/pages/create-lesson-page"
 
 export const router = createBrowserRouter([
     {
@@ -24,7 +26,10 @@ export const router = createBrowserRouter([
                     { path: "courses/:courseId", element: <CreateCoursePage /> },
                     { path: "students", element: <StudentsPage /> },
                     { path: "revenue", element: <RevenuePage /> },
+                    { path: "availability", element: <AvailabilityPage /> },
                     { path: "profile", element: <ProfilePage /> },
+                    { path: "lessons/create", element: <CreateLessonPage /> },
+                    { path: "lessons/:id/edit", element: <CreateLessonPage /> },
                 ],
             },
         ],

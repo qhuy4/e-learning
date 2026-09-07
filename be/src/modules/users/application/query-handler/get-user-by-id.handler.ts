@@ -1,8 +1,8 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { HttpStatus } from '@nestjs/common';
 
-import { GetUserByIdQuery } from '../query/get-user-by-id.query';
-import { UserRepository } from '../../infrastructure/repository/user.repository';
+import { GetUserByIdQuery } from '@/modules/users/application/query/get-user-by-id.query';
+import { UserRepository } from '@/modules/users/infrastructure/repository/user.repository';
 import { GetUserByIdResponse } from '@/modules/users/presentation/dto/admin/get-user-by-id.response';
 import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';

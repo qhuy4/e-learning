@@ -1,8 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { HttpStatus } from '@nestjs/common';
 
-import { UpdateUserCommand } from '../command/update-user.command';
-import { UserRepository } from '../../infrastructure/repository/user.repository';
+import { UpdateUserCommand } from '@/modules/users/application/command/update-user.command';
+import { UserRepository } from '@/modules/users/infrastructure/repository/user.repository';
 
 import { PasswordService } from '@/common/service/password.service';
 import { AppException } from '@/common/exception/app.exception';

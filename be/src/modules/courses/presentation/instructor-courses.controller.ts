@@ -9,21 +9,25 @@ import {
   Post,
   Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 
-import { GetInstructorCoursesQuery } from '../application/query/get-instructor-courses.query';
-import { GetCourseByIdQuery } from '../application/query/get-course-by-id.query';
-import { CreateCourseCommand } from '../application/command/create-course.command';
-import { UpdateCourseCommand } from '../application/command/update-course.command';
-import { DeleteCourseCommand } from '../application/command/delete-course.command';
+import { GetInstructorCoursesQuery } from '@/modules/courses/application/query/get-instructor-courses.query';
+import { GetCourseByIdQuery } from '@/modules/courses/application/query/get-course-by-id.query';
+import { CreateCourseCommand } from '@/modules/courses/application/command/create-course.command';
+import { UpdateCourseCommand } from '@/modules/courses/application/command/update-course.command';
+import { DeleteCourseCommand } from '@/modules/courses/application/command/delete-course.command';
+import { CloneCourseCommand } from '@/modules/courses/application/command/clone-course.command';
 
-import { CreateCourseDto } from './dto/create-course.dto';
-import { UpdateCourseDto } from './dto/update-course.dto';
+import { CreateCourseDto } from '@/modules/courses/presentation/dto/create-course.dto';
+import { UpdateCourseDto } from '@/modules/courses/presentation/dto/update-course.dto';
 
+@UseGuards(JwtAuthGuard)
 @Controller('instructor/courses')
 export class InstructorCoursesController {
   constructor(
@@ -99,6 +103,14 @@ export class InstructorCoursesController {
         parentId: dto.parentId,
       }),
     );
+  }
+
+  @Post(':id/clone')
+  async clone(
+    @CurrentUser('id') instructorId: number,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.commandBus.execute(new CloneCourseCommand(id, instructorId));
   }
 
   @Delete(':id')

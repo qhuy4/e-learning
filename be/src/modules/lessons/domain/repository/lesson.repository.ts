@@ -1,4 +1,4 @@
-import { Lesson } from '../entity/lesson.entity';
+import { Lesson } from '@/modules/lessons/domain/entity/lesson.entity';
 
 export const LESSON_REPOSITORY = Symbol('LESSON_REPOSITORY');
 

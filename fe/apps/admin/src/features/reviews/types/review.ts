@@ -1,3 +1,15 @@
+export interface ReviewUser {
+    id: number;
+    name: string;
+    email: string;
+}
+
+export interface ReviewCourse {
+    id: string;
+    title: string;
+    slug: string;
+}
+
 export interface Review {
     id: string;
     userId: string;
@@ -7,6 +19,8 @@ export interface Review {
     status: number;
     createdAt: Date | null;
     updatedAt: Date | null;
+    user?: ReviewUser;
+    course?: ReviewCourse;
 }
 
 export type ReviewStatus = 1 | 2 | 3;

@@ -17,7 +17,7 @@ import {
   UploadFileInput,
   CreateUploadUrlInput,
   CreateDownloadUrlInput,
-} from '../../domain/interface/file-storage.interface';
+} from '@/common/storage/domain/interface/file-storage.interface';
 
 @Injectable()
 export class R2StorageService implements FileStorage {

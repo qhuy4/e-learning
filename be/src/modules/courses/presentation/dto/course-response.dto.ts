@@ -1,6 +1,6 @@
-import { Course } from '../../domain/entity/course.entity';
-import { CourseOrmEntity } from '../../infrastructure/entity/course.orm-entity';
-import { FileStorage } from '../../../../common/storage/domain/interface/file-storage.interface';
+import { Course } from '@/modules/courses/domain/entity/course.entity';
+import { CourseOrmEntity } from '@/modules/courses/infrastructure/entity/course.orm-entity';
+import { FileStorage } from '@/common/storage/domain/interface/file-storage.interface';
 
 const DOWNLOAD_EXPIRES_IN = 600;
 

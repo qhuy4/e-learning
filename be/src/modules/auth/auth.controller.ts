@@ -7,10 +7,10 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { SendInstructorInviteDto } from './dto/send-instructor-invite.dto';
-import { RegisterInstructorDto } from './dto/register-instructor.dto';
-import { LoginDto } from './dto/login.dto';
+import { AuthService } from '@/modules/auth/auth.service';
+import { SendInstructorInviteDto } from '@/modules/auth/dto/send-instructor-invite.dto';
+import { RegisterInstructorDto } from '@/modules/auth/dto/register-instructor.dto';
+import { LoginDto } from '@/modules/auth/dto/login.dto';
 
 @Controller('auth')
 export class AuthController {

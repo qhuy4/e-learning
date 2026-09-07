@@ -22,6 +22,11 @@ export const reviewService = {
         return response.data;
     },
 
+    async getReview(id: string): Promise<Review> {
+        const response = await adminApi.get<{data: Review}>(`/reviews/${id}`);
+        return response.data.data;
+    },
+
     async updateStatus(id: string, status: number): Promise<Review> {
         const response = await adminApi.patch<Review>(`/reviews/${id}/status`, null, {
             params: {status}

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
-import { UsersController } from './presentation/user.controller';
+import { UsersController } from '@/modules/users/presentation/user.controller';
+import { InstructorProfileController } from '@/modules/users/presentation/instructor-profile.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserRepository } from '@/modules/users/infrastructure/repository/user.repository';
 import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
@@ -8,17 +9,21 @@ import { UserProfileRepository } from '@/modules/users/infrastructure/repository
 import { CqrsModule } from '@nestjs/cqrs';
 import { GetUsersHandler } from '@/modules/users/application/query-handler/get-users.handler';
 import { GetUserByIdHandler } from '@/modules/users/application/query-handler/get-user-by-id.handler';
+import { GetMyProfileHandler } from '@/modules/users/application/query-handler/get-my-profile.handler';
+import { GetInstructorProfileHandler } from '@/modules/users/application/query-handler/get-instructor-profile.handler';
 import { ServiceModule } from '@/common/service/service.module';
 import { CreateUserHandler } from '@/modules/users/application/command-handler/create-user.handler';
 import { UpdateUserHandler } from '@/modules/users/application/command-handler/update-user.handler';
+import { UpdateInstructorProfileHandler } from '@/modules/users/application/command-handler/update-instructor-profile.handler';
 import { DeleteUserHandler } from '@/modules/users/application/command-handler/delete-user.handler';
 import { BlockUserCommandHandler } from '@/modules/users/application/command-handler/block-user.handler';
 import { UnBlockUserCommandHandler } from '@/modules/users/application/command-handler/unblock-user.handler';
 
-const QueryHandlers = [GetUsersHandler, GetUserByIdHandler];
+const QueryHandlers = [GetUsersHandler, GetUserByIdHandler, GetMyProfileHandler, GetInstructorProfileHandler];
 const CommandHandlers = [
   CreateUserHandler,
   UpdateUserHandler,
+  UpdateInstructorProfileHandler,
   DeleteUserHandler,
   BlockUserCommandHandler,
   UnBlockUserCommandHandler,
@@ -30,7 +35,7 @@ const CommandHandlers = [
     ServiceModule,
     TypeOrmModule.forFeature([UserOrmEntity, UserProfileOrmEntity]),
   ],
-  controllers: [UsersController],
+  controllers: [UsersController, InstructorProfileController],
   providers: [
     UserRepository,
     UserProfileRepository,

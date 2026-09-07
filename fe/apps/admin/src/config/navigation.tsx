@@ -1,22 +1,22 @@
 import {
-  LayoutDashboard,
-  Users,
-  Settings,
-  ChartBar,
-  GraduationCap,
-  UserRound,
-  LogOut,
-  BookOpen,
-  DollarSign,
-  Star,
-} from "lucide-react";
-import type { NavGroup, NavItem } from "@/shared/types/navigation";
+    LayoutDashboard,
+    Users,
+    Settings,
+    ChartBar,
+    GraduationCap,
+    BookOpen,
+    DollarSign,
+    Star,
+    LogOut,
+    UserCheck,
+    Shield,
+} from "lucide-react"
+import type { NavGroup, NavItem } from "@/shared/types/navigation"
 
 type Navigation = {
-  main: NavGroup[];
-  secondary: NavItem[];
-};
-
+    main: NavGroup[]
+    secondary: NavItem[]
+}
 export const navigation: Navigation = {
     main: [
         {
@@ -35,7 +35,7 @@ export const navigation: Navigation = {
             ],
         },
         {
-            label: "Management",
+            label: "Quản lý",
             items: [
                 {
                     title: "Users",
@@ -43,9 +43,9 @@ export const navigation: Navigation = {
                     icon: Users,
                 },
                 {
-                    title: "Teachers",
-                    url: "/teachers",
-                    icon: GraduationCap,
+                    title: "Duyệt Giảng Viên (eKYC)",
+                    url: "/instructors/approvals",
+                    icon: UserCheck,
                 },
             ],
         },
@@ -53,19 +53,19 @@ export const navigation: Navigation = {
             label: "Học tập",
             items: [
                 {
-                    title: "Khóa học của tôi",
+                    title: "Khóa học",
                     url: "/courses",
                     icon: BookOpen,
                 },
                 {
                     title: "Học viên",
                     url: "/students",
-                    icon: UserRound,
+                    icon: GraduationCap,
                 },
                 {
                     title: "Giảng viên",
                     url: "/instructors",
-                    icon: GraduationCap,
+                    icon: Users,
                 },
                 {
                     title: "Đánh giá",
@@ -82,24 +82,25 @@ export const navigation: Navigation = {
                     url: "/earnings",
                     icon: DollarSign,
                 },
+            ],
+        },
+    ],
+
+    secondary: [
+        {
+            title: "Hệ thống",
+            items: [
                 {
-                    title: "Duyệt Giảng Viên (eKYC)",
-                    url: "/instructors/approvals",
-                    icon: Users,
+                    title: "Cài đặt",
+                    url: "/settings",
+                    icon: Settings,
+                },
+                {
+                    title: "Đăng xuất",
+                    url: "/logout",
+                    icon: LogOut,
                 },
             ],
         },
     ],
-  secondary: [
-    {
-      title: "Cài đặt",
-      url: "/settings",
-      icon: Settings,
-    },
-    {
-      title: "Đăng xuất",
-      url: "/logout",
-      icon: LogOut,
-    },
-  ],
-};
+}

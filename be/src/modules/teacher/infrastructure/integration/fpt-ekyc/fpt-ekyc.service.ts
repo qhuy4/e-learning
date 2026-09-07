@@ -2,13 +2,13 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
 import FormData from 'form-data';
 import { firstValueFrom } from 'rxjs';
-import { FptEkycConfig } from './fpt-ekyc.config';
+import { FptEkycConfig } from '@/modules/teacher/infrastructure/integration/fpt-ekyc/fpt-ekyc.config';
 import {
   FptEkycFaceLivenessResponse,
   FptEkycInitSessionResponse,
   FptEkycOcrResponse,
   ParsedOcrData,
-} from './fpt-ekyc.types';
+} from '@/modules/teacher/infrastructure/integration/fpt-ekyc/fpt-ekyc.types';
 
 /**
  * Client tích hợp FPT.AI eKYC - luồng "cập nhật thông tin" (update information flow).

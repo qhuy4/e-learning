@@ -10,7 +10,7 @@ import {
   IsUrl,
   ValidateNested,
 } from 'class-validator';
-import { CertificateItemDto } from './certificate-item.dto';
+import { CertificateItemDto } from '@/modules/teacher/presentation/dto/certificate-item.dto';
 
 /**
  * Field text của multipart/form-data khi đăng ký làm giáo viên.

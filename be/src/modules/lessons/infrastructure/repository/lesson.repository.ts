@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { LessonOrmEntity } from '../entity/lesson.orm-entity';
-import { LessonMapper } from '../mapper/lesson.mapper';
+import { LessonOrmEntity } from '@/modules/lessons/infrastructure/entity/lesson.orm-entity';
 
-import { Lesson } from '../../domain/entity/lesson.entity';
-import { ILessonRepository } from '../../domain/repository/lesson.repository';
+import { Lesson } from '@/modules/lessons/domain/entity/lesson.entity';
+import { ILessonRepository } from '@/modules/lessons/domain/repository/lesson.repository';
+import { LessonMapper } from '@/modules/lessons/infrastructure/mapper/lesson.mapper';
 
 @Injectable()
 export class LessonRepository implements ILessonRepository {

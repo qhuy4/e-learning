@@ -5,14 +5,13 @@ import { toast } from "sonner";
 
 import {
   useGetCourses,
-  useDeleteCourse,
+  useCloneCourse,
 } from "@/features/courses/hook/use-courses";
 import { CourseCard } from "@/features/courses/components/course-list/course-card";
 import { CourseFilterBar } from "@/features/courses/components/course-list/course-filter-bar";
 import { CourseListSkeleton } from "@/features/courses/components/course-list/course-skeleton";
 import { CourseEmptyState } from "@/features/courses/components/course-list/course-empty-state";
 import { CoursePagination } from "@/features/courses/components/course-list/course-pagination";
-import { ConfirmDialog } from "@/components/confirm-dialog";
 
 import { Button } from "@fe/components/ui/button";
 
@@ -24,37 +23,33 @@ export default function CoursesListPage() {
   const [level, setLevel] = useState<string>("");
   const [status, setStatus] = useState<string>("");
   const [page, setPage] = useState(1);
-  const [deletingId, setDeletingId] = useState<string | number | null>(null);
+  const [cloningId, setCloningId] = useState<string | null>(null);
 
   const { data: coursesData, isLoading } = useGetCourses({
     page,
     limit: LIMIT,
     keyword: keyword || undefined,
-    level: level || undefined,
-    status: status || undefined,
+    level: level ? Number(level) : undefined,
+    status: status ? Number(status) : undefined,
   });
 
-  const { mutate: deleteCourse, isPending: isDeleting } = useDeleteCourse();
+  const { mutate: cloneCourse, isPending: isCloning } = useCloneCourse();
 
   const courses = coursesData?.data ?? [];
   const meta = coursesData?.meta;
 
   const handleFilterChange = () => setPage(1);
 
-  const handleDeleteRequest = (id: string | number) => {
-    setDeletingId(id);
-  };
-
-  const handleDeleteConfirm = () => {
-    if (!deletingId) return;
-    const tid = toast.loading("Đang xóa khóa học...");
-    deleteCourse(String(deletingId), {
-      onSuccess: () => {
-        toast.success("Đã xóa khóa học thành công!", { id: tid });
-        if (courses.length === 1 && page > 1) setPage((p) => p - 1);
+  const handleClone = (id: string) => {
+    setCloningId(id);
+    const tid = toast.loading("Đang nhân bản khóa học...");
+    cloneCourse(String(id), {
+      onSuccess: (res) => {
+        toast.success("Đã nhân bản khóa học!", { id: tid });
+        navigate(`/courses/${res.data.id}`);
       },
-      onError: () => toast.error("Có lỗi xảy ra khi xóa, vui lòng thử lại.", { id: tid }),
-      onSettled: () => setDeletingId(null),
+      onError: () => toast.error("Có lỗi xảy ra khi nhân bản.", { id: tid }),
+      onSettled: () => setCloningId(null),
     });
   };
 
@@ -94,8 +89,8 @@ export default function CoursesListPage() {
               key={course.id}
               course={course}
               onEdit={(id) => navigate(`/courses/${id}`)}
-              onDelete={handleDeleteRequest}
-              isDeleting={isDeleting && deletingId === course.id}
+              onClone={handleClone}
+              isCloning={isCloning && cloningId === course.id}
             />
           ))}
         </div>
@@ -109,15 +104,6 @@ export default function CoursesListPage() {
           onPageChange={setPage}
         />
       )}
-
-      <ConfirmDialog
-        open={deletingId !== null}
-        title="Xóa khóa học"
-        description="Bạn có chắc chắn muốn xóa khóa học này không? Hành động này không thể hoàn tác."
-        confirmLabel="Xóa khóa học"
-        onConfirm={handleDeleteConfirm}
-        onCancel={() => setDeletingId(null)}
-      />
     </div>
   );
 }

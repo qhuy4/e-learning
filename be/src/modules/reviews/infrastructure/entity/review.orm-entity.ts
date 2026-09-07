@@ -1,4 +1,6 @@
-import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
+import { CourseOrmEntity } from '@/modules/courses/infrastructure/entity/course.orm-entity';
 
 @Entity({
   name: 'reviews',
@@ -61,4 +63,12 @@ export class ReviewOrmEntity {
     nullable: true,
   })
   deletedAt: Date | null;
+
+  @ManyToOne(() => UserOrmEntity, { nullable: false })
+  @JoinColumn({ name: 'user_id' })
+  user: UserOrmEntity;
+
+  @ManyToOne(() => CourseOrmEntity, { nullable: false })
+  @JoinColumn({ name: 'course_id' })
+  course: CourseOrmEntity;
 }

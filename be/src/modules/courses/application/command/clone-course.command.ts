@@ -1,5 +1,6 @@
-import { ICommand } from '@nestjs/cqrs';
-
-export class CloneCourseCommand implements ICommand {
-  constructor(public readonly courseId: number) {}
+export class CloneCourseCommand {
+  constructor(
+    public readonly courseId: number,
+    public readonly instructorId: number,
+  ) {}
 }

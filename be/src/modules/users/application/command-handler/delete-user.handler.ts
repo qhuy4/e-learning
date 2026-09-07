@@ -1,8 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { NotFoundException } from '@nestjs/common';
 
-import { DeleteUserCommand } from '../command/delete-user.command';
-import { UserRepository } from '../../infrastructure/repository/user.repository';
+import { DeleteUserCommand } from '@/modules/users/application/command/delete-user.command';
+import { UserRepository } from '@/modules/users/infrastructure/repository/user.repository';
 
 @CommandHandler(DeleteUserCommand)
 export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {

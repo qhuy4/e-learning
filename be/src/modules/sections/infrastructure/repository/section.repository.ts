@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { SectionOrmEntity } from '../entity/section.orm-entity';
-import { SectionMapper } from '../mapper/section.mapper';
+import { SectionOrmEntity } from '@/modules/sections/infrastructure/entity/section.orm-entity';
 
-import { Section } from '../../domain/entity/section.entity';
-import { ISectionRepository } from '../../domain/repository/section.repository';
+import { Section } from '@/modules/sections/domain/entity/section.entity';
+import { ISectionRepository } from '@/modules/sections/domain/repository/section.repository';
+import { SectionMapper } from '@/modules/sections/infrastructure/mapper/section.mapper';
 
 @Injectable()
 export class SectionRepository implements ISectionRepository {

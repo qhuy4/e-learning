@@ -13,19 +13,59 @@ import { GetInstructorByIdHandler } from '@/modules/instructors/application/quer
 import { UpdateInstructorHandler } from '@/modules/instructors/application/command-handler/update-instructor.handler';
 import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
 
-const QueryHandlers = [GetInstructorProfileHandler, GetInstructorsHandler, GetInstructorByIdHandler];
-const CommandHandlers = [UpdateInstructorHandler];
+import { TeacherAvailabilityRecurringOrmEntity } from '@/modules/instructors/infrastructure/entity/teacher-availability-recurring.orm.entity';
+import { TeacherAvailabilityExceptionOrmEntity } from '@/modules/instructors/infrastructure/entity/teacher-availability-exception.orm.entity';
+import { TeacherAvailabilityRecurringRepository } from '@/modules/instructors/infrastructure/repository/teacher-availability-recurring.repository';
+import { TeacherAvailabilityExceptionRepository } from '@/modules/instructors/infrastructure/repository/teacher-availability-exception.repository';
+import { InstructorRecurringAvailabilityController } from '@/modules/instructors/presentation/instructor-recurring-availability.controller';
+import { InstructorExceptionAvailabilityController } from '@/modules/instructors/presentation/instructor-exception-availability.controller';
+import { GetRecurringAvailabilityHandler } from '@/modules/instructors/application/query-handler/get-recurring-availability.handler';
+import { GetExceptionAvailabilityHandler } from '@/modules/instructors/application/query-handler/get-exception-availability.handler';
+import { CreateRecurringAvailabilityHandler } from '@/modules/instructors/application/command-handler/create-recurring-availability.handler';
+import { UpdateRecurringAvailabilityHandler } from '@/modules/instructors/application/command-handler/update-recurring-availability.handler';
+import { DeleteRecurringAvailabilityHandler } from '@/modules/instructors/application/command-handler/delete-recurring-availability.handler';
+import { CreateExceptionAvailabilityHandler } from '@/modules/instructors/application/command-handler/create-exception-availability.handler';
+import { UpdateExceptionAvailabilityHandler } from '@/modules/instructors/application/command-handler/update-exception-availability.handler';
+import { DeleteExceptionAvailabilityHandler } from '@/modules/instructors/application/command-handler/delete-exception-availability.handler';
+
+const QueryHandlers = [
+  GetInstructorProfileHandler,
+  GetInstructorsHandler,
+  GetInstructorByIdHandler,
+  GetRecurringAvailabilityHandler,
+  GetExceptionAvailabilityHandler,
+];
+const CommandHandlers = [
+  UpdateInstructorHandler,
+  CreateRecurringAvailabilityHandler,
+  UpdateRecurringAvailabilityHandler,
+  DeleteRecurringAvailabilityHandler,
+  CreateExceptionAvailabilityHandler,
+  UpdateExceptionAvailabilityHandler,
+  DeleteExceptionAvailabilityHandler,
+];
 
 @Module({
   imports: [
     CqrsModule,
     UserModule,
-    TypeOrmModule.forFeature([InstructorProfileTypeOrmEntity, UserOrmEntity]),
+    TypeOrmModule.forFeature([
+      InstructorProfileTypeOrmEntity,
+      UserOrmEntity,
+      TeacherAvailabilityRecurringOrmEntity,
+      TeacherAvailabilityExceptionOrmEntity,
+    ]),
   ],
-  controllers: [InstructorsController],
+  controllers: [
+    InstructorsController,
+    InstructorRecurringAvailabilityController,
+    InstructorExceptionAvailabilityController,
+  ],
   providers: [
     InstructorProfileRepository,
     InstructorRepository,
+    TeacherAvailabilityRecurringRepository,
+    TeacherAvailabilityExceptionRepository,
     ...QueryHandlers,
     ...CommandHandlers,
   ],

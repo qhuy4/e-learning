@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { AppModule } from '@/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ResponseInterceptor } from '@/common/exception/response.interceptor';
 import { GlobalExceptionFilter } from '@/common/exception/global.exception';
@@ -7,7 +7,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 
 import { DataSource } from 'typeorm';
-import { initDatabaseTables } from './database/init-db';
+import { initDatabaseTables } from '@/database/init-db';
 
 import * as express from 'express';
 import * as path from 'path';

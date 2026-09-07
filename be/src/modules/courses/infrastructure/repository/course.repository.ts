@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
-import { CourseOrmEntity } from '../entity/course.orm-entity';
-import { Course } from '../../domain/entity/course.entity';
-import { CourseStatus } from '../../domain/enum/course-status.enum';
-import { ICourseRepository } from '../../domain/repository/course.repository';
-import { CourseMapper } from '../mapper/course.mapper';
+import { CourseOrmEntity } from '@/modules/courses/infrastructure/entity/course.orm-entity';
+import { Course } from '@/modules/courses/domain/entity/course.entity';
+import { CourseStatus } from '@/modules/courses/domain/enum/course-status.enum';
+import { ICourseRepository } from '@/modules/courses/domain/repository/course.repository';
+import { CourseMapper } from '@/modules/courses/infrastructure/mapper/course.mapper';
 
 export interface FindCoursesOptions {
   page: number;

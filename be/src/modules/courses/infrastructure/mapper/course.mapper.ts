@@ -1,7 +1,7 @@
-import { Course } from '../../domain/entity/course.entity';
+import { Course } from '@/modules/courses/domain/entity/course.entity';
 import { Section } from '@/modules/sections/domain/entity/section.entity';
 import { Lesson } from '@/modules/lessons/domain/entity/lesson.entity';
-import { CourseOrmEntity } from '../entity/course.orm-entity';
+import { CourseOrmEntity } from '@/modules/courses/infrastructure/entity/course.orm-entity';
 
 export class CourseMapper {
   static toDomain(entity: CourseOrmEntity): Course {

@@ -1,8 +1,5 @@
-import { Course } from '../../domain/entity/course.entity';
-import { CourseDetailResponseDto } from '../dto/course-detail-response.dto';
-import { SectionDtoMapper } from '@/modules/sections/presentation/mappers/section-dto.mapper';
-import { FileStorage } from '@/common/storage/domain/interface/file-storage.interface';
-import { resolveSignedUrl } from '../dto/course-response.dto';
+import { Course } from '@/modules/courses/domain/entity/course.entity';
+import { CourseDetailResponseDto } from '@/modules/courses/presentation/dto/course-detail-response.dto';
 
 export class CourseDtoMapper {
   static async toDetailDto(

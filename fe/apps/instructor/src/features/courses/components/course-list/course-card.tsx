@@ -1,5 +1,5 @@
 import { Button } from "@fe/components/ui/button";
-import { Edit, Trash2, BookOpen } from "lucide-react";
+import { Edit, Copy, BookOpen } from "lucide-react";
 
 export const LEVEL_LABELS: Record<number, string> = {
   1: "Cơ bản",
@@ -27,11 +27,11 @@ interface CourseCardProps {
     status: number;
   };
   onEdit: (id: string) => void;
-  onDelete: (id: string) => void;
-  isDeleting?: boolean;
+  onClone: (id: string) => void;
+  isCloning?: boolean;
 }
 
-export function CourseCard({ course, onEdit, onDelete, isDeleting }: CourseCardProps) {
+export function CourseCard({ course, onEdit, onClone, isCloning }: CourseCardProps) {
   const statusInfo = STATUS_CONFIG[course.status];
 
   return (
@@ -110,12 +110,12 @@ export function CourseCard({ course, onEdit, onDelete, isDeleting }: CourseCardP
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => onDelete(course.id)}
-              disabled={isDeleting}
-              className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg"
-              title="Xóa"
+              onClick={() => onClone(course.id)}
+              disabled={isCloning}
+              className="h-8 w-8 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 rounded-lg"
+              title="Nhân bản"
             >
-              <Trash2 className="h-4 w-4" />
+              <Copy className="h-4 w-4" />
             </Button>
           </div>
         </div>

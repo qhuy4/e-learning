@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { KycStatus } from '../../domain/enum/kyc-status.enum';
+import { KycStatus } from '@/modules/teacher/domain/enum/kyc-status.enum';
 
 /**
  * Map với bảng `instructor_kyc`.

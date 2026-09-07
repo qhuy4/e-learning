@@ -3,16 +3,16 @@ import { SlugUtil } from '../../../../common/utils/slug.util';
 import { extname } from 'path';
 import { randomUUID } from 'crypto';
 
-import { CreateCourseCommand } from './../command/create-course.command';
-import { Course } from '../../domain/entity/course.entity';
+import { CreateCourseCommand } from '@/modules/courses/application/command/create-course.command';
+import { Course } from '@/modules/courses/domain/entity/course.entity';
 import {
   COURSE_REPOSITORY,
   ICourseRepository,
-} from '../../domain/repository/course.repository';
+} from '@/modules/courses/domain/repository/course.repository';
 import {
   FILE_STORAGE,
   FileStorage,
-} from '../../../../common/storage/domain/interface/file-storage.interface';
+} from '@/common/storage/domain/interface/file-storage.interface';
 
 import { Inject, ConflictException } from '@nestjs/common';
 

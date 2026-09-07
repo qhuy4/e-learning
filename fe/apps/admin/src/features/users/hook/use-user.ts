@@ -5,8 +5,8 @@ import type {UserWriteInput} from "@/features/users/types/user.type"
 export const userKeys = {
     all: ["users"] as const,
     lists: () => [...userKeys.all, "list"] as const,
-    list: (page: number, limit: number, search?: string, sortBy?: string, sortOrder?: string) =>
-        [...userKeys.lists(), {page, limit, search, sortBy, sortOrder}] as const,
+    list: (page: number, limit: number, search?: string, sortBy?: string, sortOrder?: string, role?: string) =>
+        [...userKeys.lists(), {page, limit, search, sortBy, sortOrder, role}] as const,
     details: () => [...userKeys.all, "detail"] as const,
     detail: (id: number) => [...userKeys.details(), id] as const,
 }
@@ -16,11 +16,12 @@ export function useUsers(
     limit: number,
     search?: string,
     sortBy?: string,
-    sortOrder?: "asc" | "desc"
+    sortOrder?: "asc" | "desc",
+    role?: string
 ) {
     return useQuery({
-        queryKey: userKeys.list(page, limit, search, sortBy, sortOrder),
-        queryFn: () => userService.getUsers(page, limit, search, sortBy, sortOrder),
+        queryKey: userKeys.list(page, limit, search, sortBy, sortOrder, role),
+        queryFn: () => userService.getUsers(page, limit, search, sortBy, sortOrder, role),
     })
 }
 

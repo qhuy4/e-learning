@@ -1,10 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Inject, NotFoundException } from '@nestjs/common';
-import { DeleteCourseCommand } from '../command/delete-course.command';
+import { DeleteCourseCommand } from '@/modules/courses/application/command/delete-course.command';
 import {
   COURSE_REPOSITORY,
   ICourseRepository,
-} from '../../domain/repository/course.repository';
+} from '@/modules/courses/domain/repository/course.repository';
 
 @CommandHandler(DeleteCourseCommand)
 export class DeleteCourseHandler implements ICommandHandler<DeleteCourseCommand> {
