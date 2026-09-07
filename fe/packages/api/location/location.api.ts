@@ -4,7 +4,7 @@ import type { City, Country } from "./location.type"
 export function createLocationService(api: AxiosInstance) {
     return {
         async getCountries(): Promise<Country[]> {
-            const response = await api.get<Country[]>(
+            const response = await api.get<{ data: Country[] }>(
                 "/locations/countries",
             )
 
@@ -14,7 +14,7 @@ export function createLocationService(api: AxiosInstance) {
         async getCities(
             countryCode: string,
         ): Promise<City[]> {
-            const response = await api.get<City[]>(
+            const response = await api.get<{ data: City[] }>(
                 `/locations/cities/${countryCode}`,
             )
 
