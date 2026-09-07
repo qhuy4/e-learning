@@ -7,11 +7,15 @@ import { useLocation } from "react-router";
 
 const PAGE_TITLES: Record<string, string> = {
   "/": "Dashboard",
-  "/courses": "Khóa học của tôi",
+  "/courses": "Khóa học",
   "/courses/create": "Tạo khóa học",
   "/students": "Học viên",
+  "/students/create": "Tạo học viên",
+  "/instructors": "Giảng viên",
+  "/instructors/approvals": "Duyệt Giảng Viên",
   "/earnings": "Doanh thu",
   "/reviews": "Đánh giá",
+  "/users": "Users",
   "/settings": "Cài đặt",
 };
 
@@ -27,6 +31,18 @@ export function SiteHeader() {
       return "Bài học";
     if (location.pathname.startsWith("/courses/")) return "Chỉnh sửa khóa học";
     if (location.pathname.startsWith("/lessons/")) return "Chỉnh sửa bài học";
+    if (location.pathname.startsWith("/students/")) {
+      if (location.pathname.endsWith("/edit")) return "Chỉnh sửa học viên";
+      return "Chi tiết học viên";
+    }
+    if (location.pathname.startsWith("/instructors/")) {
+      if (location.pathname.endsWith("/edit")) return "Chỉnh sửa giảng viên";
+      return "Chi tiết giảng viên";
+    }
+    if (location.pathname.startsWith("/users/")) {
+      if (location.pathname.endsWith("/edit")) return "Chỉnh sửa người dùng";
+      return "Chi tiết người dùng";
+    }
     return "Dashboard";
   };
 
