@@ -4,20 +4,20 @@ import slugify from 'slugify';
 import { extname } from 'path';
 import { randomUUID } from 'crypto';
 
-import { CreateLessonCommand } from '../command/create-lesson.command';
-import { Lesson } from '../../domain/entity/lesson.entity';
+import { CreateLessonCommand } from '@/modules/lessons/application/command/create-lesson.command';
+import { Lesson } from '@/modules/lessons/domain/entity/lesson.entity';
 import {
   SECTION_REPOSITORY,
   ISectionRepository,
-} from '../../../sections/domain/repository/section.repository';
+} from '@/modules/sections/domain/repository/section.repository';
 import {
   LESSON_REPOSITORY,
   ILessonRepository,
-} from '../../domain/repository/lesson.repository';
+} from '@/modules/lessons/domain/repository/lesson.repository';
 import {
   FILE_STORAGE,
   FileStorage,
-} from '../../../../common/storage/domain/interface/file-storage.interface';
+} from '@/common/storage/domain/interface/file-storage.interface';
 
 @CommandHandler(CreateLessonCommand)
 export class CreateLessonHandler implements ICommandHandler<CreateLessonCommand> {

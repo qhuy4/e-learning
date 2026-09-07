@@ -1,9 +1,9 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { Inject, NotFoundException } from '@nestjs/common';
-import { GetLessonByIdQuery } from '../query/get-lesson-by-id.query';
-import { LESSON_REPOSITORY, ILessonRepository } from '../../domain/repository/lesson.repository';
-import { FileStorage } from '../../../../common/storage/domain/interface/file-storage.interface';
-import { FILE_STORAGE } from '../../../../common/storage/domain/interface/file-storage.interface';
+import { GetLessonByIdQuery } from '@/modules/lessons/application/query/get-lesson-by-id.query';
+import { LESSON_REPOSITORY, ILessonRepository } from '@/modules/lessons/domain/repository/lesson.repository';
+import { FileStorage } from '@/common/storage/domain/interface/file-storage.interface';
+import { FILE_STORAGE } from '@/common/storage/domain/interface/file-storage.interface';
 
 async function resolveSignedUrl(key: string | null, storage: FileStorage): Promise<string | null> {
   if (!key) return null;

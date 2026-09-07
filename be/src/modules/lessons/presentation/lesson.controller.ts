@@ -7,20 +7,23 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  UseGuards,
   UseInterceptors,
   UploadedFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 
-import { CreateLessonDto } from './dto/create-lesson.dto';
-import { UpdateLessonDto } from './dto/update-lesson.dto';
+import { CreateLessonDto } from '@/modules/lessons/presentation/dto/create-lesson.dto';
+import { UpdateLessonDto } from '@/modules/lessons/presentation/dto/update-lesson.dto';
 
-import { CreateLessonCommand } from '../application/command/create-lesson.command';
-import { UpdateLessonCommand } from '../application/command/update-lesson.command';
-import { DeleteLessonCommand } from '../application/command/delete-lesson.command';
-import { GetLessonByIdQuery } from '../application/query/get-lesson-by-id.query';
+import { CreateLessonCommand } from '@/modules/lessons/application/command/create-lesson.command';
+import { UpdateLessonCommand } from '@/modules/lessons/application/command/update-lesson.command';
+import { DeleteLessonCommand } from '@/modules/lessons/application/command/delete-lesson.command';
+import { GetLessonByIdQuery } from '@/modules/lessons/application/query/get-lesson-by-id.query';
 
+@UseGuards(JwtAuthGuard)
 @Controller('sections/:sectionId/lessons')
 export class LessonController {
   constructor(

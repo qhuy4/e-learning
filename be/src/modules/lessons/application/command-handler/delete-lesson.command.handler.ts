@@ -2,12 +2,12 @@ import { Inject, NotFoundException } from '@nestjs/common';
 
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { DeleteLessonCommand } from '../command/delete-lesson.command';
+import { DeleteLessonCommand } from '@/modules/lessons/application/command/delete-lesson.command';
 
 import {
   LESSON_REPOSITORY,
   ILessonRepository,
-} from '../../domain/repository/lesson.repository';
+} from '@/modules/lessons/domain/repository/lesson.repository';
 
 @CommandHandler(DeleteLessonCommand)
 export class DeleteLessonHandler implements ICommandHandler<DeleteLessonCommand> {
