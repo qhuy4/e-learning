@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Patch,
-  Query,
-  Body,
-} from '@nestjs/common';
+import { Controller, Get, Param, Patch, Query, Body } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { PaginationDto } from '@/common/pagination/pagination.dto';
 import { GetAdminCoursesQuery } from '@/modules/courses/application/query/get-admin-courses.query';
@@ -27,15 +20,17 @@ export class AdminCoursesController {
     @Query('status') status?: number,
     @Query('instructorId') instructorId?: number,
   ) {
-    return this.queryBus.execute(new GetAdminCoursesQuery({
-      page: query.page,
-      limit: query.limit,
-      keyword,
-      status,
-      instructorId,
-      sortBy: query.sortBy,
-      sortOrder: query.sortOrder,
-    }));
+    return this.queryBus.execute(
+      new GetAdminCoursesQuery({
+        page: query.page,
+        limit: query.limit,
+        keyword,
+        status,
+        instructorId,
+        sortBy: query.sortBy,
+        sortOrder: query.sortOrder,
+      }),
+    );
   }
 
   @Get(':id')
@@ -48,24 +43,36 @@ export class AdminCoursesController {
     @Param('id') id: string,
     @Body() body: { status: number; rejectReason?: string },
   ) {
-    return this.commandBus.execute(new ReviewCourseCommand({
-      id,
-      status: body.status,
-      rejectReason: body.rejectReason,
-    }));
+    return this.commandBus.execute(
+      new ReviewCourseCommand({
+        id,
+        status: body.status,
+        rejectReason: body.rejectReason,
+      }),
+    );
   }
 
   @Patch('lessons/:lessonId/preview')
-  togglePreview(@Param('lessonId') lessonId: string, @Body() body: { isPreview: boolean }) {
-    return this.commandBus.execute(new UpdateLessonCommand(Number(lessonId), {
-      isPreview: body.isPreview,
-    }));
+  togglePreview(
+    @Param('lessonId') lessonId: string,
+    @Body() body: { isPreview: boolean },
+  ) {
+    return this.commandBus.execute(
+      new UpdateLessonCommand(Number(lessonId), {
+        isPreview: body.isPreview,
+      }),
+    );
   }
 
   @Patch('lessons/:lessonId/status')
-  toggleStatus(@Param('lessonId') lessonId: string, @Body() body: { status: number }) {
-    return this.commandBus.execute(new UpdateLessonCommand(Number(lessonId), {
-      status: body.status,
-    }));
+  toggleStatus(
+    @Param('lessonId') lessonId: string,
+    @Body() body: { status: number },
+  ) {
+    return this.commandBus.execute(
+      new UpdateLessonCommand(Number(lessonId), {
+        status: body.status,
+      }),
+    );
   }
 }

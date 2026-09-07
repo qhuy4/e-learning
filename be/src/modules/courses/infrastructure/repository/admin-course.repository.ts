@@ -9,7 +9,7 @@ export interface FindAdminCoursesOptions {
   limit: number;
   keyword?: string;
   status?: number;
-  instructorId?: string;
+  instructorId?: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
 }

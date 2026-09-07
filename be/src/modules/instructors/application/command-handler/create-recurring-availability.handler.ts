@@ -1,8 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { ConflictException } from '@nestjs/common';
+import { HttpStatus } from '@nestjs/common';
 import { CreateRecurringAvailabilityCommand } from '../command/create-recurring-availability.command';
 import { TeacherAvailabilityRecurringRepository } from '@/modules/instructors/infrastructure/repository/teacher-availability-recurring.repository';
 import { ErrorCode } from '@/common/enum/error-code.enum';
+import { AppException } from '@/common/exception/app.exception';
 
 @CommandHandler(CreateRecurringAvailabilityCommand)
 export class CreateRecurringAvailabilityHandler
@@ -19,7 +20,10 @@ export class CreateRecurringAvailabilityHandler
     );
 
     if (existing) {
-      throw new ConflictException(ErrorCode.AVAILABILITY_CONFLICT);
+      throw new AppException(
+        ErrorCode.AVAILABILITY_CONFLICT,
+        HttpStatus.CONFLICT,
+      );
     }
 
     return this.repo.create({

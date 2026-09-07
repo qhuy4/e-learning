@@ -7,15 +7,16 @@ import { UpdateRecurringAvailabilityCommand } from '../command/update-recurring-
 import { TeacherAvailabilityRecurringRepository } from '@/modules/instructors/infrastructure/repository/teacher-availability-recurring.repository';
 
 @CommandHandler(UpdateRecurringAvailabilityCommand)
-export class UpdateRecurringAvailabilityHandler
-  implements ICommandHandler<UpdateRecurringAvailabilityCommand>
-{
+export class UpdateRecurringAvailabilityHandler implements ICommandHandler<UpdateRecurringAvailabilityCommand> {
   constructor(private readonly repo: TeacherAvailabilityRecurringRepository) {}
 
   async execute(command: UpdateRecurringAvailabilityCommand) {
     const existing = await this.repo.findById(command.id);
     if (!existing || existing.instructor_id !== command.instructorId) {
-      throw new AppException(ErrorCode.INVALID_PERMISSION, HttpStatus.FORBIDDEN);
+      throw new AppException(
+        ErrorCode.INVALID_PERMISSION,
+        HttpStatus.FORBIDDEN,
+      );
     }
 
     const dayOfWeek = command.data.day_of_week ?? existing.day_of_week;
@@ -31,7 +32,10 @@ export class UpdateRecurringAvailabilityHandler
     );
 
     if (overlap) {
-      throw new ConflictException(ErrorCode.AVAILABILITY_CONFLICT);
+      throw new AppException(
+        ErrorCode.INVALID_PERMISSION,
+        HttpStatus.FORBIDDEN,
+      );
     }
 
     return this.repo.update(command.id, command.data);

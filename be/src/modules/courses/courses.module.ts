@@ -41,6 +41,7 @@ import { PreviewCourseQueryHandler } from '@/modules/courses/application/query-h
 import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
 import { LessonOrmEntity } from '@/modules/lessons/infrastructure/entity/lesson.orm-entity';
 import { SectionOrmEntity } from '@/modules/sections/infrastructure/entity/section.orm-entity';
+import { GetAdminCourseByIdHandler } from '@/modules/courses/application/query-handler/get-admin-course-by-id.handler';
 
 @Module({
   imports: [
@@ -84,12 +85,11 @@ import { SectionOrmEntity } from '@/modules/sections/infrastructure/entity/secti
     RejectCourseHandler,
     CancelReviewCourseHandler,
     CreatePreviewTokenHandler,
-
     // Query handlers
     GetCoursesHandler,
     GetAdminCoursesHandler,
     GetInstructorCoursesHandler,
-
+    GetAdminCourseByIdHandler,
     GetCourseBySlugHandler,
     GetCourseByIdHandler,
     PreviewCourseQueryHandler,
