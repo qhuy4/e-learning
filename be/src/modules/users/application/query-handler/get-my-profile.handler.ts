@@ -1,6 +1,6 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { GetMyProfileQuery } from '../query/get-my-profile.query';
+import { GetMyProfileQuery } from '@/modules/users/application/query/get-my-profile.query';
 import { UserRepository } from '@/modules/users/infrastructure/repository/user.repository';
 import { UserProfileRepository } from '@/modules/users/infrastructure/repository/user-profile.repository';
 import { GetMyProfileResponse } from '@/modules/users/presentation/dto/admin/get-my-profile.response';

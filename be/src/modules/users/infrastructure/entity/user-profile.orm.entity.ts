@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { UserOrmEntity } from './user.orm.entity';
+import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
 import { Gender } from '@/modules/users/domain/enum/user.gender';
 
 @Entity('user_profiles')

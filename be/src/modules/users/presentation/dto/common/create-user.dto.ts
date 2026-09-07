@@ -6,8 +6,8 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
-import { UserRole } from '../../../domain/enum/user.role';
-import { UserStatus } from '../../../domain/enum/user.status';
+import { UserRole } from '@/modules/users/domain/enum/user.role';
+import { UserStatus } from '@/modules/users/domain/enum/user.status';
 import {
   UserRoleApi,
   UserStatusApi,

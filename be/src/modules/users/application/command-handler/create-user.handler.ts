@@ -1,8 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { CreateUserCommand } from '../command/create-user.command';
-import { User } from '../../domain/entity/user.entity';
-import { UserRepository } from '../../infrastructure/repository/user.repository';
+import { CreateUserCommand } from '@/modules/users/application/command/create-user.command';
+import { User } from '@/modules/users/domain/entity/user.entity';
+import { UserRepository } from '@/modules/users/infrastructure/repository/user.repository';
 
 import { PasswordService } from '@/common/service/password.service';
 import { AppException } from '@/common/exception/app.exception';

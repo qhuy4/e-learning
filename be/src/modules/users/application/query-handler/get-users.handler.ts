@@ -1,8 +1,8 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { GetUsersQuery } from '../query/get-users.query';
-import { UserRepository } from '../../infrastructure/repository/user.repository';
-import { GetUsersResponse } from '../../presentation/dto/admin/get-users.response';
+import { GetUsersQuery } from '@/modules/users/application/query/get-users.query';
+import { UserRepository } from '@/modules/users/infrastructure/repository/user.repository';
+import { GetUsersResponse } from '@/modules/users/presentation/dto/admin/get-users.response';
 import { UserResponseMapper } from '@/modules/users/presentation/mapper/user-response.mapper';
 
 @QueryHandler(GetUsersQuery)

@@ -9,8 +9,8 @@ import {
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 
-import { UserRole } from '../../../domain/enum/user.role';
-import { UserStatus } from '../../../domain/enum/user.status';
+import { UserRole } from '@/modules/users/domain/enum/user.role';
+import { UserStatus } from '@/modules/users/domain/enum/user.status';
 import {
   GenderApi,
   UserRoleApi,
