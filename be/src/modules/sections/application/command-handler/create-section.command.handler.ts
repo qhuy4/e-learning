@@ -1,22 +1,24 @@
-import { ConflictException, Inject, NotFoundException } from '@nestjs/common';
+import { ConflictException, Inject, NotFoundException, ForbiddenException } from '@nestjs/common';
 
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import slugify from 'slugify';
 
-import { CreateSectionCommand } from '../command/create-section.command';
+import { CreateSectionCommand } from '@/modules/sections/application/command/create-section.command';
 
-import { Section } from '../../domain/entity/section.entity';
+import { Section } from '@/modules/sections/domain/entity/section.entity';
 
 import {
   COURSE_REPOSITORY,
   ICourseRepository,
-} from '../../../courses/domain/repository/course.repository';
+} from '@/modules/courses/domain/repository/course.repository';
 
 import {
   SECTION_REPOSITORY,
   ISectionRepository,
-} from '../../domain/repository/section.repository';
+} from '@/modules/sections/domain/repository/section.repository';
+
+const EDITABLE_STATUSES = [1, 4];
 
 @CommandHandler(CreateSectionCommand)
 export class CreateSectionHandler implements ICommandHandler<CreateSectionCommand> {
@@ -33,6 +35,10 @@ export class CreateSectionHandler implements ICommandHandler<CreateSectionComman
 
     if (!course) {
       throw new NotFoundException('Course not found');
+    }
+
+    if (!EDITABLE_STATUSES.includes(course.status)) {
+      throw new ForbiddenException('Không thể chỉnh sửa khóa học ở trạng thái hiện tại.');
     }
 
     const slug = slugify(command.title, {

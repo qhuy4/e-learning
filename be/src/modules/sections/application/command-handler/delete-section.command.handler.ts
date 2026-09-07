@@ -2,12 +2,12 @@ import { Inject, NotFoundException } from '@nestjs/common';
 
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { DeleteSectionCommand } from '../command/delete-section.command';
+import { DeleteSectionCommand } from '@/modules/sections/application/command/delete-section.command';
 
 import {
   SECTION_REPOSITORY,
   ISectionRepository,
-} from '../../domain/repository/section.repository';
+} from '@/modules/sections/domain/repository/section.repository';
 
 @CommandHandler(DeleteSectionCommand)
 export class DeleteSectionHandler implements ICommandHandler<DeleteSectionCommand> {
