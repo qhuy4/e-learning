@@ -37,7 +37,7 @@ export function CourseFilterBar({
         />
       </div>
 
-      <Select value={level} onValueChange={onLevelChange}>
+      <Select value={level} onValueChange={(v) => onLevelChange(v ?? "")}>
         <SelectTrigger className="h-10 min-w-[160px]">
           <SelectValue placeholder="Tất cả cấp độ" />
         </SelectTrigger>
@@ -49,7 +49,7 @@ export function CourseFilterBar({
         </SelectContent>
       </Select>
 
-      <Select value={status} onValueChange={onStatusChange}>
+      <Select value={status} onValueChange={(v) => onStatusChange(v ?? "")}>
         <SelectTrigger className="h-10 min-w-[160px]">
           <SelectValue placeholder="Tất cả trạng thái" />
         </SelectTrigger>
