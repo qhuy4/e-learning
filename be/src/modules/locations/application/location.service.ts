@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { Country } from '../domain/entity/country.entity';
-import { City } from '../domain/entity/city.entity';
+import { Country } from '@/modules/locations/domain/entity/country.entity';
+import { City } from '@/modules/locations/domain/entity/city.entity';
 
 @Injectable()
 export class LocationService {
