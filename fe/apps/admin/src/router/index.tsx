@@ -21,6 +21,10 @@ import ReviewsPage from "@/pages/reviews/reviews-page.tsx";
 import ReviewDetailPage from "@/pages/reviews/review-detail-page.tsx";
 import CourseListPage from "@/pages/courses/courses-page";
 import {CourseDetailPage} from "@/pages/courses/course-detail-page";
+import OrdersPage from "@/pages/orders/orders-page";
+import OrderDetailPage from "@/pages/orders/order-detail-page";
+import EnrollmentsPage from "@/pages/enrollments/enrollments-page";
+import EnrollmentDetailPage from "@/pages/enrollments/enrollment-detail-page";
 
 
 export const router = createBrowserRouter([
@@ -116,6 +120,32 @@ export const router = createBrowserRouter([
                             {
                                 path: ":id/edit",
                                 element: <InstructorEditPage/>,
+                            },
+                        ],
+                    },
+                    {
+                        path: "orders",
+                        children: [
+                            {
+                                index: true,
+                                element: <OrdersPage/>,
+                            },
+                            {
+                                path: ":id",
+                                element: <OrderDetailPage/>,
+                            },
+                        ],
+                    },
+                    {
+                        path: "enrollments",
+                        children: [
+                            {
+                                index: true,
+                                element: <EnrollmentsPage/>,
+                            },
+                            {
+                                path: ":id",
+                                element: <EnrollmentDetailPage/>,
                             },
                         ],
                     },
