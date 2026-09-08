@@ -1,8 +1,8 @@
 import {useNavigate, useParams} from "react-router-dom";
 import {useState} from "react";
 import {ArrowLeft, ChevronDown, ChevronRight, Play, FileText, HelpCircle, Eye, EyeOff} from "lucide-react";
-import {useAdminCourse, useReviewCourse, useToggleLessonPreview, useToggleLessonStatus} from "@/features/admin-courses/hooks/use-admin-course";
-import {courseStatusLabel, courseStatusClassName, courseLevelLabel, CourseStatus} from "@/features/admin-courses/types/admin-course";
+import {useAdminCourse, useReviewCourse, useToggleLessonPreview, useToggleLessonStatus} from "@/features/courses/hooks/use-admin-course";
+import {courseStatusLabel, courseStatusClassName, courseLevelLabel, CourseStatus} from "@/features/courses/types/admin-course";
 import {Badge} from "@fe/components/ui/badge.tsx";
 import {Button} from "@fe/components/ui/button";
 import {Separator} from "@fe/components/ui/separator";

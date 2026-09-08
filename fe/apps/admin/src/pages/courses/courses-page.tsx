@@ -1,8 +1,8 @@
 import {useNavigate} from "react-router-dom";
 import {DataTable} from "@/components/common/data-table/data-table";
 import {useListPage} from "@/components/common/page/use-list-page";
-import {useAdminCourses} from "@/features/admin-courses/hooks/use-admin-course";
-import {createCourseColumns} from "@/features/admin-courses/components/course-columns";
+import {useAdminCourses} from "@/features/courses/hooks/use-admin-course";
+import {createCourseColumns} from "@/features/courses/components/course-columns";
 
 export default function CourseListPage() {
     const navigate = useNavigate();

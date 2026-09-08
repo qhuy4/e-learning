@@ -2,17 +2,17 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { Eye, CheckCircle, XCircle } from "lucide-react";
-import { useGetCourses } from "@/features/admin-courses/hooks/use-admin-courses";
+import { useGetCourses } from "@/features/courses/hooks/use-admin-courses";
 import {
   useApproveCourse,
   useRejectCourse,
-} from "@/features/admin-courses/hooks/use-admin-courses";
-import { adminCourseService } from "@/features/admin-courses/services/admin-course.service";
+} from "@/features/courses/hooks/use-admin-courses";
+import { adminCourseService } from "@/features/courses/services/admin-course.service";
 
-import { AdminCourseFilterBar } from "@/features/admin-courses/components/admin-course-list/admin-course-filter-bar";
-import { AdminCourseListSkeleton } from "@/features/admin-courses/components/admin-course-list/admin-course-skeleton";
-import { AdminCourseEmptyState } from "@/features/admin-courses/components/admin-course-list/admin-course-empty-state";
-import { AdminCoursePagination } from "@/features/admin-courses/components/admin-course-list/admin-course-pagination";
+import { AdminCourseFilterBar } from "@/features/courses/components/admin-course-list/admin-course-filter-bar";
+import { AdminCourseListSkeleton } from "@/features/courses/components/admin-course-list/admin-course-skeleton";
+import { AdminCourseEmptyState } from "@/features/courses/components/admin-course-list/admin-course-empty-state";
+import { AdminCoursePagination } from "@/features/courses/components/admin-course-list/admin-course-pagination";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Button } from "@fe/components/ui/button";
 import {
@@ -26,7 +26,7 @@ import {
 import {
   LEVEL_LABELS,
   STATUS_CONFIG,
-} from "@/features/admin-courses/components/admin-course-list/admin-course-card";
+} from "@/features/courses/components/admin-course-list/admin-course-card";
 import { Badge } from "@fe/components/ui/badge";
 
 const LIMIT = 10;
