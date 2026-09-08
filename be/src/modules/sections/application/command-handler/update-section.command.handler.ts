@@ -1,4 +1,4 @@
-import { Inject, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Inject, NotFoundException, HttpStatus } from '@nestjs/common';
 
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
@@ -15,6 +15,8 @@ import {
   COURSE_REPOSITORY,
   ICourseRepository,
 } from '@/modules/courses/domain/repository/course.repository';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 
 const EDITABLE_STATUSES = [1, 4];
 
@@ -37,7 +39,7 @@ export class UpdateSectionHandler implements ICommandHandler<UpdateSectionComman
 
     const course = await this.courseRepository.findById(section.courseId);
     if (course && !EDITABLE_STATUSES.includes(course.status)) {
-      throw new ForbiddenException('Không thể chỉnh sửa khóa học ở trạng thái hiện tại.');
+      throw new AppException(ErrorCode.COURSE_NOT_EDITABLE, HttpStatus.FORBIDDEN);
     }
 
     const slug = command.data.title

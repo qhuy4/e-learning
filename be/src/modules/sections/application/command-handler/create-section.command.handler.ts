@@ -2,7 +2,7 @@ import {
   ConflictException,
   Inject,
   NotFoundException,
-  ForbiddenException,
+  HttpStatus,
 } from '@nestjs/common';
 
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
@@ -21,6 +21,8 @@ import {
   ISectionRepository,
 } from '@/modules/sections/domain/repository/section.repository';
 import { SlugUtil } from '@/common/utils/slug.util';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 
 const EDITABLE_STATUSES = [1, 4];
 
@@ -42,9 +44,7 @@ export class CreateSectionHandler implements ICommandHandler<CreateSectionComman
 
     const slug = SlugUtil.generate(command.title);
     if (!EDITABLE_STATUSES.includes(course.status)) {
-      throw new ForbiddenException(
-        'Không thể chỉnh sửa khóa học ở trạng thái hiện tại.',
-      );
+      throw new AppException(ErrorCode.COURSE_NOT_EDITABLE, HttpStatus.FORBIDDEN);
     }
 
     const existingSection = await this.sectionRepository.findBySlug(
