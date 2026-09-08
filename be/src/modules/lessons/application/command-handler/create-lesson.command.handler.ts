@@ -1,4 +1,4 @@
-import { ConflictException, Inject, NotFoundException } from '@nestjs/common';
+import { ConflictException, Inject, NotFoundException, HttpStatus } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SlugUtil } from '../../../../common/utils/slug.util';
 import { extname } from 'path';
@@ -6,6 +6,7 @@ import { randomUUID } from 'crypto';
 
 import { CreateLessonCommand } from '@/modules/lessons/application/command/create-lesson.command';
 import { Lesson } from '@/modules/lessons/domain/entity/lesson.entity';
+import { LessonType } from '@/modules/lessons/domain/enums/lesson-type.enum';
 import {
   SECTION_REPOSITORY,
   ISectionRepository,
@@ -18,6 +19,15 @@ import {
   FILE_STORAGE,
   FileStorage,
 } from '@/common/storage/domain/interface/file-storage.interface';
+import {
+  COURSE_REPOSITORY,
+  ICourseRepository,
+} from '@/modules/courses/domain/repository/course.repository';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
+import { extractDuration } from '@/common/utils/media-duration.util';
+
+const EDITABLE_STATUSES = [1, 4];
 
 @CommandHandler(CreateLessonCommand)
 export class CreateLessonHandler implements ICommandHandler<CreateLessonCommand> {
@@ -30,6 +40,9 @@ export class CreateLessonHandler implements ICommandHandler<CreateLessonCommand>
 
     @Inject(FILE_STORAGE)
     private readonly storage: FileStorage,
+
+    @Inject(COURSE_REPOSITORY)
+    private readonly courseRepository: ICourseRepository,
   ) {}
 
   async execute(command: CreateLessonCommand) {
@@ -37,6 +50,11 @@ export class CreateLessonHandler implements ICommandHandler<CreateLessonCommand>
 
     if (!section) {
       throw new NotFoundException('Section not found');
+    }
+
+    const course = await this.courseRepository.findById(section.courseId);
+    if (course && !EDITABLE_STATUSES.includes(course.status)) {
+      throw new AppException(ErrorCode.COURSE_NOT_EDITABLE, HttpStatus.FORBIDDEN);
     }
 
     const slug = SlugUtil.generate(command.title);
@@ -51,6 +69,7 @@ export class CreateLessonHandler implements ICommandHandler<CreateLessonCommand>
     }
 
     let videoSource = command.videoSource ?? null;
+    let duration = command.duration ?? null;
 
     if (command.video) {
       const extension = extname(command.video.originalname).toLowerCase();
@@ -62,6 +81,13 @@ export class CreateLessonHandler implements ICommandHandler<CreateLessonCommand>
         contentType: command.video.mimetype,
         contentLength: command.video.size,
       });
+
+      if (command.type === LessonType.VIDEO || command.type === LessonType.AUDIO) {
+        const extracted = await extractDuration(command.video.buffer, command.video.mimetype);
+        if (extracted !== null) {
+          duration = extracted;
+        }
+      }
     }
 
     try {
@@ -72,7 +98,7 @@ export class CreateLessonHandler implements ICommandHandler<CreateLessonCommand>
         type: command.type,
         videoProvider: command.videoProvider,
         videoSource: videoSource,
-        duration: command.duration,
+        duration,
         content: command.content,
         position: command.position,
         isPreview: command.isPreview,

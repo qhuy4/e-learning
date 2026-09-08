@@ -1,5 +1,6 @@
 import { Lesson } from '../../domain/entity/lesson.entity';
 import { LessonOrmEntity } from '../entity/lesson.orm-entity';
+import { LessonType } from '../../domain/enums/lesson-type.enum';
 
 export class LessonMapper {
   static toDomain(entity: LessonOrmEntity): Lesson {
@@ -8,7 +9,7 @@ export class LessonMapper {
       sectionId: Number(entity.sectionId),
       title: entity.title,
       slug: entity.slug,
-      type: entity.type,
+      type: entity.type as LessonType,
       videoProvider: entity.videoProvider,
       videoSource: entity.videoSource,
       duration: entity.duration,

@@ -36,9 +36,7 @@ export class GetLessonByIdHandler implements IQueryHandler<GetLessonByIdQuery> {
       throw new NotFoundException('Lesson not found');
     }
 
-    const signedUrl = lesson.isPreview
-      ? await resolveSignedUrl(lesson.videoSource, this.storage)
-      : null;
+    const signedUrl = await resolveSignedUrl(lesson.videoSource, this.storage);
 
     return LessonDtoMapper.toDetailDto(lesson, signedUrl);
   }

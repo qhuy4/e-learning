@@ -1,5 +1,6 @@
 import {
   IsBoolean,
+  IsIn,
   IsInt,
   IsOptional,
   IsString,
@@ -8,6 +9,7 @@ import {
 } from 'class-validator';
 
 import { Transform } from 'class-transformer';
+import { LessonType } from '@/modules/lessons/domain/enums/lesson-type.enum';
 
 export class CreateLessonDto {
   @IsString()
@@ -15,8 +17,8 @@ export class CreateLessonDto {
   title: string;
 
   @IsOptional()
-  @IsString()
-  type?: string;
+  @IsIn(Object.values(LessonType))
+  type?: LessonType;
 
   @IsOptional()
   @IsString()
