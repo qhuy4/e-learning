@@ -18,4 +18,10 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   [ErrorCode.COURSE_NO_SECTIONS]: 'Khóa học phải có ít nhất một chương trước khi gửi duyệt',
   [ErrorCode.COURSE_NO_LESSONS]: 'Khóa học phải có ít nhất một bài học trước khi gửi duyệt',
   [ErrorCode.COURSE_THUMBNAIL_NOT_FOUND]: 'File thumbnail không tồn tại',
+  [ErrorCode.COURSE_NOT_EDITABLE]: 'Không thể chỉnh sửa khóa học ở trạng thái hiện tại',
+
+  [ErrorCode.ORDER_NOT_FOUND]: 'Đơn hàng không tồn tại',
+  [ErrorCode.ORDER_INVALID_STATUS_TRANSITION]: 'Không thể chuyển trạng thái đơn hàng',
+
+  [ErrorCode.ENROLLMENT_NOT_FOUND]: 'Ghi danh không tồn tại',
 };
