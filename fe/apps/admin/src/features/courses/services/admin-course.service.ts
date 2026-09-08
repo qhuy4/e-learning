@@ -1,5 +1,5 @@
 import type {PaginationResponse} from "@/shared/types/pagination.ts";
-import type {AdminCourse} from "@/features/admin-courses/types/admin-course.ts";
+import type {AdminCourse} from "@/features/courses/types/admin-course.ts";
 import {adminApi} from "@/shared/lib/axios.ts";
 
 export const adminCourseService = {

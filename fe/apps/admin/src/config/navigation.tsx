@@ -10,6 +10,8 @@ import {
     LogOut,
     UserCheck,
     Shield,
+    ShoppingCart,
+    ClipboardList,
 } from "lucide-react"
 import type { NavGroup, NavItem } from "@/shared/types/navigation"
 
@@ -72,11 +74,21 @@ export const navigation: Navigation = {
                     url: "/reviews",
                     icon: Star,
                 },
+                {
+                    title: "Ghi danh",
+                    url: "/enrollments",
+                    icon: ClipboardList,
+                },
             ],
         },
         {
             label: "Tài chính",
             items: [
+                {
+                    title: "Đơn hàng",
+                    url: "/orders",
+                    icon: ShoppingCart,
+                },
                 {
                     title: "Doanh thu",
                     url: "/earnings",

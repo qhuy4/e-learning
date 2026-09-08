@@ -1,8 +1,8 @@
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
-import {adminCourseService} from "@/features/admin-courses/services/admin-course.service"
+import {adminCourseService} from "@/features/courses/services/admin-course.service"
 
 export const adminCourseKeys = {
-    all: ["admin-courses"] as const,
+    all: ["courses"] as const,
     lists: () => [...adminCourseKeys.all, "list"] as const,
     list: (page: number, limit: number, search?: string, sortBy?: string, sortOrder?: string, status?: number) =>
         [...adminCourseKeys.lists(), {page, limit, search, sortBy, sortOrder, status}] as const,

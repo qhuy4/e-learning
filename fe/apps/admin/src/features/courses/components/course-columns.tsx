@@ -6,7 +6,7 @@ import type {HeaderContext} from "@tanstack/react-table"
 
 import {type DataTableFeatures} from "@/components/common/data-table/data-table-features.ts"
 import {Badge} from "@fe/components/ui/badge.tsx"
-import {CourseStatus, CourseLevel} from "@/features/admin-courses/types/admin-course";
+import {CourseStatus, CourseLevel} from "@/features/courses/types/admin-course";
 
 const columnHelper = createColumnHelper<DataTableFeatures, any>()
 
