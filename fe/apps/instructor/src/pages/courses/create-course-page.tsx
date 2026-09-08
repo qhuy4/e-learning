@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams, useLocation } from "react-router";
 import {
   ChevronLeft,
   Save,
@@ -43,14 +43,21 @@ function isEditable(status: number) {
 
 export default function CreateCoursePage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { courseId } = useParams<{ courseId: string }>();
   const isEditMode = Boolean(courseId);
 
   const { mutate: createCourse, isPending: isCreating } = useCreateCourse();
   const { mutate: updateCourse, isPending: isUpdating } = useUpdateCourse();
-  const { data: courseResponse } = useGetCourseDetail(courseId);
+  const { data: courseResponse, refetch } = useGetCourseDetail(courseId);
 
   const isBusy = isCreating || isUpdating;
+
+  useEffect(() => {
+    if (location.state?.refresh && courseId) {
+      refetch();
+    }
+  }, [location.state?.refresh, courseId, refetch]);
 
   const [courseData, setCourseData] = useState<Course>({
     title: "",
@@ -130,7 +137,7 @@ export default function CreateCoursePage() {
     updateCourse({ id: courseId!, data: formData }, {
       onSuccess: () => {
         toast.success("Đã gửi yêu cầu duyệt thành công!", { id: tid });
-        navigate("/courses");
+        setCourseData((prev) => ({ ...prev, status: 2 }));
       },
       onError: (err: any) => {
         const msg = err?.response?.data?.message;

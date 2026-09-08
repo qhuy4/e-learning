@@ -7,6 +7,7 @@ import { LessonForm } from "@/features/lessons/components/lesson-form";
 import { useCreateLesson, useGetLesson, useUpdateLesson } from "../hook/use-lessons";
 import { useGetCourseDetail } from "@/features/courses/hook/use-courses";
 import { toast } from "sonner";
+import type { LessonType } from "../types/lesson.types";
 
 export function CreateLessonPage() {
   const navigate = useNavigate();
@@ -18,22 +19,25 @@ export function CreateLessonPage() {
 
   const { data: lessonData, isLoading } = useGetLesson(isEditing ? Number(id) : 0);
   const { data: courseData } = useGetCourseDetail(courseId ?? undefined);
-  const { mutate: createLesson } = useCreateLesson();
-  const { mutate: updateLesson } = useUpdateLesson();
+  const { mutate: createLesson, isPending: isCreating } = useCreateLesson();
+  const { mutate: updateLesson, isPending: isUpdating } = useUpdateLesson();
+  const isSaving = isCreating || isUpdating;
 
   const course = courseData?.data;
   const sections = course?.sections ?? [];
   const section = sections.find((s: any) => String(s.id) === String(sectionId));
 
-  const handleSave = (data: { title: string; type: "video"; duration?: number; position?: number; content?: string; isPreview: boolean; videoSource?: File | string; thumbnail?: File | string }) => {
+  const toCourse = () => navigate(`/courses/${courseId}`, { state: { refresh: Date.now() } });
+
+  const handleSave = (data: { title: string; type: LessonType; duration?: number; position?: number; content?: string; isPreview: boolean; videoSource?: File | string; thumbnail?: File | string }) => {
     if (isEditing) {
       const tid = toast.loading("Đang cập nhật bài học...");
       updateLesson(
-        { id: Number(id), data },
+        { id: Number(id), data: { ...data, courseId: Number(courseId) } as any },
         {
           onSuccess: () => {
             toast.success("Đã cập nhật bài học!", { id: tid });
-            navigate(-1);
+            toCourse();
           },
           onError: () => {
             toast.error("Có lỗi xảy ra khi cập nhật bài học.", { id: tid });
@@ -47,11 +51,11 @@ export function CreateLessonPage() {
       }
       const tid = toast.loading("Đang tạo bài học...");
       createLesson(
-        { sectionId: Number(sectionId), data: { ...data, sectionId: Number(sectionId) } as any },
+        { sectionId: Number(sectionId), data: { ...data, sectionId: Number(sectionId), courseId: Number(courseId) } as any },
         {
           onSuccess: () => {
             toast.success("Đã tạo bài học thành công!", { id: tid });
-            navigate(-1);
+            toCourse();
           },
           onError: () => {
             toast.error("Có lỗi xảy ra khi tạo bài học.", { id: tid });
@@ -104,7 +108,7 @@ export function CreateLessonPage() {
         </div>
       )}
 
-      <LessonForm initialData={lessonData?.data} onSave={handleSave} onCancel={() => navigate(-1)} />
+      <LessonForm initialData={lessonData?.data} onSave={handleSave} onCancel={() => navigate(-1)} isSaving={isSaving} />
     </div>
   );
 }

@@ -37,7 +37,8 @@ export function useUpdateCourse() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: FormData }) =>
       courseService.updateCourse(id, data),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      queryClient.removeQueries({ queryKey: ["course", variables.id] });
       queryClient.invalidateQueries({ queryKey: ["courses"] });
     },
   });

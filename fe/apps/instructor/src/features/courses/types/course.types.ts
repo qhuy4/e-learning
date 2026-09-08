@@ -1,7 +1,7 @@
 export interface Lesson {
   id: string;
   title: string;
-  type: "video" | "document" | "quiz";
+  type: "video" | "audio" | "text" | "document" | "quiz" | "live";
   duration?: number;
   position?: number;
   isPreview?: boolean;

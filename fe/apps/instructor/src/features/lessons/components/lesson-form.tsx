@@ -1,16 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { Button } from "@fe/components/ui/button";
 import { Input } from "@fe/components/ui/input";
 import { Label } from "@fe/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@fe/components/ui/card";
-import { Type, LayoutList, Save, X, BookOpen, Clock, Eye } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@fe/components/ui/select";
+import { Type, LayoutList, Save, X, BookOpen, Clock, Eye, Loader2 } from "lucide-react";
 import { VideoUploader } from "./video-uploader";
 import { ThumbnailUploader } from "./thumbnail-uploader";
+import { LessonType, LESSON_TYPE_LABELS, MEDIA_TYPES } from "../types/lesson.types";
 
 interface LessonFormData {
   title: string;
-  type: "video";
+  type: LessonType;
   duration?: number;
   position?: number;
   content?: string;
@@ -23,11 +25,13 @@ interface LessonFormProps {
   initialData?: any;
   onSave: (data: LessonFormData) => void;
   onCancel: () => void;
+  isSaving?: boolean;
 }
 
-export function LessonForm({ initialData, onSave, onCancel }: LessonFormProps) {
+export function LessonForm({ initialData, onSave, onCancel, isSaving }: LessonFormProps) {
   const isEditing = Boolean(initialData?.id);
   const [title, setTitle] = useState("");
+  const [lessonType, setLessonType] = useState<LessonType>("video");
   const [duration, setDuration] = useState("");
   const [content, setContent] = useState("");
   const [isPreview, setIsPreview] = useState(false);
@@ -35,30 +39,45 @@ export function LessonForm({ initialData, onSave, onCancel }: LessonFormProps) {
   const [videoSource, setVideoSource] = useState<File | string | undefined>(undefined);
   const [thumbnail, setThumbnail] = useState<File | string | undefined>(undefined);
 
+  const typeChangedByUser = useRef(false);
+
+  const isMedia = MEDIA_TYPES.includes(lessonType);
+
   useEffect(() => {
     if (!initialData) return;
     setTitle(initialData.title ?? "");
-    setDuration(initialData.duration ? String(initialData.duration) : "");
+    setLessonType(initialData.type ?? "video");
+    setDuration(initialData.duration != null ? String(initialData.duration) : "");
     setContent(initialData.content ?? "");
     setIsPreview(initialData.isPreview ?? false);
     setPosition(initialData.position ? String(initialData.position) : "");
     setVideoSource(initialData.videoSource ?? undefined);
     setThumbnail(initialData.thumbnail ?? undefined);
+    typeChangedByUser.current = false;
   }, [initialData]);
+
+  const handleTypeChange = (value: LessonType | null) => {
+    if (!value) return;
+    typeChangedByUser.current = true;
+    setLessonType(value);
+    if (MEDIA_TYPES.includes(value)) {
+      setDuration("");
+    }
+  };
 
   const handleSubmit = () => {
     if (!title.trim()) {
       toast.error("Vui lòng nhập tên bài học.");
       return;
     }
-    if (!isEditing && !videoSource) {
-      toast.error("Vui lòng tải video bài học.");
+    if (!isEditing && !videoSource && isMedia) {
+      toast.error("Vui lòng tải file bài học.");
       return;
     }
     onSave({
       title: title.trim(),
-      type: "video",
-      duration: duration ? Number(duration) : undefined,
+      type: lessonType,
+      duration: isMedia ? undefined : (duration ? Number(duration) : undefined),
       position: position ? Number(position) : undefined,
       content: content.trim() || undefined,
       isPreview,
@@ -66,6 +85,9 @@ export function LessonForm({ initialData, onSave, onCancel }: LessonFormProps) {
       thumbnail,
     });
   };
+
+  const isUploading = isSaving && videoSource instanceof File;
+  const isDisabled = isSaving;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -82,21 +104,38 @@ export function LessonForm({ initialData, onSave, onCancel }: LessonFormProps) {
           </CardHeader>
           <CardContent className="space-y-6 pt-6">
             <div className="space-y-2">
+              <Label className="font-medium">
+                Loại bài học <span className="text-destructive">*</span>
+              </Label>
+              <Select value={lessonType} onValueChange={handleTypeChange} disabled={isDisabled}>
+                <SelectTrigger className="w-full h-11">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {(Object.entries(LESSON_TYPE_LABELS) as [LessonType, string][]).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>{label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="title" className="font-medium">
                 Tên bài học <span className="text-destructive">*</span>
               </Label>
               <div className="relative">
                 <Type className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input id="title" placeholder="Nhập tên bài học..." className="pl-10 h-11" value={title} onChange={(e) => setTitle(e.target.value)} />
+                <Input id="title" placeholder="Nhập tên bài học..." className="pl-10 h-11" value={title} onChange={(e) => setTitle(e.target.value)} disabled={isDisabled} />
               </div>
             </div>
-            <div className="space-y-2 pt-2">
-              <Label className="font-medium">
-                Video bài học{!isEditing && <span className="text-destructive ml-1">*</span>}
-                {isEditing && <span className="ml-2 text-xs font-normal text-muted-foreground">(để trống nếu không thay đổi)</span>}
-              </Label>
-              <VideoUploader value={videoSource} onChange={setVideoSource} />
-            </div>
+            {isMedia && (
+              <div className="space-y-2 pt-2">
+                <Label className="font-medium">
+                  File bài học{!isEditing && <span className="text-destructive ml-1">*</span>}
+                  {isEditing && <span className="ml-2 text-xs font-normal text-muted-foreground">(để trống nếu không thay đổi)</span>}
+                </Label>
+                <VideoUploader value={videoSource} onChange={setVideoSource} />
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="content" className="font-medium flex items-center gap-2">
                 <LayoutList className="h-4 w-4 text-muted-foreground" />
@@ -119,7 +158,14 @@ export function LessonForm({ initialData, onSave, onCancel }: LessonFormProps) {
                 <Clock className="h-4 w-4 text-muted-foreground" />
                 Thời lượng (phút)
               </Label>
-              <Input id="duration" type="number" min="0" placeholder="VD: 15" value={duration} onChange={(e) => setDuration(e.target.value)} />
+              {isMedia ? (
+                <Input id="duration" type="number" min="0" disabled value={duration} placeholder="Tự động từ file" className="bg-muted/50" />
+              ) : (
+                <Input id="duration" type="number" min="0" placeholder="VD: 15" value={duration} onChange={(e) => setDuration(e.target.value)} />
+              )}
+              {isMedia && (
+                <p className="text-xs text-muted-foreground">Thời lượng được tự động xác định từ file âm thanh/video.</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="position" className="font-medium">Thứ tự bài học</Label>
@@ -142,11 +188,25 @@ export function LessonForm({ initialData, onSave, onCancel }: LessonFormProps) {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-3 border-t border-border pt-6 bg-muted/20">
-            <Button onClick={handleSubmit} className="w-full gap-2 rounded-md shadow-sm bg-emerald-600 hover:bg-emerald-700 text-white font-medium">
-              <Save className="w-4 h-4" />
-              {isEditing ? "Lưu thay đổi" : "Tạo bài học"}
+            <Button onClick={handleSubmit} disabled={isDisabled} className="w-full gap-2 rounded-md shadow-sm bg-emerald-600 hover:bg-emerald-700 text-white font-medium">
+              {isUploading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Đang tải lên video...
+                </>
+              ) : isSaving ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Đang lưu...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  {isEditing ? "Lưu thay đổi" : "Tạo bài học"}
+                </>
+              )}
             </Button>
-            <Button variant="outline" onClick={onCancel} className="w-full gap-2 rounded-md shadow-sm font-medium">
+            <Button variant="outline" onClick={onCancel} disabled={isDisabled} className="w-full gap-2 rounded-md shadow-sm font-medium">
               <X className="w-4 h-4" />
               Hủy bỏ
             </Button>
