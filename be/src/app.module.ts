@@ -15,6 +15,8 @@ import { InstructorModule } from '@/modules/instructors/instructor.module';
 import { LocationModule } from '@/modules/locations/location.module';
 import { LessonProgressModule } from './modules/lesson-progress/lesson-progress.module';
 import { ReviewsModule } from '@/modules/reviews/reviews.module';
+import { OrdersModule } from '@/modules/orders/orders.module';
+import { EnrollmentsModule } from '@/modules/enrollments/enrollments.module';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { ReviewsModule } from '@/modules/reviews/reviews.module';
     }),
     LocationModule,
     ReviewsModule,
+    OrdersModule,
+    EnrollmentsModule,
     UserModule,
     AuthModule,
     InstructorModule,

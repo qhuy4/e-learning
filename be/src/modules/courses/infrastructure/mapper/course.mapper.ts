@@ -1,6 +1,7 @@
 import { Course } from '@/modules/courses/domain/entity/course.entity';
 import { Section } from '@/modules/sections/domain/entity/section.entity';
 import { Lesson } from '@/modules/lessons/domain/entity/lesson.entity';
+import { LessonType } from '@/modules/lessons/domain/enums/lesson-type.enum';
 import { CourseOrmEntity } from '@/modules/courses/infrastructure/entity/course.orm-entity';
 
 export class CourseMapper {
@@ -44,7 +45,7 @@ export class CourseMapper {
               sectionId: Number(lessonOrm.sectionId),
               title: lessonOrm.title,
               slug: lessonOrm.slug,
-              type: lessonOrm.type,
+              type: lessonOrm.type as LessonType,
               videoProvider: lessonOrm.videoProvider ?? null,
               videoSource: lessonOrm.videoSource ?? null,
               content: lessonOrm.content ?? null,
