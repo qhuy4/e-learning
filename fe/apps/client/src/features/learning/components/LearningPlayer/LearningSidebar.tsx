@@ -1,4 +1,4 @@
-import { PlayCircle, CheckCircle2, Lock, File } from 'lucide-react';
+import { PlayCircle, CheckCircle2, Lock } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
@@ -39,7 +39,7 @@ export const LearningSidebar = ({ sections, courseSlug }: LearningSidebarProps) 
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
-        <Accordion type="multiple" defaultValue={defaultValues}>
+        <Accordion defaultValue={defaultValues}>
           {sections.map((section) => (
             <AccordionItem
               key={section.id}

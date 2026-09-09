@@ -457,7 +457,7 @@ export const InstructorApprovalsPage: React.FC = () => {
                 </p>
               ) : (
                 <div className="space-y-2">
-                  {selectedProfile.certificates.map((cert) => (
+                  {selectedProfile.certificates.map((cert: any) => (
                     <div
                       key={cert.id}
                       className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg flex items-center justify-between text-xs"

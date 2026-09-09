@@ -52,7 +52,6 @@ export const CourseContent = ({ course }: CourseContentProps) => {
       </div>
 
       <Accordion
-        type="multiple"
         defaultValue={sections.length > 0 ? [String(sections[0].id)] : []}
         className="space-y-4"
       >

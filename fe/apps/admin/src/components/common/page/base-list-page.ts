@@ -22,5 +22,5 @@ type BaseListPageProps<T> = {
     onSortChange: (
         sortBy: string,
         sortOrder: "asc" | "desc"
-    )
+    ) => void
 }
