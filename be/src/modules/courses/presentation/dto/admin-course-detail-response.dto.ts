@@ -1,4 +1,4 @@
-import { CourseStatus } from '../../domain/enum/course-status.enum';
+import { CourseStatus } from '@/modules/courses/domain/enum/course-status.enum';
 
 export class AdminCourseDetailResponseDto {
   id: string;
@@ -55,6 +55,7 @@ export class AdminCourseDetailResponseDto {
       position: number;
       isPreview: boolean;
       videoUrl?: string | null;
+      content: string | null;
       isActive: boolean;
       createdAt: Date | null;
       deletedAt: Date | null;

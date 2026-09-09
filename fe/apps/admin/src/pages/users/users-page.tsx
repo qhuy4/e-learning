@@ -1,37 +1,38 @@
 import {DataTable} from "@/components/common/data-table/data-table";
-import { createUserColumns } from "@/features/users/column";
-// import type {User} from "@/features/users/service"
+import {createUserColumns} from "@/features/users/column";
 import {useNavigate} from "react-router";
-import {useEffect, useState} from "react";
-import { Plus } from "lucide-react";
-import type { User } from "@/features/users/types/user.type";
-import { Button } from "@fe/components/ui/button";
+import {Plus} from "lucide-react";
+import type {User} from "@/features/users/types/user.type";
+import {Button} from "@fe/components/ui/button";
 import {useUsers} from "@/features/users/hook/use-user.ts";
 import {DeleteConfirmDialog} from "@/features/users/components/delete-confirm-diialog.tsx";
-
-const columns = createUserColumns()
+import {useListPage} from "@/components/common/page/use-list-page.ts";
+import {useDeleteDialog} from "@/features/users/hook/user-dialog.ts";
 
 export default function UsersPage() {
+    const {
+        page,
+        limit,
+        search,
+        debouncedSearch,
+        sortBy,
+        sortOrder,
+        setPage,
+        setLimit,
+        setSearch,
+        handleSortChange,
+    } = useListPage()
+
     const navigate = useNavigate()
-    const [page, setPage] = useState(1)
-    const [limit, setLimit] = useState(10)
-    const [search, setSearch] = useState("")
-    const [debouncedSearch, setDebouncedSearch] = useState("")
-    const [sortBy, setSortBy] = useState("id")
-    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
 
-    const [deleteOpen, setDeleteOpen] = useState(false)
-    const [deletingUser, setDeletingUser] = useState<User | null>(null)
+    const {
+        open: deleteOpen,
+        item: deletingUser,
+        setOpen: setDeleteOpen,
+        handleDelete,
+    } = useDeleteDialog<User>()
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setDebouncedSearch(search)
-            setPage(1)
-        }, 300)
-        return () => clearTimeout(timer)
-    }, [search])
-
-    const { data: result, isLoading: loading } = useUsers(
+    const {data: result, isLoading: loading, refetch, isFetching} = useUsers(
         page,
         limit,
         debouncedSearch || undefined,
@@ -43,12 +44,6 @@ export default function UsersPage() {
         ? Math.ceil(result.meta.total / result.meta.limit)
         : 0
 
-    const handleSortChange = (newSortBy: string, newSortOrder: "asc" | "desc") => {
-        setSortBy(newSortBy)
-        setSortOrder(newSortOrder)
-        setPage(1)
-    }
-
     const handleCreate = () => {
         navigate("/users/create")
     }
@@ -56,19 +51,24 @@ export default function UsersPage() {
     const handleEdit = (user: User) => {
         navigate(`/users/${user.id}/edit`)
     }
-
-    const handleDelete = (user: User) => {
-        setDeletingUser(user)
-        setDeleteOpen(true)
-    }
-
+    const columns = createUserColumns(() => [
+        {
+            label: "Sửa",
+            onClick: handleEdit,
+        },
+        {
+            label: "Xóa",
+            variant: "destructive",
+            onClick: handleDelete,
+        },
+    ])
     return (
         <div className="p-6">
             <div className="mb-4 flex items-center justify-between">
-                <h1 className="text-2xl font-bold">Users</h1>
+                <h1 className="text-2xl font-bold">Người dùng</h1>
                 <Button onClick={handleCreate}>
-                    <Plus className="size-4" />
-                    Create User
+                    <Plus className="size-4"/>
+                    Tạo người dùng
                 </Button>
             </div>
 
@@ -78,6 +78,8 @@ export default function UsersPage() {
                 page={page}
                 totalPages={totalPages}
                 loading={loading}
+                isFetching={isFetching}
+                refetch={refetch}
                 pageSize={limit}
                 onPageChange={setPage}
                 onRowClick={(user) => navigate(`/users/${user.id}`)}
@@ -90,14 +92,25 @@ export default function UsersPage() {
                 sortBy={sortBy}
                 sortOrder={sortOrder}
                 onSortChange={handleSortChange}
-                tableMeta={{ onEdit: handleEdit, onDelete: handleDelete }}
+                tableMeta={{onEdit: handleEdit, onDelete: handleDelete}}
+                text={{
+                    searchPlaceholder: "Tìm kiếm...",
+                    reload: "Tải lại",
+                    rowsPerPage: "Dòng trên trang",
+                    noResults: "Không có kết quả.",
+                    pageOf: (p, tp) => `Trang ${p} / ${tp || 1}`,
+                    previous: "Trước",
+                    next: "Sau",
+                }}
             />
 
             <DeleteConfirmDialog
                 open={deleteOpen}
                 onOpenChange={setDeleteOpen}
                 user={deletingUser}
-                onSuccess={() => {}}
+                onSuccess={() => {
+                    setDeleteOpen(false)
+                }}
             />
         </div>
     )

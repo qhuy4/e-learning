@@ -1,18 +1,20 @@
-import { BadRequestException, Inject, NotFoundException } from '@nestjs/common';
+import { Inject, NotFoundException, HttpStatus } from '@nestjs/common';
 
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import {
   FILE_STORAGE,
   FileStorage,
-} from '../../../../common/storage/domain/interface/file-storage.interface';
+} from '@/common/storage/domain/interface/file-storage.interface';
 
 import {
   COURSE_REPOSITORY,
   ICourseRepository,
-} from '../../domain/repository/course.repository';
+} from '@/modules/courses/domain/repository/course.repository';
 
-import { UpdateCourseThumbnailCommand } from '../command/update-course-thumbnail.command';
+import { UpdateCourseThumbnailCommand } from '@/modules/courses/application/command/update-course-thumbnail.command';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 
 @CommandHandler(UpdateCourseThumbnailCommand)
 export class UpdateCourseThumbnailHandler implements ICommandHandler<UpdateCourseThumbnailCommand> {
@@ -34,7 +36,7 @@ export class UpdateCourseThumbnailHandler implements ICommandHandler<UpdateCours
     const exists = await this.storage.exists(command.key);
 
     if (!exists) {
-      throw new BadRequestException('Thumbnail file does not exist');
+      throw new AppException(ErrorCode.COURSE_THUMBNAIL_NOT_FOUND, HttpStatus.BAD_REQUEST);
     }
 
     const oldThumbnail = course.thumbnail;

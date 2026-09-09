@@ -24,19 +24,25 @@ export class CreateCourseDto {
   // thumbnail?: string;
 
   @IsOptional()
-  @Transform(({ value }) => (value === '' || value == null ? undefined : Number(value)))
+  @Transform(({ value }) =>
+    value === '' || value == null ? undefined : Number(value),
+  )
   @IsInt()
   @Min(1)
   level?: number;
 
   @IsOptional()
-  @Transform(({ value }) => (value === '' || value == null ? undefined : Number(value)))
+  @Transform(({ value }) =>
+    value === '' || value == null ? undefined : Number(value),
+  )
   @IsNumber()
   @Min(0)
   price?: number;
 
   @IsOptional()
-  @Transform(({ value }) => (value === '' || value == null ? undefined : Number(value)))
+  @Transform(({ value }) =>
+    value === '' || value == null ? undefined : Number(value),
+  )
   @IsInt()
   parentId?: number;
 }

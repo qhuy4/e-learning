@@ -1,13 +1,20 @@
 import {
     LayoutDashboard,
     Users,
-    Settings, ChartBar, GraduationCap, UserRound,
-    LogOut,
+    Settings,
+    ChartBar,
+    GraduationCap,
     BookOpen,
     DollarSign,
-    Star
+    Star,
+    LogOut,
+    UserCheck,
+    UserRound,
+    ShoppingCart,
+    ClipboardList,
 } from "lucide-react"
-import type { NavGroup,NavItem } from "@/shared/types/navigation"
+import type { NavGroup, NavItem } from "@/shared/types/navigation"
+
 type Navigation = {
     main: NavGroup[]
     secondary: NavItem[]
@@ -30,7 +37,7 @@ export const navigation: Navigation = {
             ],
         },
         {
-            label: "Management",
+            label: "Quản lý",
             items: [
                 {
                     title: "Users",
@@ -38,12 +45,17 @@ export const navigation: Navigation = {
                     icon: Users,
                 },
                 {
-                    title: "Instructors",
+                    title: "Giảng viên",
                     url: "/instructors",
                     icon: GraduationCap,
                 },
                 {
-                    title: "Students",
+                    title: "Duyệt Giảng Viên (eKYC)",
+                    url: "/instructors/approvals",
+                    icon: UserCheck,
+                },
+                {
+                    title: "Học viên",
                     url: "/students",
                     icon: UserRound,
                 },
@@ -53,7 +65,7 @@ export const navigation: Navigation = {
             label: "Học tập",
             items: [
                 {
-                    title: "Khóa học của tôi",
+                    title: "Khóa học",
                     url: "/courses",
                     icon: BookOpen,
                 },
@@ -62,11 +74,21 @@ export const navigation: Navigation = {
                     url: "/reviews",
                     icon: Star,
                 },
+                {
+                    title: "Ghi danh",
+                    url: "/enrollments",
+                    icon: ClipboardList,
+                },
             ],
         },
         {
             label: "Tài chính",
             items: [
+                {
+                    title: "Đơn hàng",
+                    url: "/orders",
+                    icon: ShoppingCart,
+                },
                 {
                     title: "Doanh thu",
                     url: "/earnings",

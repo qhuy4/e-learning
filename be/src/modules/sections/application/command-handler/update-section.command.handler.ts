@@ -1,21 +1,33 @@
-import { Inject, NotFoundException } from '@nestjs/common';
+import { Inject, NotFoundException, HttpStatus } from '@nestjs/common';
 
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import slugify from 'slugify';
+import { SlugUtil } from '../../../../common/utils/slug.util';
 
-import { UpdateSectionCommand } from '../command/update-section.command';
+import { UpdateSectionCommand } from '@/modules/sections/application/command/update-section.command';
 
 import {
   SECTION_REPOSITORY,
   ISectionRepository,
-} from '../../domain/repository/section.repository';
+} from '@/modules/sections/domain/repository/section.repository';
+
+import {
+  COURSE_REPOSITORY,
+  ICourseRepository,
+} from '@/modules/courses/domain/repository/course.repository';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
+
+const EDITABLE_STATUSES = [1, 4];
 
 @CommandHandler(UpdateSectionCommand)
 export class UpdateSectionHandler implements ICommandHandler<UpdateSectionCommand> {
   constructor(
     @Inject(SECTION_REPOSITORY)
     private readonly sectionRepository: ISectionRepository,
+
+    @Inject(COURSE_REPOSITORY)
+    private readonly courseRepository: ICourseRepository,
   ) {}
 
   async execute(command: UpdateSectionCommand) {
@@ -25,12 +37,13 @@ export class UpdateSectionHandler implements ICommandHandler<UpdateSectionComman
       throw new NotFoundException('Section not found');
     }
 
+    const course = await this.courseRepository.findById(section.courseId);
+    if (course && !EDITABLE_STATUSES.includes(course.status)) {
+      throw new AppException(ErrorCode.COURSE_NOT_EDITABLE, HttpStatus.FORBIDDEN);
+    }
+
     const slug = command.data.title
-      ? slugify(command.data.title, {
-          lower: true,
-          strict: true,
-          trim: true,
-        })
+      ? SlugUtil.generate(command.data.title)
       : undefined;
 
     section.update({

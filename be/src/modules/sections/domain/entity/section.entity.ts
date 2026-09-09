@@ -92,4 +92,14 @@ export class Section {
       this.isActive = params.isActive;
     }
   }
+  clone(courseId: number): Section {
+    return Section.create({
+      courseId,
+      title: this.title,
+      slug: this.slug,
+      description: this.description,
+      position: this.position,
+      isActive: this.isActive,
+    });
+  }
 }

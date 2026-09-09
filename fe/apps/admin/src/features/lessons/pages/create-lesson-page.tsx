@@ -9,7 +9,7 @@ import { toast } from "sonner";
 export function CreateLessonPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { id } = useParams(); // If we have an id, we are editing
+  const { id } = useParams(); 
 
   const sectionId = searchParams.get("sectionId");
 

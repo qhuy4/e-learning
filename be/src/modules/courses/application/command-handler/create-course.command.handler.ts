@@ -1,18 +1,18 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import slugify from 'slugify';
+import { SlugUtil } from '../../../../common/utils/slug.util';
 import { extname } from 'path';
 import { randomUUID } from 'crypto';
 
-import { CreateCourseCommand } from './../command/create-course.command';
-import { Course } from '../../domain/entity/course.entity';
+import { CreateCourseCommand } from '@/modules/courses/application/command/create-course.command';
+import { Course } from '@/modules/courses/domain/entity/course.entity';
 import {
   COURSE_REPOSITORY,
   ICourseRepository,
-} from '../../domain/repository/course.repository';
+} from '@/modules/courses/domain/repository/course.repository';
 import {
   FILE_STORAGE,
   FileStorage,
-} from '../../../../common/storage/domain/interface/file-storage.interface';
+} from '@/common/storage/domain/interface/file-storage.interface';
 
 import { Inject, ConflictException } from '@nestjs/common';
 
@@ -27,11 +27,7 @@ export class CreateCourseHandler implements ICommandHandler<CreateCourseCommand>
   ) {}
 
   async execute(command: CreateCourseCommand) {
-    const slug = slugify(command.title, {
-      lower: true,
-      strict: true,
-      trim: true,
-    });
+    const slug = SlugUtil.generate(command.title);
 
     const existingCourse = await this.courseRepository.findBySlug(slug);
 
@@ -63,6 +59,7 @@ export class CreateCourseHandler implements ICommandHandler<CreateCourseCommand>
         level: command.level,
         price: command.price,
         parentId: command.parentId,
+        version: 1,
       });
 
       const createdCourse = await this.courseRepository.create(course);

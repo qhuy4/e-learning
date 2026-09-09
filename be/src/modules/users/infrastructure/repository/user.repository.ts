@@ -10,6 +10,9 @@ export interface FindUsersOptions {
   page: number;
   limit: number;
   keyword?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  role?: number;
 }
 
 @Injectable()
@@ -82,7 +85,7 @@ export class UserRepository implements IUserRepository {
   async findAll(
     options: FindUsersOptions,
   ): Promise<{ users: User[]; total: number }> {
-    const { page, limit, keyword } = options;
+    const { page, limit, keyword, sortBy, sortOrder, role } = options;
     const query = this.repository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.profile', 'profile')
@@ -92,6 +95,10 @@ export class UserRepository implements IUserRepository {
         'profile.first_name',
         'profile.last_name',
       ]);
+
+    if (role !== undefined && role !== null) {
+      query.andWhere('user.role = :role', { role });
+    }
 
     if (keyword) {
       query.andWhere(
@@ -103,8 +110,24 @@ export class UserRepository implements IUserRepository {
       );
     }
 
+    const sortableColumns: Record<string, string> = {
+      name: 'user.name',
+      email: 'user.email',
+      role: 'user.role',
+      status: 'user.status',
+      createdAt: 'user.created_at',
+    };
+
+    const sortColumn =
+      sortBy && sortableColumns[sortBy]
+        ? sortableColumns[sortBy]
+        : 'user.created_at';
+
+    const sortDirection: 'ASC' | 'DESC' =
+      sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
     query
-      .orderBy('user.created_at', 'DESC')
+      .orderBy(sortColumn, sortDirection)
       .skip((page - 1) * limit)
       .take(limit);
 

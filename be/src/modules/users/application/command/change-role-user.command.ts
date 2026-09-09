@@ -1,4 +1,4 @@
-import { UserRole } from '../../domain/enum/user.role';
+import { UserRole } from '@/modules/users/domain/enum/user.role';
 
 export class ChangeUserRoleCommand {
   constructor(

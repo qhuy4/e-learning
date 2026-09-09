@@ -1,4 +1,4 @@
-import { Section } from '../entity/section.entity';
+import { Section } from '@/modules/sections/domain/entity/section.entity';
 
 export const SECTION_REPOSITORY = Symbol('SECTION_REPOSITORY');
 
@@ -12,4 +12,6 @@ export interface ISectionRepository {
   update(section: Section): Promise<Section>;
 
   delete(id: number): Promise<void>;
+
+  findByCourseId(courseId: number): Promise<Section[]>;
 }

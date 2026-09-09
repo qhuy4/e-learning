@@ -10,15 +10,15 @@ import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
-// import { User } from '../users/domain/entity/user.entity'
-import { UserOrmEntity } from '../users/infrastructure/entity/user.orm.entity';
-import { Role } from '../../common/enum/role.enum';
-import { InstructorInviteEntity } from './entities/instructor-invite.entity';
-import { MailService } from './services/mail.service';
-import { SendInstructorInviteDto } from './dto/send-instructor-invite.dto';
-import { RegisterInstructorDto } from './dto/register-instructor.dto';
-import { LoginDto } from './dto/login.dto';
-import { UserRole } from '../users/domain/enum/user.role';
+// import { User } from '@/modules/users/domain/entity/user.entity'
+import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
+import { Role } from '@/common/enum/role.enum';
+import { InstructorInviteEntity } from '@/modules/auth/entities/instructor-invite.entity';
+import { MailService } from '@/modules/auth/services/mail.service';
+import { SendInstructorInviteDto } from '@/modules/auth/dto/send-instructor-invite.dto';
+import { RegisterInstructorDto } from '@/modules/auth/dto/register-instructor.dto';
+import { LoginDto } from '@/modules/auth/dto/login.dto';
+import { UserRole } from '@/modules/users/domain/enum/user.role';
 
 @Injectable()
 export class AuthService {

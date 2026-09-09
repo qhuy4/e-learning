@@ -1,29 +1,36 @@
-import { ConflictException, Inject, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  NotFoundException,
+  HttpStatus,
+} from '@nestjs/common';
 
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import slugify from 'slugify';
+import { CreateSectionCommand } from '@/modules/sections/application/command/create-section.command';
 
-import { CreateSectionCommand } from '../command/create-section.command';
-
-import { Section } from '../../domain/entity/section.entity';
+import { Section } from '@/modules/sections/domain/entity/section.entity';
 
 import {
   COURSE_REPOSITORY,
   ICourseRepository,
-} from '../../../courses/domain/repository/course.repository';
+} from '@/modules/courses/domain/repository/course.repository';
 
 import {
   SECTION_REPOSITORY,
   ISectionRepository,
-} from '../../domain/repository/section.repository';
+} from '@/modules/sections/domain/repository/section.repository';
+import { SlugUtil } from '@/common/utils/slug.util';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
+
+const EDITABLE_STATUSES = [1, 4];
 
 @CommandHandler(CreateSectionCommand)
 export class CreateSectionHandler implements ICommandHandler<CreateSectionCommand> {
   constructor(
     @Inject(COURSE_REPOSITORY)
     private readonly courseRepository: ICourseRepository,
-
     @Inject(SECTION_REPOSITORY)
     private readonly sectionRepository: ISectionRepository,
   ) {}
@@ -35,11 +42,10 @@ export class CreateSectionHandler implements ICommandHandler<CreateSectionComman
       throw new NotFoundException('Course not found');
     }
 
-    const slug = slugify(command.title, {
-      lower: true,
-      strict: true,
-      trim: true,
-    });
+    const slug = SlugUtil.generate(command.title);
+    if (!EDITABLE_STATUSES.includes(course.status)) {
+      throw new AppException(ErrorCode.COURSE_NOT_EDITABLE, HttpStatus.FORBIDDEN);
+    }
 
     const existingSection = await this.sectionRepository.findBySlug(
       command.courseId,

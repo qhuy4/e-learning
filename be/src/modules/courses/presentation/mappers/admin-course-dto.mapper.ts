@@ -1,7 +1,7 @@
-import { Course } from '../../domain/entity/course.entity';
-import { AdminCourseDetailResponseDto } from '../dto/admin-course-detail-response.dto';
-import { FileStorage } from '../../../../common/storage/domain/interface/file-storage.interface';
-import { resolveSignedUrl } from '../dto/course-response.dto';
+import { Course } from '@/modules/courses/domain/entity/course.entity';
+import { AdminCourseDetailResponseDto } from '@/modules/courses/presentation/dto/admin-course-detail-response.dto';
+import { FileStorage } from '@/common/storage/domain/interface/file-storage.interface';
+import { resolveSignedUrl } from '@/modules/courses/presentation/dto/course-response.dto';
 
 export class AdminCourseDtoMapper {
   static async toDetailDto(
@@ -38,30 +38,35 @@ export class AdminCourseDtoMapper {
       reviewCount: 0,
     };
 
-    dto.sections = (course.sections ?? []).map((section) => ({
-      id: String(section.id),
-      title: section.title,
-      slug: section.slug,
-      description: section.description,
-      position: section.position,
-      isActive: section.isActive,
-      createdAt: section.createdAt,
-      deletedAt: section.deletedAt,
+    dto.sections = await Promise.all(
+      (course.sections ?? []).map(async (section) => ({
+        id: String(section.id),
+        title: section.title,
+        slug: section.slug,
+        description: section.description,
+        position: section.position,
+        isActive: section.isActive,
+        createdAt: section.createdAt,
+        deletedAt: section.deletedAt,
 
-      lessons: (section.lessons ?? []).map((lesson) => ({
-        id: String(lesson.id),
-        title: lesson.title,
-        slug: lesson.slug,
-        type: lesson.type,
-        duration: lesson.duration,
-        position: lesson.position,
-        isPreview: lesson.isPreview,
-        videoUrl: lesson.videoSource ?? null,
-        isActive: lesson.status === 1,
-        createdAt: lesson.createdAt,
-        deletedAt: lesson.deletedAt,
+        lessons: await Promise.all(
+          (section.lessons ?? []).map(async (lesson) => ({
+            id: String(lesson.id),
+            title: lesson.title,
+            slug: lesson.slug,
+            type: lesson.type,
+            duration: lesson.duration,
+            position: lesson.position,
+            isPreview: lesson.isPreview,
+            videoUrl: await resolveSignedUrl(lesson.videoSource, storage),
+            content: lesson.content ?? null,
+            isActive: lesson.status === 1,
+            createdAt: lesson.createdAt,
+            deletedAt: lesson.deletedAt,
+          })),
+        ),
       })),
-    }));
+    );
 
     return dto;
   }

@@ -4,8 +4,10 @@ import { Plus } from "lucide-react";
 import { toast } from "sonner";
 
 import {
-  useGetCourses,
+  useGetMyCourses,
   useDeleteCourse,
+  useCloneCourse,
+  useCancelReviewCourse,
 } from "@/features/courses/hook/use-courses";
 import { CourseCard } from "@/features/courses/components/course-list/course-card";
 import { CourseFilterBar } from "@/features/courses/components/course-list/course-filter-bar";
@@ -25,16 +27,21 @@ export function CoursesListPage() {
   const [status, setStatus] = useState<string>("");
   const [page, setPage] = useState(1);
   const [deletingId, setDeletingId] = useState<string | number | null>(null);
+  const [cloningId, setCloningId] = useState<string | number | null>(null);
+  const [cancelingCourse, setCancelingCourse] = useState<any | null>(null);
 
-  const { data: coursesData, isLoading } = useGetCourses({
+  // Dùng useGetMyCourses để chỉ lấy khóa học của instructor đang đăng nhập
+  const { data: coursesData, isLoading } = useGetMyCourses({
     page,
     limit: LIMIT,
     keyword: keyword || undefined,
-    level: level || undefined,
-    status: status || undefined,
+    level: (level && level !== "all") ? level : undefined,
+    status: (status && status !== "all") ? status : undefined,
   });
 
   const { mutate: deleteCourse, isPending: isDeleting } = useDeleteCourse();
+  const { mutate: cloneCourse } = useCloneCourse();
+  const { mutate: cancelReview, isPending: isCancelingReview } = useCancelReviewCourse();
 
   const courses = coursesData?.data ?? [];
   const meta = coursesData?.meta;
@@ -43,6 +50,60 @@ export function CoursesListPage() {
 
   const handleDeleteRequest = (id: string | number) => {
     setDeletingId(id);
+  };
+
+  const handleEdit = (course: any) => {
+    if (course.status === 2) {
+      toast.warning("Khóa học đang chờ duyệt, không thể chỉnh sửa. Vui lòng hủy duyệt trước.");
+      return;
+    }
+    if (course.status === 5) { // Published
+      setCloningId(course.id);
+    } else {
+      navigate(`/courses/${course.id}`);
+    }
+  };
+
+  const handleCancelReviewRequest = (course: any) => {
+    setCancelingCourse(course);
+  };
+
+  const handleCancelReviewConfirm = () => {
+    if (!cancelingCourse) return;
+    const tid = toast.loading("Đang hủy yêu cầu duyệt...");
+    cancelReview(cancelingCourse.id, {
+      onSuccess: () => {
+        toast.success("Đã hủy yêu cầu duyệt. Khóa học đã chuyển về bản nháp!", { id: tid });
+        setCancelingCourse(null);
+      },
+      onError: () => {
+        toast.error("Có lỗi xảy ra khi hủy yêu cầu duyệt, vui lòng thử lại.", { id: tid });
+        setCancelingCourse(null);
+      },
+    });
+  };
+
+  const handleCloneConfirm = () => {
+    if (!cloningId) return;
+    const tid = toast.loading("Đang tạo bản sao để chỉnh sửa...");
+    cloneCourse(cloningId, {
+      onSuccess: (res: any) => {
+        toast.success("Tạo bản sao thành công!", { id: tid });
+        const newId = res.data?.id || res.id || res;
+        setCloningId(null);
+        // Navigate sau khi refetch đã hoàn tất (refetch xảy ra trong onSuccess của hook)
+        navigate(`/courses/${newId}`);
+      },
+      onError: (error: any) => {
+        // Lấy message từ BE (ví dụ: 409 ConflictException)
+        const message =
+          error?.response?.data?.message ||
+          error?.message ||
+          "Có lỗi xảy ra khi tạo bản sao.";
+        toast.error(message, { id: tid });
+        setCloningId(null);
+      }
+    });
   };
 
   const handleDeleteConfirm = () => {
@@ -93,9 +154,11 @@ export function CoursesListPage() {
             <CourseCard
               key={course.id}
               course={course}
-              onEdit={(id) => navigate(`/courses/${id}`)}
+              onEdit={handleEdit}
               onDelete={handleDeleteRequest}
               isDeleting={isDeleting && deletingId === course.id}
+              onCancelReview={handleCancelReviewRequest}
+              isCancelingReview={isCancelingReview && cancelingCourse?.id === course.id}
             />
           ))}
         </div>
@@ -117,6 +180,24 @@ export function CoursesListPage() {
         confirmLabel="Xóa khóa học"
         onConfirm={handleDeleteConfirm}
         onCancel={() => setDeletingId(null)}
+      />
+
+      <ConfirmDialog
+        open={cloningId !== null}
+        title="Tạo bản sao khóa học"
+        description="Khóa học này đã được xuất bản. Bạn có muốn tạo một bản sao để chỉnh sửa không? Phiên bản gốc sẽ không bị ảnh hưởng cho đến khi bản cập nhật được duyệt."
+        confirmLabel="Tạo bản sao"
+        onConfirm={handleCloneConfirm}
+        onCancel={() => setCloningId(null)}
+      />
+
+      <ConfirmDialog
+        open={cancelingCourse !== null}
+        title="Hủy yêu cầu duyệt"
+        description={`Bạn có chắc chắn muốn hủy yêu cầu duyệt khóa học "${cancelingCourse?.title}" không? Khóa học sẽ trở về trạng thái bản nháp để bạn có thể chỉnh sửa.`}
+        confirmLabel="Hủy duyệt"
+        onConfirm={handleCancelReviewConfirm}
+        onCancel={() => setCancelingCourse(null)}
       />
     </div>
   );

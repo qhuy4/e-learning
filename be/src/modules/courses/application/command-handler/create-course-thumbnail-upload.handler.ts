@@ -9,14 +9,14 @@ import { randomUUID } from 'crypto';
 import {
   FILE_STORAGE,
   FileStorage,
-} from '../../../../common/storage/domain/interface/file-storage.interface';
+} from '@/common/storage/domain/interface/file-storage.interface';
 
 import {
   COURSE_REPOSITORY,
   ICourseRepository,
-} from '../../domain/repository/course.repository';
+} from '@/modules/courses/domain/repository/course.repository';
 
-import { CreateCourseThumbnailUploadCommand } from '../command/create-course-thumbnail-upload.command';
+import { CreateCourseThumbnailUploadCommand } from '@/modules/courses/application/command/create-course-thumbnail-upload.command';
 
 @CommandHandler(CreateCourseThumbnailUploadCommand)
 export class CreateCourseThumbnailUploadHandler implements ICommandHandler<CreateCourseThumbnailUploadCommand> {

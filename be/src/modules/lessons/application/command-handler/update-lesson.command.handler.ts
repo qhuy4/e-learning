@@ -1,18 +1,32 @@
-import { Inject, NotFoundException } from '@nestjs/common';
+import { Inject, NotFoundException, HttpStatus } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import slugify from 'slugify';
+import { SlugUtil } from '../../../../common/utils/slug.util';
 import { extname } from 'path';
 import { randomUUID } from 'crypto';
 
-import { UpdateLessonCommand } from '../command/update-lesson.command';
+import { UpdateLessonCommand } from '@/modules/lessons/application/command/update-lesson.command';
+import { LessonType } from '@/modules/lessons/domain/enums/lesson-type.enum';
 import {
   LESSON_REPOSITORY,
   ILessonRepository,
-} from '../../domain/repository/lesson.repository';
+} from '@/modules/lessons/domain/repository/lesson.repository';
 import {
   FILE_STORAGE,
   FileStorage,
-} from '../../../../common/storage/domain/interface/file-storage.interface';
+} from '@/common/storage/domain/interface/file-storage.interface';
+import {
+  SECTION_REPOSITORY,
+  ISectionRepository,
+} from '@/modules/sections/domain/repository/section.repository';
+import {
+  COURSE_REPOSITORY,
+  ICourseRepository,
+} from '@/modules/courses/domain/repository/course.repository';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
+import { extractDuration } from '@/common/utils/media-duration.util';
+
+const EDITABLE_STATUSES = [1, 4];
 
 @CommandHandler(UpdateLessonCommand)
 export class UpdateLessonHandler implements ICommandHandler<UpdateLessonCommand> {
@@ -22,6 +36,12 @@ export class UpdateLessonHandler implements ICommandHandler<UpdateLessonCommand>
 
     @Inject(FILE_STORAGE)
     private readonly storage: FileStorage,
+
+    @Inject(SECTION_REPOSITORY)
+    private readonly sectionRepository: ISectionRepository,
+
+    @Inject(COURSE_REPOSITORY)
+    private readonly courseRepository: ICourseRepository,
   ) {}
 
   async execute(command: UpdateLessonCommand) {
@@ -31,16 +51,21 @@ export class UpdateLessonHandler implements ICommandHandler<UpdateLessonCommand>
       throw new NotFoundException('Lesson not found');
     }
 
+    const section = await this.sectionRepository.findById(lesson.sectionId);
+    if (section) {
+      const course = await this.courseRepository.findById(section.courseId);
+      if (course && !EDITABLE_STATUSES.includes(course.status)) {
+        throw new AppException(ErrorCode.COURSE_NOT_EDITABLE, HttpStatus.FORBIDDEN);
+      }
+    }
+
     const slug = command.data.title
-      ? slugify(command.data.title, {
-          lower: true,
-          strict: true,
-          trim: true,
-        })
+      ? SlugUtil.generate(command.data.title)
       : undefined;
 
     let videoSource = command.data.videoSource ?? lesson.videoSource;
     let oldVideoSource: string | null = null;
+    let duration = command.data.duration;
 
     if (command.data.video) {
       const extension = extname(command.data.video.originalname).toLowerCase();
@@ -56,12 +81,21 @@ export class UpdateLessonHandler implements ICommandHandler<UpdateLessonCommand>
       if (lesson.videoSource) {
         oldVideoSource = lesson.videoSource;
       }
+
+      const lessonType = command.data.type ?? lesson.type;
+      if (lessonType === LessonType.VIDEO || lessonType === LessonType.AUDIO) {
+        const extracted = await extractDuration(command.data.video.buffer, command.data.video.mimetype);
+        if (extracted !== null) {
+          duration = extracted;
+        }
+      }
     }
 
     try {
       lesson.update({
         ...command.data,
         videoSource,
+        duration,
         slug,
       });
 

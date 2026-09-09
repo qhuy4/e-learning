@@ -1,7 +1,7 @@
 "use client"
 
 import {useTable, type ColumnDef, type RowData} from "@tanstack/react-table"
-import { Search } from "lucide-react"
+import { RefreshCw, Search } from "lucide-react"
 
 import {
     Table,
@@ -24,6 +24,16 @@ import {
     SelectValue,
 } from "@fe/components/ui/select.tsx";
 
+interface DataTableText {
+    searchPlaceholder?: string
+    reload?: string
+    rowsPerPage?: string
+    noResults?: string
+    pageOf?: (page: number, totalPages: number) => string
+    previous?: string
+    next?: string
+}
+
 interface DataTableProps<TData extends RowData> {
     columns: ColumnDef<DataTableFeatures, TData>[]
     data: TData[]
@@ -33,6 +43,10 @@ interface DataTableProps<TData extends RowData> {
     totalPages: number
     onPageChange: (page: number) => void
     loading?: boolean
+
+    // Reload support
+    refetch?: () => void
+    isFetching?: boolean
 
     // Search and filtering
     search?: string
@@ -48,6 +62,9 @@ interface DataTableProps<TData extends RowData> {
 
     // Additional meta to forward to the table instance (e.g. onEdit, onDelete)
     tableMeta?: Record<string, unknown>
+
+    // Localized text
+    text?: DataTableText
 }
 
 export function DataTable<TData extends RowData>({
@@ -59,6 +76,8 @@ export function DataTable<TData extends RowData>({
     onPageChange,
     pageSize,
     loading = false,
+    refetch,
+    isFetching = false,
     search,
     onSearchChange,
     onPageSizeChange,
@@ -66,7 +85,18 @@ export function DataTable<TData extends RowData>({
     sortOrder,
     onSortChange,
     tableMeta,
+    text,
 }: DataTableProps<TData>) {
+
+    const t = {
+        searchPlaceholder: text?.searchPlaceholder ?? "Search...",
+        reload: text?.reload ?? "Reload",
+        rowsPerPage: text?.rowsPerPage ?? "Rows per page",
+        noResults: text?.noResults ?? "No results.",
+        pageOf: text?.pageOf ?? ((p, tp) => `Page ${p} of ${tp || 1}`),
+        previous: text?.previous ?? "Previous",
+        next: text?.next ?? "Next",
+    }
 
     const table = useTable({
         features,
@@ -80,16 +110,18 @@ export function DataTable<TData extends RowData>({
         },
     })
 
+    const isLoading = loading || isFetching
+
     return (
         <div className="space-y-4">
             {/* Top Toolbar */}
-            {(onSearchChange || onPageSizeChange) && (
+            {(onSearchChange || onPageSizeChange || refetch) && (
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     {onSearchChange && (
                         <div className="relative flex-1 max-w-sm">
                             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                             <Input
-                                placeholder="Search..."
+                                placeholder={t.searchPlaceholder}
                                 value={search || ""}
                                 onChange={(e) => onSearchChange(e.target.value)}
                                 className="pl-9 h-9"
@@ -97,28 +129,41 @@ export function DataTable<TData extends RowData>({
                         </div>
                     )}
 
-                    {onPageSizeChange && (
-                        <div className="flex items-center gap-2 sm:ml-auto">
-                            <span className="text-sm text-muted-foreground whitespace-nowrap">
-                                Rows per page
-                            </span>
-                            <Select
-                                value={String(pageSize)}
-                                onValueChange={(val) => onPageSizeChange(Number(val))}
+                    <div className="flex items-center gap-2 sm:ml-auto">
+                        {refetch && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => refetch()}
+                                disabled={isFetching}
                             >
-                                <SelectTrigger className="h-9 w-[80px]">
-                                    <SelectValue placeholder={String(pageSize)} />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {[5, 10, 20, 50].map((size) => (
-                                        <SelectItem key={size} value={String(size)}>
-                                            {size}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    )}
+                                <RefreshCw className={`size-4 ${isFetching ? "animate-spin" : ""}`}/>
+                                {t.reload}
+                            </Button>
+                        )}
+                        {onPageSizeChange && (
+                            <>
+                                <span className="text-sm text-muted-foreground whitespace-nowrap">
+                                    {t.rowsPerPage}
+                                </span>
+                                <Select
+                                    value={String(pageSize)}
+                                    onValueChange={(val) => onPageSizeChange(Number(val))}
+                                >
+                                    <SelectTrigger className="h-9 w-[80px]">
+                                        <SelectValue placeholder={String(pageSize)} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {[5, 10, 20, 50].map((size) => (
+                                            <SelectItem key={size} value={String(size)}>
+                                                {size}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </>
+                        )}
+                    </div>
                 </div>
             )}
 
@@ -142,7 +187,7 @@ export function DataTable<TData extends RowData>({
                             ))}
                         </TableHeader>
                         <TableBody>
-                            {loading ? (
+                            {isLoading ? (
                                 Array.from({length: pageSize}).map((_, index) => (
                                     <TableRow key={`skeleton-${index}`} className="h-12">
                                         {columns.map((_, columnIndex) => (
@@ -191,7 +236,7 @@ export function DataTable<TData extends RowData>({
                                         colSpan={columns.length}
                                         className="h-24 text-center"
                                     >
-                                        No results.
+                                        {t.noResults}
                                     </TableCell>
                                 </TableRow>
                             )}
@@ -203,16 +248,16 @@ export function DataTable<TData extends RowData>({
             {/* Pagination Controls */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-1">
                 <div className="text-sm text-muted-foreground order-2 sm:order-1">
-                    Page {page} of {totalPages || 1}
+                    {t.pageOf(page, totalPages)}
                 </div>
                 <div className="flex items-center gap-1.5 order-1 sm:order-2">
                     <Button
                         variant="outline"
                         size="sm"
-                        disabled={page === 1 || loading}
+                        disabled={page === 1 || isLoading}
                         onClick={() => onPageChange(page - 1)}
                     >
-                        Previous
+                        {t.previous}
                     </Button>
 
                     {Array.from({length: totalPages}, (_, index) => {
@@ -220,7 +265,7 @@ export function DataTable<TData extends RowData>({
 
                         return (
                             <Button
-                                disabled={loading}
+                                disabled={isLoading}
                                 key={pageNumber}
                                 variant={pageNumber === page ? "default" : "outline"}
                                 size="sm"
@@ -234,10 +279,10 @@ export function DataTable<TData extends RowData>({
                     <Button
                         variant="outline"
                         size="sm"
-                        disabled={page === totalPages || totalPages === 0 || loading}
+                        disabled={page === totalPages || totalPages === 0 || isLoading}
                         onClick={() => onPageChange(page + 1)}
                     >
-                        Next
+                        {t.next}
                     </Button>
                 </div>
             </div>

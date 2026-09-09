@@ -1,4 +1,4 @@
-import { Course } from '../entity/course.entity';
+import { Course } from '@/modules/courses/domain/entity/course.entity';
 
 export const COURSE_REPOSITORY = Symbol('COURSE_REPOSITORY');
 
@@ -16,4 +16,6 @@ export interface ICourseRepository {
   update(course: Course): Promise<Course>;
 
   delete(id: number): Promise<void>;
+
+  findUnpublishedClone(parentId: number): Promise<Course | null>;
 }

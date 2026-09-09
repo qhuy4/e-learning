@@ -187,7 +187,7 @@ export function UserEditPage() {
                 submit:
                     err instanceof Error
                         ? err.message
-                        : "An unexpected error occurred",
+                        : "Đã xảy ra lỗi không mong muốn",
             })
         }
     }
@@ -199,15 +199,15 @@ export function UserEditPage() {
             <div className="p-6 max-w-3xl mx-auto">
                 <Button variant="ghost" size="sm" onClick={() => navigate("/users")} className="mb-6 -ml-2">
                     <ArrowLeft className="size-4"/>
-                    Back to Users
+                    Quay lại danh sách
                 </Button>
                 <div className="flex flex-col items-center justify-center py-24 text-center">
-                    <h2 className="text-lg font-semibold">User not found</h2>
+                    <h2 className="text-lg font-semibold">Không tìm thấy người dùng</h2>
                     <p className="text-sm text-muted-foreground mt-1">
-                        The user you are trying to edit does not exist.
+                        Người dùng bạn đang chỉnh sửa không tồn tại.
                     </p>
                     <Button className="mt-6" onClick={() => navigate("/users")}>
-                        Back to Users
+                        Quay lại danh sách
                     </Button>
                 </div>
             </div>
@@ -220,14 +220,14 @@ export function UserEditPage() {
         <div className="p-6 mx-auto space-y-6 ">
             <Button variant="ghost" size="sm" onClick={() => navigate(`/users/${user.id}`)} className="-ml-2">
                 <ArrowLeft className="size-4"/>
-                Back to User
+                Quay lại người dùng
             </Button>
 
             <div className="rounded-xl border bg-card">
                 <div className="px-6 py-4 border-b">
-                    <h1 className="text-xl font-bold">Edit User</h1>
+                    <h1 className="text-xl font-bold">Chỉnh sửa người dùng</h1>
                     <p className="text-sm text-muted-foreground mt-1">
-                        Update the user's account and profile information.
+                        Cập nhật thông tin tài khoản và hồ sơ người dùng.
                     </p>
                 </div>
 
@@ -237,20 +237,20 @@ export function UserEditPage() {
                         {/* Account Section */}
                         <div className="space-y-4 grow-1">
                             <div className="flex items-center gap-3">
-                                <h3 className="text-sm font-semibold text-foreground">Account</h3>
+                                <h3 className="text-sm font-semibold text-foreground">Tài khoản</h3>
                                 <Separator className="flex-1"/>
                             </div>
 
                             <div className="grid grid-cols-1 gap-3">
                                 <div className="space-y-1.5">
                                     <label className="text-sm font-medium" htmlFor="user-name">
-                                        Name
+                                        Họ và tên
                                     </label>
                                     <Input
                                         id="user-name"
                                         value={form.name}
                                         onChange={(e) => setField("name", e.target.value)}
-                                        placeholder="Full name"
+                                        placeholder="Họ và tên đầy đủ"
                                         disabled
                                         aria-invalid={!!errors.name}
                                     />
@@ -279,14 +279,14 @@ export function UserEditPage() {
 
                                 <div className="space-y-1.5">
                                     <label className="text-sm font-medium" htmlFor="user-password">
-                                        Password
+                                        Mật khẩu
                                     </label>
                                     <Input
                                         id="user-password"
                                         type="password"
                                         value={form.password}
                                         onChange={(e) => setField("password", e.target.value)}
-                                        placeholder="Leave blank to keep current"
+                                        placeholder="Để trống nếu giữ nguyên"
                                         aria-invalid={!!errors.password}
                                     />
                                     {errors.password && (
@@ -296,7 +296,7 @@ export function UserEditPage() {
 
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="space-y-1.5">
-                                        <label className="text-sm font-medium">Status</label>
+                                        <label className="text-sm font-medium">Trạng thái</label>
                                         <Select
                                             disabled
                                             value={form.status}
@@ -316,7 +316,7 @@ export function UserEditPage() {
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <label className="text-sm font-medium">Role</label>
+                                        <label className="text-sm font-medium">Vai trò</label>
                                         <Select
                                             value={form.role}
                                             onValueChange={(val) => setField("role", val as UserRole)}
@@ -338,14 +338,14 @@ export function UserEditPage() {
                                 {form.status === UserStatus.BLOCKED && (
                                     <div className="space-y-1.5">
                                         <label className="text-sm font-medium" htmlFor="user-block-reason">
-                                            Block Reason
+                                            Lý do chặn
                                         </label>
                                         <Input
                                             id="user-block-reason"
                                             value={form.block_reason}
                                             disabled
                                             onChange={(e) => setField("block_reason", e.target.value)}
-                                            placeholder="Reason for blocking this user"
+                                            placeholder="Lý do chặn người dùng này"
                                             aria-invalid={!!errors.block_reason}
                                         />
                                         {errors.block_reason && (
@@ -358,7 +358,7 @@ export function UserEditPage() {
                         {/* Profile Section */}
                         <div className="space-y-4 grow-1">
                             <div className="flex items-center gap-3">
-                                <h3 className="text-sm font-semibold text-foreground">Profile</h3>
+                                <h3 className="text-sm font-semibold text-foreground">Hồ sơ</h3>
                                 <Separator className="flex-1"/>
                             </div>
 
@@ -366,37 +366,37 @@ export function UserEditPage() {
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="space-y-1.5">
                                         <label className="text-sm font-medium" htmlFor="user-firstName">
-                                            First Name
+                                            Tên
                                         </label>
                                         <Input
                                             id="user-firstName"
                                             value={form.firstName}
                                             onChange={(e) => setField("firstName", e.target.value)}
-                                            placeholder="First"
+                                            placeholder="Tên"
                                         />
                                     </div>
                                     <div className="space-y-1.5">
                                         <label className="text-sm font-medium" htmlFor="user-lastName">
-                                            Last Name
+                                            Họ
                                         </label>
                                         <Input
                                             id="user-lastName"
                                             value={form.lastName}
                                             onChange={(e) => setField("lastName", e.target.value)}
-                                            placeholder="Last"
+                                            placeholder="Họ"
                                         />
                                     </div>
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <label className="text-sm font-medium">Gender</label>
+                                    <label className="text-sm font-medium">Giới tính</label>
                                     <Select
                                         value={form.gender}
                                         onValueChange={(val) => setField("gender", val as Gender)}
                                     >
                                         <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Select gender">
-                                                {form.gender ? genderLabel[form.gender] : "Select gender"}
+                                            <SelectValue placeholder="Chọn giới tính">
+                                                {form.gender ? genderLabel[form.gender] : "Chọn giới tính"}
                                             </SelectValue>
                                         </SelectTrigger>
 
@@ -412,7 +412,7 @@ export function UserEditPage() {
 
                                 <div className="space-y-1.5">
                                     <label className="text-sm font-medium" htmlFor="user-phone">
-                                        Phone
+                                        Số điện thoại
                                     </label>
                                     <Input
                                         id="user-phone"
@@ -424,7 +424,7 @@ export function UserEditPage() {
 
                                 <div className="space-y-1.5">
                                     <Field>
-                                        <FieldLabel htmlFor="date">Date of birth</FieldLabel>
+                                        <FieldLabel htmlFor="date">Ngày sinh</FieldLabel>
 
                                         <Popover open={open} onOpenChange={setOpen}>
                                             <PopoverTrigger
@@ -436,7 +436,7 @@ export function UserEditPage() {
                                                     >
                                                         {selectedDate
                                                             ? selectedDate.toLocaleDateString()
-                                                            : "Select date"}
+                                                            : "Chọn ngày"}
                                                     </Button>
                                                 }
                                             />
@@ -465,25 +465,25 @@ export function UserEditPage() {
 
                                 <div className="space-y-1.5">
                                     <label className="text-sm font-medium" htmlFor="user-occupation">
-                                        Occupation
+                                        Nghề nghiệp
                                     </label>
                                     <Input
                                         id="user-occupation"
                                         value={form.occupation}
                                         onChange={(e) => setField("occupation", e.target.value)}
-                                        placeholder="e.g. Software Engineer"
+                                        placeholder="VD: Kỹ sư phần mềm"
                                     />
                                 </div>
 
                                 <div className="space-y-1.5">
                                     <label className="text-sm font-medium" htmlFor="user-bio">
-                                        Bio
+                                        Giới thiệu
                                     </label>
                                     <textarea
                                         id="user-bio"
                                         value={form.bio}
                                         onChange={(e) => setField("bio", e.target.value)}
-                                        placeholder="Short bio..."
+                                        placeholder="Giới thiệu ngắn..."
                                         rows={3}
                                         className="w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 resize-none dark:bg-input/30"
                                     />
@@ -491,13 +491,13 @@ export function UserEditPage() {
 
                                 <div className="space-y-1.5">
                                     <label className="text-sm font-medium" htmlFor="user-address">
-                                        Address
+                                        Địa chỉ
                                     </label>
                                     <Input
                                         id="user-address"
                                         value={form.address}
                                         onChange={(e) => setField("address", e.target.value)}
-                                        placeholder="Street address"
+                                        placeholder="Địa chỉ"
                                     />
                                 </div>
 
@@ -505,7 +505,7 @@ export function UserEditPage() {
                                     {/* City */}
                                     <div className="space-y-1.5">
                                         <label className="text-sm font-medium">
-                                            City
+                                            Tỉnh/Thành phố
                                         </label>
 
                                         <Select
@@ -514,7 +514,7 @@ export function UserEditPage() {
                                             disabled={!form.country}
                                         >
                                             <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Select city"/>
+                                                <SelectValue placeholder="Chọn tỉnh/thành phố"/>
                                             </SelectTrigger>
 
                                             <SelectContent>
@@ -533,7 +533,7 @@ export function UserEditPage() {
                                     {/* Country */}
                                     <div className="space-y-1.5">
                                         <label className="text-sm font-medium">
-                                            Country
+                                            Quốc gia
                                         </label>
 
                                         <Select
@@ -544,7 +544,7 @@ export function UserEditPage() {
                                             }}
                                         >
                                             <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Select country"/>
+                                                <SelectValue placeholder="Chọn quốc gia"/>
                                             </SelectTrigger>
 
                                             <SelectContent>
@@ -563,7 +563,7 @@ export function UserEditPage() {
 
                                 <div className="space-y-1.5">
                                     <label className="text-sm font-medium" htmlFor="user-avatarUrl">
-                                        Avatar
+                                        Ảnh đại diện
                                     </label>
                                     <AvatarUpload
                                         value={form.avatarUrl}
@@ -589,10 +589,10 @@ export function UserEditPage() {
                             onClick={() => navigate(`/users/${user.id}`)}
                             disabled={submitting}
                         >
-                            Cancel
+                            Hủy
                         </Button>
                         <Button type="submit" disabled={submitting}>
-                            {submitting ? "Saving..." : "Save Changes"}
+                            {submitting ? "Đang lưu..." : "Lưu thay đổi"}
                         </Button>
                     </div>
                 </form>

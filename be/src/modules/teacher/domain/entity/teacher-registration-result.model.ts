@@ -1,5 +1,5 @@
-import { ApprovalStatus } from '../enum/approval-status.enum';
-import { KycStatus } from '../enum/kyc-status.enum';
+import { ApprovalStatus } from '@/modules/teacher/domain/enum/approval-status.enum';
+import { KycStatus } from '@/modules/teacher/domain/enum/kyc-status.enum';
 
 /**
  * Model thuần domain (không phụ thuộc ORM) thể hiện kết quả sau khi

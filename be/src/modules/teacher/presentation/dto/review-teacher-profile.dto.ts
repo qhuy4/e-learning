@@ -1,5 +1,5 @@
 import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { ApprovalStatus } from '../../domain/enum/approval-status.enum';
+import { ApprovalStatus } from '@/modules/teacher/domain/enum/approval-status.enum';
 
 export class ReviewTeacherProfileDto {
   @IsEnum(ApprovalStatus, {

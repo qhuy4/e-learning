@@ -1,10 +1,12 @@
+import { LessonType } from '@/modules/lessons/domain/enums/lesson-type.enum';
+
 export class Lesson {
   private constructor(
     public id: number | null,
     public sectionId: number,
     public title: string,
     public slug: string,
-    public type: string,
+    public type: LessonType,
     public videoProvider: string | null,
     public videoSource: string | null,
     public duration: number | null,
@@ -22,7 +24,7 @@ export class Lesson {
     sectionId: number;
     title: string;
     slug: string;
-    type?: string;
+    type?: LessonType;
     videoProvider?: string | null;
     videoSource?: string | null;
     duration?: number | null;
@@ -36,7 +38,7 @@ export class Lesson {
       params.sectionId,
       params.title,
       params.slug,
-      params.type ?? 'video',
+      params.type ?? LessonType.VIDEO,
       params.videoProvider ?? null,
       params.videoSource ?? null,
       params.duration ?? null,
@@ -56,7 +58,7 @@ export class Lesson {
     sectionId: number;
     title: string;
     slug: string;
-    type: string;
+    type: LessonType;
     videoProvider: string | null;
     videoSource: string | null;
     duration: number | null;
@@ -92,7 +94,7 @@ export class Lesson {
   update(params: {
     title?: string;
     slug?: string;
-    type?: string;
+    type?: LessonType;
     videoProvider?: string | null;
     videoSource?: string | null;
     duration?: number | null;
@@ -140,5 +142,20 @@ export class Lesson {
     if (params.isPreview !== undefined) {
       this.isPreview = params.isPreview;
     }
+  }
+  clone(sectionId: number): Lesson {
+    return Lesson.create({
+      sectionId,
+      title: this.title,
+      slug: this.slug,
+      type: this.type,
+      videoProvider: this.videoProvider,
+      videoSource: this.videoSource,
+      duration: this.duration,
+      content: this.content,
+      position: this.position,
+      status: this.status,
+      isPreview: this.isPreview,
+    });
   }
 }

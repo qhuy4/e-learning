@@ -3,13 +3,14 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-// import { User } from '../users/entities/user.entity';
-import { InstructorInviteEntity } from './entities/instructor-invite.entity';
-import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
-import { MailService } from './services/mail.service';
-import { JwtStrategy } from './strategies/jwt.strategy';
+// import { User } from '@/modules/users/entities/user.entity';
+import { InstructorInviteEntity } from '@/modules/auth/entities/instructor-invite.entity';
+import { AuthService } from '@/modules/auth/auth.service';
+import { AuthController } from '@/modules/auth/auth.controller';
+import { MailService } from '@/modules/auth/services/mail.service';
+import { JwtStrategy } from '@/modules/auth/strategies/jwt.strategy';
 import { AdminAuthController } from '@/modules/auth/presentation/controllers/admin-auth.controller';
+import { InstructorAuthController } from '@/modules/auth/presentation/controllers/instructor-auth.controller';
 // import { TokenService } from '@/modules/auth/service/token.service';
 import { TokenService } from '@/common/service/token.service';
 import { LoginHandler } from '@/modules/auth/application/command-handler/login.handler';
@@ -18,7 +19,7 @@ import { UserModule } from '@/modules/users/user.module';
 import { UsersController } from '@/modules/users/presentation/user.controller';
 import { RegisterHandler } from '@/modules/auth/application/command-handler/register.handler';
 // import { PasswordService } from '@/modules/auth/service/password.service';
-import { UserOrmEntity } from '../users/infrastructure/entity/user.orm.entity';
+import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
 import { PasswordService } from '@/common/service/password.service';
 import { ServiceModule } from '@/common/service/service.module';
 
@@ -44,7 +45,7 @@ import { ServiceModule } from '@/common/service/service.module';
       }),
     }),
   ],
-  controllers: [AuthController, AdminAuthController, UsersController],
+  controllers: [AuthController, AdminAuthController, InstructorAuthController, UsersController],
   providers: [AuthService, MailService, JwtStrategy, TokenService, LoginHandler, RegisterHandler, PasswordService],
   exports: [AuthService, JwtModule, PassportModule],
 })

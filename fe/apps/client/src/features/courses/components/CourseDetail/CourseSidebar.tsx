@@ -7,50 +7,71 @@ import {
   Award,
 } from "lucide-react";
 import { Button } from "@fe/components/ui/button";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { formatCurrency } from "@fe/lib/utils";
 import type { CourseDetail } from "../../types/course.type";
 
 interface CourseSidebarProps {
-  course: CourseDetail;
+  course?: CourseDetail;
 }
 export const CourseSidebar = ({ course }: CourseSidebarProps) => {
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  const tokenFromUrl = searchParams.get("previewToken");
+  const previewToken = tokenFromUrl || (window.location.pathname.includes('/courses/preview') ? id : null);
+
+  const firstLesson = course?.sections?.flatMap((s) => s.lessons || [])[0];
+  const firstLessonSlug = firstLesson?.slug || '';
+  const courseIdentifier = course?.slug || course?.id || id || 'preview';
+  
+  const previewUrl = firstLessonSlug
+    ? `/learning/${courseIdentifier}/${firstLessonSlug}${previewToken ? `?previewToken=${previewToken}` : ''}`
+    : `/learning/${courseIdentifier}${previewToken ? `?previewToken=${previewToken}` : ''}`;
+
   return (
     <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] sticky top-24">
-      {/* Video Thumbnail placeholder */}
-      <div className="relative rounded-2xl overflow-hidden mb-6 aspect-video bg-slate-200 group cursor-pointer">
-        <img
-          src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=600&auto=format&fit=crop"
-          alt="Course Preview"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-          <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition-transform">
-            <Play className="w-6 h-6 text-rose-500 ml-1" />
+      <div
+        className="relative rounded-2xl overflow-hidden mb-6 aspect-video bg-slate-100 group cursor-pointer block border border-slate-100"
+      >
+        {course?.thumbnail ? (
+          <img
+            src={course.thumbnail}
+            alt={course.title || "Course Thumbnail"}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-slate-100 text-slate-400">
+            <span>Chưa có ảnh</span>
           </div>
-        </div>
-        <div className="absolute bottom-4 left-0 right-0 text-center text-white font-medium text-sm drop-shadow-md">
-          Xem trước khóa học
-        </div>
+        )}
       </div>
 
       {/* Pricing */}
-      <div className="flex items-center gap-3 mb-1">
-        <span className="text-3xl font-bold text-slate-900">{course.price}</span>
-        <span className="text-xs font-semibold text-rose-500 bg-rose-50 border border-rose-100 px-2 py-1 rounded-full">
-          Giảm 50%
+      <div className="flex items-center gap-3 mb-6">
+        <span className="text-3xl font-bold text-slate-900">
+          {formatCurrency(course?.price)}
         </span>
+        {Number(course?.price) > 0 && (
+          <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full">
+            Chất lượng cao
+          </span>
+        )}
       </div>
-      <div className="text-sm text-slate-400 line-through mb-6">$99.00</div>
 
       {/* Actions */}
       <div className="space-y-3 mb-8">
-        <Button className="w-full bg-rose-400 hover:bg-rose-500 text-white rounded-full py-6 text-base font-semibold shadow-sm shadow-rose-200">
-          Mua ngay
-        </Button>
+        {Number(course?.price) > 0 && (
+          <Button className="w-full bg-rose-500 hover:bg-rose-600 text-white rounded-full py-6 text-base font-semibold shadow-sm shadow-rose-200 cursor-pointer">
+            Mua ngay
+          </Button>
+        )}
         <Button
-          variant="outline"
-          className="w-full rounded-full py-6 text-base font-semibold border-2 border-slate-200 text-slate-700 hover:bg-slate-50"
+          onClick={() => navigate(previewUrl)}
+          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-full py-6 text-base font-semibold shadow-sm shadow-emerald-200 flex items-center justify-center gap-2 cursor-pointer"
         >
-          Thêm vào giỏ hàng
+          <Play className="w-5 h-5 fill-current" />
+          Xem thử bài học
         </Button>
       </div>
 

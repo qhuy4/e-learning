@@ -2,10 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { SectionOrmEntity } from '../entity/section.orm-entity';
+import { SectionOrmEntity } from '@/modules/sections/infrastructure/entity/section.orm-entity';
 
-import { Section } from '../../domain/entity/section.entity';
-import { ISectionRepository } from '../../domain/repository/section.repository';
+import { Section } from '@/modules/sections/domain/entity/section.entity';
+import { ISectionRepository } from '@/modules/sections/domain/repository/section.repository';
+import { SectionMapper } from '@/modules/sections/infrastructure/mapper/section.mapper';
 
 @Injectable()
 export class SectionRepository implements ISectionRepository {
@@ -25,7 +26,7 @@ export class SectionRepository implements ISectionRepository {
       return null;
     }
 
-    return this.toDomain(entity);
+    return SectionMapper.toDomain(entity);
   }
 
   async findBySlug(courseId: number, slug: string): Promise<Section | null> {
@@ -40,7 +41,7 @@ export class SectionRepository implements ISectionRepository {
       return null;
     }
 
-    return this.toDomain(entity);
+    return SectionMapper.toDomain(entity);
   }
 
   async create(section: Section): Promise<Section> {
@@ -55,7 +56,7 @@ export class SectionRepository implements ISectionRepository {
 
     const saved = await this.repository.save(entity);
 
-    return this.toDomain(saved);
+    return SectionMapper.toDomain(saved);
   }
 
   async update(section: Section): Promise<Section> {
@@ -75,25 +76,23 @@ export class SectionRepository implements ISectionRepository {
 
     const saved = await this.repository.save(entity);
 
-    return this.toDomain(saved);
+    return SectionMapper.toDomain(saved);
   }
 
   async delete(id: number): Promise<void> {
     await this.repository.softDelete(id);
   }
 
-  private toDomain(entity: SectionOrmEntity): Section {
-    return Section.restore({
-      id: Number(entity.id),
-      courseId: Number(entity.courseId),
-      title: entity.title,
-      slug: entity.slug,
-      description: entity.description,
-      position: entity.position,
-      isActive: entity.isActive,
-      createdAt: entity.createdAt,
-      updatedAt: entity.updatedAt,
-      deletedAt: entity.deletedAt,
+  async findByCourseId(courseId: number): Promise<Section[]> {
+    const entities = await this.repository.find({
+      where: {
+        courseId: courseId.toString(),
+      },
+      order: {
+        position: 'ASC',
+      },
     });
+
+    return entities.map((entity) => SectionMapper.toDomain(entity));
   }
 }

@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { Country } from './domain/entity/country.entity';
-import { City } from './domain/entity/city.entity';
-import { LocationService } from './application/location.service';
-import { LocationController } from './presentation/controller/location.controller';
+import { Country } from '@/modules/locations/domain/entity/country.entity';
+import { City } from '@/modules/locations/domain/entity/city.entity';
+import { LocationService } from '@/modules/locations/application/location.service';
+import { LocationController } from '@/modules/locations/presentation/controller/location.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Country, City])],

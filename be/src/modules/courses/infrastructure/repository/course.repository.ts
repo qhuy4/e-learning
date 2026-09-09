@@ -1,17 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
-import { CourseOrmEntity } from '../entity/course.orm-entity';
-import { Course } from '../../domain/entity/course.entity';
-import { CourseStatus } from '../../domain/enum/course-status.enum';
-import { ICourseRepository } from '../../domain/repository/course.repository';
-import { CourseMapper } from '../mapper/course.mapper';
+import { CourseOrmEntity } from '@/modules/courses/infrastructure/entity/course.orm-entity';
+import { Course } from '@/modules/courses/domain/entity/course.entity';
+import { CourseStatus } from '@/modules/courses/domain/enum/course-status.enum';
+import { ICourseRepository } from '@/modules/courses/domain/repository/course.repository';
+import { CourseMapper } from '@/modules/courses/infrastructure/mapper/course.mapper';
 
 export interface FindCoursesOptions {
   page: number;
   limit: number;
   level?: number;
   keyword?: string;
+  instructorId?: number;
 }
 
 @Injectable()
@@ -45,7 +46,7 @@ export class CourseRepository implements ICourseRepository {
     }
 
     query
-      .orderBy('course.publishedAt', 'DESC')
+      .orderBy('course.updatedAt', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
 
@@ -203,12 +204,32 @@ export class CourseRepository implements ICourseRepository {
       .andWhere('course.deletedAt IS NULL');
   }
 
-  async findAllCourses(options: FindCoursesOptions & { status?: number }) {
+  async findUnpublishedClone(parentId: number): Promise<Course | null> {
+    const entity = await this.repository
+      .createQueryBuilder('course')
+      .where('course.parent_id = :parentId', { parentId })
+      .andWhere('course.status != :published', {
+        published: CourseStatus.PUBLISHED,
+      })
+      .andWhere('course.deletedAt IS NULL')
+      .getOne();
+
+    if (!entity) return null;
+    return CourseMapper.toDomain(entity);
+  }
+
+  async findCoursesByInstructorId(
+    instructorId: number,
+    options: FindCoursesOptions & { status?: number },
+  ) {
     const { page, limit, level, keyword, status } = options;
 
     const query = this.repository
       .createQueryBuilder('course')
-      .where('course.deletedAt IS NULL');
+      .where('course.instructorId = :instructorId', {
+        instructorId: instructorId.toString(),
+      })
+      .andWhere('course.deletedAt IS NULL');
 
     if (level) {
       query.andWhere('course.level = :level', { level });
@@ -231,6 +252,99 @@ export class CourseRepository implements ICourseRepository {
 
     query
       .orderBy('course.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    return query.getManyAndCount();
+  }
+
+  async findAllCourses(options: FindCoursesOptions & { status?: number }) {
+    const { page, limit, level, keyword, status, instructorId } = options;
+
+    const query = this.repository
+      .createQueryBuilder('course')
+      .where('course.deletedAt IS NULL')
+      .andWhere((qb) => {
+        const subQuery = qb
+          .subQuery()
+          .select('1')
+          .from('courses', 'child')
+          .where('child.parent_id = course.id')
+          .andWhere('child.deleted_at IS NULL')
+          .getQuery();
+
+        return `NOT EXISTS ${subQuery}`;
+      });
+
+    if (instructorId) {
+      query.andWhere('course.instructorId = :instructorId', { instructorId });
+    }
+
+    if (level) {
+      query.andWhere('course.level = :level', { level });
+    }
+
+    if (status !== undefined) {
+      query.andWhere('course.status = :status', { status });
+    }
+
+    if (keyword) {
+      query.andWhere(
+        new Brackets((qb) => {
+          qb.where('course.title ILIKE :keyword', {
+            keyword: `%${keyword}%`,
+          }).orWhere('course.description ILIKE :keyword', {
+            keyword: `%${keyword}%`,
+          });
+        }),
+      );
+    }
+
+    query
+      .orderBy('course.updatedAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    return query.getManyAndCount();
+  }
+
+  /**
+   * Dành cho trang duyệt khóa học của admin.
+   * Hiện TẤT CẢ version, không filter NOT EXISTS child.
+   */
+  async findAllCoursesForAdmin(options: FindCoursesOptions & { status?: number }) {
+    const { page, limit, level, keyword, status, instructorId } = options;
+
+    const query = this.repository
+      .createQueryBuilder('course')
+      .where('course.deletedAt IS NULL');
+
+    if (instructorId) {
+      query.andWhere('course.instructorId = :instructorId', { instructorId });
+    }
+
+    if (level) {
+      query.andWhere('course.level = :level', { level });
+    }
+
+    if (status !== undefined) {
+      query.andWhere('course.status = :status', { status });
+    }
+
+    if (keyword) {
+      query.andWhere(
+        new Brackets((qb) => {
+          qb.where('course.title ILIKE :keyword', {
+            keyword: `%${keyword}%`,
+          }).orWhere('course.description ILIKE :keyword', {
+            keyword: `%${keyword}%`,
+          });
+        }),
+      );
+    }
+
+    query
+      .orderBy('course.updatedAt', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
 

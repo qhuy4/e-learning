@@ -1,8 +1,14 @@
-import { Course } from '../../domain/entity/course.entity';
-import { CourseDetailResponseDto } from '../dto/course-detail-response.dto';
+import { Course } from '@/modules/courses/domain/entity/course.entity';
+import { CourseDetailResponseDto } from '@/modules/courses/presentation/dto/course-detail-response.dto';
+import { resolveSignedUrl } from '@/modules/courses/presentation/dto/course-response.dto';
+import { SectionDtoMapper } from '@/modules/sections/presentation/mappers/section-dto.mapper';
+import { FileStorage } from '@/common/storage/domain/interface/file-storage.interface';
 
 export class CourseDtoMapper {
-  static toDetailDto(course: Course): CourseDetailResponseDto {
+  static async toDetailDto(
+    course: Course,
+    storage?: FileStorage,
+  ): Promise<CourseDetailResponseDto> {
     const dto = new CourseDetailResponseDto();
 
     dto.id = String(course.id);
@@ -10,7 +16,10 @@ export class CourseDtoMapper {
     dto.title = course.title;
     dto.slug = course.slug;
     dto.description = course.description;
-    dto.thumbnail = course.thumbnail;
+
+    dto.thumbnail = storage
+      ? await resolveSignedUrl(course.thumbnail, storage)
+      : course.thumbnail;
     dto.level = Number(course.level);
     dto.price = Number(course.price);
     dto.publishedAt = course.publishedAt;
@@ -23,23 +32,7 @@ export class CourseDtoMapper {
       reviewCount: 0,
     };
 
-    dto.sections = (course.sections ?? []).map((section) => ({
-      id: String(section.id),
-      title: section.title,
-      slug: section.slug,
-      description: section.description,
-      position: section.position,
-
-      lessons: (section.lessons ?? []).map((lesson) => ({
-        id: String(lesson.id),
-        title: lesson.title,
-        slug: lesson.slug,
-        type: lesson.type,
-        duration: lesson.duration,
-        position: lesson.position,
-        isPreview: lesson.isPreview,
-      })),
-    }));
+    dto.sections = SectionDtoMapper.toDtoList(course.sections ?? []);
 
     return dto;
   }

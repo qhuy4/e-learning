@@ -1,11 +1,14 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { Inject, NotFoundException } from '@nestjs/common';
-import { GetLessonByIdQuery } from '../query/get-lesson-by-id.query';
-import { LESSON_REPOSITORY, ILessonRepository } from '../../domain/repository/lesson.repository';
-import { FileStorage } from '../../../../common/storage/domain/interface/file-storage.interface';
-import { FILE_STORAGE } from '../../../../common/storage/domain/interface/file-storage.interface';
+import { GetLessonByIdQuery } from '@/modules/lessons/application/query/get-lesson-by-id.query';
+import { LESSON_REPOSITORY, ILessonRepository } from '@/modules/lessons/domain/repository/lesson.repository';
+import { FileStorage } from '@/common/storage/domain/interface/file-storage.interface';
+import { FILE_STORAGE } from '@/common/storage/domain/interface/file-storage.interface';
 
-async function resolveSignedUrl(key: string | null, storage: FileStorage): Promise<string | null> {
+async function resolveSignedUrl(
+  key: string | null,
+  storage: FileStorage,
+): Promise<string | null> {
   if (!key) return null;
   if (key.startsWith('http')) return key;
   try {
@@ -14,6 +17,8 @@ async function resolveSignedUrl(key: string | null, storage: FileStorage): Promi
     return null;
   }
 }
+
+import { LessonDtoMapper } from '../../presentation/mappers/lesson-dto.mapper';
 
 @QueryHandler(GetLessonByIdQuery)
 export class GetLessonByIdHandler implements IQueryHandler<GetLessonByIdQuery> {
@@ -31,19 +36,8 @@ export class GetLessonByIdHandler implements IQueryHandler<GetLessonByIdQuery> {
       throw new NotFoundException('Lesson not found');
     }
 
-    return {
-      id: lesson.id,
-      sectionId: lesson.sectionId,
-      title: lesson.title,
-      slug: lesson.slug,
-      type: lesson.type,
-      videoProvider: lesson.videoProvider,
-      videoSource: await resolveSignedUrl(lesson.videoSource, this.storage),
-      duration: lesson.duration,
-      content: lesson.content,
-      position: lesson.position,
-      isPreview: lesson.isPreview,
-      status: lesson.status,
-    };
+    const signedUrl = await resolveSignedUrl(lesson.videoSource, this.storage);
+
+    return LessonDtoMapper.toDetailDto(lesson, signedUrl);
   }
 }

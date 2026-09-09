@@ -16,7 +16,7 @@ export const CourseDetailPage = () => {
 
   const { data: course, isLoading, isError } = useCourseBySlug(slug ?? "");
 
-  const courseData = course?.data;
+  const courseData = (course as any)?.data ?? course;
 
   if (isLoading) return <div>Loading...</div>;
 

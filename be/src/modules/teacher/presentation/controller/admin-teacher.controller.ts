@@ -11,13 +11,13 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { InstructorProfileEntity } from '../../infrastructure/entity/instructor-profile.entity';
-import { InstructorKycEntity } from '../../infrastructure/entity/instructor-kyc.entity';
-import { InstructorCertificateEntity } from '../../infrastructure/entity/instructor-certificate.entity';
-// import { User } from '../../../users/domain/entity/user.entity';
-import { ApprovalStatus } from '../../domain/enum/approval-status.enum';
-import { ReviewTeacherProfileDto } from '../dto/review-teacher-profile.dto';
-import { UserOrmEntity } from '../../../users/infrastructure/entity/user.orm.entity';
+import { InstructorProfileEntity } from '@/modules/teacher/infrastructure/entity/instructor-profile.entity';
+import { InstructorKycEntity } from '@/modules/teacher/infrastructure/entity/instructor-kyc.entity';
+import { InstructorCertificateEntity } from '@/modules/teacher/infrastructure/entity/instructor-certificate.entity';
+// import { User } from '@/modules/users/domain/entity/user.entity';
+import { ApprovalStatus } from '@/modules/teacher/domain/enum/approval-status.enum';
+import { ReviewTeacherProfileDto } from '@/modules/teacher/presentation/dto/review-teacher-profile.dto';
+import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
 
 @Controller('admin/teachers')
 export class AdminTeacherController {

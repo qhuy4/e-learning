@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { ApprovalStatus } from '../../domain/enum/approval-status.enum';
+import { ApprovalStatus } from '@/modules/teacher/domain/enum/approval-status.enum';
 
 /**
  * Map với bảng `instructor_profiles`.

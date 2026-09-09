@@ -1,13 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { GetCoursesQuery } from '../query/get-courses.query';
-import { CourseRepository } from '../../infrastructure/repository/course.repository';
-import { CourseResponseDto } from '../../presentation/dto/course-response.dto';
+import { GetCoursesQuery } from '@/modules/courses/application/query/get-courses.query';
+import { CourseRepository } from '@/modules/courses/infrastructure/repository/course.repository';
+import { CourseResponseDto } from '@/modules/courses/presentation/dto/course-response.dto';
 import {
   FILE_STORAGE,
   FileStorage,
-} from '../../../../common/storage/domain/interface/file-storage.interface';
+} from '@/common/storage/domain/interface/file-storage.interface';
 
 @QueryHandler(GetCoursesQuery)
 @Injectable()
@@ -25,10 +25,13 @@ export class GetCoursesHandler implements IQueryHandler<GetCoursesQuery> {
       level: query.level,
       keyword: query.keyword,
       status: query.status,
+      instructorId: query.instructorId,
     });
 
     const data = await Promise.all(
-      courses.map((entity) => CourseResponseDto.fromEntity(entity, this.storage)),
+      courses.map((entity) =>
+        CourseResponseDto.fromEntity(entity, this.storage),
+      ),
     );
 
     return {

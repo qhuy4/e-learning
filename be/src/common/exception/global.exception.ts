@@ -6,11 +6,9 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
+import { ErrorCode } from '@/common/enum/error-code.enum';
+import { AppException } from '@/common/exception/app.exception';
 import { Request, Response } from 'express';
-
-import { AppException } from './app.exception';
-import { ErrorCode } from '../enum/error-code.enum';
-
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(GlobalExceptionFilter.name);
@@ -21,12 +19,18 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
+    if (exception instanceof Error) {
+      this.logger.error(`${request.method} ${request.url}`, exception.stack);
+    } else {
+      this.logger.error(
+        `${request.method} ${request.url}`,
+        JSON.stringify(exception),
+      );
+    }
+
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
-
     let code: ErrorCode | string = ErrorCode.INTERNAL_SERVER_ERROR;
-
     let message = 'Internal server error';
-
     let details: unknown = null;
 
     if (exception instanceof AppException) {
@@ -56,6 +60,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
           message = responseBody.message ?? 'Request failed';
         }
       }
+
       code = this.getHttpErrorCode(status);
     } else if (exception instanceof Error) {
       message = exception.message;

@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { CertificateStatus } from '../../domain/enum/certificate-status.enum';
+import { CertificateStatus } from '@/modules/teacher/domain/enum/certificate-status.enum';
 
 /**
  * Map với bảng `instructor_certificates`.

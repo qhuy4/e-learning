@@ -38,11 +38,24 @@ export class UsersController {
   ) {}
 
   @Get()
-  findAll(@Query() query: PaginationDto, @Query('keyword') keyword?: string) {
+  findAll(
+    @Query() query: PaginationDto,
+    @Query('keyword') keyword?: string,
+    @Query('role') role?: string,
+  ) {
+    const roleMap: Record<string, number> = {
+      ADMIN: 1,
+      INSTRUCTOR: 2,
+      STUDENT: 3,
+    };
+
     const data = {
       page: query.page,
       limit: query.limit,
       keyword,
+      sortBy: query.sortBy,
+      sortOrder: query.sortOrder,
+      role: role && roleMap[role] ? roleMap[role] : undefined,
     };
 
     return this.queryBus.execute(new GetUsersQuery(data));
