@@ -38,13 +38,13 @@ export const navigation: Navigation = {
                     icon: Users,
                 },
                 {
-                    title: "Teachers",
-                    url: "/teachers",
+                    title: "Instructors",
+                    url: "/instructors",
                     icon: GraduationCap,
                 },
                 {
                     title: "Students",
-                    url: "/sttudents",
+                    url: "/students",
                     icon: UserRound,
                 },
             ],
@@ -56,21 +56,6 @@ export const navigation: Navigation = {
                     title: "Khóa học của tôi",
                     url: "/courses",
                     icon: BookOpen,
-                },
-                {
-                    title: "Học viên",
-                    url: "/students",
-                    icon: Users,
-                },
-                {
-                    title: "Teachers",
-                    url: "/teachers",
-                    icon: GraduationCap,
-                },
-                {
-                    title: "Students",
-                    url: "/sttudents",
-                    icon: UserRound,
                 },
                 {
                     title: "Đánh giá",
@@ -86,11 +71,6 @@ export const navigation: Navigation = {
                     title: "Doanh thu",
                     url: "/earnings",
                     icon: DollarSign,
-                },
-                {
-                    title: "Duyệt Giảng Viên (eKYC)",
-                    url: "/instructors/approvals",
-                    icon: Users,
                 },
             ],
         },
