@@ -25,6 +25,10 @@ import OrdersPage from "@/pages/orders/orders-page";
 import OrderDetailPage from "@/pages/orders/order-detail-page";
 import EnrollmentsPage from "@/pages/enrollments/enrollments-page";
 import EnrollmentDetailPage from "@/pages/enrollments/enrollment-detail-page";
+import CouponsPage from "@/pages/coupons/coupons-page";
+import CouponCreatePage from "@/pages/coupons/coupon-create-page";
+import CouponDetailPage from "@/pages/coupons/coupon-detail-page";
+import CouponEditPage from "@/pages/coupons/coupon-edit-page";
 
 
 export const router = createBrowserRouter([
@@ -146,6 +150,27 @@ export const router = createBrowserRouter([
                             {
                                 path: ":id",
                                 element: <EnrollmentDetailPage/>,
+                            },
+                        ],
+                    },
+                    {
+                        path: "coupons",
+                        children: [
+                            {
+                                index: true,
+                                element: <CouponsPage/>,
+                            },
+                            {
+                                path: "create",
+                                element: <CouponCreatePage/>,
+                            },
+                            {
+                                path: ":id",
+                                element: <CouponDetailPage/>,
+                            },
+                            {
+                                path: ":id/edit",
+                                element: <CouponEditPage/>,
                             },
                         ],
                     },
