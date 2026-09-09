@@ -27,6 +27,11 @@ import { DeleteRecurringAvailabilityHandler } from '@/modules/instructors/applic
 import { CreateExceptionAvailabilityHandler } from '@/modules/instructors/application/command-handler/create-exception-availability.handler';
 import { UpdateExceptionAvailabilityHandler } from '@/modules/instructors/application/command-handler/update-exception-availability.handler';
 import { DeleteExceptionAvailabilityHandler } from '@/modules/instructors/application/command-handler/delete-exception-availability.handler';
+import { InstructorRevenueController } from '@/modules/instructors/presentation/instructor-revenue.controller';
+import { GetInstructorRevenueSummaryHandler } from '@/modules/instructors/application/query-handler/get-instructor-revenue-summary.handler';
+import { GetInstructorRevenueByCourseHandler } from '@/modules/instructors/application/query-handler/get-instructor-revenue-by-course.handler';
+import { OrderItemOrmEntity } from '@/modules/orders/infrastructure/entity/order-item.orm-entity';
+import { CourseOrmEntity } from '@/modules/courses/infrastructure/entity/course.orm-entity';
 
 const QueryHandlers = [
   GetInstructorProfileHandler,
@@ -34,6 +39,8 @@ const QueryHandlers = [
   GetInstructorByIdHandler,
   GetRecurringAvailabilityHandler,
   GetExceptionAvailabilityHandler,
+  GetInstructorRevenueSummaryHandler,
+  GetInstructorRevenueByCourseHandler,
 ];
 const CommandHandlers = [
   UpdateInstructorHandler,
@@ -54,12 +61,15 @@ const CommandHandlers = [
       UserOrmEntity,
       TeacherAvailabilityRecurringOrmEntity,
       TeacherAvailabilityExceptionOrmEntity,
+      OrderItemOrmEntity,
+      CourseOrmEntity,
     ]),
   ],
   controllers: [
     InstructorsController,
     InstructorRecurringAvailabilityController,
     InstructorExceptionAvailabilityController,
+    InstructorRevenueController,
   ],
   providers: [
     InstructorProfileRepository,

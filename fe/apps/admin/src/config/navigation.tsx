@@ -12,6 +12,7 @@ import {
     UserRound,
     ShoppingCart,
     ClipboardList,
+    Tag,
 } from "lucide-react"
 import type { NavGroup, NavItem } from "@/shared/types/navigation"
 
@@ -88,6 +89,11 @@ export const navigation: Navigation = {
                     title: "Đơn hàng",
                     url: "/orders",
                     icon: ShoppingCart,
+                },
+                {
+                    title: "Mã giảm giá",
+                    url: "/coupons",
+                    icon: Tag,
                 },
                 {
                     title: "Doanh thu",

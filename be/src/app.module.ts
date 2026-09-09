@@ -17,6 +17,7 @@ import { LessonProgressModule } from './modules/lesson-progress/lesson-progress.
 import { ReviewsModule } from '@/modules/reviews/reviews.module';
 import { OrdersModule } from '@/modules/orders/orders.module';
 import { EnrollmentsModule } from '@/modules/enrollments/enrollments.module';
+import { CouponsModule } from '@/modules/coupons/coupons.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { EnrollmentsModule } from '@/modules/enrollments/enrollments.module';
     ReviewsModule,
     OrdersModule,
     EnrollmentsModule,
+    CouponsModule,
     UserModule,
     AuthModule,
     InstructorModule,

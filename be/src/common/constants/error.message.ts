@@ -24,4 +24,7 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   [ErrorCode.ORDER_INVALID_STATUS_TRANSITION]: 'Không thể chuyển trạng thái đơn hàng',
 
   [ErrorCode.ENROLLMENT_NOT_FOUND]: 'Ghi danh không tồn tại',
+
+  [ErrorCode.COUPON_NOT_FOUND]: 'Mã giảm giá không tồn tại',
+  [ErrorCode.COUPON_CODE_EXISTS]: 'Mã giảm giá đã tồn tại',
 };

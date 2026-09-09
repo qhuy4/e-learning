@@ -10,5 +10,14 @@ export interface IEnrollmentRepository {
     sortOrder?: 'asc' | 'desc';
   }): Promise<{ data: any[]; meta: { page: number; limit: number; total: number; totalPages: number } }>;
 
+  findAllByInstructorId(options: {
+    instructorId: number;
+    page: number;
+    limit: number;
+    keyword?: string;
+    status?: number;
+    courseId?: number;
+  }): Promise<{ data: any[]; meta: { page: number; limit: number; total: number; totalPages: number } }>;
+
   findById(id: number): Promise<any | null>;
 }
