@@ -12,7 +12,17 @@ export interface IOrderRepository {
     sortOrder?: 'asc' | 'desc';
   }): Promise<{ data: Order[]; meta: { page: number; limit: number; total: number; totalPages: number } }>;
 
+  findAllByUser(userId: number, options?: {
+    page: number;
+    limit: number;
+    status?: string;
+  }): Promise<{ data: Order[]; total: number }>;
+
   findById(id: number): Promise<Order | null>;
 
+  create(order: Order, items: { courseId: number; instructorId: number; unitPrice: number; finalPrice: number }[]): Promise<Order>;
+
   updateStatus(id: number, status: string): Promise<Order | null>;
+
+  existsByCourseId(courseId: number): Promise<boolean>;
 }

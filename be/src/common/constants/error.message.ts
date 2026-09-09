@@ -22,6 +22,15 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
 
   [ErrorCode.ORDER_NOT_FOUND]: 'Đơn hàng không tồn tại',
   [ErrorCode.ORDER_INVALID_STATUS_TRANSITION]: 'Không thể chuyển trạng thái đơn hàng',
+  [ErrorCode.ORDER_COURSE_DUPLICATE]: 'Khóa học bị trùng trong đơn hàng',
+  [ErrorCode.ORDER_EMPTY]: 'Đơn hàng phải có ít nhất một khóa học',
 
   [ErrorCode.ENROLLMENT_NOT_FOUND]: 'Ghi danh không tồn tại',
+  [ErrorCode.ENROLLMENT_ALREADY_EXISTS]: 'Đã ghi danh khóa học này',
+
+  [ErrorCode.PAYMENT_NOT_FOUND]: 'Payment not found',
+  [ErrorCode.PAYMENT_ALREADY_COMPLETED]: 'Payment is already completed',
+  [ErrorCode.PAYMENT_GATEWAY_ERROR]: 'Payment gateway error',
+  [ErrorCode.PAYMENT_INVALID_STATUS_TRANSITION]:
+    'Invalid payment status transition',
 };

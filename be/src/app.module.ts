@@ -17,6 +17,7 @@ import { LessonProgressModule } from './modules/lesson-progress/lesson-progress.
 import { ReviewsModule } from '@/modules/reviews/reviews.module';
 import { OrdersModule } from '@/modules/orders/orders.module';
 import { EnrollmentsModule } from '@/modules/enrollments/enrollments.module';
+import { PaymentsModule } from '@/modules/payments/payments.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { EnrollmentsModule } from '@/modules/enrollments/enrollments.module';
     LessonsModule,
     StorageModule,
     LessonProgressModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

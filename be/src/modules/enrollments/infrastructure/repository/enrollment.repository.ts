@@ -4,6 +4,7 @@ import { Brackets, Repository } from 'typeorm';
 import { EnrollmentOrmEntity } from '@/modules/enrollments/infrastructure/entity/enrollment.orm-entity';
 import { IEnrollmentRepository } from '@/modules/enrollments/domain/repository/enrollment.repository';
 import { EnrollmentMapper } from '@/modules/enrollments/infrastructure/mapper/enrollment.mapper';
+import { Enrollment } from '@/modules/enrollments/domain/entity/enrollment.entity';
 
 @Injectable()
 export class EnrollmentRepository implements IEnrollmentRepository {
@@ -80,5 +81,65 @@ export class EnrollmentRepository implements IEnrollmentRepository {
     if (!entity) return null;
 
     return EnrollmentMapper.toDomain(entity);
+  }
+
+  async findByUserAndCourse(userId: number, courseId: number): Promise<Enrollment | null> {
+    const entity = await this.repository.findOne({
+      where: {
+        userId: userId.toString(),
+        courseId: courseId.toString(),
+      },
+      relations: { user: true, course: true },
+    });
+
+    if (!entity) return null;
+
+    return EnrollmentMapper.toDomain(entity);
+  }
+
+  async findByUser(userId: number, options?: { page: number; limit: number }) {
+    const page = options?.page ?? 1;
+    const limit = options?.limit ?? 10;
+
+    const [entities, total] = await this.repository.findAndCount({
+      where: { userId: userId.toString() },
+      relations: { course: true },
+      order: { enrolledAt: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return {
+      data: entities.map(EnrollmentMapper.toDomain),
+      total,
+    };
+  }
+
+  async create(enrollment: Enrollment): Promise<Enrollment> {
+    const entity = this.repository.create({
+      userId: String(enrollment.userId),
+      courseId: String(enrollment.courseId),
+      status: enrollment.status,
+      progress: enrollment.progress,
+      pricePaid: enrollment.pricePaid ? String(enrollment.pricePaid) : null,
+      currency: enrollment.currency,
+      enrolledAt: enrollment.enrolledAt,
+    });
+
+    const saved = await this.repository.save(entity);
+    const result = Array.isArray(saved) ? saved[0] : saved;
+    return EnrollmentMapper.toDomain(result);
+  }
+
+  async existsActiveByUserAndCourse(userId: number, courseId: number): Promise<boolean> {
+    const count = await this.repository.count({
+      where: {
+        userId: userId.toString(),
+        courseId: courseId.toString(),
+        status: 1,
+      },
+    });
+
+    return count > 0;
   }
 }
