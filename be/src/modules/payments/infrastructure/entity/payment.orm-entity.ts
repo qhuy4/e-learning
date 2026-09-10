@@ -33,8 +33,8 @@ export class PaymentOrmEntity {
   currency: string;
 
   @Column({
-    type: 'enum',
-    enum: PaymentStatus,
+    type: 'smallint',
+    default: 1,
   })
   status: PaymentStatus;
 

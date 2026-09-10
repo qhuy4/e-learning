@@ -6,7 +6,7 @@ import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';
 import { OrderStatus } from '@/modules/orders/domain/enum/order-status.enum';
 
-const VALID_TRANSITIONS: Record<string, string[]> = {
+const VALID_TRANSITIONS: Record<number, number[]> = {
   [OrderStatus.PENDING]: [OrderStatus.PAID, OrderStatus.FAILED, OrderStatus.CANCELLED],
   [OrderStatus.PAID]: [OrderStatus.REFUNDED],
   [OrderStatus.FAILED]: [OrderStatus.PENDING],

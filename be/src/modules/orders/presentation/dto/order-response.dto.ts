@@ -5,7 +5,7 @@ export class OrderResponseDto {
   discountAmount: number;
   total: number;
   currency: string;
-  status: string;
+  status: number;
   paidAt: Date | null;
   createdAt: Date | null;
   items: OrderItemResponseDto[];

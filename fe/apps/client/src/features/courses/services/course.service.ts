@@ -1,30 +1,26 @@
 import { api } from "@fe/lib/axios";
-import type { Course,CourseDetail ,GetCoursesParams } from "../types/course.type";
+import type { Course, CourseDetail, GetCoursesParams } from "../types/course.type";
 
 export const courseService = {
   getCourses: async (params?: GetCoursesParams): Promise<Course[]> => {
-    const response = await api.get("/courses", {
-      params,
-    });
-
-    return response.data;
+    const { data: res } = await api.get("/courses", { params });
+    return res.data;
   },
 
-    getCourseBySlug: async (slug: string): Promise<CourseDetail> => {
-    const response = await api.get<CourseDetail>(`/courses/${slug}`);
-
-    return response.data;
+  getCourseBySlug: async (slug: string): Promise<CourseDetail> => {
+    const { data: res } = await api.get(`/courses/${slug}`);
+    return res.data;
   },
-  
+
   getCourseById: async (id: string | number): Promise<CourseDetail> => {
-    const response = await api.get<CourseDetail>(`/courses/id/${id}`);
-    return response.data;
+    const { data: res } = await api.get(`/courses/id/${id}`);
+    return res.data;
   },
 
   previewCourse: async (token: string): Promise<CourseDetail> => {
-    const response = await api.get<CourseDetail>("/courses/preview", {
+    const { data: res } = await api.get("/courses/preview", {
       params: { token },
     });
-    return response.data;
+    return res.data;
   },
 };

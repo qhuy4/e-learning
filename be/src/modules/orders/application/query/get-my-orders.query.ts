@@ -4,7 +4,7 @@ export class GetMyOrdersQuery {
       userId: number;
       page: number;
       limit: number;
-      status?: string;
+      status?: number;
     },
   ) {}
 }

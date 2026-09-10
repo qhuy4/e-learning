@@ -7,7 +7,7 @@ export interface IOrderRepository {
     page: number;
     limit: number;
     keyword?: string;
-    status?: string;
+    status?: number;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
   }): Promise<{ data: Order[]; meta: { page: number; limit: number; total: number; totalPages: number } }>;
@@ -15,14 +15,14 @@ export interface IOrderRepository {
   findAllByUser(userId: number, options?: {
     page: number;
     limit: number;
-    status?: string;
+    status?: number;
   }): Promise<{ data: Order[]; total: number }>;
 
   findById(id: number): Promise<Order | null>;
 
   create(order: Order, items: { courseId: number; instructorId: number; unitPrice: number; finalPrice: number }[]): Promise<Order>;
 
-  updateStatus(id: number, status: string): Promise<Order | null>;
+  updateStatus(id: number, status: number): Promise<Order | null>;
 
   existsByCourseId(courseId: number): Promise<boolean>;
 }

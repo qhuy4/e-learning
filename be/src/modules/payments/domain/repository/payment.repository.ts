@@ -6,7 +6,7 @@ export interface FindPaymentsOptions {
   page: number;
   limit: number;
   orderId?: number;
-  status?: string;
+  status?: number;
   gateway?: string;
 }
 

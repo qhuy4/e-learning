@@ -7,7 +7,7 @@ export class PaymentResponseDto {
   gateway: string;
   amount: number;
   currency: string;
-  status: string;
+  status: number;
   gatewayResponse: Record<string, any> | null;
   paidAt: Date | null;
   createdAt: Date | null;

@@ -48,7 +48,7 @@ export class StudentOrdersController {
         userId,
         page: Number(page) || 1,
         limit: Number(limit) || 10,
-        status,
+        status: status ? Number(status) : undefined,
       }),
     );
   }

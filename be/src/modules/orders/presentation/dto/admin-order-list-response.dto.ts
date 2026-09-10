@@ -5,6 +5,6 @@ export class AdminOrderListResponseDto {
   userEmail: string;
   itemCount: number;
   total: number;
-  status: string;
+  status: number;
   createdAt: Date | null;
 }

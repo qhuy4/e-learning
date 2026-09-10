@@ -1,4 +1,4 @@
-import { Controller, Post, Req, Res } from '@nestjs/common';
+import { Controller, Get, Post, Req, Res } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { Request, Response } from 'express';
 
@@ -9,7 +9,7 @@ import { PaymentGateway } from '@/modules/payments/domain/enum/payment-gateway.e
 export class PaymentWebhookController {
   constructor(private readonly commandBus: CommandBus) {}
 
-  @Post('vnpay')
+  @Get('vnpay')
   async handleVnpayCallback(@Req() req: Request, @Res() res: Response) {
     const result = await this.commandBus.execute(
       new ProcessPaymentCallbackCommand({
@@ -23,8 +23,9 @@ export class PaymentWebhookController {
     );
 
     if (result) {
+      const query = new URLSearchParams(req.query as Record<string, string>);
       return res.redirect(
-        `${process.env.APP_URL ?? 'http://localhost:3000'}/payment/result?orderId=${result.orderId}&status=${result.status}`,
+        `${process.env.CLIENT_URL ?? 'http://localhost:5173'}/payment/result?${query.toString()}`,
       );
     }
 

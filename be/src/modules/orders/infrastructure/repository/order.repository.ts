@@ -18,7 +18,7 @@ export class OrderRepository implements IOrderRepository {
     page: number;
     limit: number;
     keyword?: string;
-    status?: string;
+    status?: number;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
   }) {
@@ -89,7 +89,7 @@ export class OrderRepository implements IOrderRepository {
     return OrderMapper.toDomain(entity);
   }
 
-  async findAllByUser(userId: number, options?: { page: number; limit: number; status?: string }) {
+  async findAllByUser(userId: number, options?: { page: number; limit: number; status?: number }) {
     const page = options?.page ?? 1;
     const limit = options?.limit ?? 10;
 
@@ -156,13 +156,13 @@ export class OrderRepository implements IOrderRepository {
       .createQueryBuilder('order')
       .innerJoin('order.items', 'item')
       .where('item.course_id = :courseId', { courseId: courseId.toString() })
-      .andWhere('order.status = :status', { status: '1' })
+      .andWhere('order.status = :status', { status: 3 })
       .getCount();
 
     return count > 0;
   }
 
-  async updateStatus(id: number, status: string) {
+  async updateStatus(id: number, status: number) {
     await this.repository.update(id.toString(), { status });
     return this.findById(id);
   }

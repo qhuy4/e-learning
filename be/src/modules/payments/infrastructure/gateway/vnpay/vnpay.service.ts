@@ -22,13 +22,13 @@ export class VnpayService implements PaymentGatewayService {
   private readonly returnUrl: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.tmnCode = this.configService.get<string>('VNPAY_TMN_CODE', '');
-    this.hashSecret = this.configService.get<string>('VNPAY_HASH_SECRET', '');
+    this.tmnCode = this.configService.get<string>('VNP_TMN_CODE', '');
+    this.hashSecret = this.configService.get<string>('VNP_HASH_SECRET', '');
     this.payUrl = this.configService.get<string>(
-      'VNPAY_PAY_URL',
+      'VNP_URL',
       'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html',
     );
-    this.returnUrl = this.configService.get<string>('VNPAY_RETURN_URL', '');
+    this.returnUrl = this.configService.get<string>('VNP_RETURN_URL', '');
   }
 
   async createPaymentUrl(input: CreatePaymentInput): Promise<CreatePaymentOutput> {
@@ -52,20 +52,13 @@ export class VnpayService implements PaymentGatewayService {
       vnp_ExpireDate: expireDate,
     };
 
-    const sortedKeys = Object.keys(params).sort();
-    const queryString = sortedKeys
-      .map((key) => `${key}=${encodeURIComponent(params[key])}`)
-      .join('&');
-
+    const signData = this.getSortedQueryString(params);
     const hmac = crypto.createHmac('sha512', this.hashSecret);
-    const signed = hmac.update(Buffer.from(queryString, 'utf-8')).digest('hex');
+    const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
 
-    params.vnp_SecureHash = signed;
+    const paymentUrl = `${this.payUrl}?${signData}&vnp_SecureHash=${signed}`;
 
-    const paymentUrl = `${this.payUrl}?${Object.keys(params)
-      .sort()
-      .map((key) => `${key}=${encodeURIComponent(params[key])}`)
-      .join('&')}`;
+    this.logger.log(`VNPAY URL for order ${input.orderId}: ${paymentUrl}`);
 
     return {
       paymentUrl,
@@ -86,24 +79,14 @@ export class VnpayService implements PaymentGatewayService {
       vnp_IpAddr: '127.0.0.1',
     };
 
-    const sortedKeys = Object.keys(params).sort();
-    const queryString = sortedKeys
-      .map((key) => `${key}=${encodeURIComponent(params[key])}`)
-      .join('&');
-
+    const signData = this.getSortedQueryString(params);
     const hmac = crypto.createHmac('sha512', this.hashSecret);
-    const signed = hmac.update(Buffer.from(queryString, 'utf-8')).digest('hex');
-
-    params.vnp_SecureHash = signed;
-
-    this.logger.log(
-      `Refund request sent for transaction ${input.transactionId}`,
-    );
+    const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
 
     return {
       success: true,
       refundTransactionId: `VNP_REF_${input.transactionId}_${Date.now()}`,
-      rawResponse: params,
+      rawResponse: { ...params, vnp_SecureHash: signed },
     };
   }
 
@@ -115,13 +98,9 @@ export class VnpayService implements PaymentGatewayService {
     delete params.vnp_SecureHash;
     delete params.vnp_SecureHashType;
 
-    const sortedKeys = Object.keys(params).sort();
-    const queryString = sortedKeys
-      .map((key) => `${key}=${encodeURIComponent(params[key])}`)
-      .join('&');
-
+    const signData = this.getSortedQueryString(params);
     const hmac = crypto.createHmac('sha512', this.hashSecret);
-    const checkSum = hmac.update(Buffer.from(queryString, 'utf-8')).digest('hex');
+    const checkSum = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
 
     if (secureHash !== checkSum) {
       this.logger.warn('VNPay callback checksum mismatch');
@@ -144,6 +123,22 @@ export class VnpayService implements PaymentGatewayService {
       status: isSuccess ? 'success' : 'failed',
       rawResponse: query,
     };
+  }
+
+  private getSortedQueryString(params: Record<string, string>): string {
+    return Object.keys(params)
+      .sort()
+      .map((key) => `${key}=${this.phpUrlEncode(params[key])}`)
+      .join('&');
+  }
+
+  private phpUrlEncode(str: string): string {
+    return encodeURIComponent(str)
+      .replace(/%20/g, '+')
+      .replace(/%2D/g, '-')
+      .replace(/%5F/g, '_')
+      .replace(/%2E/g, '.')
+      .replace(/%7E/g, '~');
   }
 
   private formatDate(date: Date): string {

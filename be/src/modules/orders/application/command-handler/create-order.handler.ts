@@ -9,9 +9,7 @@ import {
 } from '@/modules/orders/domain/repository/order.repository';
 
 @CommandHandler(CreateOrderCommand)
-export class CreateOrderHandler
-  implements ICommandHandler<CreateOrderCommand>
-{
+export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
   constructor(
     @Inject(ORDER_REPOSITORY)
     private readonly orderRepository: IOrderRepository,
@@ -20,7 +18,7 @@ export class CreateOrderHandler
   async execute(command: CreateOrderCommand) {
     const { userId, couponId, items } = command.data;
 
-    if (!items.length) {
+    if (!items || !items.length) {
       throw new BadRequestException('Order must have at least one item');
     }
 

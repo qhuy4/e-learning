@@ -7,7 +7,7 @@ import {
   Award,
 } from "lucide-react";
 import { Button } from "@fe/components/ui/button";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import { formatCurrency } from "@fe/lib/utils";
 import type { CourseDetail } from "../../types/course.type";
 
@@ -28,6 +28,8 @@ export const CourseSidebar = ({ course }: CourseSidebarProps) => {
   const previewUrl = firstLessonSlug
     ? `/learning/${courseIdentifier}/${firstLessonSlug}${previewToken ? `?previewToken=${previewToken}` : ''}`
     : `/learning/${courseIdentifier}${previewToken ? `?previewToken=${previewToken}` : ''}`;
+
+  const isFree = Number(course?.price) === 0;
 
   return (
     <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] sticky top-24">
@@ -50,9 +52,9 @@ export const CourseSidebar = ({ course }: CourseSidebarProps) => {
       {/* Pricing */}
       <div className="flex items-center gap-3 mb-6">
         <span className="text-3xl font-bold text-slate-900">
-          {formatCurrency(course?.price)}
+          {isFree ? "Miễn phí" : formatCurrency(course?.price)}
         </span>
-        {Number(course?.price) > 0 && (
+        {!isFree && (
           <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full">
             Chất lượng cao
           </span>
@@ -61,14 +63,24 @@ export const CourseSidebar = ({ course }: CourseSidebarProps) => {
 
       {/* Actions */}
       <div className="space-y-3 mb-8">
-        {Number(course?.price) > 0 && (
-          <Button className="w-full bg-rose-500 hover:bg-rose-600 text-white rounded-full py-6 text-base font-semibold shadow-sm shadow-rose-200 cursor-pointer">
+        {isFree ? (
+          <Button
+            onClick={() => navigate(`/checkout/${course?.slug}`)}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-full py-6 text-base font-semibold shadow-sm shadow-emerald-200 cursor-pointer"
+          >
+            Đăng ký miễn phí
+          </Button>
+        ) : (
+          <Button
+            onClick={() => navigate(`/checkout/${course?.slug}`)}
+            className="w-full bg-rose-500 hover:bg-rose-600 text-white rounded-full py-6 text-base font-semibold shadow-sm shadow-rose-200 cursor-pointer"
+          >
             Mua ngay
           </Button>
         )}
         <Button
           onClick={() => navigate(previewUrl)}
-          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-full py-6 text-base font-semibold shadow-sm shadow-emerald-200 flex items-center justify-center gap-2 cursor-pointer"
+          className="w-full bg-slate-800 hover:bg-slate-900 text-white rounded-full py-6 text-base font-semibold shadow-sm flex items-center justify-center gap-2 cursor-pointer"
         >
           <Play className="w-5 h-5 fill-current" />
           Xem thử bài học

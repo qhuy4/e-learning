@@ -58,7 +58,7 @@ export class PaymentsController {
         page: query.page,
         limit: query.limit,
         orderId,
-        status,
+        status: status ? Number(status) : undefined,
         gateway,
       }),
     );

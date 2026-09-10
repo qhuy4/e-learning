@@ -8,7 +8,7 @@ export class AdminOrderDetailResponseDto {
   subtotal: number;
   discountAmount: number;
   total: number;
-  status: string;
+  status: number;
   paidAt: Date | null;
   createdAt: Date | null;
   updatedAt: Date | null;
