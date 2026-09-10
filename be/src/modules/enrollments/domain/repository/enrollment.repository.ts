@@ -21,4 +21,6 @@ export interface IEnrollmentRepository {
   create(enrollment: Enrollment): Promise<Enrollment>;
 
   existsActiveByUserAndCourse(userId: number, courseId: number): Promise<boolean>;
+
+  existsActiveByUserAndCourseSlug(userId: number, courseSlug: string): Promise<boolean>;
 }

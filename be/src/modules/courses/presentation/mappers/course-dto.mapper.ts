@@ -11,8 +11,8 @@ export class CourseDtoMapper {
   ): Promise<CourseDetailResponseDto> {
     const dto = new CourseDetailResponseDto();
 
-    dto.id = String(course.id);
-    dto.instructorId = String(course.instructorId);
+    dto.id = Number(course.id);
+    dto.instructorId = Number(course.instructorId);
     dto.title = course.title;
     dto.slug = course.slug;
     dto.description = course.description;

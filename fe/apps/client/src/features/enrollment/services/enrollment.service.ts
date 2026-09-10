@@ -3,6 +3,7 @@ import { api } from "@fe/lib/axios";
 export interface Enrollment {
   id: number;
   courseId: number;
+  courseSlug: string;
   courseTitle: string;
   courseThumbnail: string | null;
   status: number;
@@ -30,9 +31,9 @@ export const enrollmentService = {
     return res.data;
   },
 
-  checkEnrollment: async (courseId: number): Promise<EnrollmentCheck> => {
+  checkEnrollment: async (courseSlug: string): Promise<EnrollmentCheck> => {
     const { data: res } = await api.get("/enrollments/check", {
-      params: { courseId },
+      params: { courseSlug },
     });
     return res.data;
   },

@@ -142,4 +142,16 @@ export class EnrollmentRepository implements IEnrollmentRepository {
 
     return count > 0;
   }
+
+  async existsActiveByUserAndCourseSlug(userId: number, courseSlug: string): Promise<boolean> {
+    const count = await this.repository
+      .createQueryBuilder('enrollment')
+      .innerJoin('enrollment.course', 'course')
+      .where('enrollment.userId = :userId', { userId: userId.toString() })
+      .andWhere('enrollment.status = :status', { status: 1 })
+      .andWhere('course.slug = :courseSlug', { courseSlug })
+      .getCount();
+
+    return count > 0;
+  }
 }

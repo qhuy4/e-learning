@@ -34,12 +34,12 @@ export class StudentEnrollmentsController {
   @Get('check')
   checkEnrollment(
     @CurrentUser('id') userId: number,
-    @Query('courseId') courseId: string,
+    @Query('courseSlug') courseSlug: string,
   ) {
     return this.queryBus.execute(
       new CheckEnrollmentQuery({
         userId,
-        courseId: Number(courseId),
+        courseSlug,
       }),
     );
   }

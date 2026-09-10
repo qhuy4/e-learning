@@ -10,13 +10,21 @@ import {
 
 import { useParams } from "react-router-dom";
 import { useCourseBySlug } from "../hooks/use-courses";
+import { useEnrollmentCheck } from "../../enrollment/hooks/use-enrollment";
+import { useAuth } from "../../auth/hooks/use-auth";
 
 export const CourseDetailPage = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { isAuthenticated } = useAuth();
 
   const { data: course, isLoading, isError } = useCourseBySlug(slug ?? "");
-
   const courseData = (course as any)?.data ?? course;
+
+  const { data: enrollmentCheck } = useEnrollmentCheck(
+    courseData?.slug,
+    isAuthenticated,
+  );
+  const isEnrolled = isAuthenticated && enrollmentCheck?.enrolled === true;
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -40,7 +48,7 @@ export const CourseDetailPage = () => {
 
           {/* Right Column - Sidebar */}
           <div className="w-full lg:w-[340px] shrink-0">
-            <CourseSidebar course={courseData} />
+            <CourseSidebar course={courseData} isEnrolled={isEnrolled} />
           </div>
         </div>
 

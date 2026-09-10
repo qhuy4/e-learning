@@ -28,6 +28,7 @@ export class GetMyEnrollmentsHandler
       data: data.map((e) => ({
         id: e.id,
         courseId: e.courseId,
+        courseSlug: e.course?.slug ?? '',
         courseTitle: e.course?.title ?? '',
         courseThumbnail: e.course?.thumbnail ?? null,
         status: e.status,

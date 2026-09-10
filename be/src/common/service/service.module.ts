@@ -23,6 +23,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
   ],
   providers: [PasswordService, TokenService, PreviewTokenService],
-  exports: [PasswordService, TokenService, PreviewTokenService],
+  exports: [PasswordService, TokenService, PreviewTokenService, JwtModule],
 })
 export class ServiceModule {}

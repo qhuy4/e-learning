@@ -17,23 +17,16 @@ export class CheckEnrollmentHandler
   ) {}
 
   async execute(query: CheckEnrollmentQuery) {
-    const { userId, courseId } = query.data;
+    const { userId, courseSlug } = query.data;
 
-    const enrollment = await this.enrollmentRepository.findByUserAndCourse(
+    const enrolled = await this.enrollmentRepository.existsActiveByUserAndCourseSlug(
       userId,
-      courseId,
+      courseSlug,
     );
 
     return {
-      enrolled: !!enrollment,
-      enrollment: enrollment
-        ? {
-            id: enrollment.id,
-            status: enrollment.status,
-            progress: enrollment.progress,
-            enrolledAt: enrollment.enrolledAt,
-          }
-        : null,
+      enrolled,
+      enrollment: enrolled ? { status: 1 } : null,
     };
   }
 }

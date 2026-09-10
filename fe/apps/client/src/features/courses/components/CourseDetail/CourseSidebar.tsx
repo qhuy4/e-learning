@@ -13,8 +13,9 @@ import type { CourseDetail } from "../../types/course.type";
 
 interface CourseSidebarProps {
   course?: CourseDetail;
+  isEnrolled?: boolean;
 }
-export const CourseSidebar = ({ course }: CourseSidebarProps) => {
+export const CourseSidebar = ({ course, isEnrolled }: CourseSidebarProps) => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
@@ -50,20 +51,37 @@ export const CourseSidebar = ({ course }: CourseSidebarProps) => {
       </div>
 
       {/* Pricing */}
-      <div className="flex items-center gap-3 mb-6">
-        <span className="text-3xl font-bold text-slate-900">
-          {isFree ? "Miễn phí" : formatCurrency(course?.price)}
-        </span>
-        {!isFree && (
-          <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full">
-            Chất lượng cao
+      {isEnrolled ? (
+        <div className="mb-6">
+          <div className="flex items-center gap-2 text-emerald-600 font-semibold text-sm mb-2">
+            <Check className="w-4 h-4" />
+            Bạn đã mua khóa học này
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 mb-6">
+          <span className="text-3xl font-bold text-slate-900">
+            {isFree ? "Miễn phí" : formatCurrency(course?.price)}
           </span>
-        )}
-      </div>
+          {!isFree && (
+            <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full">
+              Chất lượng cao
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Actions */}
       <div className="space-y-3 mb-8">
-        {isFree ? (
+        {isEnrolled ? (
+          <Button
+            onClick={() => navigate(previewUrl)}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-full py-6 text-base font-semibold shadow-sm shadow-emerald-200 cursor-pointer flex items-center justify-center gap-2"
+          >
+            <Play className="w-5 h-5 fill-current" />
+            Tiếp tục học
+          </Button>
+        ) : isFree ? (
           <Button
             onClick={() => navigate(`/checkout/${course?.slug}`)}
             className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-full py-6 text-base font-semibold shadow-sm shadow-emerald-200 cursor-pointer"
@@ -78,13 +96,15 @@ export const CourseSidebar = ({ course }: CourseSidebarProps) => {
             Mua ngay
           </Button>
         )}
-        <Button
-          onClick={() => navigate(previewUrl)}
-          className="w-full bg-slate-800 hover:bg-slate-900 text-white rounded-full py-6 text-base font-semibold shadow-sm flex items-center justify-center gap-2 cursor-pointer"
-        >
-          <Play className="w-5 h-5 fill-current" />
-          Xem thử bài học
-        </Button>
+        {!isEnrolled && (
+          <Button
+            onClick={() => navigate(previewUrl)}
+            className="w-full bg-slate-800 hover:bg-slate-900 text-white rounded-full py-6 text-base font-semibold shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <Play className="w-5 h-5 fill-current" />
+            Xem thử bài học
+          </Button>
+        )}
       </div>
 
       {/* Features */}

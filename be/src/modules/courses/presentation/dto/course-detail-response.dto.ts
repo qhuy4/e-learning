@@ -1,6 +1,6 @@
 export class CourseDetailResponseDto {
-  id: string;
-  instructorId: string;
+  id: number;
+  instructorId: number;
   title: string;
   slug: string;
   description: string | null;
@@ -11,8 +11,8 @@ export class CourseDetailResponseDto {
   createdAt: Date | null;
 
   instructor: {
-    id: string;
-    userId: string;
+    id: number;
+    userId: number;
     headline: string | null;
     bio: string | null;
     websiteUrl: string | null;
@@ -26,14 +26,14 @@ export class CourseDetailResponseDto {
   };
 
   sections: {
-    id: string;
+    id: number;
     title: string;
     slug: string;
     description: string | null;
     position: number;
 
     lessons: {
-      id: string;
+      id: number;
       title: string;
       slug: string;
       type: string;

@@ -39,7 +39,7 @@ export const CourseCardEnrolled = ({ enrollment }: CourseCardEnrolledProps) => {
           />
         </div>
 
-        <Link to={`/learning/${enrollment.courseId}`}>
+        <Link to={`/courses/${enrollment.courseSlug}`}>
           <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm py-5">
             <Play className="w-4 h-4 mr-2 fill-current" />
             Tiếp tục học

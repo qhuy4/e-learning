@@ -7,6 +7,8 @@ import {
 } from '../components/LearningPlayer';
 import { useLearningCourse, useLessonBySlug, usePreviewLesson } from '../hooks/use-learning';
 import { usePreviewCourse } from '../../courses/hooks/use-courses';
+import { useEnrollmentCheck } from '../../enrollment/hooks/use-enrollment';
+import { useAuth } from '../../auth/hooks/use-auth';
 import { Loader2 } from 'lucide-react';
 
 export const LearningPage = () => {
@@ -23,9 +25,16 @@ export const LearningPage = () => {
     isError: isCourseError,
   } = previewToken ? previewCourseQuery : regularCourseQuery;
 
-  const courseData = (course as any)?.data ?? course;
+  const courseData = course;
   const defaultLessonSlug = courseData?.sections?.flatMap((s: any) => s.lessons || [])[0]?.slug;
   const targetLessonSlug = lessonSlug || defaultLessonSlug;
+
+  const { isAuthenticated } = useAuth();
+  const { data: enrollmentCheck } = useEnrollmentCheck(
+    courseData?.slug,
+    isAuthenticated && !previewToken,
+  );
+  const isEnrolled = isAuthenticated && !previewToken && enrollmentCheck?.enrolled === true;
 
   const allLessons = courseData?.sections?.flatMap((s: any) => s.lessons || []) || [];
   const currentLessonObj = allLessons.find((l: any) => l.slug === targetLessonSlug);
@@ -43,7 +52,7 @@ export const LearningPage = () => {
     isError: isLessonError,
   } = previewToken ? previewLessonQuery : regularLessonQuery;
 
-  const lessonData = (lesson as any)?.data ?? lesson;
+  const lessonData = lesson;
 
   const navigate = useNavigate();
   const currentIndex = allLessons.findIndex(l => l.slug === lessonData?.slug);
@@ -81,7 +90,7 @@ export const LearningPage = () => {
   return (
     <div className="flex flex-col h-screen bg-white overflow-hidden">
       {/* Top Header */}
-      <LearningHeader courseTitle={courseData.title} progress={0} />
+      <LearningHeader courseTitle={courseData.title} courseSlug={courseData.slug} progress={0} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 flex-col lg:flex-row h-[calc(100vh-64px)]">
@@ -122,7 +131,7 @@ export const LearningPage = () => {
 
         {/* Right Column (Sidebar) */}
         <div className="w-full lg:w-[380px] xl:w-[420px] shrink-0 h-[50vh] lg:h-full">
-          <LearningSidebar sections={courseData.sections} courseSlug={courseData.slug} />
+          <LearningSidebar sections={courseData.sections} courseSlug={courseData.slug} isEnrolled={isEnrolled} />
         </div>
       </div>
     </div>

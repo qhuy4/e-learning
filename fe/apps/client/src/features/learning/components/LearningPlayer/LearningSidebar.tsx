@@ -11,9 +11,10 @@ import type { LearningSection } from '../../types/learning.type';
 interface LearningSidebarProps {
   sections: LearningSection[];
   courseSlug: string;
+  isEnrolled?: boolean;
 }
 
-export const LearningSidebar = ({ sections, courseSlug }: LearningSidebarProps) => {
+export const LearningSidebar = ({ sections, courseSlug, isEnrolled }: LearningSidebarProps) => {
   const { lessonSlug } = useParams<{ lessonSlug: string }>();
   const [searchParams] = useSearchParams();
   const previewToken = searchParams.get('previewToken');
@@ -65,8 +66,7 @@ export const LearningSidebar = ({ sections, courseSlug }: LearningSidebarProps) 
                       const isActive = lesson.slug === lessonSlug;
                       // In a real app, this would come from user progress
                       const isCompleted = false; 
-                      // If it's a paid course and not enrolled, might be locked if not preview
-                      const isLocked = !lesson.isPreview && !previewToken;
+                      const isLocked = !lesson.isPreview && !previewToken && !isEnrolled;
 
                       return (
                         <div key={lesson.id}>

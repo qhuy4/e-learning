@@ -6,7 +6,10 @@ import { Link } from "react-router";
 
 export const MyCoursesPage = () => {
   const { isAuthenticated } = useAuth();
-  const { data, isLoading } = useMyEnrollments({ page: 1, limit: 20 });
+  const { data, isLoading } = useMyEnrollments(
+    { page: 1, limit: 20 },
+    { enabled: isAuthenticated },
+  );
 
   if (!isAuthenticated) {
     return (
@@ -30,7 +33,7 @@ export const MyCoursesPage = () => {
     );
   }
 
-  const enrollments = data?.data ?? [];
+  const enrollments = data ?? [];
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-slate-50 py-8">
