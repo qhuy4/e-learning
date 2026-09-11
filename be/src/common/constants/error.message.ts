@@ -27,4 +27,22 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
 
   [ErrorCode.COUPON_NOT_FOUND]: 'Mã giảm giá không tồn tại',
   [ErrorCode.COUPON_CODE_EXISTS]: 'Mã giảm giá đã tồn tại',
+
+  [ErrorCode.CATEGORY_NOT_FOUND]: 'Danh mục không tồn tại',
+  [ErrorCode.CATEGORY_SLUG_EXISTS]: 'Đường dẫn danh mục đã tồn tại',
+  [ErrorCode.CATEGORY_CANNOT_PARENT_SELF]: 'Danh mục không thể là cha của chính nó',
+
+  [ErrorCode.PAYOUT_NOT_FOUND]: 'Thanh toán không tồn tại',
+  [ErrorCode.PAYOUT_ALREADY_PROCESSED]: 'Thanh toán đã được xử lý',
+  [ErrorCode.PAYOUT_ACCOUNT_NOT_FOUND]: 'Tài khoản thanh toán không tồn tại',
+
+  [ErrorCode.COURSE_QUESTION_NOT_FOUND]: 'Câu hỏi không tồn tại',
+  [ErrorCode.COURSE_QUESTION_ANSWER_NOT_FOUND]: 'Câu trả lời không tồn tại',
+  [ErrorCode.REVENUE_SPLIT_NOT_FOUND]: 'Chia sẻ doanh thu không tồn tại',
+  [ErrorCode.NO_REVENUE_SPLITS_FOR_PERIOD]: 'Không có doanh thu nào trong khoảng thời gian này',
+
+  [ErrorCode.REVIEW_REPORT_NOT_FOUND]: 'Không tìm thấy báo cáo đánh giá',
+  [ErrorCode.REVIEW_REPORT_RESOLVE_FAILED]: 'Không thể xử lý báo cáo',
+  [ErrorCode.REVIEW_REPORT_DISMISS_FAILED]: 'Không thể từ chối báo cáo',
+  [ErrorCode.REVIEW_REPORT_DELETE_FAILED]: 'Không thể xóa báo cáo',
 };

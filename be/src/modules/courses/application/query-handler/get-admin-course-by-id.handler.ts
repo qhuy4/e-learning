@@ -8,6 +8,10 @@ import {
   FILE_STORAGE,
   FileStorage,
 } from '@/common/storage/domain/interface/file-storage.interface';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CategoryOrmEntity } from '@/modules/categories/infrastructure/entity/category.orm-entity';
+import { CategoryCourseOrmEntity } from '@/modules/categories/infrastructure/entity/category-course.orm-entity';
 
 @QueryHandler(GetAdminCourseByIdQuery)
 @Injectable()
@@ -16,6 +20,10 @@ export class GetAdminCourseByIdHandler implements IQueryHandler<GetAdminCourseBy
     private readonly adminCourseRepository: AdminCourseRepository,
     @Inject(FILE_STORAGE)
     private readonly storage: FileStorage,
+    @InjectRepository(CategoryOrmEntity)
+    private readonly categoryRepo: Repository<CategoryOrmEntity>,
+    @InjectRepository(CategoryCourseOrmEntity)
+    private readonly categoryCourseRepo: Repository<CategoryCourseOrmEntity>,
   ) {}
 
   async execute(query: GetAdminCourseByIdQuery) {
@@ -24,6 +32,6 @@ export class GetAdminCourseByIdHandler implements IQueryHandler<GetAdminCourseBy
       throw new NotFoundException(`Course with ID ${query.data.id} not found`);
     }
     const course = CourseMapper.toDomain(entity);
-    return AdminCourseDtoMapper.toDetailDto(course, this.storage);
+    return AdminCourseDtoMapper.toDetailDto(course, this.storage, this.categoryCourseRepo, this.categoryRepo);
   }
 }

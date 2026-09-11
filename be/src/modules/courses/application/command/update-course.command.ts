@@ -10,6 +10,7 @@ export class UpdateCourseCommand {
       price?: number;
       status?: number;
       parentId?: number | null;
+      categories?: string[];
     },
   ) {}
 }

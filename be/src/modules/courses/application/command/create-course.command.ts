@@ -7,5 +7,6 @@ export class CreateCourseCommand {
     public readonly level?: number,
     public readonly price?: number,
     public readonly parentId?: number,
+    public readonly categories?: string[],
   ) {}
 }
