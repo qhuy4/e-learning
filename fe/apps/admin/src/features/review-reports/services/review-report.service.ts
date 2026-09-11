@@ -1,8 +1,8 @@
-import { adminApi } from "@/lib/admin-api";
 import type {
   PaginatedReviewReportResponse,
   ReviewReport,
 } from "../types/review-report";
+import {adminApi} from "@/shared/lib/axios.ts";
 
 export const reviewReportService = {
   list: async (params: {

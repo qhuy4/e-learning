@@ -1,12 +1,13 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useReviewReports } from "@/features/review-reports/hooks/use-review-reports";
-import { reviewReportColumns } from "@/features/review-reports/components/report-columns";
-import { DataTable } from "@fe/components/data-table";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@fe/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@fe/components/ui/select";
 import { Input } from "@fe/components/ui/input";
 import { Search } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
+import {useReviewReports} from "@/features/review-reports/hooks/use-review-reports.ts";
+import {DataTable} from "@/components/common/data-table/data-table.tsx";
+import {reviewReportColumns} from "@/features/review-reports/components/report-columns.tsx";
 
 const PAGE_SIZE = 10;
 
