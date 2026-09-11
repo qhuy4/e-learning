@@ -32,6 +32,21 @@ import { GetInstructorRevenueSummaryHandler } from '@/modules/instructors/applic
 import { GetInstructorRevenueByCourseHandler } from '@/modules/instructors/application/query-handler/get-instructor-revenue-by-course.handler';
 import { OrderItemOrmEntity } from '@/modules/orders/infrastructure/entity/order-item.orm-entity';
 import { CourseOrmEntity } from '@/modules/courses/infrastructure/entity/course.orm-entity';
+import { InstructorCertificateEntity } from '@/modules/teacher/infrastructure/entity/instructor-certificate.entity';
+import { InstructorCertificateController } from '@/modules/instructors/presentation/instructor-certificate.controller';
+import { GetInstructorCertificatesHandler } from '@/modules/instructors/application/query-handler/get-instructor-certificates.handler';
+import { GetInstructorCertificateByIdHandler } from '@/modules/instructors/application/query-handler/get-instructor-certificate-by-id.handler';
+import { CreateInstructorCertificateHandler } from '@/modules/instructors/application/command-handler/create-instructor-certificate.handler';
+import { DeleteInstructorCertificateHandler } from '@/modules/instructors/application/command-handler/delete-instructor-certificate.handler';
+import { InstructorAnalyticsController } from '@/modules/analytics/presentation/instructor-analytics.controller';
+import { GetCourseAnalyticsHandler } from '@/modules/analytics/application/query-handler/get-course-analytics.handler';
+import { CourseViewOrmEntity } from '@/modules/analytics/infrastructure/entity/course-view.orm-entity';
+import { EnrollmentOrmEntity } from '@/modules/enrollments/infrastructure/entity/enrollment.orm-entity';
+import { LessonProgressOrmEntity } from '@/modules/lesson-progress/infrastructure/entity/lesson-progress.orm-entity';
+import { ReviewOrmEntity } from '@/modules/reviews/infrastructure/entity/review.orm-entity';
+import { SectionOrmEntity } from '@/modules/sections/infrastructure/entity/section.orm-entity';
+import { LessonOrmEntity } from '@/modules/lessons/infrastructure/entity/lesson.orm-entity';
+import { OrderOrmEntity } from '@/modules/orders/infrastructure/entity/order.orm-entity';
 
 const QueryHandlers = [
   GetInstructorProfileHandler,
@@ -41,6 +56,9 @@ const QueryHandlers = [
   GetExceptionAvailabilityHandler,
   GetInstructorRevenueSummaryHandler,
   GetInstructorRevenueByCourseHandler,
+  GetInstructorCertificatesHandler,
+  GetInstructorCertificateByIdHandler,
+  GetCourseAnalyticsHandler,
 ];
 const CommandHandlers = [
   UpdateInstructorHandler,
@@ -50,6 +68,8 @@ const CommandHandlers = [
   CreateExceptionAvailabilityHandler,
   UpdateExceptionAvailabilityHandler,
   DeleteExceptionAvailabilityHandler,
+  CreateInstructorCertificateHandler,
+  DeleteInstructorCertificateHandler,
 ];
 
 @Module({
@@ -63,6 +83,14 @@ const CommandHandlers = [
       TeacherAvailabilityExceptionOrmEntity,
       OrderItemOrmEntity,
       CourseOrmEntity,
+      InstructorCertificateEntity,
+      CourseViewOrmEntity,
+      EnrollmentOrmEntity,
+      LessonProgressOrmEntity,
+      ReviewOrmEntity,
+      SectionOrmEntity,
+      LessonOrmEntity,
+      OrderOrmEntity,
     ]),
   ],
   controllers: [
@@ -70,6 +98,8 @@ const CommandHandlers = [
     InstructorRecurringAvailabilityController,
     InstructorExceptionAvailabilityController,
     InstructorRevenueController,
+    InstructorCertificateController,
+    InstructorAnalyticsController,
   ],
   providers: [
     InstructorProfileRepository,
