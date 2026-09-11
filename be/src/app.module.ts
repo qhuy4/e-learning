@@ -18,6 +18,10 @@ import { ReviewsModule } from '@/modules/reviews/reviews.module';
 import { OrdersModule } from '@/modules/orders/orders.module';
 import { EnrollmentsModule } from '@/modules/enrollments/enrollments.module';
 import { CouponsModule } from '@/modules/coupons/coupons.module';
+import { CategoriesModule } from '@/modules/categories/categories.module';
+import { InstructorPayoutsModule } from '@/modules/instructor-payouts/instructor-payouts.module';
+import { CourseQuestionsModule } from '@/modules/course-questions/course-questions.module';
+import { ReviewReportsModule } from '@/modules/review-reports/review-reports.module';
 
 @Module({
   imports: [
@@ -36,6 +40,10 @@ import { CouponsModule } from '@/modules/coupons/coupons.module';
     OrdersModule,
     EnrollmentsModule,
     CouponsModule,
+    CategoriesModule,
+    InstructorPayoutsModule,
+    CourseQuestionsModule,
+    ReviewReportsModule,
     UserModule,
     AuthModule,
     InstructorModule,
