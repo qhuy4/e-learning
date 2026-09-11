@@ -13,6 +13,9 @@ import {
     ShoppingCart,
     ClipboardList,
     Tag,
+    FolderTree,
+    MessageCircle,
+    Flag,
 } from "lucide-react"
 import type { NavGroup, NavItem } from "@/shared/types/navigation"
 
@@ -71,6 +74,11 @@ export const navigation: Navigation = {
                     icon: BookOpen,
                 },
                 {
+                    title: "Danh mục",
+                    url: "/categories",
+                    icon: FolderTree,
+                },
+                {
                     title: "Đánh giá",
                     url: "/reviews",
                     icon: Star,
@@ -79,6 +87,16 @@ export const navigation: Navigation = {
                     title: "Ghi danh",
                     url: "/enrollments",
                     icon: ClipboardList,
+                },
+                {
+                    title: "Hỏi đáp",
+                    url: "/questions",
+                    icon: MessageCircle,
+                },
+                {
+                    title: "Báo cáo",
+                    url: "/review-reports",
+                    icon: Flag,
                 },
             ],
         },
