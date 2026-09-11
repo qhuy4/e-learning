@@ -29,6 +29,16 @@ import CouponCreatePage from "@/pages/coupons/coupon-create-page";
 import CouponDetailPage from "@/pages/coupons/coupon-detail-page";
 import CouponEditPage from "@/pages/coupons/coupon-edit-page";
 
+import CategoriesPage from "@/pages/categories/categories-page";
+import CategoryCreatePage from "@/pages/categories/category-create-page";
+import CategoryDetailPage from "@/pages/categories/category-detail-page";
+import CategoryEditPage from "@/pages/categories/category-edit-page";
+import EarningsPage from "@/pages/earnings/earnings-page";
+import QuestionsPage from "@/pages/questions/questions-page";
+import QuestionDetailPage from "@/pages/questions/question-detail-page";
+import ReviewReportsPage from "@/pages/review-reports/review-reports-page";
+import ReviewReportDetailPage from "@/pages/review-reports/report-detail-page";
+
 export const router = createBrowserRouter([
     {
         element: <ProtectedRoute />,
@@ -169,6 +179,57 @@ export const router = createBrowserRouter([
                             {
                                 path: ":id/edit",
                                 element: <CouponEditPage/>,
+                            },
+                        ],
+                    },
+                    {
+                        path: "categories",
+                        children: [
+                            {
+                                index: true,
+                                element: <CategoriesPage />,
+                            },
+                            {
+                                path: "create",
+                                element: <CategoryCreatePage />,
+                            },
+                            {
+                                path: ":id",
+                                element: <CategoryDetailPage />,
+                            },
+                            {
+                                path: ":id/edit",
+                                element: <CategoryEditPage />,
+                            },
+                        ],
+                    },
+                    {
+                        path: "earnings",
+                        element: <EarningsPage />,
+                    },
+                    {
+                        path: "questions",
+                        children: [
+                            {
+                                index: true,
+                                element: <QuestionsPage />,
+                            },
+                            {
+                                path: ":id",
+                                element: <QuestionDetailPage />,
+                            },
+                        ],
+                    },
+                    {
+                        path: "review-reports",
+                        children: [
+                            {
+                                index: true,
+                                element: <ReviewReportsPage />,
+                            },
+                            {
+                                path: ":id",
+                                element: <ReviewReportDetailPage />,
                             },
                         ],
                     },
