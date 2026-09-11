@@ -1,16 +1,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { Plus, Edit, Copy, BookOpen } from "lucide-react";
+import { Plus, Edit, Copy, Trash2, BarChart3 } from "lucide-react";
 import { toast } from "sonner";
 import type { ColumnDef } from "@tanstack/react-table";
 
 import {
   useGetCourses,
-  useCloneCourse,
+  useDeleteCourse,
 } from "@/features/courses/hook/use-courses";
+import { courseService } from "@/features/courses/services/course.service";
 import { DataTable } from "@/components/common/data-table/data-table";
 import type { DataTableFeatures } from "@/components/common/data-table/data-table-features";
-import { LEVEL_LABELS, STATUS_CONFIG } from "@/features/courses/components/course-list/course-card";
+import { LEVEL_LABELS, COURSE_STATUS_CONFIG } from "@/features/courses/types/course.constants";
 
 const STATUS_LABELS: Record<number, string> = {
   1: "Bản nháp",
@@ -29,6 +30,7 @@ import {
   SelectItem,
   SelectTrigger,
 } from "@fe/components/ui/select";
+import { ConfirmDialog } from "@/components/common/confirm-dialog";
 
 interface CourseRow {
   id: string;
@@ -47,7 +49,7 @@ export default function CoursesListPage() {
   const [status, setStatus] = useState<string>("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [cloningId, setCloningId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const { data: coursesData, isLoading, isFetching, refetch } = useGetCourses({
     page,
@@ -57,22 +59,39 @@ export default function CoursesListPage() {
     status: status ? Number(status) : undefined,
   });
 
-  const { mutate: cloneCourse, isPending: isCloning } = useCloneCourse();
-
   const courses = (coursesData?.data ?? []) as CourseRow[];
   const meta = coursesData?.meta;
 
-  const handleClone = (id: string) => {
-    setCloningId(id);
-    const tid = toast.loading("Đang nhân bản khóa học...");
-    cloneCourse(String(id), {
-      onSuccess: (res) => {
-        toast.success("Đã nhân bản khóa học!", { id: tid });
-        navigate(`/courses/${res.data.id}`);
+  const { mutate: deleteCourse, isPending: isDeleting } = useDeleteCourse();
+
+  const handleDelete = (id: string) => {
+    setDeletingId(id);
+  };
+
+  const confirmDelete = () => {
+    if (!deletingId) return;
+    const tid = toast.loading("Đang xóa...");
+    deleteCourse(deletingId, {
+      onSuccess: () => {
+        toast.success("Đã xóa khóa học.", { id: tid });
+        setDeletingId(null);
       },
-      onError: () => toast.error("Có lỗi xảy ra khi nhân bản.", { id: tid }),
-      onSettled: () => setCloningId(null),
+      onError: () => {
+        toast.error("Có lỗi xảy ra.", { id: tid });
+        setDeletingId(null);
+      },
     });
+  };
+
+  const handleClone = async (id: string) => {
+    const tid = toast.loading("Đang tải thông tin khóa học...");
+    try {
+      const res = await courseService.getCourseById(id);
+      toast.success("Đang tạo bản nháp...", { id: tid });
+      navigate("/courses/create", { state: { cloneData: res.data } });
+    } catch {
+      toast.error("Có lỗi xảy ra.", { id: tid });
+    }
   };
 
   const columns: ColumnDef<DataTableFeatures, CourseRow>[] = [
@@ -80,14 +99,14 @@ export default function CoursesListPage() {
       accessorKey: "thumbnail",
       header: "Ảnh",
       cell: ({ row }) => {
-        const thumb = row.original.thumbnail;
+        const url = row.original.thumbnail;
         return (
-          <div className="w-16 h-10 rounded-md overflow-hidden bg-muted flex-shrink-0">
-            {thumb ? (
-              <img src={thumb} alt="" className="w-full h-full object-cover" />
+          <div className="w-12 h-12 rounded-md overflow-hidden bg-muted shrink-0">
+            {url ? (
+              <img src={url} alt="" className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <BookOpen className="h-4 w-4 text-muted-foreground" />
+              <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
+                Ảnh
               </div>
             )}
           </div>
@@ -112,9 +131,9 @@ export default function CoursesListPage() {
       accessorKey: "status",
       header: "Trạng thái",
       cell: ({ row }) => {
-        const cfg = STATUS_CONFIG[row.original.status];
+        const cfg = COURSE_STATUS_CONFIG[row.original.status];
         return cfg ? (
-          <Badge variant="outline" className={`${cfg.className} border-0`}>
+          <Badge variant={cfg.variant} className={`${cfg.className} border-0`}>
             {cfg.label}
           </Badge>
         ) : (
@@ -152,13 +171,33 @@ export default function CoursesListPage() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleClone(course.id)}
-              disabled={isCloning && cloningId === course.id}
+              onClick={(e) => { e.stopPropagation(); handleClone(course.id); }}
               className="h-8 w-8 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 rounded-lg"
               title="Nhân bản"
             >
               <Copy className="h-4 w-4" />
             </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={(e) => { e.stopPropagation(); navigate(`/courses/${course.id}/analytics`); }}
+              className="h-8 w-8 text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 rounded-lg"
+              title="Phân tích"
+            >
+              <BarChart3 className="h-4 w-4" />
+            </Button>
+            {course.status === 1 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => { e.stopPropagation(); handleDelete(course.id); }}
+                disabled={isDeleting}
+                className="h-8 w-8 text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50 rounded-lg"
+                title="Xóa"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
           </div>
         );
       },
@@ -229,6 +268,16 @@ export default function CoursesListPage() {
           previous: "Trước",
           next: "Sau",
         }}
+      />
+
+      <ConfirmDialog
+        open={!!deletingId}
+        onOpenChange={(open) => { if (!open) setDeletingId(null); }}
+        title="Xóa khóa học?"
+        description="Bạn có chắc chắn muốn xóa khóa học này? Hành động này không thể hoàn tác."
+        confirmLabel="Xóa"
+        onConfirm={confirmDelete}
+        loading={isDeleting}
       />
     </div>
   );

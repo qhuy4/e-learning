@@ -1,15 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router";
-import {
-  ChevronLeft,
-  Save,
-  LayoutTemplate,
-  ListTree,
-  SendHorizonal,
-  Clock,
-  CheckCircle2,
-  Ban,
-} from "lucide-react";
+import { ChevronLeft, Save, SendHorizonal, Copy } from "lucide-react";
 import { toast } from "sonner";
 
 import type { Course } from "@/features/courses/types/course.types";
@@ -20,22 +11,12 @@ import {
   useGetCourseDetail,
   useUpdateCourse,
 } from "@/features/courses/hook/use-courses";
+import { COURSE_STATUS_CONFIG } from "@/features/courses/types/course.constants";
 
 import { Button } from "@fe/components/ui/button";
 import { Badge } from "@fe/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@fe/components/ui/tabs";
 import { Separator } from "@fe/components/ui/separator";
-
-const STATUS_CONFIG: Record<
-  number,
-  { label: string; variant: "default" | "secondary" | "destructive" | "outline"; icon?: React.ReactNode }
-> = {
-  1: { label: "Bản nháp",    variant: "secondary" },
-  2: { label: "Chờ duyệt",   variant: "outline",   icon: <Clock className="w-3.5 h-3.5" /> },
-  3: { label: "Đã duyệt",    variant: "default",   icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
-  4: { label: "Bị từ chối",  variant: "destructive", icon: <Ban className="w-3.5 h-3.5" /> },
-  5: { label: "Đã xuất bản", variant: "default",   icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
-};
 
 function isEditable(status: number) {
   return status === 1 || status === 4;
@@ -45,11 +26,13 @@ export default function CreateCoursePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { courseId } = useParams<{ courseId: string }>();
+  const cloneData = (location.state as any)?.cloneData;
   const isEditMode = Boolean(courseId);
+  const isCloneMode = Boolean(cloneData) && !courseId;
 
   const { mutate: createCourse, isPending: isCreating } = useCreateCourse();
   const { mutate: updateCourse, isPending: isUpdating } = useUpdateCourse();
-  const { data: courseResponse, refetch } = useGetCourseDetail(courseId);
+  const { data: courseResponse, refetch } = useGetCourseDetail(isEditMode ? courseId : undefined);
 
   const isBusy = isCreating || isUpdating;
 
@@ -69,16 +52,27 @@ export default function CreateCoursePage() {
   });
 
   useEffect(() => {
-    if (!courseResponse?.data) return;
-    setCourseData(courseResponse.data);
-  }, [courseResponse]);
+    if (isCloneMode && cloneData) {
+      setCourseData({
+        title: cloneData.title,
+        description: cloneData.description,
+        price: cloneData.price,
+        level: cloneData.level,
+        thumbnail: cloneData.thumbnail,
+        categories: cloneData.categories,
+        sections: cloneData.sections ?? [],
+      });
+    } else if (courseResponse?.data) {
+      setCourseData(courseResponse.data);
+    }
+  }, [courseResponse, isCloneMode, cloneData]);
 
   const updateCourseData = (newData: Partial<Course>) =>
     setCourseData((prev) => ({ ...prev, ...newData }));
 
   const currentStatus = courseData.status ?? 1;
-  const statusCfg = STATUS_CONFIG[currentStatus];
-  const canEdit = !isEditMode || isEditable(currentStatus);
+  const statusCfg = COURSE_STATUS_CONFIG[currentStatus];
+  const canEdit = isCloneMode || !isEditMode || isEditable(currentStatus);
 
   const createFormData = (data: Course): FormData => {
     const formData = new FormData();
@@ -89,6 +83,9 @@ export default function CreateCoursePage() {
     if (data.status) formData.append("status", String(data.status));
     if (data.thumbnail instanceof File) {
       formData.append("thumbnail", data.thumbnail);
+    }
+    if (data.categories && data.categories.length > 0) {
+      formData.append("categories", JSON.stringify(data.categories.map((c) => c.name)));
     }
     return formData;
   };
@@ -147,7 +144,7 @@ export default function CreateCoursePage() {
   };
 
   const renderActions = () => {
-    if (!isEditMode) {
+    if (!isEditMode || isCloneMode) {
       return (
         <Button variant="outline" onClick={handleCreateDraft} disabled={isBusy} className="px-5">
           <Save className="w-4 h-4 mr-2" />
@@ -193,32 +190,39 @@ export default function CreateCoursePage() {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-xl font-semibold tracking-tight">
-              {isEditMode ? "Chỉnh sửa khóa học" : "Tạo khóa học mới"}
+              {isCloneMode ? "Nhân bản khóa học" : isEditMode ? "Chỉnh sửa khóa học" : "Tạo khóa học mới"}
             </h1>
+            {isCloneMode && (
+              <Badge variant="outline" className="text-xs gap-1.5 text-emerald-600 border-emerald-300 dark:border-emerald-700">
+                <Copy className="w-3.5 h-3.5" />
+                Nhân bản
+              </Badge>
+            )}
             {isEditMode && statusCfg && (
               <Badge
                 variant={statusCfg.variant}
-                className={`text-xs gap-1.5 ${
+                className={`text-xs ${
                   currentStatus === 2 ? "text-amber-600 border-amber-300 dark:border-amber-700" :
                   currentStatus === 5 ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200" :
                   ""
                 }`}
               >
-                {statusCfg.icon}
                 {statusCfg.label}
               </Badge>
             )}
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {!isEditMode
-              ? "Điền thông tin để tạo khóa học mới. Sau khi tạo bạn có thể thêm bài học."
-              : canEdit
-                ? "Cập nhật thông tin và nội dung khóa học của bạn."
-                : currentStatus === 2
-                  ? "Khóa học đang chờ admin duyệt. Bạn không thể chỉnh sửa trong lúc này."
-                  : currentStatus === 5
-                    ? "Khóa học đã được xuất bản. Liên hệ admin nếu cần chỉnh sửa."
-                    : ""}
+            {isCloneMode
+              ? "Chỉnh sửa thông tin từ khóa học gốc và nhấn Tạo để tạo bản sao."
+              : !isEditMode
+                ? "Điền thông tin để tạo khóa học mới. Sau khi tạo bạn có thể thêm bài học."
+                : canEdit
+                  ? "Cập nhật thông tin và nội dung khóa học của bạn."
+                  : currentStatus === 2
+                    ? "Khóa học đang chờ admin duyệt. Bạn không thể chỉnh sửa trong lúc này."
+                    : currentStatus === 5
+                      ? "Khóa học đã được xuất bản. Liên hệ admin nếu cần chỉnh sửa."
+                      : ""}
           </p>
         </div>
 
@@ -233,18 +237,16 @@ export default function CreateCoursePage() {
         <TabsList className="bg-muted p-1 h-auto rounded-md flex w-fit border border-border/50">
           <TabsTrigger
             value="info"
-            className="rounded-sm px-8 py-2 data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 flex items-center gap-2 text-sm font-medium transition-all"
+            className="rounded-sm px-8 py-2 data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 text-sm font-medium transition-all"
           >
-            <LayoutTemplate className="w-4 h-4" />
             Thông tin khóa học
           </TabsTrigger>
 
           <TabsTrigger
             value="chapters"
-            disabled={!courseId}
-            className="rounded-sm px-8 py-2 data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 flex items-center gap-2 text-sm font-medium transition-all disabled:opacity-40"
+            disabled={!courseId && !isCloneMode}
+            className="rounded-sm px-8 py-2 data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 text-sm font-medium transition-all disabled:opacity-40"
           >
-            <ListTree className="w-4 h-4" />
             Chương trình học
           </TabsTrigger>
         </TabsList>
