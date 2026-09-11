@@ -6,9 +6,12 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   OneToMany,
+  ManyToOne,
+  JoinColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { SectionOrmEntity } from '@/modules/sections/infrastructure/entity/section.orm-entity';
+import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
 @Entity({
   name: 'courses',
   schema: 'public',
@@ -76,4 +79,8 @@ export class CourseOrmEntity {
 
   @OneToMany(() => SectionOrmEntity, (section) => section.course)
   sections: SectionOrmEntity[];
+
+  @ManyToOne(() => UserOrmEntity)
+  @JoinColumn({ name: 'instructor_id' })
+  instructorUser: UserOrmEntity | null;
 }

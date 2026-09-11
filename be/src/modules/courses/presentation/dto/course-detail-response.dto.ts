@@ -13,6 +13,7 @@ export class CourseDetailResponseDto {
   instructor: {
     id: number;
     userId: number;
+    name: string | null;
     headline: string | null;
     bio: string | null;
     websiteUrl: string | null;

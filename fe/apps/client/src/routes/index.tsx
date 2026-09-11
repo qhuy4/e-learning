@@ -1,6 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router";
 import { MainLayout } from "../layouts/MainLayout";
-import { Home } from "../pages/Home";
+import { HomePage } from "../features/home/pages/HomePage";
 import { CourseDetailPage } from "../features/courses/pages/CourseDetailPage";
 import { CoursePreviewPage } from "../features/courses/pages/CoursePreviewPage";
 import { LearningPage } from "../features/learning/pages/LearningPage";
@@ -22,7 +22,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Home />,
+        element: <HomePage />,
       },
       {
         path: "courses/:slug",

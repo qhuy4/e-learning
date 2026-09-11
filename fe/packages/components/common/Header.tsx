@@ -26,9 +26,9 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
   }, []);
 
   const navLinks = [
-    { name: "Home", href: "/" },
-    { name: "Courses", href: "/" },
-    { name: "Mentors", href: "/" },
+    { name: "Trang chủ", href: "/" },
+    { name: "Khóa Học", href: "/courses" },
+    { name: "Giảng Viên", href: "/" },
     { name: "Blog", href: "/" },
   ];
 
@@ -69,22 +69,13 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-full hover:bg-slate-50 transition-colors"
+                className="flex items-center gap-1 pl-1 pr-1.5 py-1 rounded-full hover:bg-slate-50 transition-colors"
               >
-                {user.avatar ? (
-                  <img
-                    src={user.avatar}
-                    alt={user.name}
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-8 h-8 bg-rose-400 rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                    {user.name?.[0] || "U"}
-                  </div>
-                )}
-                <span className="text-sm font-medium text-slate-700 max-w-[100px] truncate">
-                  {user.name}
-                </span>
+                <img
+                  src={user.avatar || "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.name || "U") + "&background=F43F5E&color=fff&bold=true"}
+                  alt={user.name}
+                  className="w-8 h-8 rounded-full object-cover"
+                />
                 <ChevronDown
                   size={14}
                   className={`text-slate-400 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
@@ -129,7 +120,7 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
                 href="/student/login"
                 className="bg-rose-400 hover:bg-rose-500 text-white text-sm font-medium px-6 py-2 rounded-full transition-colors"
               >
-                Sign Up
+                Đăng Ký
               </a>
             </>
           )}
@@ -162,20 +153,11 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
             {user ? (
               <>
                 <div className="flex items-center gap-3 px-2 py-2">
-                  {user.avatar ? (
-                    <img
-                      src={user.avatar}
-                      alt={user.name}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 bg-rose-400 rounded-full flex items-center justify-center text-white font-semibold">
-                      {user.name?.[0] || "U"}
-                    </div>
-                  )}
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900">{user.name}</p>
-                  </div>
+                  <img
+                    src={user.avatar || "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.name || "U") + "&background=F43F5E&color=fff&bold=true&size=80"}
+                    alt={user.name}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
                 </div>
                 <Link
                   to="/my-courses"
@@ -208,7 +190,7 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
                   href="/student/login"
                   className="w-full bg-rose-400 text-white font-medium py-2 rounded-full hover:bg-rose-500 transition-colors"
                 >
-                  Sign Up
+                  Đăng Ký
                 </a>
               </>
             )}

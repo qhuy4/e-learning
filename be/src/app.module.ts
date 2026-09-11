@@ -18,6 +18,7 @@ import { ReviewsModule } from '@/modules/reviews/reviews.module';
 import { OrdersModule } from '@/modules/orders/orders.module';
 import { EnrollmentsModule } from '@/modules/enrollments/enrollments.module';
 import { PaymentsModule } from '@/modules/payments/payments.module';
+import { HomeModule } from '@/modules/home/home.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { PaymentsModule } from '@/modules/payments/payments.module';
     StorageModule,
     LessonProgressModule,
     PaymentsModule,
+    HomeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -41,6 +41,7 @@ import { PreviewCourseQueryHandler } from '@/modules/courses/application/query-h
 import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
 import { LessonOrmEntity } from '@/modules/lessons/infrastructure/entity/lesson.orm-entity';
 import { SectionOrmEntity } from '@/modules/sections/infrastructure/entity/section.orm-entity';
+import { InstructorProfileTypeOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-profile.orm.entity';
 import { GetAdminCourseByIdHandler } from '@/modules/courses/application/query-handler/get-admin-course-by-id.handler';
 
 @Module({
@@ -53,6 +54,7 @@ import { GetAdminCourseByIdHandler } from '@/modules/courses/application/query-h
       UserOrmEntity,
       LessonOrmEntity,
       SectionOrmEntity,
+      InstructorProfileTypeOrmEntity,
     ]),
     forwardRef(() => SectionsModule),
     LessonsModule,

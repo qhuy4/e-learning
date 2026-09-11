@@ -43,7 +43,7 @@ export const CourseDetailPage = () => {
             <CourseLearningOutcomes />
             <CourseDescription course={courseData} />
             <CourseContent course={courseData} />
-            <CourseInstructor />
+            <CourseInstructor instructor={courseData?.instructor} />
           </div>
 
           {/* Right Column - Sidebar */}
