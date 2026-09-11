@@ -29,6 +29,7 @@ export interface Course {
   parentId?: number;
   benefits?: string[];
   sections?: Section[];
+  categories?: { id: string; name: string; slug: string }[];
 }
 
 export const CourseLevel = {

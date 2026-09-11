@@ -81,13 +81,13 @@ export function DataTable<TData extends RowData>({
 }: DataTableProps<TData>) {
 
     const t = {
-        searchPlaceholder: text?.searchPlaceholder ?? "Search...",
-        reload: text?.reload ?? "Reload",
-        rowsPerPage: text?.rowsPerPage ?? "Rows per page",
-        noResults: text?.noResults ?? "No results.",
-        pageOf: text?.pageOf ?? ((p, tp) => `Page ${p} of ${tp || 1}`),
-        previous: text?.previous ?? "Previous",
-        next: text?.next ?? "Next",
+        searchPlaceholder: text?.searchPlaceholder ?? "Tìm kiếm...",
+        reload: text?.reload ?? "Tải lại",
+        rowsPerPage: text?.rowsPerPage ?? "Hàng mỗi trang",
+        noResults: text?.noResults ?? "Không có kết quả.",
+        pageOf: text?.pageOf ?? ((p, tp) => `Trang ${p} của ${tp || 1}`),
+        previous: text?.previous ?? "Trước",
+        next: text?.next ?? "Tiếp",
     }
 
     const table = useTable({

@@ -4,8 +4,9 @@ import {
     Users,
     DollarSign,
     Clock,
+    Award,
+    BarChart3,
     UserCircle,
-    Settings,
     LogOut,
 } from "lucide-react"
 import type { NavGroup, NavItem } from "@/shared/types/navigation"
@@ -41,6 +42,11 @@ export const navigation: Navigation = {
                     icon: Users,
                 },
                 {
+                    title: "Phân tích",
+                    url: "/courses",
+                    icon: BarChart3,
+                },
+                {
                     title: "Doanh thu",
                     url: "/revenue",
                     icon: DollarSign,
@@ -50,6 +56,11 @@ export const navigation: Navigation = {
                     url: "/availability",
                     icon: Clock,
                 },
+                {
+                    title: "Chứng chỉ",
+                    url: "/certificates",
+                    icon: Award,
+                },
             ],
         },
     ],
@@ -58,11 +69,6 @@ export const navigation: Navigation = {
             title: "Hồ sơ",
             url: "/profile",
             icon: UserCircle,
-        },
-        {
-            title: "Cài đặt",
-            url: "/settings",
-            icon: Settings,
         },
         {
             title: "Đăng xuất",
