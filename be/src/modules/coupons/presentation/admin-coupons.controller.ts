@@ -69,7 +69,7 @@ export class AdminCouponsController {
   async create(@Body() dto: CreateCouponDto, @Request() req: any) {
     const coupon = await this.commandBus.execute(
       new CreateCouponCommand({
-        createdBy: String(req.user.id),
+        createdBy: req.user.id,
         code: dto.code,
         discountType: dto.discountType,
         discountValue: dto.discountValue,
