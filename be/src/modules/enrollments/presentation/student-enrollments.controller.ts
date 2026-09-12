@@ -12,11 +12,11 @@ import { GetMyEnrollmentsQuery } from '@/modules/enrollments/application/query/g
 import { CheckEnrollmentQuery } from '@/modules/enrollments/application/query/check-enrollment.query';
 
 @Controller('enrollments')
-@UseGuards(JwtAuthGuard)
 export class StudentEnrollmentsController {
   constructor(private readonly queryBus: QueryBus) {}
 
   @Get('my')
+  @UseGuards(JwtAuthGuard)
   findMyEnrollments(
     @CurrentUser('id') userId: number,
     @Query('page') page?: string,
@@ -32,10 +32,13 @@ export class StudentEnrollmentsController {
   }
 
   @Get('check')
-  checkEnrollment(
-    @CurrentUser('id') userId: number,
+  async checkEnrollment(
+    @CurrentUser('id') userId: number | undefined,
     @Query('courseSlug') courseSlug: string,
   ) {
+    if (!userId) {
+      return { enrolled: false, enrollment: null };
+    }
     return this.queryBus.execute(
       new CheckEnrollmentQuery({
         userId,

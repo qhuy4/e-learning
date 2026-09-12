@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Loader2, ShieldCheck, ArrowLeft } from "lucide-react";
@@ -6,11 +6,19 @@ import { Button } from "@fe/components/ui/button";
 import { checkoutService } from "../services/checkout.service";
 import { OrderSummary } from "../components/OrderSummary";
 import { PaymentMethodSelect } from "../components/PaymentMethodSelect";
+import { useAuth } from "../../auth/hooks/use-auth";
 
 export const CheckoutPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [gateway, setGateway] = useState("VNPAY");
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/student/login");
+    }
+  }, [isAuthenticated, navigate]);
 
   const { data: course, isLoading } = useQuery({
     queryKey: ["checkout-course", slug],
@@ -79,7 +87,7 @@ export const CheckoutPage = () => {
     );
   }
 
-  const isFree = course.price === 0;
+  const isFree = Number(course.price) === 0;
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-slate-50 py-8">

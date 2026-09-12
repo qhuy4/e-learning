@@ -88,7 +88,6 @@ export async function resolveSignedUrl(
       expiresIn: DOWNLOAD_EXPIRES_IN,
     });
   } catch {
-    // Nếu R2 fail, trả về null thay vì crash
     return null;
   }
 }

@@ -19,6 +19,12 @@ async function bootstrap() {
   const dataSource = app.get(DataSource);
   await initDatabaseTables(dataSource);
 
+  app.use(express.json({
+    verify: (req: any, _res, buf) => {
+      req.rawBody = buf;
+    },
+  }));
+
   app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
   app.useGlobalPipes(

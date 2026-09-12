@@ -1,6 +1,7 @@
-import { createBrowserRouter, RouterProvider } from "react-router";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router";
 import { MainLayout } from "../layouts/MainLayout";
 import { HomePage } from "../features/home/pages/HomePage";
+import { CourseCatalogPage } from "../features/courses/pages/CourseCatalogPage";
 import { CourseDetailPage } from "../features/courses/pages/CourseDetailPage";
 import { CoursePreviewPage } from "../features/courses/pages/CoursePreviewPage";
 import { LearningPage } from "../features/learning/pages/LearningPage";
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
+        path: "courses",
+        element: <CourseCatalogPage />,
+      },
+      {
         path: "courses/:slug",
         element: <CourseDetailPage />,
       },
@@ -43,6 +48,14 @@ const router = createBrowserRouter([
       {
         path: "payment/result",
         element: <PaymentResultPage />,
+      },
+      {
+        path: "payment/success",
+        element: <Navigate to="/payment/result?status=success" replace />,
+      },
+      {
+        path: "payment/cancel",
+        element: <Navigate to="/payment/result?status=failed" replace />,
       },
       {
         path: "my-courses",

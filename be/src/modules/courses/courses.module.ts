@@ -43,6 +43,9 @@ import { LessonOrmEntity } from '@/modules/lessons/infrastructure/entity/lesson.
 import { SectionOrmEntity } from '@/modules/sections/infrastructure/entity/section.orm-entity';
 import { InstructorProfileTypeOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-profile.orm.entity';
 import { GetAdminCourseByIdHandler } from '@/modules/courses/application/query-handler/get-admin-course-by-id.handler';
+import { GetCatalogCoursesHandler } from '@/modules/courses/application/query-handler/get-catalog-courses.handler';
+import { GetRelatedCoursesHandler } from '@/modules/courses/application/query-handler/get-related-courses.handler';
+import { ReviewOrmEntity } from '@/modules/reviews/infrastructure/entity/review.orm-entity';
 
 @Module({
   imports: [
@@ -55,6 +58,7 @@ import { GetAdminCourseByIdHandler } from '@/modules/courses/application/query-h
       LessonOrmEntity,
       SectionOrmEntity,
       InstructorProfileTypeOrmEntity,
+      ReviewOrmEntity,
     ]),
     forwardRef(() => SectionsModule),
     LessonsModule,
@@ -95,6 +99,8 @@ import { GetAdminCourseByIdHandler } from '@/modules/courses/application/query-h
     GetCourseBySlugHandler,
     GetCourseByIdHandler,
     PreviewCourseQueryHandler,
+    GetCatalogCoursesHandler,
+    GetRelatedCoursesHandler,
   ],
   exports: [COURSE_REPOSITORY],
 })

@@ -17,12 +17,19 @@ import { Repository } from 'typeorm';
 async function resolveSignedUrl(
   key: string | null,
   storage: FileStorage,
+  logger?: Logger,
 ): Promise<string | null> {
-  if (!key) return null;
+  if (!key) {
+    logger?.warn(`resolveSignedUrl: key is null/empty`);
+    return null;
+  }
   if (key.startsWith('http')) return key;
   try {
-    return await storage.createDownloadUrl({ key, expiresIn: 3600 });
-  } catch {
+    const url = await storage.createDownloadUrl({ key, expiresIn: 3600 });
+    logger?.debug(`resolveSignedUrl: signed URL generated for key=${key}`);
+    return url;
+  } catch (err) {
+    logger?.error(`resolveSignedUrl: failed for key=${key}, error=${(err as Error).message}`);
     return null;
   }
 }
@@ -59,6 +66,10 @@ export class GetLessonBySlugHandler implements IQueryHandler<GetLessonBySlugQuer
 
     let canViewVideo = lesson.isPreview;
 
+    if (canViewVideo) {
+      this.logger.debug(`Lesson is preview → canViewVideo=true`);
+    }
+
     if (!canViewVideo && query.userId && lesson.sectionId) {
       const section = await this.sectionRepository.findOne({
         where: { id: lesson.sectionId.toString() },
@@ -71,13 +82,17 @@ export class GetLessonBySlugHandler implements IQueryHandler<GetLessonBySlugQuer
           Number(section.courseId),
         );
         this.logger.debug(`Enrollment check: userId=${query.userId}, courseId=${section.courseId}, enrolled=${canViewVideo}`);
+      } else {
+        this.logger.warn(`Section NOT found for sectionId=${lesson.sectionId} → canViewVideo=false`);
       }
+    } else if (!canViewVideo) {
+      this.logger.warn(`Enrollment check SKIPPED: userId=${query.userId}, sectionId=${lesson.sectionId} → canViewVideo=false`);
     }
 
     this.logger.debug(`canViewVideo=${canViewVideo}, videoSource=${lesson.videoSource}`);
 
     const signedUrl = canViewVideo
-      ? await resolveSignedUrl(lesson.videoSource, this.storage)
+      ? await resolveSignedUrl(lesson.videoSource, this.storage, this.logger)
       : null;
 
     this.logger.debug(`Result: signedUrl=${signedUrl ? 'present' : 'null'}`);

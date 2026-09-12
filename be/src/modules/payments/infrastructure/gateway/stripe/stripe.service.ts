@@ -21,7 +21,7 @@ export class StripeService implements PaymentGatewayService {
 
   private getClient(): Stripe {
     if (!this.stripe) {
-      const secretKey = this.configService.get<string>('STRIPE_SECRET_KEY');
+      const secretKey = this.configService.get<string>('STRIPE_SECRET');
       if (!secretKey) {
         throw new Error('STRIPE_SECRET_KEY is not configured');
       }
@@ -50,8 +50,8 @@ export class StripeService implements PaymentGatewayService {
         },
       ],
       mode: 'payment',
-      success_url: `${this.configService.get<string>('APP_URL', 'http://localhost:3001')}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${this.configService.get<string>('APP_URL', 'http://localhost:3001')}/payment/cancel?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${this.configService.get<string>('CLIENT_URL', 'http://localhost:5173')}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${this.configService.get<string>('CLIENT_URL', 'http://localhost:5173')}/payment/cancel?session_id={CHECKOUT_SESSION_ID}`,
       metadata: {
         orderId: input.orderId.toString(),
       },

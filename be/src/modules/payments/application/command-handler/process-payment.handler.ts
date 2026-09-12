@@ -7,11 +7,10 @@ import {
   PAYMENT_REPOSITORY,
   IPaymentRepository,
 } from '@/modules/payments/domain/repository/payment.repository';
-import {
-  PAYMENT_GATEWAY_SERVICE,
-  PaymentGatewayService,
-} from '@/modules/payments/domain/gateway/payment-gateway.interface';
 import { PaymentStatus } from '@/modules/payments/domain/enum/payment-status.enum';
+import { PaymentGateway } from '@/modules/payments/domain/enum/payment-gateway.enum';
+import { VnpayService } from '@/modules/payments/infrastructure/gateway/vnpay/vnpay.service';
+import { StripeService } from '@/modules/payments/infrastructure/gateway/stripe/stripe.service';
 
 @CommandHandler(ProcessPaymentCommand)
 export class ProcessPaymentHandler
@@ -22,10 +21,18 @@ export class ProcessPaymentHandler
   constructor(
     @Inject(PAYMENT_REPOSITORY)
     private readonly paymentRepository: IPaymentRepository,
-
-    @Inject(PAYMENT_GATEWAY_SERVICE)
-    private readonly gatewayService: PaymentGatewayService,
+    private readonly vnpayService: VnpayService,
+    private readonly stripeService: StripeService,
   ) {}
+
+  private getGatewayService(gateway: PaymentGateway) {
+    switch (gateway) {
+      case PaymentGateway.STRIPE:
+        return this.stripeService;
+      default:
+        return this.vnpayService;
+    }
+  }
 
   async execute(command: ProcessPaymentCommand) {
     const { orderId, gateway, amount, currency, description } = command.data;
@@ -40,7 +47,8 @@ export class ProcessPaymentHandler
     const created = await this.paymentRepository.create(payment);
 
     try {
-      const result = await this.gatewayService.createPaymentUrl({
+      const gatewayService = this.getGatewayService(gateway);
+      const result = await gatewayService.createPaymentUrl({
         orderId,
         amount,
         currency,

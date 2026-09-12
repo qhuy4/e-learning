@@ -4,10 +4,14 @@ import { Request, Response } from 'express';
 
 import { ProcessPaymentCallbackCommand } from '@/modules/payments/application/command/process-payment-callback.command';
 import { PaymentGateway } from '@/modules/payments/domain/enum/payment-gateway.enum';
+import { StripeService } from '@/modules/payments/infrastructure/gateway/stripe/stripe.service';
 
 @Controller('payments/webhook')
 export class PaymentWebhookController {
-  constructor(private readonly commandBus: CommandBus) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly stripeService: StripeService,
+  ) {}
 
   @Get('vnpay')
   async handleVnpayCallback(@Req() req: Request, @Res() res: Response) {
@@ -34,33 +38,22 @@ export class PaymentWebhookController {
 
   @Post('stripe')
   async handleStripeCallback(@Req() req: Request, @Res() res: Response) {
-    const sig = req.headers['stripe-signature'] as string;
-    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    const verification = await this.stripeService.verifyCallback({
+      query: {
+        'stripe-signature': req.headers['stripe-signature'] as string,
+        rawBody: req['rawBody']?.toString() ?? JSON.stringify(req.body),
+      },
+    });
 
-    let event: any;
-
-    try {
-      const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-      event = stripe.webhooks.constructEvent(
-        req['rawBody'] ?? JSON.stringify(req.body),
-        sig,
-        endpointSecret,
-      );
-    } catch {
-      return res.status(400).json({ message: 'Invalid signature' });
-    }
-
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object;
-
+    if (verification.status === 'success') {
       await this.commandBus.execute(
         new ProcessPaymentCallbackCommand({
           gateway: PaymentGateway.STRIPE,
-          transactionId: session.id,
-          orderId: Number(session.metadata?.orderId ?? 0),
-          amount: (session.amount_total ?? 0) / 100,
-          status: 'success',
-          rawResponse: event,
+          transactionId: verification.transactionId,
+          orderId: verification.orderId,
+          amount: verification.amount,
+          status: verification.status,
+          rawResponse: verification.rawResponse,
         }),
       );
     }

@@ -1,5 +1,6 @@
 import { api } from "@fe/lib/axios";
 import type { Course, CourseDetail, GetCoursesParams } from "../types/course.type";
+import type { CatalogCourse } from "../components/Catalog/types";
 
 export const courseService = {
   getCourses: async (params?: GetCoursesParams): Promise<Course[]> => {
@@ -20,6 +21,13 @@ export const courseService = {
   previewCourse: async (token: string): Promise<CourseDetail> => {
     const { data: res } = await api.get("/courses/preview", {
       params: { token },
+    });
+    return res.data;
+  },
+
+  getRelatedCourses: async (slug: string, limit = 4): Promise<CatalogCourse[]> => {
+    const { data: res } = await api.get(`/courses/slug/${slug}/related`, {
+      params: { limit },
     });
     return res.data;
   },

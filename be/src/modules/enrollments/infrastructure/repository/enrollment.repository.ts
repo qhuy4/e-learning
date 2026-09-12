@@ -132,14 +132,23 @@ export class EnrollmentRepository implements IEnrollmentRepository {
   }
 
   async existsActiveByUserAndCourse(userId: number, courseId: number): Promise<boolean> {
+    const userIdStr = userId.toString();
+    const courseIdStr = courseId.toString();
+
+    const allForUser = await this.repository.find({
+      where: { userId: userIdStr },
+    });
+    console.log(`[ENROLLMENT DIAG] all enrollments for userId=${userId}: ${JSON.stringify(allForUser.map(e => ({ id: e.id, courseId: e.courseId, status: e.status, deletedAt: e.deletedAt })))}`);
+
     const count = await this.repository.count({
       where: {
-        userId: userId.toString(),
-        courseId: courseId.toString(),
+        userId: userIdStr,
+        courseId: courseIdStr,
         status: 1,
       },
     });
 
+    console.log(`[ENROLLMENT DIAG] count for courseId=${courseId}(status=1)=${count}`);
     return count > 0;
   }
 
