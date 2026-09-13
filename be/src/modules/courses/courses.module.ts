@@ -49,6 +49,12 @@ import { ReviewOrmEntity } from '@/modules/reviews/infrastructure/entity/review.
 import { CategoryOrmEntity } from '@/modules/categories/infrastructure/entity/category.orm-entity';
 import { CategoryCourseOrmEntity } from '@/modules/categories/infrastructure/entity/category-course.orm-entity';
 import { CourseViewOrmEntity } from '@/modules/analytics/infrastructure/entity/course-view.orm-entity';
+import { InstructorProfileTypeOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-profile.orm.entity';
+import { ReviewOrmEntity } from '@/modules/reviews/infrastructure/entity/review.orm-entity';
+import { CreateCourseThumbnailUploadHandler } from '@/modules/courses/application/command-handler/create-course-thumbnail-upload.handler';
+import { UpdateCourseThumbnailHandler } from '@/modules/courses/application/command-handler/update-course-thumbnail.handler';
+import { GetCatalogCoursesHandler } from '@/modules/courses/application/query-handler/get-catalog-courses.handler';
+import { GetRelatedCoursesHandler } from '@/modules/courses/application/query-handler/get-related-courses.handler';
 
 @Module({
   imports: [
@@ -65,6 +71,8 @@ import { CourseViewOrmEntity } from '@/modules/analytics/infrastructure/entity/c
       CategoryOrmEntity,
       CategoryCourseOrmEntity,
       CourseViewOrmEntity,
+      InstructorProfileTypeOrmEntity,
+      ReviewOrmEntity,
     ]),
     forwardRef(() => SectionsModule),
     LessonsModule,
@@ -97,6 +105,8 @@ import { CourseViewOrmEntity } from '@/modules/analytics/infrastructure/entity/c
     RejectCourseHandler,
     CancelReviewCourseHandler,
     CreatePreviewTokenHandler,
+    CreateCourseThumbnailUploadHandler,
+    UpdateCourseThumbnailHandler,
     // Query handlers
     GetCoursesHandler,
     GetAdminCoursesHandler,
