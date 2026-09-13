@@ -97,20 +97,53 @@ export class EnrollmentRepository implements IEnrollmentRepository {
     return EnrollmentMapper.toDomain(entity);
   }
 
-  async findByUser(userId: number, options?: { page: number; limit: number }) {
+  async findByUser(
+    userId: number,
+    options?: {
+      page?: number;
+      limit?: number;
+      keyword?: string;
+      status?: number;
+      sortBy?: string;
+      sortOrder?: 'asc' | 'desc';
+    },
+  ) {
     const page = options?.page ?? 1;
     const limit = options?.limit ?? 10;
+    const { keyword, status, sortBy, sortOrder } = options || {};
 
-    const [entities, total] = await this.repository.findAndCount({
-      where: { userId: userId.toString() },
-      relations: { course: true },
-      order: { enrolledAt: 'DESC' },
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+    const query = this.repository
+      .createQueryBuilder('enrollment')
+      .leftJoinAndSelect('enrollment.course', 'course')
+      .leftJoinAndSelect('course.instructorUser', 'instructorUser')
+      .where('enrollment.userId = :userId', { userId: userId.toString() });
+
+    if (keyword) {
+      query.andWhere('course.title ILIKE :keyword', { keyword: `%${keyword}%` });
+    }
+
+    if (status !== undefined) {
+      query.andWhere('enrollment.status = :status', { status });
+    }
+
+    const sortableColumns: Record<string, string> = {
+      progress: 'enrollment.progress',
+      enrolledAt: 'enrollment.enrolled_at',
+      title: 'course.title',
+    };
+
+    const sortKey = sortBy && sortableColumns[sortBy] ? sortableColumns[sortBy] : 'enrollment.enrolled_at';
+    const sortDirection: 'ASC' | 'DESC' = sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+    query
+      .orderBy(sortKey, sortDirection)
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    const [entities, total] = await query.getManyAndCount();
 
     return {
-      data: entities.map(EnrollmentMapper.toDomain),
+      data: entities.map((entity) => EnrollmentMapper.toDomain(entity)),
       total,
     };
   }

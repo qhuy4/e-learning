@@ -41,7 +41,7 @@ import { ServiceModule } from '@/common/service/service.module';
           'elearning-jwt-secret-key-2026',
         ),
         signOptions: {
-          expiresIn: '7d' as any,
+          expiresIn: '7d',
         },
       }),
     }),

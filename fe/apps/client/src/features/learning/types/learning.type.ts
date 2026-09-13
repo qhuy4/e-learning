@@ -41,3 +41,25 @@ export interface LearningCourse {
   thumbnail: string | null;
   sections: LearningSection[];
 }
+
+// ─── Lesson Progress ────────────────────────────────────────────────────────
+export interface LessonProgress {
+  id: number;
+  userId: number;
+  courseId: number;
+  lessonId: number;
+  watchSeconds: number;
+  progressPercent: number;
+  isCompleted: boolean;
+  completedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CourseProgress {
+  courseId: number;
+  totalProgress: number;
+  completedLessons: number;
+  totalLessons: number;
+  lessons: LessonProgress[];
+}

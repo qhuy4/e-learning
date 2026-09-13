@@ -5,10 +5,11 @@ import {
   LearningTabs,
   LearningSidebar,
 } from '../components/LearningPlayer';
-import { useLearningCourse, useLessonBySlug, usePreviewLesson } from '../hooks/use-learning';
+import { useLearningCourse, useLessonBySlug, usePreviewLesson, useCourseProgress } from '../hooks/use-learning';
 import { usePreviewCourse } from '../../courses/hooks/use-courses';
 import { useEnrollmentCheck } from '../../enrollment/hooks/use-enrollment';
 import { useAuth } from '../../auth/hooks/use-auth';
+import { useVideoProgress } from '../hooks/use-video-progress';
 import { Loader2 } from 'lucide-react';
 
 export const LearningPage = () => {
@@ -54,6 +55,30 @@ export const LearningPage = () => {
 
   const lessonData = lesson;
 
+  const { data: courseProgress } = useCourseProgress(
+    courseData?.id,
+    isEnrolled,
+  );
+
+  const lessonProgressMap = new Map<number, { isCompleted: boolean; progressPercent: number; watchSeconds: number }>();
+  courseProgress?.lessons?.forEach((lp) => {
+    lessonProgressMap.set(Number(lp.lessonId), {
+      isCompleted: lp.isCompleted,
+      progressPercent: lp.progressPercent,
+      watchSeconds: lp.watchSeconds,
+    });
+  });
+
+  const currentLessonProgress = lessonData
+    ? lessonProgressMap.get(lessonData.id)
+    : undefined;
+
+  const { handleProgressUpdate, handleVideoEnd } = useVideoProgress({
+    courseId: courseData?.id ?? 0,
+    lessonId: lessonData?.id ?? 0,
+    enabled: isEnrolled && !!lessonData,
+  });
+
   const navigate = useNavigate();
   const currentIndex = allLessons.findIndex(l => l.slug === lessonData?.slug);
   const prevLesson = currentIndex > 0 ? allLessons[currentIndex - 1] : null;
@@ -89,21 +114,31 @@ export const LearningPage = () => {
 
   return (
     <div className="flex flex-col h-screen bg-white overflow-hidden">
-      {/* Top Header */}
-      <LearningHeader courseTitle={courseData.title} courseSlug={courseData.slug} progress={0} />
+      <LearningHeader
+        courseTitle={courseData.title}
+        courseSlug={courseData.slug}
+        progress={courseProgress?.totalProgress ?? 0}
+      />
 
-      {/* Main Content Area */}
       <div className="flex flex-1 flex-col lg:flex-row h-[calc(100vh-64px)]">
-        {/* Left Column (Video + Tabs) */}
         <div className="flex-1 overflow-y-auto min-w-0 custom-scrollbar flex flex-col bg-slate-50">
           <VideoPlayer
             videoSource={lessonData.videoSource}
             title={lessonData.title}
+            initialPosition={currentLessonProgress?.isCompleted ? 0 : currentLessonProgress?.watchSeconds}
+            onProgressUpdate={handleProgressUpdate}
+            onVideoEnd={handleVideoEnd}
           />
           
-          {/* Lesson Navigation & Title */}
           <div className="bg-white p-4 md:p-6 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <h1 className="text-xl md:text-2xl font-bold text-slate-900">{lessonData.title}</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl md:text-2xl font-bold text-slate-900">{lessonData.title}</h1>
+              {currentLessonProgress?.isCompleted && (
+                <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
+                  Đã hoàn thành
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-2 shrink-0">
               <button
                 disabled={!prevLesson}
@@ -129,9 +164,13 @@ export const LearningPage = () => {
           </div>
         </div>
 
-        {/* Right Column (Sidebar) */}
         <div className="w-full lg:w-[380px] xl:w-[420px] shrink-0 h-[50vh] lg:h-full">
-          <LearningSidebar sections={courseData.sections} courseSlug={courseData.slug} isEnrolled={isEnrolled} />
+          <LearningSidebar
+            sections={courseData.sections}
+            courseSlug={courseData.slug}
+            isEnrolled={isEnrolled}
+            lessonProgressMap={lessonProgressMap}
+          />
         </div>
       </div>
     </div>

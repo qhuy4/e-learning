@@ -4,6 +4,10 @@ export class GetMyEnrollmentsQuery {
       userId: number;
       page: number;
       limit: number;
+      keyword?: string;
+      status?: number;
+      sortBy?: string;
+      sortOrder?: 'asc' | 'desc';
     },
   ) {}
 }

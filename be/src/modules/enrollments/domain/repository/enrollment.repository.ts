@@ -16,7 +16,17 @@ export interface IEnrollmentRepository {
 
   findByUserAndCourse(userId: number, courseId: number): Promise<Enrollment | null>;
 
-  findByUser(userId: number, options?: { page: number; limit: number }): Promise<{ data: Enrollment[]; total: number }>;
+  findByUser(
+    userId: number,
+    options?: {
+      page?: number;
+      limit?: number;
+      keyword?: string;
+      status?: number;
+      sortBy?: string;
+      sortOrder?: 'asc' | 'desc';
+    },
+  ): Promise<{ data: Enrollment[]; total: number }>;
 
   create(enrollment: Enrollment): Promise<Enrollment>;
 

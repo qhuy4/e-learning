@@ -4,6 +4,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { EnrollmentOrmEntity } from '@/modules/enrollments/infrastructure/entity/enrollment.orm-entity';
 import { EnrollmentRepository } from '@/modules/enrollments/infrastructure/repository/enrollment.repository';
 import { ENROLLMENT_REPOSITORY } from '@/modules/enrollments/domain/repository/enrollment.repository';
+import { StorageModule } from '@/common/storage/storage.module';
 
 import { AdminEnrollmentsController } from '@/modules/enrollments/presentation/admin-enrollments.controller';
 import { StudentEnrollmentsController } from '@/modules/enrollments/presentation/student-enrollments.controller';
@@ -15,7 +16,7 @@ import { CheckEnrollmentHandler } from '@/modules/enrollments/application/query-
 import { CreateEnrollmentHandler } from '@/modules/enrollments/application/command-handler/create-enrollment.handler';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([EnrollmentOrmEntity]), CqrsModule],
+  imports: [TypeOrmModule.forFeature([EnrollmentOrmEntity]), CqrsModule, StorageModule],
   controllers: [AdminEnrollmentsController, StudentEnrollmentsController],
   providers: [
     { provide: ENROLLMENT_REPOSITORY, useClass: EnrollmentRepository },

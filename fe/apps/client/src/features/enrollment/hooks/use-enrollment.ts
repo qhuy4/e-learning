@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { enrollmentService } from "../services/enrollment.service";
+import { enrollmentService, type GetMyEnrollmentsParams } from "../services/enrollment.service";
 
 export const useMyEnrollments = (
-  params?: { page?: number; limit?: number },
+  params?: GetMyEnrollmentsParams,
   options?: { enabled?: boolean },
 ) => {
   return useQuery({

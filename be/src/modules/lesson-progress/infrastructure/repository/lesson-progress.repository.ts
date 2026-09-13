@@ -18,17 +18,9 @@ export class LessonProgressRepository implements ILessonProgressRepository {
     lessonId: number,
   ): Promise<LessonProgress | null> {
     const entity = await this.repository.findOne({
-      where: {
-        userId,
-        lessonId,
-      },
+      where: { userId, lessonId },
     });
-
-    if (!entity) {
-      return null;
-    }
-
-    return this.toDomain(entity);
+    return entity ? this.toDomain(entity) : null;
   }
 
   async findByUserAndCourse(
@@ -36,15 +28,9 @@ export class LessonProgressRepository implements ILessonProgressRepository {
     courseId: number,
   ): Promise<LessonProgress[]> {
     const entities = await this.repository.find({
-      where: {
-        userId,
-        courseId,
-      },
-      order: {
-        lessonId: 'ASC',
-      },
+      where: { userId, courseId },
+      order: { lessonId: 'ASC' },
     });
-
     return entities.map((entity) => this.toDomain(entity));
   }
 
@@ -60,7 +46,6 @@ export class LessonProgressRepository implements ILessonProgressRepository {
     });
 
     const saved = await this.repository.save(entity);
-
     return this.toDomain(saved);
   }
 
@@ -77,7 +62,6 @@ export class LessonProgressRepository implements ILessonProgressRepository {
     });
 
     const saved = await this.repository.save(entity);
-
     return this.toDomain(saved);
   }
 
