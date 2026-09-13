@@ -31,11 +31,7 @@ export class LessonProgressOrmEntity {
   @Column({ name: 'is_completed', default: false })
   isCompleted: boolean;
 
-  @Column({
-    name: 'completed_at',
-    type: 'timestamp',
-    nullable: true,
-  })
+  @Column({ name: 'completed_at', type: 'timestamp', nullable: true })
   completedAt?: Date;
 
   @CreateDateColumn({ name: 'created_at' })

@@ -4,7 +4,7 @@ import { LessonDtoMapper } from '@/modules/lessons/presentation/mappers/lesson-d
 export class SectionDtoMapper {
   static toDto(section: Section) {
     return {
-      id: String(section.id),
+      id: Number(section.id),
       title: section.title,
       slug: section.slug,
       description: section.description,

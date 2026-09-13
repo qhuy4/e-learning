@@ -3,7 +3,7 @@ import { Lesson } from '../../domain/entity/lesson.entity';
 export class LessonDtoMapper {
   static toDto(lesson: Lesson) {
     return {
-      id: String(lesson.id),
+      id: Number(lesson.id),
       title: lesson.title,
       slug: lesson.slug,
       type: lesson.type,

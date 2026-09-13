@@ -1,13 +1,30 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, Settings } from 'lucide-react';
+
+interface VideoProgressInfo {
+  currentTime: number;
+  duration: number;
+  percent: number;
+  watchSeconds: number;
+}
 
 interface VideoPlayerProps {
   videoSource: string | null;
   posterUrl?: string | null;
   title?: string;
+  initialPosition?: number;
+  onProgressUpdate?: (info: VideoProgressInfo) => void;
+  onVideoEnd?: () => void;
 }
 
-export const VideoPlayer = ({ videoSource, posterUrl, title }: VideoPlayerProps) => {
+export const VideoPlayer = ({
+  videoSource,
+  posterUrl,
+  title,
+  initialPosition = 0,
+  onProgressUpdate,
+  onVideoEnd,
+}: VideoPlayerProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<HTMLDivElement>(null);
 
@@ -27,31 +44,50 @@ export const VideoPlayer = ({ videoSource, posterUrl, title }: VideoPlayerProps)
     setCurrentTime(0);
   }, [videoSource]);
 
-  const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || initialPosition <= 0) return;
 
-  const handleTimeUpdate = () => {
+    const seekIfNeeded = () => {
+      if (videoRef.current && videoRef.current === video) {
+        videoRef.current.currentTime = initialPosition;
+        setProgress(duration > 0 ? (initialPosition / duration) * 100 : 0);
+        setCurrentTime(initialPosition);
+      }
+    };
+
+    if (video.readyState >= 1) {
+      seekIfNeeded();
+    } else {
+      video.addEventListener('loadeddata', seekIfNeeded, { once: true });
+      return () => video.removeEventListener('loadeddata', seekIfNeeded);
+    }
+  }, [initialPosition, videoSource]);
+
+  const handleTimeUpdate = useCallback(() => {
     if (videoRef.current) {
       const current = videoRef.current.currentTime;
       const total = videoRef.current.duration;
       setCurrentTime(current);
       if (total > 0) {
-        setProgress((current / total) * 100);
+        const pct = (current / total) * 100;
+        setProgress(pct);
+        onProgressUpdate?.({
+          currentTime: current,
+          duration: total,
+          percent: Math.min(pct, 100),
+          watchSeconds: Math.floor(current),
+        });
       }
     }
-  };
+  }, [onProgressUpdate]);
 
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
       setDuration(videoRef.current.duration);
+      if (initialPosition > 0 && videoRef.current.currentTime < initialPosition) {
+        videoRef.current.currentTime = initialPosition;
+      }
     }
   };
 
@@ -61,6 +97,17 @@ export const VideoPlayer = ({ videoSource, posterUrl, title }: VideoPlayerProps)
       const newTime = (value / 100) * duration;
       videoRef.current.currentTime = newTime;
       setProgress(value);
+    }
+  };
+
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
     }
   };
 
@@ -145,7 +192,10 @@ export const VideoPlayer = ({ videoSource, posterUrl, title }: VideoPlayerProps)
           onClick={togglePlay}
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={handleLoadedMetadata}
-          onEnded={() => setIsPlaying(false)}
+          onEnded={() => {
+            setIsPlaying(false);
+            onVideoEnd?.();
+          }}
         />
 
         {/* Big play button overlay when paused */}
@@ -173,7 +223,6 @@ export const VideoPlayer = ({ videoSource, posterUrl, title }: VideoPlayerProps)
                 className="absolute top-0 left-0 h-full bg-emerald-500 rounded-full transition-all duration-75 ease-linear pointer-events-none" 
                 style={{ width: `${progress}%` }} 
               />
-              {/* Thumb */}
               <div 
                 className="absolute w-3 h-3 sm:w-4 sm:h-4 bg-white rounded-full shadow hover:scale-125 transition-transform pointer-events-none opacity-0 group-hover/scrub:opacity-100"
                 style={{ left: `calc(${progress}% - 8px)` }}
@@ -228,7 +277,6 @@ export const VideoPlayer = ({ videoSource, posterUrl, title }: VideoPlayerProps)
                   {playbackRate}x
                 </button>
                 
-                {/* Speed Menu */}
                 {showSpeedMenu && (
                   <div className="absolute bottom-full right-0 mb-3 bg-slate-900/95 backdrop-blur border border-slate-700 rounded-xl overflow-hidden min-w-32 shadow-xl animate-in fade-in slide-in-from-bottom-2">
                     {[0.5, 0.75, 1, 1.25, 1.5, 2].map((rate) => (

@@ -4,23 +4,24 @@ import { useNavigate } from 'react-router';
 
 interface LearningHeaderProps {
   courseTitle: string;
+  courseSlug?: string;
   progress?: number;
 }
 
-export const LearningHeader = ({ courseTitle, progress = 0 }: LearningHeaderProps) => {
+export const LearningHeader = ({ courseTitle, courseSlug, progress = 0 }: LearningHeaderProps) => {
   const navigate = useNavigate();
 
   return (
     <header className="h-16 border-b border-slate-200 bg-white flex items-center justify-between px-4 md:px-6 sticky top-0 z-50">
       <div className="flex items-center gap-4">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => courseSlug ? navigate(`/courses/${courseSlug}`) : navigate(-1)}
           className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 transition-colors"
         >
           <div className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-50">
             <ArrowLeft className="w-4 h-4" />
           </div>
-          <span className="font-medium hidden sm:inline">Back to Dashboard</span>
+          <span className="font-medium hidden sm:inline">Quay lại khóa học</span>
         </button>
 
         <div className="h-8 w-px bg-slate-200 mx-2 hidden md:block" />

@@ -39,8 +39,8 @@ export class OrderOrmEntity {
   @Column({ type: 'varchar', length: 10, default: 'VND' })
   currency: string;
 
-  @Column({ type: 'varchar', length: 255, default: '0' })
-  status: string;
+  @Column({ type: 'smallint', default: 1 })
+  status: number;
 
   @Column({ name: 'paid_at', type: 'timestamp', nullable: true })
   paidAt: Date | null;

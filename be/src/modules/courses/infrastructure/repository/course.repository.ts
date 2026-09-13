@@ -6,6 +6,7 @@ import { Course } from '@/modules/courses/domain/entity/course.entity';
 import { CourseStatus } from '@/modules/courses/domain/enum/course-status.enum';
 import { ICourseRepository } from '@/modules/courses/domain/repository/course.repository';
 import { CourseMapper } from '@/modules/courses/infrastructure/mapper/course.mapper';
+import { InstructorProfileTypeOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-profile.orm.entity';
 
 export interface FindCoursesOptions {
   page: number;
@@ -20,6 +21,8 @@ export class CourseRepository implements ICourseRepository {
   constructor(
     @InjectRepository(CourseOrmEntity)
     private readonly repository: Repository<CourseOrmEntity>,
+    @InjectRepository(InstructorProfileTypeOrmEntity)
+    private readonly instructorRepository: Repository<InstructorProfileTypeOrmEntity>,
   ) {}
 
   async findPublishedCourses(options: FindCoursesOptions) {
@@ -74,10 +77,11 @@ export class CourseRepository implements ICourseRepository {
   }
 
   async getCourseDetail(slug: string): Promise<CourseOrmEntity | null> {
-    return this.repository
+    const entity = await this.repository
       .createQueryBuilder('course')
       .leftJoinAndSelect('course.sections', 'section')
       .leftJoinAndSelect('section.lessons', 'lesson')
+      .leftJoinAndSelect('course.instructorUser', 'instructorUser')
       .where('course.slug = :slug', { slug })
       .andWhere('course.status = :status', { status: CourseStatus.PUBLISHED })
       .andWhere('course.deletedAt IS NULL')
@@ -87,6 +91,17 @@ export class CourseRepository implements ICourseRepository {
       .orderBy('section.position', 'ASC')
       .addOrderBy('lesson.position', 'ASC')
       .getOne();
+
+    if (entity?.instructorUser) {
+      const profile = await this.instructorRepository.findOne({
+        where: { userId: entity.instructorUser.id },
+      });
+      if (profile) {
+        (entity as any).instructorProfile = profile;
+      }
+    }
+
+    return entity;
   }
 
   async findPublishedBySlug(slug: string): Promise<Course | null> {

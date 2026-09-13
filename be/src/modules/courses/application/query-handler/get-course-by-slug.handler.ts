@@ -16,11 +16,11 @@ export class GetCourseBySlugHandler implements IQueryHandler<GetCourseBySlugQuer
   ) {}
 
   async execute(query: GetCourseBySlugQuery) {
-    const course = await this.courseRepository.findPublishedBySlug(query.slug);
-    if (!course) {
+    const courseEntity = await this.courseRepository.getCourseDetail(query.slug);
+    if (!courseEntity) {
       throw new NotFoundException('Course not found');
     }
 
-    return CourseDtoMapper.toDetailDto(course, this.storage);
+    return CourseDtoMapper.toDetailDto(courseEntity, this.storage);
   }
 }

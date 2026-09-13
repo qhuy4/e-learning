@@ -11,6 +11,7 @@ import { MailService } from '@/modules/auth/services/mail.service';
 import { JwtStrategy } from '@/modules/auth/strategies/jwt.strategy';
 import { AdminAuthController } from '@/modules/auth/presentation/controllers/admin-auth.controller';
 import { InstructorAuthController } from '@/modules/auth/presentation/controllers/instructor-auth.controller';
+import { UserAuthController } from '@/modules/auth/presentation/controllers/user-auth.controller';
 // import { TokenService } from '@/modules/auth/service/token.service';
 import { TokenService } from '@/common/service/token.service';
 import { LoginHandler } from '@/modules/auth/application/command-handler/login.handler';
@@ -40,12 +41,12 @@ import { ServiceModule } from '@/common/service/service.module';
           'elearning-jwt-secret-key-2026',
         ),
         signOptions: {
-          expiresIn: '7d' as any,
+          expiresIn: '7d',
         },
       }),
     }),
   ],
-  controllers: [AuthController, AdminAuthController, InstructorAuthController, UsersController],
+  controllers: [AuthController, AdminAuthController, InstructorAuthController, UserAuthController, UsersController],
   providers: [AuthService, MailService, JwtStrategy, TokenService, LoginHandler, RegisterHandler, PasswordService],
   exports: [AuthService, JwtModule, PassportModule],
 })

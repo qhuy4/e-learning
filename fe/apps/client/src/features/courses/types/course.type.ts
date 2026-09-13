@@ -42,10 +42,11 @@ export interface GetCoursesParams {
 export interface CourseDetail extends Course {
   instructor: {
     id: number;
+    name: string | null;
     headline: string | null;
     bio: string | null;
     websiteUrl: string | null;
-  };
+  } | null;
 
   statistics: {
     studentCount: number;

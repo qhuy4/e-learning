@@ -26,7 +26,7 @@ export class AdminOrdersController {
         page: Number(page) || 1,
         limit: Number(limit) || 10,
         keyword,
-        status,
+        status: status ? Number(status) : undefined,
         sortBy,
         sortOrder: sortOrder as 'asc' | 'desc' | undefined,
       }),
@@ -50,7 +50,7 @@ export class AdminOrdersController {
     @Query('status') status: string,
   ) {
     const order = await this.commandBus.execute(
-      new UpdateOrderStatusCommand({ id, status }),
+      new UpdateOrderStatusCommand({ id, status: Number(status) }),
     );
     return AdminOrderDtoMapper.toDetailDto(order);
   }

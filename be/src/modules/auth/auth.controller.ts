@@ -10,7 +10,6 @@ import {
 import { AuthService } from '@/modules/auth/auth.service';
 import { SendInstructorInviteDto } from '@/modules/auth/dto/send-instructor-invite.dto';
 import { RegisterInstructorDto } from '@/modules/auth/dto/register-instructor.dto';
-import { LoginDto } from '@/modules/auth/dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -39,14 +38,5 @@ export class AuthController {
   @Post('instructor/register')
   async registerInstructor(@Body() dto: RegisterInstructorDto) {
     return this.authService.registerInstructor(dto);
-  }
-
-  /**
-   * API Đăng nhập chung
-   */
-  @Post('login')
-  @HttpCode(HttpStatus.OK)
-  async login(@Body() dto: LoginDto) {
-    return this.authService.login(dto);
   }
 }

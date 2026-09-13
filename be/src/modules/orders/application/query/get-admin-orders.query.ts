@@ -4,7 +4,7 @@ export class GetAdminOrdersQuery {
       page: number;
       limit: number;
       keyword?: string;
-      status?: string;
+      status?: number;
       sortBy?: string;
       sortOrder?: 'asc' | 'desc';
     },

@@ -1,10 +1,10 @@
 import { api } from '@fe/lib/axios';
-import type { LessonDetail, LearningCourse } from '../types/learning.type';
+import type { LessonDetail, LearningCourse, LessonProgress, CourseProgress } from '../types/learning.type';
 
 export const learningService = {
   getLessonBySlug: async (lessonSlug: string): Promise<LessonDetail> => {
-    const response = await api.get<LessonDetail>(`/lessons/slug/${lessonSlug}`);
-    return response.data;
+    const { data: res } = await api.get(`/lessons/slug/${lessonSlug}`);
+    return res.data;
   },
 
   previewLesson: async (
@@ -12,14 +12,34 @@ export const learningService = {
     lessonId?: number,
     lessonSlug?: string,
   ): Promise<LessonDetail> => {
-    const response = await api.get<LessonDetail>(`/lessons/preview`, {
+    const { data: res } = await api.get(`/lessons/preview`, {
       params: { token, lessonId, lessonSlug },
     });
-    return response.data;
+    return res.data;
   },
 
   getCourseBySlug: async (courseSlug: string): Promise<LearningCourse> => {
-    const response = await api.get<LearningCourse>(`/courses/${courseSlug}`);
-    return response.data;
+    const { data: res } = await api.get(`/courses/${courseSlug}`);
+    return res.data;
+  },
+
+  updateLessonProgress: async (payload: {
+    courseId: number;
+    lessonId: number;
+    watchSeconds: number;
+    progressPercent: number;
+  }): Promise<LessonProgress> => {
+    const { data: res } = await api.patch('/lesson-progress', payload);
+    return res.data;
+  },
+
+  getLessonProgress: async (lessonId: number): Promise<LessonProgress | null> => {
+    const { data: res } = await api.get(`/lesson-progress/${lessonId}`);
+    return res.data;
+  },
+
+  getCourseProgress: async (courseId: number): Promise<CourseProgress> => {
+    const { data: res } = await api.get(`/lesson-progress/course/${courseId}`);
+    return res.data;
   },
 };

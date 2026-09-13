@@ -32,3 +32,11 @@ export const usePreviewCourse = (token: string) => {
     enabled: !!token,
   });
 };
+
+export const useRelatedCourses = (slug: string) => {
+  return useQuery({
+    queryKey: ['courses', 'related', slug],
+    queryFn: () => courseService.getRelatedCourses(slug),
+    enabled: !!slug,
+  });
+};

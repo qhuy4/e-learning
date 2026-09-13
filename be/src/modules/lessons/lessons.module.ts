@@ -22,7 +22,9 @@ import { GetLessonBySlugHandler } from '@/modules/lessons/application/query-hand
 import { PreviewLessonHandler } from '@/modules/lessons/application/query-handler/preview-lesson.handler';
 import { ServiceModule } from '@/common/service/service.module';
 import { CoursesModule } from '@/modules/courses/courses.module';
+import { EnrollmentsModule } from '@/modules/enrollments/enrollments.module';
 import { LessonPublicController } from '@/modules/lessons/presentation/lesson-public.controller';
+import { SectionOrmEntity } from '@/modules/sections/infrastructure/entity/section.orm-entity';
 
 const CommandHandlers = [
   CreateLessonHandler,
@@ -39,11 +41,12 @@ const QueryHandlers = [
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([LessonOrmEntity]),
+    TypeOrmModule.forFeature([LessonOrmEntity, SectionOrmEntity]),
     SectionsModule,
     forwardRef(() => CoursesModule),
     StorageModule,
     ServiceModule,
+    EnrollmentsModule,
   ],
 
   controllers: [LessonController, LessonPublicController],

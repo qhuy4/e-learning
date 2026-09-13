@@ -22,7 +22,15 @@ export class EnrollmentMapper {
         ? { id: entity.user.id, name: entity.user.name, email: entity.user.email }
         : undefined,
       course: entity.course
-        ? { id: entity.course.id, title: entity.course.title, thumbnail: entity.course.thumbnail }
+        ? {
+            id: entity.course.id,
+            title: entity.course.title,
+            thumbnail: entity.course.thumbnail,
+            slug: entity.course.slug,
+            instructorName: entity.course.instructorUser
+              ? entity.course.instructorUser.name || entity.course.instructorUser.email
+              : null,
+          }
         : undefined,
     });
   }

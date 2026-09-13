@@ -1,9 +1,9 @@
 export const OrderStatus = {
-  PENDING: '0',
-  PAID: '1',
-  FAILED: '2',
-  REFUNDED: '3',
-  CANCELLED: '4',
+  PENDING: 1,
+  PAID: 3,
+  FAILED: 4,
+  REFUNDED: 5,
+  CANCELLED: 6,
 } as const;
 
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];

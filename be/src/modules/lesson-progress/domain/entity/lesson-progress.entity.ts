@@ -21,7 +21,7 @@ export class LessonProgress {
     this.completedAt = new Date();
   }
 
-  updateProgress(position: number, watchedSeconds: number, percent: number) {
+  updateProgress(watchedSeconds: number, percent: number) {
     this.watchSeconds = watchedSeconds;
     this.progressPercent = percent;
 

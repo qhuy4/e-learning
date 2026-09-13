@@ -20,8 +20,12 @@ import { QueryBus, CommandBus } from '@nestjs/cqrs';
 
 import { GetCoursesDto } from '@/modules/courses/presentation/dto/get-courses.dto';
 import { GetCoursesQuery } from '@/modules/courses/application/query/get-courses.query';
+import { GetCatalogCoursesDto } from '@/modules/courses/presentation/dto/get-catalog-courses.dto';
+import { GetCatalogCoursesQuery } from '@/modules/courses/application/query/get-catalog-courses.query';
+import { CatalogCourseDto } from '@/modules/courses/presentation/dto/catalog-course.dto';
 
 import { GetCourseBySlugQuery } from '@/modules/courses/application/query/get-course-by-slug.query';
+import { GetRelatedCoursesQuery } from '@/modules/courses/application/query/get-related-courses.query';
 
 import { CourseResponseDto } from '@/modules/courses/presentation/dto/course-response.dto';
 import { CourseDetailResponseDto } from '@/modules/courses/presentation/dto/course-detail-response.dto';
@@ -113,6 +117,27 @@ export class CoursesController {
     return this.queryBus.execute(new PreviewCourseQuery(token));
   }
 
+  @Get('catalog')
+  async findCatalog(
+    @Query() query: GetCatalogCoursesDto,
+  ): Promise<{ data: CatalogCourseDto[]; meta: any }> {
+    const levels = query.levels
+      ? query.levels.split(',').map((l) => Number(l.trim())).filter((n) => !isNaN(n))
+      : undefined;
+
+    return this.queryBus.execute(
+      new GetCatalogCoursesQuery(
+        query.page,
+        query.limit,
+        query.keyword,
+        levels,
+        query.price ?? 'all',
+        query.minRating,
+        query.sort,
+      ),
+    );
+  }
+
   @Post(':id/preview-token')
   @UseGuards(JwtAuthGuard)
   async createPreviewToken(
@@ -120,6 +145,16 @@ export class CoursesController {
     @CurrentUser() user: User,
   ): Promise<{ token: string }> {
     return this.commandBus.execute(new CreatePreviewTokenCommand(user, id));
+  }
+
+  @Get('slug/:slug/related')
+  async findRelated(
+    @Param('slug') slug: string,
+    @Query('limit') limit?: number,
+  ): Promise<CatalogCourseDto[]> {
+    return this.queryBus.execute(
+      new GetRelatedCoursesQuery(slug, limit ?? 4),
+    );
   }
 
   @Get(':slug')
