@@ -1,0 +1,74 @@
+import { CouponType } from '@/modules/coupons/domain/enum/coupon-type.enum';
+import { CouponScope } from '@/modules/coupons/domain/enum/coupon-scope.enum';
+import { CouponOwnerType } from '@/modules/coupons/domain/enum/coupon-owner-type.enum';
+
+export class Coupon {
+  private constructor(
+    public readonly id: number | null,
+    public readonly createdBy: number,
+    public readonly code: string,
+    public readonly discountType: CouponType,
+    public readonly discountValue: number,
+    public readonly minOrderAmount: number,
+    public readonly maxDiscountAmount: number | null,
+    public readonly usageLimit: number | null,
+    public readonly usageLimitPerUser: number,
+    public readonly usedCount: number,
+    public readonly scope: CouponScope,
+    public readonly couponOwnerType: CouponOwnerType,
+    public readonly isActive: boolean,
+    public readonly validFrom: Date,
+    public readonly description: string | null,
+    public readonly validUntil: Date | null,
+    public readonly createdAt: Date | null,
+    public readonly updatedAt: Date | null,
+    public courses?: any[],
+    public creator?: any,
+  ) {}
+
+  static restore(params: {
+    id: number;
+    createdBy: number;
+    code: string;
+    discountType: CouponType;
+    discountValue: number;
+    minOrderAmount: number;
+    maxDiscountAmount: number | null;
+    usageLimit: number | null;
+    usageLimitPerUser: number;
+    usedCount: number;
+    scope: CouponScope;
+    couponOwnerType: CouponOwnerType;
+    isActive: boolean;
+    validFrom: Date;
+    description: string | null;
+    validUntil: Date | null;
+    createdAt: Date | null;
+    updatedAt: Date | null;
+    courses?: any[];
+    creator?: any;
+  }): Coupon {
+    return new Coupon(
+      params.id,
+      params.createdBy,
+      params.code,
+      params.discountType,
+      params.discountValue,
+      params.minOrderAmount,
+      params.maxDiscountAmount,
+      params.usageLimit,
+      params.usageLimitPerUser,
+      params.usedCount,
+      params.scope,
+      params.couponOwnerType,
+      params.isActive,
+      params.validFrom,
+      params.description,
+      params.validUntil,
+      params.createdAt,
+      params.updatedAt,
+      params.courses,
+      params.creator,
+    );
+  }
+}

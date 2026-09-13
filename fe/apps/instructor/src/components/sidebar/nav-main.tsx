@@ -13,6 +13,11 @@ export function NavMain({ groups }: {
 }) {
     const location = useLocation();
 
+    const isActive = (url: string) => {
+        if (url === "/") return location.pathname === "/";
+        return location.pathname === url || location.pathname.startsWith(url + "/");
+    };
+
     return (
         <SidebarGroup>
             <SidebarGroupContent className="flex flex-col gap-2">
@@ -27,18 +32,18 @@ export function NavMain({ groups }: {
 
                             {group.items.map((item) => {
                                 const Icon = item.icon
-                                const isActive = location.pathname === item.url;
+                                const active = isActive(item.url);
 
                                 return (
                                     <SidebarMenuItem key={item.title}>
                                         <SidebarMenuButton
                                             tooltip={item.title}
-                                            isActive={isActive}
+                                            isActive={active}
                                             render={<NavLink to={item.url} />}
-                                            className={isActive ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200 hover:text-emerald-900 dark:bg-emerald-900/30 dark:text-emerald-400" : ""}
+                                            className={active ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200 hover:text-emerald-900 dark:bg-emerald-900/30 dark:text-emerald-400" : ""}
                                         >
-                                            {Icon && <Icon className={isActive ? "text-emerald-600 dark:text-emerald-400" : ""} />}
-                                            <span className={`text-sm ${isActive ? "font-semibold" : "font-medium"}`}>{item.title}</span>
+                                            {Icon && <Icon className={active ? "text-emerald-600 dark:text-emerald-400" : ""} />}
+                                            <span className={`text-sm ${active ? "font-semibold" : "font-medium"}`}>{item.title}</span>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
                                 )

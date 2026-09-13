@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsInt,
   IsNumber,
   IsOptional,
@@ -7,7 +8,7 @@ import {
   Min,
 } from 'class-validator';
 
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class UpdateCourseDto {
   @IsOptional()
@@ -54,4 +55,21 @@ export class UpdateCourseDto {
   @IsInt()
   @Min(1)
   status?: number;
+
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? parsed : [parsed];
+      } catch {
+        return value ? [value] : [];
+      }
+    }
+    return [];
+  })
+  @IsArray()
+  @Type(() => String)
+  categories?: string[];
 }

@@ -33,4 +33,14 @@ export interface IEnrollmentRepository {
   existsActiveByUserAndCourse(userId: number, courseId: number): Promise<boolean>;
 
   existsActiveByUserAndCourseSlug(userId: number, courseSlug: string): Promise<boolean>;
+  findAllByInstructorId(options: {
+    instructorId: number;
+    page: number;
+    limit: number;
+    keyword?: string;
+    status?: number;
+    courseId?: number;
+  }): Promise<{ data: any[]; meta: { page: number; limit: number; total: number; totalPages: number } }>;
+
+  findById(id: number): Promise<any | null>;
 }

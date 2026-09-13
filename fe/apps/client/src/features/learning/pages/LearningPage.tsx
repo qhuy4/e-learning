@@ -80,7 +80,7 @@ export const LearningPage = () => {
   });
 
   const navigate = useNavigate();
-  const currentIndex = allLessons.findIndex(l => l.slug === lessonData?.slug);
+  const currentIndex = allLessons.findIndex((l: any) => l.slug === lessonData?.slug);
   const prevLesson = currentIndex > 0 ? allLessons[currentIndex - 1] : null;
   const nextLesson = currentIndex >= 0 && currentIndex < allLessons.length - 1 ? allLessons[currentIndex + 1] : null;
 

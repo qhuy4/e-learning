@@ -1,7 +1,19 @@
 import { api } from "@fe/lib/axios";
 import { instructorApi } from "@/shared/lib/axios";
 
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  children?: Category[];
+}
+
 export const courseService = {
+  async getCategories() {
+    const response = await api.get("/categories");
+    return response.data;
+  },
+
   async getCourses(params: {
     page?: number;
     limit?: number;
@@ -43,17 +55,17 @@ export const courseService = {
   },
 
   async createSection(courseId: number, section: { title: string; position?: number; description?: string }) {
-    const response = await api.post(`/courses/${courseId}/sections`, section);
+    const response = await instructorApi.post(`/courses/${courseId}/sections`, section);
     return response.data;
   },
 
   async updateSection(courseId: number, sectionId: number, data: { title?: string; position?: number }) {
-    const response = await api.patch(`/courses/${courseId}/sections/${sectionId}`, data);
+    const response = await instructorApi.patch(`/courses/${courseId}/sections/${sectionId}`, data);
     return response.data;
   },
 
   async deleteSection(courseId: number, sectionId: number) {
-    const response = await api.delete(`/courses/${courseId}/sections/${sectionId}`);
+    const response = await instructorApi.delete(`/courses/${courseId}/sections/${sectionId}`);
     return response.data;
   },
 

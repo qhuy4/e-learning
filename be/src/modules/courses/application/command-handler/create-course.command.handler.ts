@@ -2,6 +2,8 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SlugUtil } from '../../../../common/utils/slug.util';
 import { extname } from 'path';
 import { randomUUID } from 'crypto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, In } from 'typeorm';
 
 import { CreateCourseCommand } from '@/modules/courses/application/command/create-course.command';
 import { Course } from '@/modules/courses/domain/entity/course.entity';
@@ -13,6 +15,8 @@ import {
   FILE_STORAGE,
   FileStorage,
 } from '@/common/storage/domain/interface/file-storage.interface';
+import { CategoryOrmEntity } from '@/modules/categories/infrastructure/entity/category.orm-entity';
+import { CategoryCourseOrmEntity } from '@/modules/categories/infrastructure/entity/category-course.orm-entity';
 
 import { Inject, ConflictException } from '@nestjs/common';
 
@@ -24,6 +28,12 @@ export class CreateCourseHandler implements ICommandHandler<CreateCourseCommand>
 
     @Inject(FILE_STORAGE)
     private readonly storage: FileStorage,
+
+    @InjectRepository(CategoryOrmEntity)
+    private readonly categoryRepo: Repository<CategoryOrmEntity>,
+
+    @InjectRepository(CategoryCourseOrmEntity)
+    private readonly categoryCourseRepo: Repository<CategoryCourseOrmEntity>,
   ) {}
 
   async execute(command: CreateCourseCommand) {
@@ -63,6 +73,26 @@ export class CreateCourseHandler implements ICommandHandler<CreateCourseCommand>
       });
 
       const createdCourse = await this.courseRepository.create(course);
+
+      if (command.categories && command.categories.length > 0) {
+        const categories = await this.categoryRepo.find({
+          where: { name: In(command.categories) },
+        });
+
+        if (categories.length > 0) {
+          const pivots = categories.map((cat) => ({
+            courseId: createdCourse.id!.toString(),
+            categoryId: cat.id,
+          }));
+          await this.categoryCourseRepo
+            .createQueryBuilder()
+            .insert()
+            .into(CategoryCourseOrmEntity)
+            .values(pivots)
+            .orIgnore()
+            .execute();
+        }
+      }
 
       return {
         id: createdCourse.id,

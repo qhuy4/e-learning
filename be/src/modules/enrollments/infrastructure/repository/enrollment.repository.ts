@@ -120,6 +120,29 @@ export class EnrollmentRepository implements IEnrollmentRepository {
 
     if (keyword) {
       query.andWhere('course.title ILIKE :keyword', { keyword: `%${keyword}%` });
+  async findAllByInstructorId(options: {
+    instructorId: number;
+    page: number;
+    limit: number;
+    keyword?: string;
+    status?: number;
+    courseId?: number;
+  }) {
+    const { instructorId, page, limit, keyword, status, courseId } = options;
+
+    const query = this.repository
+      .createQueryBuilder('enrollment')
+      .leftJoinAndSelect('enrollment.user', 'user')
+      .leftJoinAndSelect('enrollment.course', 'course')
+      .where('course.instructorId = :instructorId', { instructorId });
+
+    if (keyword) {
+      query.andWhere(
+        new Brackets((qb) => {
+          qb.where('user.name ILIKE :keyword', { keyword: `%${keyword}%` })
+            .orWhere('user.email ILIKE :keyword', { keyword: `%${keyword}%` });
+        }),
+      );
     }
 
     if (status !== undefined) {
@@ -137,6 +160,12 @@ export class EnrollmentRepository implements IEnrollmentRepository {
 
     query
       .orderBy(sortKey, sortDirection)
+    if (courseId !== undefined) {
+      query.andWhere('course.id = :courseId', { courseId });
+    }
+
+    query
+      .orderBy('enrollment.created_at', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
 
@@ -195,5 +224,16 @@ export class EnrollmentRepository implements IEnrollmentRepository {
       .getCount();
 
     return count > 0;
+    const data = entities.map((entity) => EnrollmentMapper.toDomain(entity));
+
+    return {
+      data,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 }

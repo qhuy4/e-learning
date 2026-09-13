@@ -11,6 +11,7 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  Req,
 } from '@nestjs/common';
 
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -47,12 +48,17 @@ import { Course } from '@/modules/courses/domain/entity/course.entity';
 import { RejectCourseCommand } from '@/modules/courses/application/command/reject-course.command';
 import { ApproveCourseCommand } from '@/modules/courses/application/command/approve-course.command';
 import { CancelReviewCourseCommand } from '@/modules/courses/application/command/cancel-review-course.command';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CourseViewOrmEntity } from '@/modules/analytics/infrastructure/entity/course-view.orm-entity';
 
 @Controller('courses')
 export class CoursesController {
   constructor(
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
+    @InjectRepository(CourseViewOrmEntity)
+    private readonly courseViewRepo: Repository<CourseViewOrmEntity>,
   ) {}
 
   @Get()
@@ -242,6 +248,24 @@ export class CoursesController {
   @Post(':id/cancel-review')
   async cancelReview(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.commandBus.execute(new CancelReviewCourseCommand(id));
+  }
+
+  @Post(':id/view')
+  async recordView(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: any,
+  ): Promise<void> {
+    const userId = req.user?.id ?? null;
+    const ipAddress = req.ip ?? null;
+    const userAgent = req.headers?.['user-agent'] ?? null;
+
+    const view = this.courseViewRepo.create({
+      courseId: id,
+      userId: userId ? Number(userId) : null,
+      ipAddress,
+      userAgent,
+    });
+    await this.courseViewRepo.save(view);
   }
 
   @Delete(':id')

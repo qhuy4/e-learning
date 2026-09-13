@@ -14,6 +14,11 @@ import {
     Star,
     Users,
     DollarSign,
+    CreditCard,
+    Plus,
+    Building2,
+    Check,
+    X,
 } from "lucide-react"
 
 import {Button} from "@fe/components/ui/button"
@@ -32,6 +37,9 @@ import {
 import {userStatusLabel} from "@/features/users/constants/users.constants.ts";
 import {DeleteConfirmDialog} from "@/features/users/components/delete-confirm-diialog.tsx";
 import type {Instructor} from "@/features/instructors/type/instructor.ts";
+import {usePayoutAccounts, useDeletePayoutAccount} from "@/features/instructors/hooks/use-payout-accounts.ts";
+import {accountTypeLabel, accountTypeClassName, type PayoutAccount} from "@/features/instructors/types/payout-account.ts";
+import {toast} from "sonner";
 
 function statusVariant(status: UserStatus) {
     if (status === UserStatus.ACTIVE) return "default" as const
@@ -259,6 +267,99 @@ export function InstructorDetailPage() {
                 user={instructor as any}
                 onSuccess={() => navigate("/instructors")}
             />
+
+            {/* Payout Accounts Section */}
+            {p && <PayoutAccountsSection instructorProfileId={String(p.id)} />}
         </div>
     )
+}
+
+function PayoutAccountsSection({instructorProfileId}: {instructorProfileId: string}) {
+    const {data, isLoading} = usePayoutAccounts(instructorProfileId);
+    const deleteMutation = useDeletePayoutAccount();
+    const accounts = data?.data ?? [];
+
+    const handleDelete = (account: PayoutAccount) => {
+        const loadingId = toast.loading("Đang xóa tài khoản...");
+        deleteMutation.mutate(account.id, {
+            onSuccess: () => {
+                toast.success("Đã xóa tài khoản thanh toán", {id: loadingId});
+            },
+            onError: (error: any) => {
+                const msg = error?.response?.data?.message || error?.message || "Không thể xóa";
+                toast.error(msg, {id: loadingId});
+            },
+        });
+    };
+
+    return (
+        <div className="rounded-xl border bg-card p-6 space-y-4">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <CreditCard className="size-4 text-muted-foreground"/>
+                    <h2 className="text-sm font-semibold">Tài khoản thanh toán</h2>
+                </div>
+                <Badge variant="secondary">{accounts.length}</Badge>
+            </div>
+            <Separator/>
+
+            {isLoading ? (
+                <div className="text-sm text-muted-foreground py-4 text-center">Đang tải...</div>
+            ) : accounts.length === 0 ? (
+                <div className="text-sm text-muted-foreground py-4 text-center">
+                    Chưa có tài khoản thanh toán nào.
+                </div>
+            ) : (
+                <div className="space-y-3">
+                    {accounts.map((account) => (
+                        <div
+                            key={account.id}
+                            className="flex items-center justify-between rounded-lg border p-4"
+                        >
+                            <div className="flex items-center gap-3 min-w-0">
+                                <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted">
+                                    <Building2 className="size-4 text-muted-foreground"/>
+                                </div>
+                                <div className="min-w-0">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <span className="text-sm font-medium">{account.accountHolderName}</span>
+                                        <Badge className={accountTypeClassName[account.accountType] ?? ""}>
+                                            {accountTypeLabel[account.accountType] ?? account.accountType}
+                                        </Badge>
+                                        {account.isPrimary && (
+                                            <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                                                Chính
+                                            </Badge>
+                                        )}
+                                        {account.isVerified && (
+                                            <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                                                <Check className="size-3 mr-1"/>
+                                                Đã xác minh
+                                            </Badge>
+                                        )}
+                                    </div>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                        {account.bankName && `${account.bankName}`}
+                                        {account.bankBranch && ` - ${account.bankBranch}`}
+                                        {account.accountNumber && ` | STK: ${account.accountNumber}`}
+                                        {account.paypalEmail && ` | ${account.paypalEmail}`}
+                                        {` (${account.currency})`}
+                                    </p>
+                                </div>
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-destructive hover:text-destructive shrink-0"
+                                onClick={() => handleDelete(account)}
+                                disabled={deleteMutation.isPending}
+                            >
+                                <Trash2 className="size-3.5"/>
+                            </Button>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
 }

@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { Input } from "@fe/components/ui/input";
 import { Label } from "@fe/components/ui/label";
 import { Button } from "@fe/components/ui/button";
-import {ImagePlus,Type,DollarSign,AlignLeft,CheckCircle2,Plus,Trash2,X,} from "lucide-react";
+import {ImagePlus,Type,DollarSign,AlignLeft,CheckCircle2,Plus,Trash2,X,Tag,ChevronDown,ChevronRight,} from "lucide-react";
 import {Card,CardContent,CardHeader,CardTitle,CardDescription,
 } from "@fe/components/ui/card";
 import type { Course } from "../../types/course.types";
 import { CourseLevel } from "../../types/course.types";
+import { useGetCategories } from "../../hook/use-courses";
+import type { Category } from "../../services/course.service";
 
 interface CourseInfoStepProps {
   data: Course;
@@ -15,6 +17,24 @@ interface CourseInfoStepProps {
 
 export function CourseInfoStep({ data, updateData }: CourseInfoStepProps) {
   const benefits = data.benefits || [""];
+  const { data: categoriesData } = useGetCategories();
+  const selectedCategories = data.categories || [];
+  const [showCategoryPicker, setShowCategoryPicker] = useState(false);
+
+  const allCategories: Category[] = categoriesData?.data?.data ?? [];
+
+  const toggleCategory = (cat: { id: string; name: string; slug: string }) => {
+    const isSelected = selectedCategories.some((c) => c.id === cat.id);
+    if (isSelected) {
+      updateData({
+        categories: selectedCategories.filter((c) => c.id !== cat.id),
+      });
+    } else {
+      updateData({
+        categories: [...selectedCategories, cat],
+      });
+    }
+  };
 
   const getInitialPreview = () => {
     if (!data.thumbnail) return null;
@@ -247,6 +267,101 @@ export function CourseInfoStep({ data, updateData }: CourseInfoStepProps) {
 
                 <option value={CourseLevel.ADVANCED}>Nâng cao</option>
               </select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="font-medium flex items-center gap-2">
+                <Tag className="w-4 h-4 text-emerald-600 dark:text-emerald-500" />
+                Danh mục
+              </Label>
+
+              {selectedCategories.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {selectedCategories.map((cat) => (
+                    <span
+                      key={cat.id}
+                      className="inline-flex items-center gap-1 rounded-sm bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-1 text-xs"
+                    >
+                      {cat.name}
+                      <button
+                        type="button"
+                        onClick={() => toggleCategory(cat)}
+                        className="hover:text-emerald-900 dark:hover:text-emerald-200"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowCategoryPicker(!showCategoryPicker)}
+                  className="flex h-11 w-full items-center justify-between rounded-sm border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                >
+                  <span className="text-muted-foreground">
+                    {selectedCategories.length > 0
+                      ? `Đã chọn ${selectedCategories.length} danh mục`
+                      : "Chọn danh mục..."}
+                  </span>
+                  {showCategoryPicker ? (
+                    <ChevronDown className="h-4 w-4 opacity-50" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4 opacity-50" />
+                  )}
+                </button>
+
+                {showCategoryPicker && (
+                  <div className="absolute z-50 mt-1 w-full rounded-sm border border-border bg-background shadow-md max-h-60 overflow-auto">
+                    {allCategories.map((parent) => (
+                      <div key={parent.id}>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            toggleCategory({ id: parent.id, name: parent.name, slug: parent.slug })
+                          }
+                          className={`w-full text-left px-3 py-2 text-sm hover:bg-muted flex items-center justify-between ${
+                            selectedCategories.some((c) => c.id === parent.id)
+                              ? "bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400"
+                              : ""
+                          }`}
+                        >
+                          <span className="font-medium">{parent.name}</span>
+                          {selectedCategories.some((c) => c.id === parent.id) && (
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                          )}
+                        </button>
+                        {parent.children?.map((child) => (
+                          <button
+                            key={child.id}
+                            type="button"
+                            onClick={() =>
+                              toggleCategory({ id: child.id, name: child.name, slug: child.slug })
+                            }
+                            className={`w-full text-left pl-8 pr-3 py-2 text-sm hover:bg-muted flex items-center justify-between ${
+                              selectedCategories.some((c) => c.id === child.id)
+                                ? "bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400"
+                                : ""
+                            }`}
+                          >
+                            <span>{child.name}</span>
+                            {selectedCategories.some((c) => c.id === child.id) && (
+                              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    ))}
+                    {allCategories.length === 0 && (
+                      <div className="px-3 py-4 text-sm text-muted-foreground text-center">
+                        Không có danh mục nào
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="space-y-2">
