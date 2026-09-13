@@ -1,7 +1,7 @@
 import { Inject, Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import slugify from 'slugify';
 import { extname } from 'path';
 import { randomUUID } from 'crypto';
@@ -21,6 +21,8 @@ import { SectionOrmEntity } from '@/modules/sections/infrastructure/entity/secti
 import { LessonOrmEntity } from '@/modules/lessons/infrastructure/entity/lesson.orm-entity';
 import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';
+import { CategoryOrmEntity } from '@/modules/categories/infrastructure/entity/category.orm-entity';
+import { CategoryCourseOrmEntity } from '@/modules/categories/infrastructure/entity/category-course.orm-entity';
 
 const PENDING_REVIEW_STATUS = 2;
 
@@ -40,6 +42,12 @@ export class UpdateCourseHandler implements ICommandHandler<UpdateCourseCommand>
 
     @InjectRepository(LessonOrmEntity)
     private readonly lessonRepo: Repository<LessonOrmEntity>,
+
+    @InjectRepository(CategoryOrmEntity)
+    private readonly categoryRepo: Repository<CategoryOrmEntity>,
+
+    @InjectRepository(CategoryCourseOrmEntity)
+    private readonly categoryCourseRepo: Repository<CategoryCourseOrmEntity>,
   ) {}
 
   async execute(command: UpdateCourseCommand) {
@@ -113,6 +121,36 @@ export class UpdateCourseHandler implements ICommandHandler<UpdateCourseCommand>
       );
       const updatedCourse = await this.courseRepository.update(course);
 
+      if (command.data.categories !== undefined) {
+        const courseIdStr = command.id.toString();
+        await this.categoryCourseRepo
+          .createQueryBuilder()
+          .delete()
+          .from(CategoryCourseOrmEntity)
+          .where('course_id = :courseId', { courseId: courseIdStr })
+          .execute();
+
+        if (command.data.categories.length > 0) {
+          const categories = await this.categoryRepo.find({
+            where: { name: In(command.data.categories) },
+          });
+
+          if (categories.length > 0) {
+            const pivots = categories.map((cat) => ({
+              courseId: courseIdStr,
+              categoryId: cat.id,
+            }));
+            await this.categoryCourseRepo
+              .createQueryBuilder()
+              .insert()
+              .into(CategoryCourseOrmEntity)
+              .values(pivots)
+              .orIgnore()
+              .execute();
+          }
+        }
+      }
+
       if (oldThumbnail) {
         this.storage
           .delete(oldThumbnail)
@@ -121,7 +159,7 @@ export class UpdateCourseHandler implements ICommandHandler<UpdateCourseCommand>
           );
       }
 
-      return AdminCourseDtoMapper.toDetailDto(updatedCourse, this.storage);
+      return AdminCourseDtoMapper.toDetailDto(updatedCourse, this.storage, this.categoryCourseRepo, this.categoryRepo);
     } catch (error) {
       this.logger.error(
         `Failed to update course id=${command.id}: ${error.message}`,

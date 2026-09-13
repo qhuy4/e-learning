@@ -17,6 +17,7 @@ export interface AdminCourse {
     createdAt: Date | null;
     updatedAt: Date | null;
     sections?: AdminCourseSection[];
+    categories?: { id: string; name: string; slug: string }[];
 }
 
 export interface AdminCourseSection {

@@ -240,6 +240,21 @@ export function CourseDetailPage() {
 
                 <Separator/>
 
+                {course.categories && course.categories.length > 0 && (
+                    <div className="space-y-1.5">
+                        <p className="text-sm font-medium text-muted-foreground">Danh mục</p>
+                        <div className="flex flex-wrap gap-2">
+                            {course.categories.map((cat) => (
+                                <Badge key={cat.id} className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                                    {cat.name}
+                                </Badge>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                <Separator/>
+
                 <div className="grid grid-cols-4 gap-4 text-sm">
                     <div>
                         <p className="text-muted-foreground">Chương</p>

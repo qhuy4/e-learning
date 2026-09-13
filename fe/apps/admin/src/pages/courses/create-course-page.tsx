@@ -21,7 +21,7 @@ import {
   useGetCourseDetail,
   useUpdateCourse,
   useCancelReviewCourse,
-} from "@/features/courses/hook/use-courses";
+} from "@/features/courses/hooks/use-courses";
 import { validateCourse, validateCourseEdit } from "@/features/courses/schemas/course.schema";
 
 import { Button } from "@fe/components/ui/button";

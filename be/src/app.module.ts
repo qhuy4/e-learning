@@ -17,8 +17,11 @@ import { LessonProgressModule } from './modules/lesson-progress/lesson-progress.
 import { ReviewsModule } from '@/modules/reviews/reviews.module';
 import { OrdersModule } from '@/modules/orders/orders.module';
 import { EnrollmentsModule } from '@/modules/enrollments/enrollments.module';
-import { PaymentsModule } from '@/modules/payments/payments.module';
-import { HomeModule } from '@/modules/home/home.module';
+import { CouponsModule } from '@/modules/coupons/coupons.module';
+import { CategoriesModule } from '@/modules/categories/categories.module';
+import { InstructorPayoutsModule } from '@/modules/instructor-payouts/instructor-payouts.module';
+import { CourseQuestionsModule } from '@/modules/course-questions/course-questions.module';
+import { ReviewReportsModule } from '@/modules/review-reports/review-reports.module';
 
 @Module({
   imports: [
@@ -36,6 +39,11 @@ import { HomeModule } from '@/modules/home/home.module';
     ReviewsModule,
     OrdersModule,
     EnrollmentsModule,
+    CouponsModule,
+    CategoriesModule,
+    InstructorPayoutsModule,
+    CourseQuestionsModule,
+    ReviewReportsModule,
     UserModule,
     AuthModule,
     InstructorModule,
@@ -45,8 +53,6 @@ import { HomeModule } from '@/modules/home/home.module';
     LessonsModule,
     StorageModule,
     LessonProgressModule,
-    PaymentsModule,
-    HomeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

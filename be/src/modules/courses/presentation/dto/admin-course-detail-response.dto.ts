@@ -61,4 +61,6 @@ export class AdminCourseDetailResponseDto {
       deletedAt: Date | null;
     }[];
   }[];
+
+  categories: { id: string; name: string; slug: string }[];
 }

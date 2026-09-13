@@ -41,11 +41,10 @@ import { PreviewCourseQueryHandler } from '@/modules/courses/application/query-h
 import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
 import { LessonOrmEntity } from '@/modules/lessons/infrastructure/entity/lesson.orm-entity';
 import { SectionOrmEntity } from '@/modules/sections/infrastructure/entity/section.orm-entity';
-import { InstructorProfileTypeOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-profile.orm.entity';
 import { GetAdminCourseByIdHandler } from '@/modules/courses/application/query-handler/get-admin-course-by-id.handler';
-import { GetCatalogCoursesHandler } from '@/modules/courses/application/query-handler/get-catalog-courses.handler';
-import { GetRelatedCoursesHandler } from '@/modules/courses/application/query-handler/get-related-courses.handler';
-import { ReviewOrmEntity } from '@/modules/reviews/infrastructure/entity/review.orm-entity';
+import { CategoryOrmEntity } from '@/modules/categories/infrastructure/entity/category.orm-entity';
+import { CategoryCourseOrmEntity } from '@/modules/categories/infrastructure/entity/category-course.orm-entity';
+import { CourseViewOrmEntity } from '@/modules/analytics/infrastructure/entity/course-view.orm-entity';
 
 @Module({
   imports: [
@@ -57,8 +56,9 @@ import { ReviewOrmEntity } from '@/modules/reviews/infrastructure/entity/review.
       UserOrmEntity,
       LessonOrmEntity,
       SectionOrmEntity,
-      InstructorProfileTypeOrmEntity,
-      ReviewOrmEntity,
+      CategoryOrmEntity,
+      CategoryCourseOrmEntity,
+      CourseViewOrmEntity,
     ]),
     forwardRef(() => SectionsModule),
     LessonsModule,
@@ -99,8 +99,6 @@ import { ReviewOrmEntity } from '@/modules/reviews/infrastructure/entity/review.
     GetCourseBySlugHandler,
     GetCourseByIdHandler,
     PreviewCourseQueryHandler,
-    GetCatalogCoursesHandler,
-    GetRelatedCoursesHandler,
   ],
   exports: [COURSE_REPOSITORY],
 })

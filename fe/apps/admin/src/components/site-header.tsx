@@ -14,6 +14,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/instructors": "Giảng viên",
   "/instructors/approvals": "Duyệt Giảng Viên",
   "/earnings": "Doanh thu",
+  "/questions": "Hỏi đáp",
   "/reviews": "Đánh giá",
   "/users": "Users",
   "/settings": "Cài đặt",

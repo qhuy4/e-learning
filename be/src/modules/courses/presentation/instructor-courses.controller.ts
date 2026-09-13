@@ -80,6 +80,7 @@ export class InstructorCoursesController {
         dto.level,
         dto.price,
         dto.parentId,
+        dto.categories,
       ),
     );
   }
@@ -101,6 +102,7 @@ export class InstructorCoursesController {
         price: dto.price,
         status: dto.status,
         parentId: dto.parentId,
+        categories: dto.categories,
       }),
     );
   }

@@ -1,6 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { courseService } from "../services/course.service";
 
+export function useGetCategories() {
+  return useQuery({
+    queryKey: ["categories"],
+    queryFn: () => courseService.getCategories(),
+  });
+}
+
 export function useGetCourses(params: {
   page?: number;
   limit?: number;

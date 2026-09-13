@@ -1,5 +1,5 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@fe/components/ui/tabs';
-import { FileText, MessageSquare, ThumbsUp } from 'lucide-react';
+import { FileText, MessageSquare } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@fe/components/ui/avatar';
 import type { LessonDetail } from '../../types/learning.type';
 

@@ -9,9 +9,13 @@ import {
     Star,
     LogOut,
     UserCheck,
-    Shield,
+    UserRound,
     ShoppingCart,
     ClipboardList,
+    Tag,
+    FolderTree,
+    MessageCircle,
+    Flag,
 } from "lucide-react"
 import type { NavGroup, NavItem } from "@/shared/types/navigation"
 
@@ -45,9 +49,19 @@ export const navigation: Navigation = {
                     icon: Users,
                 },
                 {
+                    title: "Giảng viên",
+                    url: "/instructors",
+                    icon: GraduationCap,
+                },
+                {
                     title: "Duyệt Giảng Viên (eKYC)",
                     url: "/instructors/approvals",
                     icon: UserCheck,
+                },
+                {
+                    title: "Học viên",
+                    url: "/students",
+                    icon: UserRound,
                 },
             ],
         },
@@ -60,14 +74,9 @@ export const navigation: Navigation = {
                     icon: BookOpen,
                 },
                 {
-                    title: "Học viên",
-                    url: "/students",
-                    icon: GraduationCap,
-                },
-                {
-                    title: "Giảng viên",
-                    url: "/instructors",
-                    icon: Users,
+                    title: "Danh mục",
+                    url: "/categories",
+                    icon: FolderTree,
                 },
                 {
                     title: "Đánh giá",
@@ -78,6 +87,16 @@ export const navigation: Navigation = {
                     title: "Ghi danh",
                     url: "/enrollments",
                     icon: ClipboardList,
+                },
+                {
+                    title: "Hỏi đáp",
+                    url: "/questions",
+                    icon: MessageCircle,
+                },
+                {
+                    title: "Báo cáo",
+                    url: "/review-reports",
+                    icon: Flag,
                 },
             ],
         },
@@ -90,6 +109,11 @@ export const navigation: Navigation = {
                     icon: ShoppingCart,
                 },
                 {
+                    title: "Mã giảm giá",
+                    url: "/coupons",
+                    icon: Tag,
+                },
+                {
                     title: "Doanh thu",
                     url: "/earnings",
                     icon: DollarSign,
@@ -100,19 +124,14 @@ export const navigation: Navigation = {
 
     secondary: [
         {
-            title: "Hệ thống",
-            items: [
-                {
-                    title: "Cài đặt",
-                    url: "/settings",
-                    icon: Settings,
-                },
-                {
-                    title: "Đăng xuất",
-                    url: "/logout",
-                    icon: LogOut,
-                },
-            ],
+            title: "Cài đặt",
+            url: "/settings",
+            icon: Settings,
+        },
+        {
+            title: "Đăng xuất",
+            url: "/logout",
+            icon: LogOut,
         },
     ],
 }

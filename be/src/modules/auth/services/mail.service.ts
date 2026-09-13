@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 
@@ -63,10 +63,10 @@ export class MailService {
         this.logger.log(`Đã gửi email mời đăng ký giảng viên thành công tới: ${email}`);
       } catch (error) {
         this.logger.error(`Lỗi khi gửi email qua SMTP: ${(error as Error).message}`);
-        throw new Error(`Không thể gửi email tới ${email}. Vui lòng kiểm tra lại cấu hình SMTP: ${(error as Error).message}`);
+        throw new BadRequestException(`Không thể gửi email tới ${email}. Vui lòng kiểm tra lại cấu hình SMTP: ${(error as Error).message}`);
       }
     } else {
-      throw new Error(
+      throw new BadRequestException(
         'Hệ thống chưa được cấu hình tài khoản gửi mail (SMTP). Vui lòng thêm SMTP_HOST, SMTP_USER, SMTP_PASS vào file .env.',
       );
     }

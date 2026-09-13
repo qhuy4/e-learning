@@ -10,6 +10,8 @@ const PAGE_TITLES: Record<string, string> = {
   "/courses": "Khóa học",
   "/students": "Học viên",
   "/revenue": "Doanh thu",
+  "/availability": "Lịch giảng dạy",
+  "/certificates": "Chứng chỉ",
   "/profile": "Hồ sơ",
 };
 
@@ -19,6 +21,11 @@ export function SiteHeader() {
 
   const getPageTitle = () => {
     if (PAGE_TITLES[location.pathname]) return PAGE_TITLES[location.pathname];
+    if (location.pathname.startsWith("/courses/create")) return "Tạo khóa học";
+    if (location.pathname.startsWith("/courses/")) return "Chỉnh sửa khóa học";
+    if (location.pathname.startsWith("/certificates/create")) return "Tạo chứng chỉ";
+    if (location.pathname.startsWith("/certificates/")) return "Chi tiết chứng chỉ";
+    if (location.pathname.startsWith("/lessons/")) return "Chỉnh sửa bài học";
     return "Tổng quan";
   };
 
