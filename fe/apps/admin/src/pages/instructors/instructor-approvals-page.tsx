@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   adminInstructorService,
-  type PendingInstructorProfile,
 } from "@/features/instructors/service";
+import type { PendingInstructorProfile } from "@/features/instructors/type/pending-instructor.ts";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { useConfirmDialog } from "@/hooks/use-confirm-dialog";
+import { DataTable } from "@/components/common/data-table/data-table.tsx";
+import { createInstructorApprovalColumns } from "@/features/instructors/approval-columns.tsx";
 
 const getMediaUrl = (pathStr: string | null | undefined) => {
   if (!pathStr) return "";
@@ -18,6 +20,9 @@ export const InstructorApprovalsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [profiles, setProfiles] = useState<PendingInstructorProfile[]>([]);
   const [statusFilter, setStatusFilter] = useState<number | undefined>(1); // 1 = PENDING default
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [search, setSearch] = useState("");
   const [selectedProfile, setSelectedProfile] =
     useState<PendingInstructorProfile | null>(null);
 
@@ -50,6 +55,23 @@ export const InstructorApprovalsPage: React.FC = () => {
   useEffect(() => {
     fetchProfiles(statusFilter);
   }, [statusFilter]);
+
+  const filteredProfiles = useMemo(() => {
+    const keyword = search.trim().toLocaleLowerCase("vi");
+    if (!keyword) return profiles;
+
+    return profiles.filter((profile) =>
+      [profile.user?.name, profile.user?.email, profile.headline, profile.bio, profile.kyc?.identityNumber]
+        .some((value) => value?.toLocaleLowerCase("vi").includes(keyword)),
+    );
+  }, [profiles, search]);
+
+  const totalPages = Math.ceil(filteredProfiles.length / pageSize);
+  const visibleProfiles = useMemo(
+    () => filteredProfiles.slice((page - 1) * pageSize, page * pageSize),
+    [filteredProfiles, page, pageSize],
+  );
+  const columns = useMemo(() => createInstructorApprovalColumns(), []);
 
   const handleApprove = async (profileId: number) => {
     const ok = await confirm({
@@ -128,12 +150,6 @@ export const InstructorApprovalsPage: React.FC = () => {
             cấp chuyên môn của giảng viên
           </p>
         </div>
-        <button
-          onClick={() => fetchProfiles(statusFilter)}
-          className="px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm font-semibold rounded-lg transition-colors inline-flex items-center gap-2 self-start sm:self-auto"
-        >
-          <span>↻</span> Làm mới
-        </button>
       </div>
 
       {/* Filter Tabs */}
@@ -146,7 +162,10 @@ export const InstructorApprovalsPage: React.FC = () => {
         ].map((tab) => (
           <button
             key={String(tab.val)}
-            onClick={() => setStatusFilter(tab.val)}
+            onClick={() => {
+              setStatusFilter(tab.val);
+              setPage(1);
+            }}
             className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
               statusFilter === tab.val
                 ? "bg-indigo-600 text-white shadow-sm"
@@ -158,144 +177,36 @@ export const InstructorApprovalsPage: React.FC = () => {
         ))}
       </div>
 
-      {/* Main Content List */}
-      {loading ? (
-        <div className="text-center py-16">
-          <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-          <p className="text-gray-500 text-sm">Đang tải danh sách hồ sơ...</p>
-        </div>
-      ) : profiles.length === 0 ? (
-        <div className="text-center py-16 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800">
-          <div className="text-4xl mb-3">📋</div>
-          <h3 className="text-base font-semibold text-gray-800 dark:text-gray-200">
-            Không có hồ sơ nào trong mục này
-          </h3>
-          <p className="text-sm text-gray-500 mt-1">
-            Các hồ sơ đăng ký mới từ giảng viên sẽ xuất hiện tại đây để đối soát.
-          </p>
-        </div>
-      ) : (
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-semibold border-b border-gray-200 dark:border-gray-700">
-                <tr>
-                  <th className="px-6 py-4">Giảng viên</th>
-                  <th className="px-6 py-4">Chuyên môn / Bio</th>
-                  <th className="px-6 py-4">Kết quả eKYC (AI)</th>
-                  <th className="px-6 py-4">Bằng cấp</th>
-                  <th className="px-6 py-4">Trạng thái</th>
-                  <th className="px-6 py-4 text-right">Thao tác</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-800 text-gray-700 dark:text-gray-300">
-                {profiles.map((profile) => (
-                  <tr
-                    key={profile.profileId}
-                    className="hover:bg-gray-50/80 dark:hover:bg-gray-800/50 transition-colors"
-                  >
-                    <td className="px-6 py-4">
-                      <div className="font-semibold text-gray-900 dark:text-gray-100">
-                        {profile.user?.name || `User #${profile.userId}`}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {profile.user?.email}
-                      </div>
-                      <div className="text-[11px] text-gray-400 mt-0.5">
-                        Ngày nộp:{" "}
-                        {new Date(profile.createdAt).toLocaleDateString(
-                          "vi-VN",
-                        )}
-                      </div>
-                    </td>
-
-                    <td className="px-6 py-4 max-w-xs">
-                      <div className="font-medium text-gray-800 dark:text-gray-200 truncate">
-                        {profile.headline || "Chưa cập nhật headline"}
-                      </div>
-                      <div className="text-xs text-gray-500 truncate">
-                        {profile.bio || "Chưa có tiểu sử"}
-                      </div>
-                    </td>
-
-                    <td className="px-6 py-4">
-                      {profile.kyc ? (
-                        <div className="space-y-1">
-                          {profile.kyc.kycStatus === 2 ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">
-                              ✓ Verified (AI Pass)
-                            </span>
-                          ) : profile.kyc.kycStatus === 4 ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
-                              ⚠ Cần đối soát thủ công
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">
-                              ✕ AI Rejected
-                            </span>
-                          )}
-                          <div className="text-xs text-gray-500">
-                            CCCD:{" "}
-                            <span className="font-mono">
-                              {profile.kyc.identityNumber}
-                            </span>
-                          </div>
-                        </div>
-                      ) : (
-                        <span className="text-xs text-gray-400 italic">
-                          Chưa có eKYC
-                        </span>
-                      )}
-                    </td>
-
-                    <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
-                        🎓 {profile.certificates.length} chứng chỉ
-                      </span>
-                    </td>
-
-                    <td className="px-6 py-4">
-                      {profile.approvalStatus === 1 && (
-                        <span className="px-2.5 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800 rounded-full">
-                          Chờ duyệt (PENDING)
-                        </span>
-                      )}
-                      {profile.approvalStatus === 2 && (
-                        <span className="px-2.5 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full">
-                          Đã duyệt (APPROVED)
-                        </span>
-                      )}
-                      {profile.approvalStatus === 3 && (
-                        <span className="px-2.5 py-1 text-xs font-semibold bg-red-100 text-red-800 rounded-full">
-                          Đã từ chối (REJECTED)
-                        </span>
-                      )}
-                    </td>
-
-                    <td className="px-6 py-4 text-right space-x-2">
-                      <button
-                        onClick={() => setSelectedProfile(profile)}
-                        className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-lg transition-colors dark:bg-indigo-950 dark:text-indigo-300"
-                      >
-                        Chi tiết & Đối soát
-                      </button>
-                      {profile.approvalStatus === 1 && (
-                        <button
-                          onClick={() => handleApprove(profile.profileId)}
-                          disabled={reviewing}
-                          className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-lg transition-colors disabled:opacity-50"
-                        >
-                          Duyệt
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+      <DataTable
+        columns={columns}
+        data={visibleProfiles}
+        page={page}
+        pageSize={pageSize}
+        totalPages={totalPages}
+        onPageChange={setPage}
+        loading={loading}
+        refetch={() => fetchProfiles(statusFilter)}
+        search={search}
+        onSearchChange={(value) => {
+          setSearch(value);
+          setPage(1);
+        }}
+        onPageSizeChange={(value) => {
+          setPageSize(value);
+          setPage(1);
+        }}
+        onRowClick={setSelectedProfile}
+        tableMeta={{onView: setSelectedProfile, onApprove: handleApprove, reviewing}}
+        text={{
+          searchPlaceholder: "Tìm tên, email, chuyên môn hoặc CCCD...",
+          reload: "Làm mới",
+          rowsPerPage: "Dòng trên trang",
+          noResults: "Không có hồ sơ nào trong mục này.",
+          pageOf: (current, total) => `Trang ${current} / ${total || 1}`,
+          previous: "Trước",
+          next: "Sau",
+        }}
+      />
 
       {/* Review Detail Modal */}
       {selectedProfile && (
