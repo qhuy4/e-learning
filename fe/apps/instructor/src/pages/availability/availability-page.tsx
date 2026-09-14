@@ -34,11 +34,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@fe/components/ui/card
 import { Popover, PopoverContent, PopoverTrigger } from "@fe/components/ui/popover";
 import { Calendar } from "@fe/components/ui/calendar";
 import { ConfirmDialog } from "@/components/confirm-dialog";
-
-function getErrorMessage(err: unknown): string {
-  const data = (err as any)?.response?.data;
-  return data?.error?.message || data?.message || "Có lỗi xảy ra";
-}
+import { getErrorMessage } from "@/shared/utils/error";
 
 function parseDate(value: string): Date | undefined {
   if (!value) return undefined;

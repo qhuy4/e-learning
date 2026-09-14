@@ -5,6 +5,7 @@ import { Plus, ListTree, Trash2, ChevronDown, Video, Edit } from "lucide-react";
 
 import type { Course, Section, Lesson } from "../../types/course.types";
 import { useCreateSection, useDeleteSection, useDeleteLesson } from "../../hook/use-courses";
+import { getErrorMessage } from "@/shared/utils/error";
 
 import { Button } from "@fe/components/ui/button";
 import { Input } from "@fe/components/ui/input";
@@ -57,8 +58,8 @@ function SectionList({
       updateData({ sections: [...sections, { ...created, lessons: created.lessons ?? [] }] });
       setNewTitle("");
       toast.success("Đã thêm chương!");
-    } catch {
-      toast.error("Lỗi khi thêm chương.");
+    } catch (err) {
+      toast.error(getErrorMessage(err));
     }
   };
 
@@ -77,7 +78,7 @@ function SectionList({
             className="h-11 pl-10 bg-background rounded-sm border-transparent focus-visible:ring-1 focus-visible:border-input shadow-sm"
           />
         </div>
-        <Button onClick={addSection} disabled={isPending} className="h-11 shrink-0 px-6 rounded-sm shadow-sm bg-primary/90 hover:bg-primary">
+        <Button onClick={addSection} disabled={isPending || !newTitle.trim()} className="h-11 shrink-0 px-6 rounded-sm shadow-sm bg-primary/90 hover:bg-primary">
           <Plus className="h-4 w-4 mr-2" />
           {isPending ? "Đang thêm..." : "Thêm chương"}
         </Button>
@@ -133,8 +134,8 @@ function SectionItem({
       }
       updateData({ sections: sections.filter((s) => s.id !== section.id) });
       toast.success("Đã xóa chương!", { id: tid });
-    } catch {
-      toast.error("Lỗi khi xóa chương.", { id: tid });
+    } catch (err) {
+      toast.error(getErrorMessage(err), { id: tid });
     } finally {
       setConfirmDelete(false);
     }
@@ -149,8 +150,8 @@ function SectionItem({
       }
       updateSectionLessons(lessons.filter((l) => l.id !== deletingLessonId));
       toast.success("Đã xóa bài học!", { id: tid });
-    } catch {
-      toast.error("Lỗi khi xóa bài học.", { id: tid });
+    } catch (err) {
+      toast.error(getErrorMessage(err), { id: tid });
     } finally {
       setDeletingLessonId(null);
     }

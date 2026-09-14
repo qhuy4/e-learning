@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { Plus, Edit, Copy, Trash2, BarChart3 } from "lucide-react";
+import { Plus, Edit, Copy, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import type { ColumnDef } from "@tanstack/react-table";
 
@@ -12,6 +12,7 @@ import { courseService } from "@/features/courses/services/course.service";
 import { DataTable } from "@/components/common/data-table/data-table";
 import type { DataTableFeatures } from "@/components/common/data-table/data-table-features";
 import { LEVEL_LABELS, COURSE_STATUS_CONFIG } from "@/features/courses/types/course.constants";
+import { getErrorMessage } from "@/shared/utils/error";
 
 const STATUS_LABELS: Record<number, string> = {
   1: "Bản nháp",
@@ -76,8 +77,8 @@ export default function CoursesListPage() {
         toast.success("Đã xóa khóa học.", { id: tid });
         setDeletingId(null);
       },
-      onError: () => {
-        toast.error("Có lỗi xảy ra.", { id: tid });
+      onError: (err) => {
+        toast.error(getErrorMessage(err), { id: tid });
         setDeletingId(null);
       },
     });
@@ -89,8 +90,8 @@ export default function CoursesListPage() {
       const res = await courseService.getCourseById(id);
       toast.success("Đang tạo bản nháp...", { id: tid });
       navigate("/courses/create", { state: { cloneData: res.data } });
-    } catch {
-      toast.error("Có lỗi xảy ra.", { id: tid });
+    } catch (err) {
+      toast.error(getErrorMessage(err), { id: tid });
     }
   };
 
@@ -162,7 +163,7 @@ export default function CoursesListPage() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => navigate(`/courses/${course.id}`)}
+              onClick={() => navigate(`/courses/${course.id}/edit`)}
               className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg"
               title="Chỉnh sửa"
             >
@@ -176,15 +177,6 @@ export default function CoursesListPage() {
               title="Nhân bản"
             >
               <Copy className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => { e.stopPropagation(); navigate(`/courses/${course.id}/analytics`); }}
-              className="h-8 w-8 text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 rounded-lg"
-              title="Phân tích"
-            >
-              <BarChart3 className="h-4 w-4" />
             </Button>
             {course.status === 1 && (
               <Button

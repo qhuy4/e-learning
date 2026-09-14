@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { Camera, Save, User } from "lucide-react";
 
 import { useGetProfile, useUpdateProfile } from "@/features/profile/hook/use-profile";
+import { getErrorMessage } from "@/shared/utils/error";
 import { Button } from "@fe/components/ui/button";
 import { Input } from "@fe/components/ui/input";
 import { Label } from "@fe/components/ui/label";
@@ -100,7 +101,7 @@ export default function ProfilePage() {
           toast.success("Đã cập nhật hồ sơ!", { id: tid });
           setAvatarFile(null);
         },
-        onError: () => toast.error("Có lỗi xảy ra, vui lòng thử lại.", { id: tid }),
+        onError: (err) => toast.error(getErrorMessage(err), { id: tid }),
       }
     );
   };

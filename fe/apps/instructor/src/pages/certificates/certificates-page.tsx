@@ -9,6 +9,7 @@ import {
   useDeleteCertificate,
 } from "@/features/certificates/hook/use-certificates";
 import { CERTIFICATE_STATUS } from "@/features/certificates/types/certificate";
+import { getErrorMessage } from "@/shared/utils/error";
 import { Button } from "@fe/components/ui/button";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import {
@@ -47,8 +48,8 @@ export default function CertificatesPage() {
         toast.success("Đã xóa chứng chỉ.", { id: tid });
         setDeletingId(null);
       },
-      onError: () => {
-        toast.error("Có lỗi xảy ra.", { id: tid });
+      onError: (err) => {
+        toast.error(getErrorMessage(err), { id: tid });
         setDeletingId(null);
       },
     });

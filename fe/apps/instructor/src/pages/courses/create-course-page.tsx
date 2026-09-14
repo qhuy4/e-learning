@@ -12,6 +12,7 @@ import {
   useUpdateCourse,
 } from "@/features/courses/hook/use-courses";
 import { COURSE_STATUS_CONFIG } from "@/features/courses/types/course.constants";
+import { getErrorMessage } from "@/shared/utils/error";
 
 import { Button } from "@fe/components/ui/button";
 import { Badge } from "@fe/components/ui/badge";
@@ -102,7 +103,7 @@ export default function CreateCoursePage() {
         toast.success("Đã lưu nháp thành công!", { id: tid });
         navigate(`/courses/${res.data.id}`, { replace: true });
       },
-      onError: () => toast.error("Có lỗi xảy ra, vui lòng thử lại.", { id: tid }),
+      onError: (err) => toast.error(getErrorMessage(err), { id: tid }),
     });
   };
 
@@ -111,7 +112,7 @@ export default function CreateCoursePage() {
     const formData = createFormData(courseData);
     updateCourse({ id: courseId!, data: formData }, {
       onSuccess: () => toast.success("Đã lưu thay đổi!", { id: tid }),
-      onError: () => toast.error("Lỗi khi lưu, vui lòng thử lại.", { id: tid }),
+      onError: (err) => toast.error(getErrorMessage(err), { id: tid }),
     });
   };
 
@@ -136,9 +137,8 @@ export default function CreateCoursePage() {
         toast.success("Đã gửi yêu cầu duyệt thành công!", { id: tid });
         setCourseData((prev) => ({ ...prev, status: 2 }));
       },
-      onError: (err: any) => {
-        const msg = err?.response?.data?.message;
-        toast.error(Array.isArray(msg) ? msg[0] : (msg || "Lỗi khi gửi yêu cầu, vui lòng thử lại."), { id: tid });
+      onError: (err) => {
+        toast.error(getErrorMessage(err), { id: tid });
       },
     });
   };
@@ -181,7 +181,7 @@ export default function CreateCoursePage() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => navigate("/courses")}
+          onClick={() => navigate(-1)}
           className="rounded-md hover:bg-muted shrink-0 h-8 w-8"
         >
           <ChevronLeft className="h-4 w-4" />

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useCertificateById, useDeleteCertificate } from "@/features/certificates/hook/use-certificates";
 import { CERTIFICATE_STATUS } from "@/features/certificates/types/certificate";
+import { getErrorMessage } from "@/shared/utils/error";
 import { Button } from "@fe/components/ui/button";
 import { Badge } from "@fe/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@fe/components/ui/card";
@@ -48,7 +49,7 @@ export default function CertificateDetailPage() {
         toast.success("Đã xóa chứng chỉ.", { id: tid });
         navigate("/certificates");
       },
-      onError: () => toast.error("Có lỗi xảy ra.", { id: tid }),
+      onError: (err) => toast.error(getErrorMessage(err), { id: tid }),
     });
   };
 

@@ -64,12 +64,14 @@ export interface CourseAnalytics {
   };
 }
 
-export type DateRange = "7d" | "30d" | "90d" | "1y" | "all";
+export type DateRange = "7d" | "30d" | "90d" | "6m" | "1y" | "all" | "custom";
 
 export const DATE_RANGE_OPTIONS: { value: DateRange; label: string }[] = [
   { value: "7d", label: "7 ngày" },
   { value: "30d", label: "30 ngày" },
   { value: "90d", label: "90 ngày" },
+  { value: "6m", label: "6 tháng" },
   { value: "1y", label: "1 năm" },
   { value: "all", label: "Tất cả" },
+  { value: "custom", label: "Tùy chỉnh" },
 ];

@@ -164,3 +164,14 @@ export function useDeleteLesson() {
     },
   });
 }
+
+export function useCancelReview() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => courseService.cancelReview(id),
+    onSuccess: (_data, variables) => {
+      queryClient.removeQueries({ queryKey: ["course", variables] });
+      queryClient.invalidateQueries({ queryKey: ["courses"] });
+    },
+  });
+}

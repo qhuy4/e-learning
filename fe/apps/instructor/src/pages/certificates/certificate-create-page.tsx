@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { ChevronLeft, Save } from "lucide-react";
 import { useCreateCertificate } from "@/features/certificates/hook/use-certificates";
+import { getErrorMessage } from "@/shared/utils/error";
 import { Button } from "@fe/components/ui/button";
 import { Input } from "@fe/components/ui/input";
 import { Label } from "@fe/components/ui/label";
@@ -40,8 +41,8 @@ export default function CertificateCreatePage() {
           toast.success("Đã tạo chứng chỉ thành công!", { id: tid });
           navigate("/certificates");
         },
-        onError: () => {
-          toast.error("Có lỗi xảy ra, vui lòng thử lại.", { id: tid });
+        onError: (err) => {
+          toast.error(getErrorMessage(err), { id: tid });
         },
       }
     );

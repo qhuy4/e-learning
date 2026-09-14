@@ -5,7 +5,6 @@ import {
     DollarSign,
     Clock,
     Award,
-    BarChart3,
     UserCircle,
     LogOut,
 } from "lucide-react"
@@ -40,11 +39,6 @@ export const navigation: Navigation = {
                     title: "Học viên",
                     url: "/students",
                     icon: Users,
-                },
-                {
-                    title: "Phân tích",
-                    url: "/courses",
-                    icon: BarChart3,
                 },
                 {
                     title: "Doanh thu",

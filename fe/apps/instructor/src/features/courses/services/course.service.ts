@@ -87,4 +87,9 @@ export const courseService = {
     const response = await instructorApi.delete(`/sections/0/lessons/${id}`);
     return response.data;
   },
+
+  async cancelReview(id: string) {
+    const response = await instructorApi.post(`/courses/${id}/cancel-review`);
+    return response.data;
+  },
 };

@@ -8,6 +8,7 @@ import { useCreateLesson, useGetLesson, useUpdateLesson } from "../hook/use-less
 import { useGetCourseDetail } from "@/features/courses/hook/use-courses";
 import { toast } from "sonner";
 import type { LessonType } from "../types/lesson.types";
+import { getErrorMessage } from "@/shared/utils/error";
 
 export function CreateLessonPage() {
   const navigate = useNavigate();
@@ -39,8 +40,8 @@ export function CreateLessonPage() {
             toast.success("Đã cập nhật bài học!", { id: tid });
             toCourse();
           },
-          onError: () => {
-            toast.error("Có lỗi xảy ra khi cập nhật bài học.", { id: tid });
+          onError: (err) => {
+            toast.error(getErrorMessage(err), { id: tid });
           },
         }
       );
@@ -57,8 +58,8 @@ export function CreateLessonPage() {
             toast.success("Đã tạo bài học thành công!", { id: tid });
             toCourse();
           },
-          onError: () => {
-            toast.error("Có lỗi xảy ra khi tạo bài học.", { id: tid });
+          onError: (err) => {
+            toast.error(getErrorMessage(err), { id: tid });
           },
         }
       );
