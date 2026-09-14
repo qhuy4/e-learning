@@ -54,14 +54,14 @@ export class GetCourseAnalyticsHandler
   ) {}
 
   async execute(query: GetCourseAnalyticsQuery) {
-    const { instructorId, courseId, dateRange } = query;
+    const { instructorId, courseId, dateRange, startDate: customStartDate, endDate: customEndDate } = query;
 
     const course = await this.courseRepo.findOne({ where: { id: String(courseId) } });
     if (!course) throw new NotFoundException('Course not found');
     if (Number(course.instructorId) !== instructorId)
       throw new ForbiddenException('Access denied');
 
-    const startDate = getDateRangeStart(dateRange);
+    const startDate = customStartDate ? new Date(customStartDate) : getDateRangeStart(dateRange);
 
     // ── Overview ──────────────────────────────────────────────────────────
     const totalStudents = await this.enrollmentRepo.count({

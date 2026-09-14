@@ -54,4 +54,16 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   [ErrorCode.REVIEW_REPORT_RESOLVE_FAILED]: 'Không thể xử lý báo cáo',
   [ErrorCode.REVIEW_REPORT_DISMISS_FAILED]: 'Không thể từ chối báo cáo',
   [ErrorCode.REVIEW_REPORT_DELETE_FAILED]: 'Không thể xóa báo cáo',
+
+  [ErrorCode.CERTIFICATE_NOT_FOUND]: 'Không tìm thấy chứng chỉ',
+  [ErrorCode.INSTRUCTOR_CERTIFICATE_NOT_FOUND]: 'Không tìm thấy chứng chỉ giảng viên',
+  [ErrorCode.INSTRUCTOR_CERTIFICATE_REVIEW_FAILED]: 'Không thể duyệt chứng chỉ',
+
+  [ErrorCode.NOTIFICATION_NOT_FOUND]: 'Không tìm thấy thông báo',
+  [ErrorCode.NOTIFICATION_DELETE_FAILED]: 'Không thể xóa thông báo',
+
+  [ErrorCode.SUBSCRIPTION_NOT_FOUND]: 'Không tìm thấy gói đăng ký',
+  [ErrorCode.SUBSCRIPTION_UPDATE_FAILED]: 'Không thể cập nhật gói đăng ký',
+  [ErrorCode.WISHLIST_NOT_FOUND]: 'Không tìm thấy danh sách yêu thích',
+  [ErrorCode.WISHLIST_ITEM_NOT_FOUND]: 'Không tìm thấy mục trong danh sách',
 };

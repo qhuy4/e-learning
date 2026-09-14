@@ -21,9 +21,11 @@ export class InstructorAnalyticsController {
     @CurrentUser('id') instructorId: number,
     @Param('courseId', ParseIntPipe) courseId: number,
     @Query('dateRange') dateRange?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
   ) {
     return this.queryBus.execute(
-      new GetCourseAnalyticsQuery(instructorId, courseId, dateRange ?? '30d'),
+      new GetCourseAnalyticsQuery(instructorId, courseId, dateRange ?? '30d', startDate, endDate),
     );
   }
 }

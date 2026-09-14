@@ -24,6 +24,11 @@ import { CategoriesModule } from '@/modules/categories/categories.module';
 import { InstructorPayoutsModule } from '@/modules/instructor-payouts/instructor-payouts.module';
 import { CourseQuestionsModule } from '@/modules/course-questions/course-questions.module';
 import { ReviewReportsModule } from '@/modules/review-reports/review-reports.module';
+import { CertificatesModule } from '@/modules/certificates/certificates.module';
+import { NotificationsModule } from '@/modules/notifications/notifications.module';
+import { PremiumSubscriptionsModule } from '@/modules/premium-subscriptions/premium-subscriptions.module';
+import { WishlistsModule } from '@/modules/wishlists/wishlists.module';
+import { AdminDashboardModule } from '@/modules/analytics/admin-dashboard.module';
 
 @Module({
   imports: [
@@ -46,6 +51,11 @@ import { ReviewReportsModule } from '@/modules/review-reports/review-reports.mod
     InstructorPayoutsModule,
     CourseQuestionsModule,
     ReviewReportsModule,
+    CertificatesModule,
+    NotificationsModule,
+    PremiumSubscriptionsModule,
+    WishlistsModule,
+    AdminDashboardModule,
     UserModule,
     AuthModule,
     InstructorModule,
