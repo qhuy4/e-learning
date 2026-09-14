@@ -57,9 +57,11 @@ export class UpdateCourseHandler implements ICommandHandler<UpdateCourseCommand>
       throw new NotFoundException('Course not found');
     }
 
-    if (command.data.status === PENDING_REVIEW_STATUS) {
+    const newStatus = command.data.status != null ? Number(command.data.status) : undefined;
+
+    if (newStatus != null && !isNaN(newStatus) && newStatus === PENDING_REVIEW_STATUS) {
       const sectionCount = await this.sectionRepo.count({
-        where: { courseId: command.id.toString() },
+        where: { courseId: String(command.id) },
       });
 
       if (sectionCount === 0) {

@@ -34,6 +34,7 @@ import { OrderItemOrmEntity } from '@/modules/orders/infrastructure/entity/order
 import { CourseOrmEntity } from '@/modules/courses/infrastructure/entity/course.orm-entity';
 import { InstructorCertificateEntity } from '@/modules/teacher/infrastructure/entity/instructor-certificate.entity';
 import { InstructorCertificateController } from '@/modules/instructors/presentation/instructor-certificate.controller';
+import { AdminInstructorCertificatesController } from '@/modules/instructors/presentation/admin-instructor-certificates.controller';
 import { GetInstructorCertificatesHandler } from '@/modules/instructors/application/query-handler/get-instructor-certificates.handler';
 import { GetInstructorCertificateByIdHandler } from '@/modules/instructors/application/query-handler/get-instructor-certificate-by-id.handler';
 import { CreateInstructorCertificateHandler } from '@/modules/instructors/application/command-handler/create-instructor-certificate.handler';
@@ -99,6 +100,7 @@ const CommandHandlers = [
     InstructorExceptionAvailabilityController,
     InstructorRevenueController,
     InstructorCertificateController,
+    AdminInstructorCertificatesController,
     InstructorAnalyticsController,
   ],
   providers: [

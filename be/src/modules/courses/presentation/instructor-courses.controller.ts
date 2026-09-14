@@ -23,6 +23,7 @@ import { CreateCourseCommand } from '@/modules/courses/application/command/creat
 import { UpdateCourseCommand } from '@/modules/courses/application/command/update-course.command';
 import { DeleteCourseCommand } from '@/modules/courses/application/command/delete-course.command';
 import { CloneCourseCommand } from '@/modules/courses/application/command/clone-course.command';
+import { CancelReviewCourseCommand } from '@/modules/courses/application/command/cancel-review-course.command';
 
 import { CreateCourseDto } from '@/modules/courses/presentation/dto/create-course.dto';
 import { UpdateCourseDto } from '@/modules/courses/presentation/dto/update-course.dto';
@@ -93,6 +94,9 @@ export class InstructorCoursesController {
     @Body() dto: UpdateCourseDto,
     @UploadedFile() thumbnail?: Express.Multer.File,
   ) {
+    const rawStatus = (dto as any).status;
+    const status = dto.status ?? (rawStatus != null ? Number(rawStatus) : undefined);
+
     return this.commandBus.execute(
       new UpdateCourseCommand(id, {
         title: dto.title,
@@ -100,7 +104,7 @@ export class InstructorCoursesController {
         thumbnailFile: thumbnail,
         level: dto.level,
         price: dto.price,
-        status: dto.status,
+        status,
         parentId: dto.parentId,
         categories: dto.categories,
       }),
@@ -121,5 +125,13 @@ export class InstructorCoursesController {
     @Param('id', ParseIntPipe) id: number,
   ) {
     return this.commandBus.execute(new DeleteCourseCommand(id));
+  }
+
+  @Post(':id/cancel-review')
+  async cancelReview(
+    @CurrentUser('id') instructorId: number,
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<void> {
+    return this.commandBus.execute(new CancelReviewCourseCommand(id));
   }
 }
