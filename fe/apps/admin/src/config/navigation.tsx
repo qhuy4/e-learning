@@ -16,6 +16,11 @@ import {
     FolderTree,
     MessageCircle,
     Flag,
+    Award,
+    FileCheck,
+    Bell,
+    Crown,
+    Heart,
 } from "lucide-react"
 import type { NavGroup, NavItem } from "@/shared/types/navigation"
 
@@ -98,6 +103,21 @@ export const navigation: Navigation = {
                     url: "/review-reports",
                     icon: Flag,
                 },
+                {
+                    title: "Chứng chỉ học viên",
+                    url: "/student-certificates",
+                    icon: Award,
+                },
+                {
+                    title: "Chứng chỉ giảng viên",
+                    url: "/instructor-certificates",
+                    icon: FileCheck,
+                },
+                {
+                    title: "Thông báo",
+                    url: "/notifications",
+                    icon: Bell,
+                },
             ],
         },
         {
@@ -117,6 +137,21 @@ export const navigation: Navigation = {
                     title: "Doanh thu",
                     url: "/earnings",
                     icon: DollarSign,
+                },
+            ],
+        },
+        {
+            label: "Khác",
+            items: [
+                {
+                    title: "Gói Premium",
+                    url: "/premium-subscriptions",
+                    icon: Crown,
+                },
+                {
+                    title: "Danh sách yêu thích",
+                    url: "/wishlists",
+                    icon: Heart,
                 },
             ],
         },

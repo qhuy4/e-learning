@@ -3,7 +3,8 @@ import { SidebarTrigger } from "@fe/components/ui/sidebar";
 import { useTheme } from "@/components/theme-provider.tsx";
 import { Button } from "@fe/components/ui/button.tsx";
 import { Moon, Sun, Bell } from "lucide-react";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
+import { useUnreadCount } from "@/features/notifications/hooks/use-notifications";
 
 const PAGE_TITLES: Record<string, string> = {
   "/": "Dashboard",
@@ -16,13 +17,29 @@ const PAGE_TITLES: Record<string, string> = {
   "/earnings": "Doanh thu",
   "/questions": "Hỏi đáp",
   "/reviews": "Đánh giá",
+  "/review-reports": "Báo cáo đánh giá",
+  "/orders": "Đơn hàng",
+  "/coupons": "Mã giảm giá",
+  "/coupons/create": "Tạo mã giảm giá",
+  "/categories": "Danh mục",
+  "/categories/create": "Tạo danh mục",
+  "/enrollments": "Ghi danh",
+  "/analytics": "Analytics",
   "/users": "Users",
   "/settings": "Cài đặt",
+  "/student-certificates": "Chứng chỉ học viên",
+  "/instructor-certificates": "Chứng chỉ giảng viên",
+  "/notifications": "Thông báo",
+  "/premium-subscriptions": "Gói Premium",
+  "/wishlists": "Danh sách yêu thích",
 };
 
 export function SiteHeader() {
   const { theme, setTheme } = useTheme();
   const location = useLocation();
+  const navigate = useNavigate();
+  const { data: unreadData } = useUnreadCount();
+  const unreadCount = unreadData?.count ?? 0;
 
   const getPageTitle = () => {
     // Check exact match first
@@ -40,6 +57,16 @@ export function SiteHeader() {
       if (location.pathname.endsWith("/edit")) return "Chỉnh sửa giảng viên";
       return "Chi tiết giảng viên";
     }
+    if (location.pathname.startsWith("/orders/")) return "Chi tiết đơn hàng";
+    if (location.pathname.startsWith("/coupons/") && location.pathname.endsWith("/edit")) return "Chỉnh sửa mã giảm giá";
+    if (location.pathname.startsWith("/categories/") && location.pathname.endsWith("/edit")) return "Chỉnh sửa danh mục";
+    if (location.pathname.startsWith("/review-reports/")) return "Chi tiết báo cáo";
+    if (location.pathname.startsWith("/questions/")) return "Chi tiết câu hỏi";
+    if (location.pathname.startsWith("/student-certificates/")) return "Chi tiết chứng chỉ học viên";
+    if (location.pathname.startsWith("/instructor-certificates/")) return "Chi tiết chứng chỉ giảng viên";
+    if (location.pathname.startsWith("/notifications/")) return "Chi tiết thông báo";
+    if (location.pathname.startsWith("/premium-subscriptions/")) return "Chi tiết gói Premium";
+    if (location.pathname.startsWith("/wishlists/")) return "Chi tiết danh sách yêu thích";
     if (location.pathname.startsWith("/users/")) {
       if (location.pathname.endsWith("/edit")) return "Chỉnh sửa người dùng";
       return "Chi tiết người dùng";
@@ -64,9 +91,14 @@ export function SiteHeader() {
             variant="ghost"
             size="icon"
             className="relative h-9 w-9 rounded-full text-muted-foreground hover:text-foreground"
+            onClick={() => navigate("/notifications")}
           >
             <Bell className="h-4.5 w-4.5" />
-            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500 border-2 border-background" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white border-2 border-background">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
           </Button>
 
           {/* Theme toggle */}
