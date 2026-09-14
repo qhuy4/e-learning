@@ -16,6 +16,9 @@ import InstructorsPage from "@/pages/instructors/instructors-page.tsx";
 import { InstructorDetailPage } from "@/pages/instructors/instructor-detail-page.tsx";
 import { InstructorEditPage } from "@/pages/instructors/instructor-edit-page.tsx";
 import StudentsPage from "@/pages/students/students-page.tsx";
+import { StudentDetailPage } from "@/pages/students/student-detail-page.tsx";
+import { StudentCreatePage } from "@/pages/students/student-create-page.tsx";
+import { StudentEditPage } from "@/pages/students/student-edit-page.tsx";
 import ReviewsPage from "@/pages/reviews/reviews-page.tsx";
 import ReviewDetailPage from "@/pages/reviews/review-detail-page.tsx";
 import CourseListPage from "@/pages/courses/courses-page";
@@ -38,6 +41,16 @@ import QuestionsPage from "@/pages/questions/questions-page";
 import QuestionDetailPage from "@/pages/questions/question-detail-page";
 import ReviewReportsPage from "@/pages/review-reports/review-reports-page";
 import ReviewReportDetailPage from "@/pages/review-reports/report-detail-page";
+import { StudentCertificatesPage } from "@/pages/student-certificates/student-certificates-page";
+import { StudentCertificateDetailPage } from "@/pages/student-certificates/student-certificate-detail-page";
+import { InstructorCertificatesPage } from "@/pages/instructor-certificates/instructor-certificates-page";
+import { InstructorCertificateDetailPage } from "@/pages/instructor-certificates/instructor-certificate-detail-page";
+import { NotificationsPage } from "@/pages/notifications/notifications-page";
+import { NotificationDetailPage } from "@/pages/notifications/notification-detail-page";
+import { PremiumSubscriptionsPage } from "@/pages/premium-subscriptions/premium-subscriptions-page";
+import { PremiumSubscriptionDetailPage } from "@/pages/premium-subscriptions/premium-subscription-detail-page";
+import { WishlistsPage } from "@/pages/wishlists/wishlists-page";
+import { WishlistDetailPage } from "@/pages/wishlists/wishlist-detail-page";
 
 export const router = createBrowserRouter([
     {
@@ -74,7 +87,24 @@ export const router = createBrowserRouter([
                     },
                     {
                         path: "students",
-                        element: <StudentsPage />,
+                        children: [
+                            {
+                                index: true,
+                                element: <StudentsPage />,
+                            },
+                            {
+                                path: "create",
+                                element: <StudentCreatePage />,
+                            },
+                            {
+                                path: ":id",
+                                element: <StudentDetailPage />,
+                            },
+                            {
+                                path: ":id/edit",
+                                element: <StudentEditPage />,
+                            },
+                        ],
                     },
                     {
                         path: "reviews",
@@ -230,6 +260,71 @@ export const router = createBrowserRouter([
                             {
                                 path: ":id",
                                 element: <ReviewReportDetailPage />,
+                            },
+                        ],
+                    },
+                    {
+                        path: "student-certificates",
+                        children: [
+                            {
+                                index: true,
+                                element: <StudentCertificatesPage />,
+                            },
+                            {
+                                path: ":id",
+                                element: <StudentCertificateDetailPage />,
+                            },
+                        ],
+                    },
+                    {
+                        path: "instructor-certificates",
+                        children: [
+                            {
+                                index: true,
+                                element: <InstructorCertificatesPage />,
+                            },
+                            {
+                                path: ":id",
+                                element: <InstructorCertificateDetailPage />,
+                            },
+                        ],
+                    },
+                    {
+                        path: "notifications",
+                        children: [
+                            {
+                                index: true,
+                                element: <NotificationsPage />,
+                            },
+                            {
+                                path: ":id",
+                                element: <NotificationDetailPage />,
+                            },
+                        ],
+                    },
+                    {
+                        path: "premium-subscriptions",
+                        children: [
+                            {
+                                index: true,
+                                element: <PremiumSubscriptionsPage />,
+                            },
+                            {
+                                path: ":id",
+                                element: <PremiumSubscriptionDetailPage />,
+                            },
+                        ],
+                    },
+                    {
+                        path: "wishlists",
+                        children: [
+                            {
+                                index: true,
+                                element: <WishlistsPage />,
+                            },
+                            {
+                                path: ":id",
+                                element: <WishlistDetailPage />,
                             },
                         ],
                     },

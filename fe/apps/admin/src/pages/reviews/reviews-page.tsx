@@ -55,7 +55,10 @@ export default function ReviewsPage() {
     return (
         <div className="p-6">
             <div className="mb-4 flex items-center justify-between">
-                <h1 className="text-2xl font-bold">Đánh giá</h1>
+                <div>
+                    <h1 className="text-2xl font-bold">Đánh giá</h1>
+                    <p className="text-sm text-muted-foreground mt-1">Quản lý đánh giá từ học viên</p>
+                </div>
             </div>
 
             <DataTable

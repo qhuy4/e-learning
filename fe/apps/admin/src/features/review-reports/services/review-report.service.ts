@@ -18,18 +18,18 @@ export const reviewReportService = {
   },
 
   getById: async (id: string): Promise<ReviewReport> => {
-    const response = await adminApi.get<ReviewReport>(`/review-reports/${id}`);
-    return response.data;
+    const response = await adminApi.get(`/review-reports/${id}`);
+    return response.data.data;
   },
 
   resolve: async (id: number): Promise<ReviewReport> => {
-    const response = await adminApi.patch<ReviewReport>(`/review-reports/${id}/resolve`);
-    return response.data;
+    const response = await adminApi.patch(`/review-reports/${id}/resolve`);
+    return response.data.data;
   },
 
   dismiss: async (id: number): Promise<ReviewReport> => {
-    const response = await adminApi.patch<ReviewReport>(`/review-reports/${id}/dismiss`);
-    return response.data;
+    const response = await adminApi.patch(`/review-reports/${id}/dismiss`);
+    return response.data.data;
   },
 
   remove: async (id: number): Promise<void> => {

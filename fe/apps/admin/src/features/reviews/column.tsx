@@ -79,6 +79,27 @@ function Stars({rating}: {rating: number}) {
 
 export function createReviewColumns() {
     return columnHelper.columns([
+        columnHelper.accessor("user.name", {
+            header: (info) => <SortHeader label="Học viên" columnId="userName" info={info}/>,
+            cell: (info) => {
+                const name = info.getValue()
+                return <span className="text-sm">{name || "—"}</span>
+            },
+        }),
+        columnHelper.accessor("course.title", {
+            header: (info) => <SortHeader label="Khóa học" columnId="courseTitle" info={info}/>,
+            cell: (info) => {
+                const title = info.getValue()
+                return <span className="text-sm">{title || "—"}</span>
+            },
+        }),
+        columnHelper.accessor("rating", {
+            header: (info) => <SortHeader label="Đánh giá" columnId="rating" info={info}/>,
+            cell: (info) => {
+                const rating = info.getValue()
+                return <Stars rating={rating}/>
+            },
+        }),
         columnHelper.accessor("comment", {
             header: (info) => <SortHeader label="Nội dung" columnId="comment" info={info}/>,
             cell: (info) => {
@@ -88,13 +109,6 @@ export function createReviewColumns() {
                         {comment || <span className="text-muted-foreground">—</span>}
                     </div>
                 )
-            },
-        }),
-        columnHelper.accessor("rating", {
-            header: (info) => <SortHeader label="Đánh giá" columnId="rating" info={info}/>,
-            cell: (info) => {
-                const rating = info.getValue()
-                return <Stars rating={rating}/>
             },
         }),
         columnHelper.accessor("status", {

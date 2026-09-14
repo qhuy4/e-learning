@@ -49,7 +49,7 @@ export default function EnrollmentDetailPage() {
   const currentStatus = enrollment.status as EnrollmentStatus;
 
   return (
-      <div className="p-6 max-w-6xl mx-auto space-y-6">
+      <div className="p-6 space-y-6">
         {/* Back */}
         <Button
             variant="ghost"

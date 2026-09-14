@@ -1,5 +1,6 @@
 import {SectionCards} from "@/features/dashboard/section-cards.tsx";
 import {ChartAreaInteractive} from "@/features/dashboard/chart-area-interactive.tsx";
+import {RecentActivity} from "@/features/dashboard/recent-activity.tsx";
 
 export default function DashboardPage() {
     return (
@@ -10,7 +11,7 @@ export default function DashboardPage() {
                         <div className="px-4 lg:px-6">
                             <ChartAreaInteractive/>
                         </div>
-
+                        <RecentActivity/>
                     </div>
                 </div>
             </div>
