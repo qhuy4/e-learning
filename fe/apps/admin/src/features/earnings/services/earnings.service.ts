@@ -23,7 +23,7 @@ export const earningsService = {
     instructorId?: number;
   }): Promise<RevenueSummary> {
     const response = await adminApi.get("/revenue/summary", { params });
-    return response.data;
+    return response.data.data;
   },
 
   async listPayouts(params: {
