@@ -13,6 +13,7 @@ import { UpdateLessonHandler } from '@/modules/lessons/application/command-handl
 import { DeleteLessonHandler } from '@/modules/lessons/application/command-handler/delete-lesson.command.handler';
 
 import { LessonController } from '@/modules/lessons/presentation/lesson.controller';
+import { InstructorLessonController } from '@/modules/lessons/presentation/instructor-lesson.controller';
 
 import { GetLessonByIdHandler } from '@/modules/lessons/application/query-handler/get-lesson-by-id.handler';
 
@@ -49,7 +50,7 @@ const QueryHandlers = [
     EnrollmentsModule,
   ],
 
-  controllers: [LessonController, LessonPublicController],
+  controllers: [LessonController, LessonPublicController, InstructorLessonController],
 
   providers: [
     LessonRepository,

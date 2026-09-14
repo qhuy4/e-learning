@@ -12,6 +12,7 @@ import { StripeService } from '@/modules/payments/infrastructure/gateway/stripe/
 
 import { PaymentsController } from '@/modules/payments/presentation/payments.controller';
 import { PaymentWebhookController } from '@/modules/payments/presentation/payment-webhook.controller';
+import { AdminPaymentsController } from '@/modules/payments/presentation/admin-payments.controller';
 
 import { CreatePaymentHandler } from '@/modules/payments/application/command-handler/create-payment.handler';
 import { ProcessPaymentHandler } from '@/modules/payments/application/command-handler/process-payment.handler';
@@ -51,7 +52,7 @@ const QueryHandlers = [
     OrdersModule,
     EnrollmentsModule,
   ],
-  controllers: [PaymentsController, PaymentWebhookController],
+  controllers: [PaymentsController, PaymentWebhookController, AdminPaymentsController],
   providers: [
     PaymentRepository,
     {

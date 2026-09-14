@@ -5,7 +5,9 @@ export class GetPaymentsQuery {
       limit: number;
       orderId?: number;
       status?: number;
+      sortBy?: string;
       gateway?: string;
+      sortOrder?: string;
     },
   ) {}
 }
