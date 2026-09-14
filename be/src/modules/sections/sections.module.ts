@@ -12,6 +12,7 @@ import { UpdateSectionHandler } from '@/modules/sections/application/command-han
 import { DeleteSectionHandler } from '@/modules/sections/application/command-handler/delete-section.command.handler';
 
 import { SectionController } from '@/modules/sections/presentation/section.controller';
+import { InstructorSectionController } from '@/modules/sections/presentation/instructor-section.controller';
 
 const CommandHandlers = [
   CreateSectionHandler,
@@ -29,7 +30,7 @@ import { CoursesModule } from '@/modules/courses/courses.module';
     TypeOrmModule.forFeature([SectionOrmEntity]),
     forwardRef(() => CoursesModule),
   ],
-  controllers: [SectionController],
+  controllers: [SectionController, InstructorSectionController],
   providers: [
     SectionRepository,
     {

@@ -4,6 +4,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { ReviewOrmEntity } from '@/modules/reviews/infrastructure/entity/review.orm-entity';
 import { ReviewRepository } from '@/modules/reviews/infrastructure/repository/review.repository';
 import { ReviewsController } from '@/modules/reviews/presentation/reviews.controller';
+import { InstructorReviewsController } from '@/modules/reviews/presentation/instructor-reviews.controller';
 import { GetReviewsHandler } from '@/modules/reviews/application/query-handler/get-reviews.handler';
 import { GetReviewByIdHandler } from '@/modules/reviews/application/query-handler/get-review-by-id.handler';
 import { UpdateReviewStatusHandler } from '@/modules/reviews/application/command-handler/update-review-status.handler';
@@ -16,7 +17,7 @@ const CommandHandlers = [UpdateReviewStatusHandler];
     CqrsModule,
     TypeOrmModule.forFeature([ReviewOrmEntity]),
   ],
-  controllers: [ReviewsController],
+  controllers: [ReviewsController, InstructorReviewsController],
   providers: [
     ReviewRepository,
     ...QueryHandlers,
