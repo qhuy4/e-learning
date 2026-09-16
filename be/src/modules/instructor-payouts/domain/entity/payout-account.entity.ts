@@ -10,6 +10,7 @@ export class PayoutAccount {
     public readonly routingCode: string | null,
     public readonly paypalEmail: string | null,
     public readonly externalRef: string | null,
+    public readonly casGrantId: string | null,
     public readonly currency: string,
     public readonly isPrimary: boolean,
     public readonly isVerified: boolean,
@@ -30,6 +31,7 @@ export class PayoutAccount {
     routingCode: string | null;
     paypalEmail: string | null;
     externalRef: string | null;
+    casGrantId: string | null;
     currency: string;
     isPrimary: boolean;
     isVerified: boolean;
@@ -49,6 +51,7 @@ export class PayoutAccount {
       params.routingCode,
       params.paypalEmail,
       params.externalRef,
+      params.casGrantId,
       params.currency,
       params.isPrimary,
       params.isVerified,

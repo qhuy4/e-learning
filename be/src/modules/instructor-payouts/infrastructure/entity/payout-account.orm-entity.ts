@@ -41,6 +41,9 @@ export class PayoutAccountOrmEntity {
   @Column({ name: 'external_ref', type: 'varchar', nullable: true })
   externalRef: string | null;
 
+  @Column({ name: 'cas_grant_id', type: 'varchar', nullable: true })
+  casGrantId: string | null;
+
   @Column({ name: 'currency', type: 'char', length: 3, default: 'VND' })
   currency: string;
 

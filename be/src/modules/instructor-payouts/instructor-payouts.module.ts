@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CqrsModule } from '@nestjs/cqrs';
+import { HttpModule } from '@nestjs/axios';
 
 import { RevenueSplitOrmEntity } from '@/modules/instructor-payouts/infrastructure/entity/revenue-split.orm-entity';
 import { InstructorPayoutOrmEntity } from '@/modules/instructor-payouts/infrastructure/entity/instructor-payout.orm-entity';
 import { PayoutAccountOrmEntity } from '@/modules/instructor-payouts/infrastructure/entity/payout-account.orm-entity';
+import { InstructorProfileTypeOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-profile.orm.entity';
 
 import { RevenueSplitRepository } from '@/modules/instructor-payouts/infrastructure/repository/revenue-split.repository';
 import { InstructorPayoutRepository } from '@/modules/instructor-payouts/infrastructure/repository/instructor-payout.repository';
@@ -27,6 +29,10 @@ import { DeletePayoutAccountHandler } from '@/modules/instructor-payouts/applica
 import { AdminRevenueController } from '@/modules/instructor-payouts/presentation/admin-revenue.controller';
 import { AdminPayoutsController } from '@/modules/instructor-payouts/presentation/admin-payouts.controller';
 import { AdminPayoutAccountsController } from '@/modules/instructor-payouts/presentation/admin-payout-accounts.controller';
+import { InstructorPayoutController } from '@/modules/instructor-payouts/presentation/instructor-payout.controller';
+
+import { CasConfig } from '@/modules/instructor-payouts/infrastructure/cas/cas.config';
+import { CasService } from '@/modules/instructor-payouts/infrastructure/cas/cas.service';
 
 const QueryHandlers = [
   GetAdminRevenueSplitsHandler,
@@ -47,13 +53,17 @@ const CommandHandlers = [
 @Module({
   imports: [
     CqrsModule,
+    HttpModule.register({
+      timeout: 15000,
+    }),
     TypeOrmModule.forFeature([
       RevenueSplitOrmEntity,
       InstructorPayoutOrmEntity,
       PayoutAccountOrmEntity,
+      InstructorProfileTypeOrmEntity,
     ]),
   ],
-  controllers: [AdminRevenueController, AdminPayoutsController, AdminPayoutAccountsController],
+  controllers: [AdminRevenueController, AdminPayoutsController, AdminPayoutAccountsController, InstructorPayoutController],
   providers: [
     RevenueSplitRepository,
     InstructorPayoutRepository,
@@ -70,6 +80,8 @@ const CommandHandlers = [
       provide: PAYOUT_ACCOUNT_REPOSITORY,
       useExisting: PayoutAccountRepository,
     },
+    CasConfig,
+    CasService,
     ...QueryHandlers,
     ...CommandHandlers,
   ],
