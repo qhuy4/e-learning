@@ -1,4 +1,6 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { GetCourseBySlugQuery } from '../query/get-course-by-slug.query';
@@ -18,7 +20,7 @@ export class GetCourseBySlugHandler implements IQueryHandler<GetCourseBySlugQuer
   async execute(query: GetCourseBySlugQuery) {
     const courseEntity = await this.courseRepository.getCourseDetail(query.slug);
     if (!courseEntity) {
-      throw new NotFoundException('Course not found');
+      throw new AppException(ErrorCode.COURSE_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     return CourseDtoMapper.toDetailDto(courseEntity, this.storage);

@@ -1,4 +1,6 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CancelReviewCourseCommand } from '../command/cancel-review-course.command';
 import { CourseRepository } from '../../infrastructure/repository/course.repository';
@@ -15,7 +17,7 @@ export class CancelReviewCourseHandler
     const course = await this.courseRepository.findById(command.id);
 
     if (!course) {
-      throw new NotFoundException('Course not found');
+      throw new AppException(ErrorCode.COURSE_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     if (course.status !== CourseStatus.PENDING_REVIEW) {
