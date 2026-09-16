@@ -1,7 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Inject, Logger, NotFoundException } from '@nestjs/common';
+import { Inject, Logger, HttpStatus } from '@nestjs/common';
 
 import { RetryPaymentCommand } from '@/modules/payments/application/command/retry-payment.command';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 import {
   PAYMENT_REPOSITORY,
   IPaymentRepository,
@@ -33,18 +35,14 @@ export class RetryPaymentHandler
     );
 
     if (!oldPayment) {
-      throw new NotFoundException(
-        `Payment with ID ${command.data.paymentId} not found`,
-      );
+      throw new AppException(ErrorCode.PAYMENT_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     if (
       oldPayment.status !== PaymentStatus.FAILED &&
       oldPayment.status !== PaymentStatus.CANCELLED
     ) {
-      throw new NotFoundException(
-        `Cannot retry payment with status ${oldPayment.status}`,
-      );
+      throw new AppException(ErrorCode.PAYMENT_CANNOT_CANCEL, HttpStatus.NOT_FOUND);
     }
 
     const gateway = command.data.gateway ?? oldPayment.gateway;

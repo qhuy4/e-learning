@@ -3,7 +3,6 @@ import {
   Body,
   Controller,
   Get,
-  NotFoundException,
   Param,
   ParseIntPipe,
   Patch,
@@ -18,6 +17,9 @@ import { InstructorCertificateEntity } from '@/modules/teacher/infrastructure/en
 import { ApprovalStatus } from '@/modules/teacher/domain/enum/approval-status.enum';
 import { ReviewTeacherProfileDto } from '@/modules/teacher/presentation/dto/review-teacher-profile.dto';
 import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
+import { HttpStatus } from '@nestjs/common';
 
 @Controller('admin/teachers')
 export class AdminTeacherController {
@@ -137,7 +139,7 @@ export class AdminTeacherController {
     });
 
     if (!profile) {
-      throw new NotFoundException('Không tìm thấy hồ sơ giảng viên này.');
+      throw new AppException(ErrorCode.INSTRUCTOR_PROFILE_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     if (profile.approvalStatus === ApprovalStatus.APPROVED) {

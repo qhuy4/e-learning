@@ -1,5 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { NotFoundException } from '@nestjs/common';
+import { HttpStatus } from '@nestjs/common';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 import { UpdateReviewStatusCommand } from '@/modules/reviews/application/command/update-review-status.command';
 import { ReviewRepository } from '@/modules/reviews/infrastructure/repository/review.repository';
 
@@ -11,7 +13,7 @@ export class UpdateReviewStatusHandler implements ICommandHandler<UpdateReviewSt
     const { id, status } = command.data;
     const review = await this.reviewRepository.findById(id);
     if (!review) {
-      throw new NotFoundException(`Review with ID ${id} not found`);
+      throw new AppException(ErrorCode.REVIEW_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
     return this.reviewRepository.updateStatus(id, status);
   }

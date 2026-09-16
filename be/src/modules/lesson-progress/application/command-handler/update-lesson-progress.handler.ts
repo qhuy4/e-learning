@@ -1,4 +1,4 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler, EventBus } from '@nestjs/cqrs';
 import { UpdateLessonProgressCommand } from '../command/update-lesson-progress.command';
 import {
   ILessonProgressRepository,
@@ -10,6 +10,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EnrollmentOrmEntity } from '@/modules/enrollments/infrastructure/entity/enrollment.orm-entity';
 import { LessonOrmEntity } from '@/modules/lessons/infrastructure/entity/lesson.orm-entity';
+import { LearningEvent } from '@/modules/achievements/application/event/learning.event';
+import { AchievementCriteria } from '@/modules/achievements/domain/enum/achievement-criteria.enum';
 
 @CommandHandler(UpdateLessonProgressCommand)
 export class UpdateLessonProgressHandler implements ICommandHandler<UpdateLessonProgressCommand> {
@@ -22,6 +24,7 @@ export class UpdateLessonProgressHandler implements ICommandHandler<UpdateLesson
     private readonly enrollmentRepository: Repository<EnrollmentOrmEntity>,
     @InjectRepository(LessonOrmEntity)
     private readonly lessonRepository: Repository<LessonOrmEntity>,
+    private readonly eventBus: EventBus,
   ) {}
 
   async execute(command: UpdateLessonProgressCommand): Promise<LessonProgress> {
@@ -60,6 +63,19 @@ export class UpdateLessonProgressHandler implements ICommandHandler<UpdateLesson
     this.syncEnrollmentProgress(command.userId, command.courseId).catch((err) =>
       this.logger.error(`Failed to sync enrollment progress: ${(err as Error).message}`),
     );
+
+    if (result.isCompleted) {
+      this.eventBus
+        .publish(
+          new LearningEvent(command.userId, AchievementCriteria.LESSONS_COMPLETED, {
+            courseId: command.courseId,
+            lessonId: command.lessonId,
+          }),
+        )
+        .catch((err) =>
+          this.logger.error(`Failed to publish learning event: ${(err as Error).message}`),
+        );
+    }
 
     return result;
   }

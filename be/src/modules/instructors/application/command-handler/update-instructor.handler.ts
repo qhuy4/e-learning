@@ -4,7 +4,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
 import { InstructorProfileTypeOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-profile.orm.entity';
-import { NotFoundException } from '@nestjs/common';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
+import { HttpStatus } from '@nestjs/common';
 import { UserStatus } from '@/modules/users/domain/enum/user.status';
 
 const statusMap: Record<string, UserStatus> = {
@@ -32,7 +34,7 @@ export class UpdateInstructorHandler implements ICommandHandler<UpdateInstructor
     });
 
     if (!profile) {
-      throw new NotFoundException(`Instructor with user ID ${id} not found`);
+      throw new AppException(ErrorCode.INSTRUCTOR_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     // Update user fields
@@ -63,7 +65,7 @@ export class UpdateInstructorHandler implements ICommandHandler<UpdateInstructor
     });
 
     if (!updatedProfile) {
-      throw new NotFoundException(`Instructor with user ID ${id} not found after update`);
+      throw new AppException(ErrorCode.INSTRUCTOR_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     return {

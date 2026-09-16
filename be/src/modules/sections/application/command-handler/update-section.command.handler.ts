@@ -1,4 +1,4 @@
-import { Inject, NotFoundException, HttpStatus } from '@nestjs/common';
+import { Inject, HttpStatus } from '@nestjs/common';
 
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
@@ -34,7 +34,7 @@ export class UpdateSectionHandler implements ICommandHandler<UpdateSectionComman
     const section = await this.sectionRepository.findById(command.id);
 
     if (!section) {
-      throw new NotFoundException('Section not found');
+      throw new AppException(ErrorCode.SECTION_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     const course = await this.courseRepository.findById(section.courseId);

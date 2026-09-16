@@ -1,7 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Inject, NotFoundException } from '@nestjs/common';
+import { Inject, HttpStatus } from '@nestjs/common';
 
 import { UpdatePaymentStatusCommand } from '@/modules/payments/application/command/update-payment-status.command';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 import {
   PAYMENT_REPOSITORY,
   IPaymentRepository,
@@ -22,7 +24,7 @@ export class UpdatePaymentStatusHandler
     const payment = await this.paymentRepository.findById(id);
 
     if (!payment) {
-      throw new NotFoundException(`Payment with ID ${id} not found`);
+      throw new AppException(ErrorCode.PAYMENT_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     payment.updateStatus(status);

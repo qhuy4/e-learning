@@ -1,4 +1,4 @@
-import { Inject, NotFoundException, HttpStatus } from '@nestjs/common';
+import { Inject, HttpStatus } from '@nestjs/common';
 
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
@@ -38,7 +38,7 @@ export class DeleteLessonHandler implements ICommandHandler<DeleteLessonCommand>
     const lesson = await this.lessonRepository.findById(command.id);
 
     if (!lesson) {
-      throw new NotFoundException('Lesson not found');
+      throw new AppException(ErrorCode.LESSON_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     const section = await this.sectionRepository.findById(lesson.sectionId);

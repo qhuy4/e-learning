@@ -1,5 +1,5 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { Inject, NotFoundException } from '@nestjs/common';
+import { Inject, HttpStatus } from '@nestjs/common';
 
 import { GetMyOrderByIdQuery } from '@/modules/orders/application/query/get-my-order-by-id.query';
 import {
@@ -22,7 +22,7 @@ export class GetMyOrderByIdHandler
     const order = await this.orderRepository.findById(query.data.id);
 
     if (!order || order.userId !== query.data.userId) {
-      throw new AppException(ErrorCode.ORDER_NOT_FOUND, 404);
+      throw new AppException(ErrorCode.ORDER_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     return {

@@ -1,7 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Inject, Logger, NotFoundException } from '@nestjs/common';
+import { Inject, Logger, HttpStatus } from '@nestjs/common';
 
 import { RefundPaymentCommand } from '@/modules/payments/application/command/refund-payment.command';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 import {
   PAYMENT_REPOSITORY,
   IPaymentRepository,
@@ -30,19 +32,15 @@ export class RefundPaymentHandler
     const payment = await this.paymentRepository.findById(command.data.id);
 
     if (!payment) {
-      throw new NotFoundException(
-        `Payment with ID ${command.data.id} not found`,
-      );
+      throw new AppException(ErrorCode.PAYMENT_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     if (payment.status !== PaymentStatus.COMPLETED) {
-      throw new NotFoundException(
-        `Cannot refund payment with status ${payment.status}`,
-      );
+      throw new AppException(ErrorCode.PAYMENT_REFUND_FAILED, HttpStatus.NOT_FOUND);
     }
 
     if (!payment.transactionId) {
-      throw new NotFoundException('Payment has no transaction ID');
+      throw new AppException(ErrorCode.PAYMENT_NO_TRANSACTION, HttpStatus.NOT_FOUND);
     }
 
     const result = await this.gatewayService.refundPayment({
@@ -60,7 +58,7 @@ export class RefundPaymentHandler
       this.logger.error(
         `Refund failed for payment ${payment.id}: ${JSON.stringify(result.rawResponse)}`,
       );
-      throw new NotFoundException('Refund failed');
+      throw new AppException(ErrorCode.PAYMENT_REFUND_FAILED, HttpStatus.NOT_FOUND);
     }
 
     const updated = await this.paymentRepository.update(payment);

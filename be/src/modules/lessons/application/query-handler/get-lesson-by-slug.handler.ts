@@ -1,5 +1,5 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { Inject, Logger, NotFoundException } from '@nestjs/common';
+import { Inject, Logger, HttpStatus } from '@nestjs/common';
 import { GetLessonBySlugQuery } from '../query/get-lesson-by-slug.query';
 import {
   LESSON_REPOSITORY,
@@ -36,6 +36,8 @@ async function resolveSignedUrl(
 
 import { LessonDtoMapper } from '../../presentation/mappers/lesson-dto.mapper';
 import { SectionOrmEntity } from '@/modules/sections/infrastructure/entity/section.orm-entity';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 
 @QueryHandler(GetLessonBySlugQuery)
 export class GetLessonBySlugHandler implements IQueryHandler<GetLessonBySlugQuery> {
@@ -59,7 +61,7 @@ export class GetLessonBySlugHandler implements IQueryHandler<GetLessonBySlugQuer
 
     if (!lesson) {
       this.logger.debug(`Lesson not found: slug=${query.slug}`);
-      throw new NotFoundException('Lesson not found');
+      throw new AppException(ErrorCode.LESSON_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     this.logger.debug(`Lesson found: id=${lesson.id}, sectionId=${lesson.sectionId}, isPreview=${lesson.isPreview}`);
