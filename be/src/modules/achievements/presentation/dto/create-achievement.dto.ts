@@ -14,6 +14,10 @@ export class CreateAchievementDto {
   @IsString()
   icon?: string;
 
+  @IsOptional()
+  @IsString()
+  category?: string;
+
   @IsEnum(AchievementCriteria)
   @IsNotEmpty()
   criteria: AchievementCriteria;
