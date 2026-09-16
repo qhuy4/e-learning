@@ -11,9 +11,9 @@ export const useCreateLesson = () => {
     onSuccess: (_data, variables) => {
       const courseId = (variables.data as any).courseId;
       if (courseId) {
-        queryClient.removeQueries({ queryKey: ["course", String(courseId)] });
-        queryClient.invalidateQueries({ queryKey: ["courses"] });
+        queryClient.invalidateQueries({ queryKey: ["course", String(courseId)] });
       }
+      queryClient.invalidateQueries({ queryKey: ["courses"] });
     },
   });
 };
@@ -35,7 +35,7 @@ export const useUpdateLesson = () => {
     onSuccess: (_data, variables) => {
       const courseId = (variables.data as any)?.courseId;
       if (courseId) {
-        queryClient.removeQueries({ queryKey: ["course", String(courseId)] });
+        queryClient.invalidateQueries({ queryKey: ["course", String(courseId)] });
       }
       queryClient.invalidateQueries({ queryKey: ["courses"] });
     },
