@@ -218,7 +218,7 @@ function SectionItem({
     const tid = toast.loading("Đang xóa bài học...");
     try {
       if (!String(deletingLessonId).startsWith("new_")) {
-        await deleteLessonApi(Number(deletingLessonId));
+        await deleteLessonApi({ id: Number(deletingLessonId), courseId });
       }
       toast.success("Đã xóa bài học!", { id: tid });
     } catch (err) {

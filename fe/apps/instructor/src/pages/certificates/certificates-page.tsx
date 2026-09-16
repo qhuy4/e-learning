@@ -58,7 +58,7 @@ export default function CertificatesPage() {
   const columns = createCertificateColumns(handleDelete);
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto p-6">
+    <div className="space-y-6 mx-auto p-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Chứng chỉ</h1>

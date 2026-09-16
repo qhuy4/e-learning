@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useParams, useNavigate } from "react-router";
 import { ChevronLeft, Undo2 } from "lucide-react";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useGetCourseDetail, useCancelReview, useUpdateCourse } from "@/features/courses/hook/use-courses";
 import { LEVEL_LABELS, COURSE_STATUS_CONFIG } from "@/features/courses/types/course.constants";
@@ -22,6 +23,7 @@ const COURSE_TABS = [
 export default function CourseDetailLayout() {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { data: courseResponse, isLoading } = useGetCourseDetail(courseId);
   const course = (courseResponse as any)?.data ?? (courseResponse as any)?.data?.data;
   const [confirmCancel, setConfirmCancel] = useState(false);
@@ -49,16 +51,27 @@ export default function CourseDetailLayout() {
   const handleSubmitForReview = async () => {
     if (!courseId) return;
 
-    const sections = course?.sections ?? [];
+    let freshCourse: any;
+    try {
+      const freshData = await queryClient.fetchQuery({
+        queryKey: ["course", courseId],
+        staleTime: 0,
+      });
+      freshCourse = (freshData as any)?.data ?? (freshData as any)?.data?.data ?? course;
+    } catch {
+      freshCourse = course;
+    }
+
+    const sections = freshCourse?.sections ?? [];
     const hasSections = sections.length > 0;
-    const hasLessons = sections.some((s: any) => (s.lessons ?? []).length > 0);
+    const allSectionsHaveLessons = sections.length > 0 && sections.every((s: any) => (s.lessons ?? []).length > 0);
 
     if (!hasSections) {
       toast.error("Khóa học phải có ít nhất một chương trước khi gửi duyệt.");
       return;
     }
-    if (!hasLessons) {
-      toast.error("Khóa học phải có ít nhất một bài học trước khi gửi duyệt.");
+    if (!allSectionsHaveLessons) {
+      toast.error("Mỗi chương phải có ít nhất một bài học trước khi gửi duyệt.");
       return;
     }
 
@@ -107,7 +120,7 @@ export default function CourseDetailLayout() {
         {canSubmitForReview && (
             <Button
                 size="sm"
-                className="h-8 text-xs bg-green-600 hover:bg-green-700 text-white"
+                className="h-8 text-xs bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white border-0"
                 onClick={() => setConfirmSubmit(true)}
                 disabled={isSubmitting}
             >
