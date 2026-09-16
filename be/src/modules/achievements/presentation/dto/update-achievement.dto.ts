@@ -17,6 +17,10 @@ export class UpdateAchievementDto {
 
   @IsOptional()
   @IsString()
+  category?: string;
+
+  @IsOptional()
+  @IsString()
   @IsNotEmpty()
   criteria?: string;
 

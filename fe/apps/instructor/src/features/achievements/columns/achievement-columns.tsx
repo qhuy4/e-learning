@@ -24,6 +24,13 @@ export function createAchievementColumns(): ColumnDef<Achievement>[] {
       ),
     },
     {
+      accessorKey: "category",
+      header: "Danh mục",
+      cell: ({ row }) => (
+        <span className="text-muted-foreground">{row.original.category || "—"}</span>
+      ),
+    },
+    {
       accessorKey: "description",
       header: "Mô tả",
       cell: ({ row }) => (

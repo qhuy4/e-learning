@@ -244,6 +244,19 @@ export default function AchievementDetailPage() {
             )}
           </div>
           <div>
+            <p className="text-sm text-muted-foreground">Danh mục</p>
+            {isEditing ? (
+              <Input
+                value={editForm.category}
+                onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+                className="mt-1"
+                placeholder="Progress, Quiz / Knowledge, ..."
+              />
+            ) : (
+              <p className="font-medium">{achievement.category || "—"}</p>
+            )}
+          </div>
+          <div>
             <p className="text-sm text-muted-foreground">Loại tiêu chí</p>
             {isEditing ? (
               <Select
