@@ -11,6 +11,10 @@ export const achievementColumns = [
     header: "Tên thành tựu",
     cell: (info) => <span className="font-medium">{info.getValue()}</span>,
   }),
+  column.accessor("category", {
+    header: "Danh mục",
+    cell: (info) => <span>{info.getValue() ?? "—"}</span>,
+  }),
   column.accessor("criteria", {
     header: "Loại",
     cell: (info) => {
