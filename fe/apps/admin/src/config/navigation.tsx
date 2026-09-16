@@ -2,7 +2,6 @@ import {
     LayoutDashboard,
     Users,
     Settings,
-    ChartBar,
     GraduationCap,
     BookOpen,
     DollarSign,
@@ -16,11 +15,13 @@ import {
     FolderTree,
     MessageCircle,
     Flag,
-    Award,
+    Trophy,
     FileCheck,
     Bell,
     Crown,
     Heart,
+    CreditCard,
+    HandCoins,
 } from "lucide-react"
 import type { NavGroup, NavItem } from "@/shared/types/navigation"
 
@@ -37,11 +38,6 @@ export const navigation: Navigation = {
                     title: "Tổng quan",
                     url: "/",
                     icon: LayoutDashboard,
-                },
-                {
-                    title: "Analytics",
-                    url: "/analytics",
-                    icon: ChartBar,
                 },
             ],
         },
@@ -104,9 +100,9 @@ export const navigation: Navigation = {
                     icon: Flag,
                 },
                 {
-                    title: "Chứng chỉ học viên",
-                    url: "/student-certificates",
-                    icon: Award,
+                    title: "Thành tựu",
+                    url: "/achievements",
+                    icon: Trophy,
                 },
                 {
                     title: "Chứng chỉ giảng viên",
@@ -137,6 +133,16 @@ export const navigation: Navigation = {
                     title: "Doanh thu",
                     url: "/earnings",
                     icon: DollarSign,
+                },
+                {
+                    title: "Thanh toán",
+                    url: "/payments",
+                    icon: CreditCard,
+                },
+                {
+                    title: "Yêu cầu rút tiền",
+                    url: "/payout-requests",
+                    icon: HandCoins,
                 },
             ],
         },

@@ -2,7 +2,7 @@ import { Navigate, Outlet } from "react-router";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/shared/stores/store";
 
-export function PublicRoute() {
+export function PublishRoute() {
     const token = useSelector(
         (state: RootState) => state.auth.token
     );
