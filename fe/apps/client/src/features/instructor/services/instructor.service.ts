@@ -59,7 +59,7 @@ export const instructorService = {
 
   /** Đăng nhập */
   login: async (payload: { email: string; password: string }) => {
-    const response = await api.post("/auth/login", payload);
+    const response = await api.post("/instructor/auth/login", payload);
     return response.data?.data ?? response.data;
   },
 };
