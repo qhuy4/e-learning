@@ -46,6 +46,13 @@ const criteriaOptions = [
   { value: "COURSES_COMPLETED", label: "Khóa học hoàn thành" },
   { value: "QUIZZES_COMPLETED", label: "Quiz hoàn thành" },
   { value: "LEARNING_HOURS", label: "Giờ học" },
+  { value: "PERFECT_QUIZ_SCORE", label: "Quiz 100%" },
+  { value: "HIGH_QUIZ_SCORES", label: "Quiz 90%+" },
+  { value: "STREAK_DAYS", label: "Chuỗi ngày học" },
+  { value: "SPEAKING_SESSIONS", label: "Speaking" },
+  { value: "GRAMMAR_EXERCISES", label: "Grammar" },
+  { value: "VOCABULARY_WORDS", label: "Từ vựng" },
+  { value: "ACHIEVEMENTS_EARNED", label: "Thành tựu" },
 ];
 
 export default function AchievementDetailPage() {
