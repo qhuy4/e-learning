@@ -12,6 +12,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/revenue": "Doanh thu",
   "/availability": "Lịch giảng dạy",
   "/certificates": "Chứng chỉ",
+  "/achievements": "Thành tựu",
   "/profile": "Hồ sơ",
 };
 

@@ -1,12 +1,12 @@
-import { Inject, Logger, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Inject, Logger } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import slugify from 'slugify';
 import { extname } from 'path';
 import { randomUUID } from 'crypto';
-import { HttpStatus } from '@nestjs/common';
-
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 import { UpdateCourseCommand } from '@/modules/courses/application/command/update-course.command';
 import {
   COURSE_REPOSITORY,
@@ -19,8 +19,6 @@ import {
 import { AdminCourseDtoMapper } from '@/modules/courses/presentation/mappers/admin-course-dto.mapper';
 import { SectionOrmEntity } from '@/modules/sections/infrastructure/entity/section.orm-entity';
 import { LessonOrmEntity } from '@/modules/lessons/infrastructure/entity/lesson.orm-entity';
-import { AppException } from '@/common/exception/app.exception';
-import { ErrorCode } from '@/common/enum/error-code.enum';
 import { CategoryOrmEntity } from '@/modules/categories/infrastructure/entity/category.orm-entity';
 import { CategoryCourseOrmEntity } from '@/modules/categories/infrastructure/entity/category-course.orm-entity';
 
@@ -54,7 +52,7 @@ export class UpdateCourseHandler implements ICommandHandler<UpdateCourseCommand>
     const course = await this.courseRepository.findById(command.id);
 
     if (!course) {
-      throw new NotFoundException('Course not found');
+      throw new AppException(ErrorCode.COURSE_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     const newStatus = command.data.status != null ? Number(command.data.status) : undefined;
@@ -68,13 +66,15 @@ export class UpdateCourseHandler implements ICommandHandler<UpdateCourseCommand>
         throw new AppException(ErrorCode.COURSE_NO_SECTIONS, HttpStatus.BAD_REQUEST);
       }
 
-      const lessonCount = await this.lessonRepo
-        .createQueryBuilder('lesson')
-        .innerJoin('lesson.section', 'section')
-        .where('section.courseId = :courseId', { courseId: command.id.toString() })
+      const emptySectionCount = await this.sectionRepo
+        .createQueryBuilder('section')
+        .leftJoin('section.lessons', 'lesson')
+        .where('section.courseId = :courseId', { courseId: String(command.id) })
+        .groupBy('section.id')
+        .having('COUNT(lesson.id) = 0')
         .getCount();
 
-      if (lessonCount === 0) {
+      if (emptySectionCount > 0) {
         throw new AppException(ErrorCode.COURSE_NO_LESSONS, HttpStatus.BAD_REQUEST);
       }
     }

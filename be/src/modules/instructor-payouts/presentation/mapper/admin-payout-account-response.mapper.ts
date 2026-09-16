@@ -15,6 +15,7 @@ export class AdminPayoutAccountResponseMapper {
       currency: account.currency,
       isPrimary: account.isPrimary,
       isVerified: account.isVerified,
+      verifiedAt: account.verifiedAt,
       isActive: account.isActive,
       createdAt: account.createdAt,
       updatedAt: account.updatedAt,

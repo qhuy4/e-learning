@@ -16,9 +16,13 @@ import AvailabilityPage from "@/pages/availability/availability-page"
 import CertificatesPage from "@/pages/certificates/certificates-page"
 import CertificateDetailPage from "@/pages/certificates/certificate-detail-page"
 import CertificateCreatePage from "@/pages/certificates/certificate-create-page"
+import AchievementsPage from "@/pages/achievements/achievements-page"
 import CourseAnalyticsPage from "@/pages/analytics/course-analytics-page"
 import CourseRevenuePage from "@/pages/analytics/course-revenue-page"
 import CourseReviewsPage from "@/pages/analytics/course-reviews-page"
+import PaymentsPage from "@/pages/payments/payments-page"
+import CasCallbackPage from "@/pages/payments/cas-callback-page"
+import TeacherRegisterPage from "@/pages/teacher/teacher-register-page"
 import LoginPage from "@/pages/authen/login-page"
 import { CreateLessonPage } from "@/features/lessons/pages/create-lesson-page"
 
@@ -48,10 +52,14 @@ export const router = createBrowserRouter([
                     },
                     { path: "students", element: <StudentsPage /> },
                     { path: "revenue", element: <RevenuePage /> },
+                    { path: "payments", element: <PaymentsPage /> },
+                    { path: "payments/cas-callback", element: <CasCallbackPage /> },
+                    { path: "teacher/register", element: <TeacherRegisterPage /> },
                     { path: "availability", element: <AvailabilityPage /> },
                     { path: "certificates", element: <CertificatesPage /> },
                     { path: "certificates/create", element: <CertificateCreatePage /> },
                     { path: "certificates/:id", element: <CertificateDetailPage /> },
+                    { path: "achievements", element: <AchievementsPage /> },
                     { path: "profile", element: <ProfilePage /> },
                     { path: "lessons/create", element: <CreateLessonPage /> },
                     { path: "lessons/:id/edit", element: <CreateLessonPage /> },

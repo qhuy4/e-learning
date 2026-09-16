@@ -1,7 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Inject, NotFoundException } from '@nestjs/common';
+import { Inject, HttpStatus } from '@nestjs/common';
 
 import { CancelPaymentCommand } from '@/modules/payments/application/command/cancel-payment.command';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 import {
   PAYMENT_REPOSITORY,
   IPaymentRepository,
@@ -21,11 +23,11 @@ export class CancelPaymentHandler
     const payment = await this.paymentRepository.findById(command.id);
 
     if (!payment) {
-      throw new NotFoundException(`Payment with ID ${command.id} not found`);
+      throw new AppException(ErrorCode.PAYMENT_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     if (payment.status === PaymentStatus.COMPLETED) {
-      throw new NotFoundException('Cannot cancel a completed payment');
+      throw new AppException(ErrorCode.PAYMENT_CANNOT_CANCEL, HttpStatus.NOT_FOUND);
     }
 
     payment.updateStatus(PaymentStatus.CANCELLED);

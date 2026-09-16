@@ -1,4 +1,6 @@
-import { ConflictException, Inject, NotFoundException } from '@nestjs/common';
+import { ConflictException, HttpStatus, Inject } from '@nestjs/common';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CloneCourseCommand } from '../command/clone-course.command';
 import {
@@ -36,11 +38,11 @@ export class CloneCourseHandler implements ICommandHandler<CloneCourseCommand> {
     );
 
     if (!originalCourse) {
-      throw new NotFoundException('Course not found');
+      throw new AppException(ErrorCode.COURSE_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     if (!originalCourse.id) {
-      throw new NotFoundException('Original course id not found');
+      throw new AppException(ErrorCode.COURSE_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     const existingClone = await this.courseRepository.findUnpublishedClone(
@@ -71,7 +73,7 @@ export class CloneCourseHandler implements ICommandHandler<CloneCourseCommand> {
     const savedCourse = await this.courseRepository.create(clonedCourse);
 
     if (!savedCourse.id) {
-      throw new NotFoundException('Cloned course id not found');
+      throw new AppException(ErrorCode.COURSE_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     const sections = await this.sectionRepository.findByCourseId(
@@ -91,11 +93,11 @@ export class CloneCourseHandler implements ICommandHandler<CloneCourseCommand> {
       const savedSection = await this.sectionRepository.create(clonedSection);
 
       if (!savedSection.id) {
-        throw new NotFoundException('Cloned section id not found');
+        throw new AppException(ErrorCode.SECTION_NOT_FOUND, HttpStatus.NOT_FOUND);
       }
 
       if (!originalSection.id) {
-        throw new NotFoundException('Original section id not found');
+        throw new AppException(ErrorCode.SECTION_NOT_FOUND, HttpStatus.NOT_FOUND);
       }
 
       const lessons = await this.lessonRepository.findBySectionId(

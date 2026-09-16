@@ -1,4 +1,6 @@
-import { Inject, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Inject } from '@nestjs/common';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
@@ -32,7 +34,7 @@ export class CreateCourseThumbnailUploadHandler implements ICommandHandler<Creat
     const course = await this.courseRepository.findById(command.courseId);
 
     if (!course) {
-      throw new NotFoundException('Course not found');
+      throw new AppException(ErrorCode.COURSE_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     const extension = extname(command.fileName).toLowerCase();

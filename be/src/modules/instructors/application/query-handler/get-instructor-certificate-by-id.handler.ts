@@ -1,7 +1,9 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { NotFoundException } from '@nestjs/common';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
+import { HttpStatus } from '@nestjs/common';
 import { GetInstructorCertificateByIdQuery } from '@/modules/instructors/application/query/get-instructor-certificate-by-id.query';
 import { InstructorCertificateEntity } from '@/modules/teacher/infrastructure/entity/instructor-certificate.entity';
 
@@ -20,7 +22,7 @@ export class GetInstructorCertificateByIdHandler
     });
 
     if (!cert) {
-      throw new NotFoundException('Chứng chỉ không tồn tại');
+      throw new AppException(ErrorCode.INSTRUCTOR_CERTIFICATE_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     return {

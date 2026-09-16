@@ -1,7 +1,6 @@
 import {
   ConflictException,
   Inject,
-  NotFoundException,
   HttpStatus,
 } from '@nestjs/common';
 
@@ -39,7 +38,7 @@ export class CreateSectionHandler implements ICommandHandler<CreateSectionComman
     const course = await this.courseRepository.findById(command.courseId);
 
     if (!course) {
-      throw new NotFoundException('Course not found');
+      throw new AppException(ErrorCode.COURSE_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     const slug = SlugUtil.generate(command.title);

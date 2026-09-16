@@ -3,10 +3,13 @@ import {
     BookOpen,
     Users,
     DollarSign,
+    CreditCard,
     Clock,
     Award,
+    GraduationCap,
     UserCircle,
     LogOut,
+    Trophy,
 } from "lucide-react"
 import type { NavGroup, NavItem } from "@/shared/types/navigation"
 
@@ -46,6 +49,11 @@ export const navigation: Navigation = {
                     icon: DollarSign,
                 },
                 {
+                    title: "Thanh toán",
+                    url: "/payments",
+                    icon: CreditCard,
+                },
+                {
                     title: "Lịch giảng dạy",
                     url: "/availability",
                     icon: Clock,
@@ -54,6 +62,16 @@ export const navigation: Navigation = {
                     title: "Chứng chỉ",
                     url: "/certificates",
                     icon: Award,
+                },
+                {
+                    title: "Thành tựu",
+                    url: "/achievements",
+                    icon: Trophy,
+                },
+                {
+                    title: "Đăng ký giáo viên",
+                    url: "/teacher/register",
+                    icon: GraduationCap,
                 },
             ],
         },

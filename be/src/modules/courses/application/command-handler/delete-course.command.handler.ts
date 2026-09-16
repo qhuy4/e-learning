@@ -1,5 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Inject, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Inject } from '@nestjs/common';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 import { DeleteCourseCommand } from '@/modules/courses/application/command/delete-course.command';
 import {
   COURSE_REPOSITORY,
@@ -17,7 +19,7 @@ export class DeleteCourseHandler implements ICommandHandler<DeleteCourseCommand>
     const course = await this.courseRepository.findById(command.id);
 
     if (!course) {
-      throw new NotFoundException('Course not found');
+      throw new AppException(ErrorCode.COURSE_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     await this.courseRepository.delete(command.id);

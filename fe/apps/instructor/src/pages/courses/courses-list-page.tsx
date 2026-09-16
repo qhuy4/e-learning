@@ -85,10 +85,8 @@ export default function CoursesListPage() {
   };
 
   const handleClone = async (id: string) => {
-    const tid = toast.loading("Đang tải thông tin khóa học...");
     try {
       const res = await courseService.getCourseById(id);
-      toast.success("Đang tạo bản nháp...", { id: tid });
       navigate("/courses/create", { state: { cloneData: res.data } });
     } catch (err) {
       toast.error(getErrorMessage(err), { id: tid });
@@ -197,7 +195,7 @@ export default function CoursesListPage() {
   ];
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto p-6">
+    <div className="space-y-6  mx-auto p-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Khóa học của tôi</h1>

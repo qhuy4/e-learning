@@ -1,4 +1,4 @@
-import { ConflictException, Inject, NotFoundException, HttpStatus } from '@nestjs/common';
+import { ConflictException, Inject, HttpStatus } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SlugUtil } from '../../../../common/utils/slug.util';
 import { extname } from 'path';
@@ -49,7 +49,7 @@ export class CreateLessonHandler implements ICommandHandler<CreateLessonCommand>
     const section = await this.sectionRepository.findById(command.sectionId);
 
     if (!section) {
-      throw new NotFoundException('Section not found');
+      throw new AppException(ErrorCode.SECTION_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     const course = await this.courseRepository.findById(section.courseId);

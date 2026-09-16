@@ -1,4 +1,6 @@
-import { NotFoundException } from '@nestjs/common';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
+import { HttpStatus } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InstructorCertificateRepository } from '@/modules/teacher/infrastructure/repository/instructor-certificate.repository';
 import { InstructorKycRepository } from '@/modules/teacher/infrastructure/repository/instructor-kyc.repository';
@@ -39,9 +41,7 @@ export class GetTeacherRegistrationStatusHandler
     );
 
     if (!profile) {
-      throw new NotFoundException(
-        'Người dùng chưa nộp hồ sơ đăng ký làm giáo viên.',
-      );
+      throw new AppException(ErrorCode.TEACHER_REGISTRATION_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     const [kyc, certificates] = await Promise.all([

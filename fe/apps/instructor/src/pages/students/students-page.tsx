@@ -36,7 +36,7 @@ export default function StudentsPage() {
   const columns = createStudentColumns();
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto p-6">
+    <div className="space-y-6 mx-auto p-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Học viên</h1>
         <p className="text-sm text-muted-foreground mt-1">Danh sách học viên đã đăng ký khóa học của bạn</p>

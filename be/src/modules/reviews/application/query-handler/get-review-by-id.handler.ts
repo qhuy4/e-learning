@@ -1,5 +1,7 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { NotFoundException } from '@nestjs/common';
+import { HttpStatus } from '@nestjs/common';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 import { GetReviewByIdQuery } from '@/modules/reviews/application/query/get-review-by-id.query';
 import { ReviewRepository } from '@/modules/reviews/infrastructure/repository/review.repository';
 
@@ -10,7 +12,7 @@ export class GetReviewByIdHandler implements IQueryHandler<GetReviewByIdQuery> {
   async execute(query: GetReviewByIdQuery) {
     const review = await this.reviewRepository.findById(query.data.id);
     if (!review) {
-      throw new NotFoundException(`Review with ID ${query.data.id} not found`);
+      throw new AppException(ErrorCode.REVIEW_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
     return review;
   }

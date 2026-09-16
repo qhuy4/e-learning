@@ -6,11 +6,23 @@ import { useRevenueSplits, usePayouts, useRevenueSummary } from "@/features/earn
 import { createRevenueSplitColumns } from "@/features/earnings/components/revenue-columns";
 import { createPayoutColumns } from "@/features/earnings/components/payout-columns";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@fe/components/ui/tabs";
-import { formatCurrency } from "@/features/earnings/types/earnings";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@fe/components/ui/select";
+import { formatCurrency, payoutStatusLabel, RevenueSplitPayoutStatus, revenueSplitPayoutStatusLabel } from "@/features/earnings/types/earnings";
+
+const payoutStatusFilterOptions = [
+  { value: "all", label: "Tất cả trạng thái" },
+  ...Object.entries(payoutStatusLabel).map(([value, label]) => ({ value, label })),
+];
+
+const revenueStatusFilterOptions = [
+  { value: "all", label: "Tất cả trạng thái" },
+  { value: RevenueSplitPayoutStatus.PENDING, label: revenueSplitPayoutStatusLabel[RevenueSplitPayoutStatus.PENDING] },
+  { value: RevenueSplitPayoutStatus.INCLUDED_IN_PAYOUT, label: revenueSplitPayoutStatusLabel[RevenueSplitPayoutStatus.INCLUDED_IN_PAYOUT] },
+  { value: RevenueSplitPayoutStatus.PAID, label: revenueSplitPayoutStatusLabel[RevenueSplitPayoutStatus.PAID] },
+];
 
 export default function EarningsPage() {
   const [activeTab, setActiveTab] = useState("revenue");
-  const navigate = useNavigate();
 
   return (
     <div className="p-6">
@@ -40,11 +52,11 @@ export default function EarningsPage() {
 }
 
 function RevenueSplitTab() {
+  const navigate = useNavigate();
   const {
     page,
     limit,
     search,
-    debouncedSearch,
     sortBy,
     sortOrder,
     setPage,
@@ -53,12 +65,14 @@ function RevenueSplitTab() {
     handleSortChange,
   } = useListPage();
 
+  const [statusFilter, setStatusFilter] = useState("all");
+
   const { data, isLoading, refetch, isFetching } = useRevenueSplits(
     page,
     limit,
     undefined,
     undefined,
-    undefined,
+    statusFilter !== "all" ? statusFilter : undefined,
     sortBy,
     sortOrder,
   );
@@ -95,6 +109,23 @@ function RevenueSplitTab() {
         </div>
       )}
 
+      <div className="mb-4 flex items-center justify-end">
+        <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1); }}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue>
+              {revenueStatusFilterOptions.find((o) => o.value === statusFilter)?.label}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {revenueStatusFilterOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       <DataTable
         columns={columns}
         data={splits}
@@ -105,7 +136,7 @@ function RevenueSplitTab() {
         refetch={refetch}
         pageSize={limit}
         onPageChange={setPage}
-        onRowClick={(row) => navigate(`/courses/${row.course?.id ?? row.id}`)}
+        onRowClick={undefined}
         search={search}
         onSearchChange={setSearch}
         onPageSizeChange={(newLimit) => {
@@ -130,11 +161,11 @@ function RevenueSplitTab() {
 }
 
 function PayoutTab() {
+  const navigate = useNavigate();
   const {
     page,
     limit,
     search,
-    debouncedSearch,
     sortBy,
     sortOrder,
     setPage,
@@ -143,11 +174,13 @@ function PayoutTab() {
     handleSortChange,
   } = useListPage();
 
+  const [statusFilter, setStatusFilter] = useState("all");
+
   const { data, isLoading, refetch, isFetching } = usePayouts(
     page,
     limit,
     undefined,
-    undefined,
+    statusFilter !== "all" ? Number(statusFilter) : undefined,
     sortBy,
     sortOrder,
   );
@@ -158,35 +191,54 @@ function PayoutTab() {
   const columns = createPayoutColumns();
 
   return (
-    <DataTable
-      columns={columns}
-      data={payouts}
-      page={page}
-      totalPages={totalPages}
-      loading={isLoading}
-      isFetching={isFetching}
-      refetch={refetch}
-      pageSize={limit}
-      onPageChange={setPage}
-      onRowClick={(row) => navigate(`/earnings/payouts/${row.id}`)}
-      search={search}
-      onSearchChange={setSearch}
-      onPageSizeChange={(newLimit) => {
-        setLimit(newLimit);
-        setPage(1);
-      }}
-      sortBy={sortBy}
-      sortOrder={sortOrder}
-      onSortChange={handleSortChange}
-      text={{
-        searchPlaceholder: "Tìm kiếm thanh toán...",
-        reload: "Tải lại",
-        rowsPerPage: "Dòng trên trang",
-        noResults: "Không có lịch sử thanh toán nào.",
-        pageOf: (p, tp) => `Trang ${p} / ${tp || 1}`,
-        previous: "Trước",
-        next: "Sau",
-      }}
-    />
+    <>
+      <div className="mb-4 flex items-center justify-end">
+        <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1); }}>
+          <SelectTrigger className="w-[160px]">
+            <SelectValue>
+              {payoutStatusFilterOptions.find((o) => o.value === statusFilter)?.label}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {payoutStatusFilterOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <DataTable
+        columns={columns}
+        data={payouts}
+        page={page}
+        totalPages={totalPages}
+        loading={isLoading}
+        isFetching={isFetching}
+        refetch={refetch}
+        pageSize={limit}
+        onPageChange={setPage}
+        onRowClick={(row) => navigate(`/earnings/payouts/${row.id}`)}
+        search={search}
+        onSearchChange={setSearch}
+        onPageSizeChange={(newLimit) => {
+          setLimit(newLimit);
+          setPage(1);
+        }}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
+        onSortChange={handleSortChange}
+        text={{
+          searchPlaceholder: "Tìm kiếm thanh toán...",
+          reload: "Tải lại",
+          rowsPerPage: "Dòng trên trang",
+          noResults: "Không có lịch sử thanh toán nào.",
+          pageOf: (p, tp) => `Trang ${p} / ${tp || 1}`,
+          previous: "Trước",
+          next: "Sau",
+        }}
+      />
+    </>
   );
 }
