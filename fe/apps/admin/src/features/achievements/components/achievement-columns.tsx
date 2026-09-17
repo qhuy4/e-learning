@@ -7,6 +7,14 @@ import type { DataTableFeatures } from "@/components/common/data-table/data-tabl
 const column = createColumnHelper<DataTableFeatures, Achievement>();
 
 export const achievementColumns = [
+  column.accessor("icon", {
+    header: "Icon",
+    cell: (info) => {
+      const icon = info.getValue();
+      if (!icon) return <span className="text-muted-foreground">—</span>;
+      return <img src={icon} alt="" className="h-14 w-14 rounded object-contain" />;
+    },
+  }),
   column.accessor("name", {
     header: "Tên thành tựu",
     cell: (info) => <span className="font-medium">{info.getValue()}</span>,

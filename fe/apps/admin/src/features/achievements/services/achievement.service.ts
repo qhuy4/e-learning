@@ -11,6 +11,8 @@ export const achievementService = {
     page: number;
     limit: number;
     keyword?: string;
+    criteria?: string;
+    isActive?: boolean;
   }): Promise<PaginatedAchievementResponse> => {
     const response = await adminApi.get<PaginatedAchievementResponse>("/achievements", { params });
     return response.data;
@@ -47,6 +49,34 @@ export const achievementService = {
     },
   ): Promise<Achievement> => {
     const response = await adminApi.patch(`/achievements/${id}`, data);
+    return response.data.data;
+  },
+
+  updateWithIcon: async (
+    id: number,
+    data: {
+      name: string;
+      description: string;
+      icon: string | File;
+      criteria: string;
+      threshold: number;
+      isActive: boolean;
+    },
+  ): Promise<Achievement> => {
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("description", data.description);
+    formData.append("criteria", data.criteria);
+    formData.append("threshold", String(data.threshold));
+    formData.append("isActive", String(data.isActive));
+    if (data.icon instanceof File) {
+      formData.append("icon", data.icon);
+    } else if (data.icon) {
+      formData.append("icon", data.icon);
+    }
+    const response = await adminApi.patch(`/achievements/${id}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
     return response.data.data;
   },
 

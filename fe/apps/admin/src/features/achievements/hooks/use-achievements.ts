@@ -4,18 +4,24 @@ import { achievementService } from "@/features/achievements/services/achievement
 export const achievementKeys = {
   all: ["achievements"] as const,
   lists: () => [...achievementKeys.all, "list"] as const,
-  list: (page: number, limit: number, keyword?: string) =>
-    [...achievementKeys.lists(), { page, limit, keyword }] as const,
+  list: (page: number, limit: number, keyword?: string, criteria?: string, isActive?: boolean) =>
+    [...achievementKeys.lists(), { page, limit, keyword, criteria, isActive }] as const,
   details: () => [...achievementKeys.all, "detail"] as const,
   detail: (id: number) => [...achievementKeys.details(), id] as const,
   users: (achievementId: number, page: number, limit: number, keyword?: string) =>
     [...achievementKeys.all, "users", achievementId, { page, limit, keyword }] as const,
 };
 
-export function useAchievements(page: number, limit: number, keyword?: string) {
+export function useAchievements(
+  page: number,
+  limit: number,
+  keyword?: string,
+  criteria?: string,
+  isActive?: boolean,
+) {
   return useQuery({
-    queryKey: achievementKeys.list(page, limit, keyword),
-    queryFn: () => achievementService.list({ page, limit, keyword }),
+    queryKey: achievementKeys.list(page, limit, keyword, criteria, isActive),
+    queryFn: () => achievementService.list({ page, limit, keyword, criteria, isActive }),
   });
 }
 

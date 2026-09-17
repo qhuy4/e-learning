@@ -17,7 +17,7 @@ export function ThumbnailUploader({ value, onChange }: ThumbnailUploaderProps) {
         <img
           src={previewUrl}
           alt="Hình xem trước"
-          className="w-full h-32 object-cover"
+          className="w-full max-h-32 object-contain"
         />
         <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
           <label className="cursor-pointer">

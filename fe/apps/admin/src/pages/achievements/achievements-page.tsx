@@ -1,17 +1,29 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataTable } from "@/components/common/data-table/data-table";
 import { useListPage } from "@/components/common/page/use-list-page";
 import { useAchievements } from "@/features/achievements/hooks/use-achievements";
 import { achievementColumns } from "@/features/achievements/components/achievement-columns";
+import { achievementCriteriaLabel, type AchievementCriteria } from "@/features/achievements/types/achievement";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@fe/components/ui/select";
+
+const criteriaOptions = Object.entries(achievementCriteriaLabel).map(([value, label]) => ({
+  value,
+  label,
+}));
 
 export default function AchievementsPage() {
   const navigate = useNavigate();
   const { page, limit, search, debouncedSearch, setPage, setLimit, setSearch } = useListPage();
+  const [criteriaFilter, setCriteriaFilter] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
 
   const { data, isLoading, refetch, isFetching } = useAchievements(
     page,
     limit,
     debouncedSearch || undefined,
+    criteriaFilter || undefined,
+    statusFilter === "true" ? true : statusFilter === "false" ? false : undefined,
   );
 
   const achievements = data?.data ?? [];
@@ -25,6 +37,55 @@ export default function AchievementsPage() {
         <p className="text-sm text-muted-foreground mt-1">
           Quản lý thành tựu và huy hiệu cho học viên
         </p>
+      </div>
+
+      <div className="flex items-center gap-3 mb-4">
+        <Select
+          value={criteriaFilter}
+          onValueChange={(v) => {
+            setCriteriaFilter(v === "all" ? "" : v);
+            setPage(1);
+          }}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue>
+              {criteriaFilter
+                ? criteriaOptions.find((o) => o.value === criteriaFilter)?.label
+                : "Tất cả tiêu chí"}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tất cả tiêu chí</SelectItem>
+            {criteriaOptions.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select
+          value={statusFilter}
+          onValueChange={(v) => {
+            setStatusFilter(v === "all" ? "" : v);
+            setPage(1);
+          }}
+        >
+          <SelectTrigger className="w-[160px]">
+            <SelectValue>
+              {statusFilter === "true"
+                ? "Kích hoạt"
+                : statusFilter === "false"
+                  ? "Tạm dừng"
+                  : "Tất cả trạng thái"}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tất cả trạng thái</SelectItem>
+            <SelectItem value="true">Kích hoạt</SelectItem>
+            <SelectItem value="false">Tạm dừng</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <DataTable

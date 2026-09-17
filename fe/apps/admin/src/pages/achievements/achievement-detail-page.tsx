@@ -6,9 +6,9 @@ import { createColumnHelper } from "@tanstack/react-table";
 import {
   useAchievement,
   useAchievementUsers,
-  useUpdateAchievement,
   useDeleteAchievement,
 } from "@/features/achievements/hooks/use-achievements";
+import { achievementService } from "@/features/achievements/services/achievement.service";
 import { achievementCriteriaLabel } from "@/features/achievements/types/achievement";
 import type { AchievementCriteria } from "@/features/achievements/types/achievement";
 import type { AchievementUser } from "@/features/achievements/types/achievement";
@@ -17,8 +17,11 @@ import { Button } from "@fe/components/ui/button";
 import { Badge } from "@fe/components/ui/badge";
 import { Input } from "@fe/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@fe/components/ui/select";
+import { ThumbnailUploader } from "@/features/lessons/components/thumbnail-uploader";
 import { ArrowLeft, Trash2, Pencil, Save, X } from "lucide-react";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
+import { achievementKeys } from "@/features/achievements/hooks/use-achievements";
 
 const userColumn = createColumnHelper<DataTableFeatures, AchievementUser>();
 
@@ -46,32 +49,25 @@ const criteriaOptions = [
   { value: "COURSES_COMPLETED", label: "Khóa học hoàn thành" },
   { value: "QUIZZES_COMPLETED", label: "Quiz hoàn thành" },
   { value: "LEARNING_HOURS", label: "Giờ học" },
-  { value: "PERFECT_QUIZ_SCORE", label: "Quiz 100%" },
-  { value: "HIGH_QUIZ_SCORES", label: "Quiz 90%+" },
-  { value: "STREAK_DAYS", label: "Chuỗi ngày học" },
-  { value: "SPEAKING_SESSIONS", label: "Speaking" },
-  { value: "GRAMMAR_EXERCISES", label: "Grammar" },
-  { value: "VOCABULARY_WORDS", label: "Từ vựng" },
-  { value: "ACHIEVEMENTS_EARNED", label: "Thành tựu" },
 ];
 
 export default function AchievementDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { data: achievement, isLoading } = useAchievement(Number(id));
-  const updateMutation = useUpdateAchievement();
   const deleteMutation = useDeleteAchievement();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
     name: "",
     description: "",
-    icon: "",
-    category: "",
+    icon: "" as string | File,
     criteria: "",
     threshold: 1,
     isActive: true,
   });
+  const [saving, setSaving] = useState(false);
 
   const { page, limit, search, debouncedSearch, setPage, setLimit, setSearch } = useListPage();
   const { data: usersData, isLoading: usersLoading, refetch, isFetching } = useAchievementUsers(
@@ -91,7 +87,6 @@ export default function AchievementDetailPage() {
       name: achievement.name,
       description: achievement.description,
       icon: achievement.icon ?? "",
-      category: achievement.category ?? "",
       criteria: achievement.criteria,
       threshold: achievement.threshold,
       isActive: achievement.isActive,
@@ -103,17 +98,18 @@ export default function AchievementDetailPage() {
     setIsEditing(false);
   };
 
-  const saveEdit = () => {
-    updateMutation.mutate(
-      { id: Number(id), data: editForm },
-      {
-        onSuccess: () => {
-          toast.success("Đã cập nhật thành tựu");
-          setIsEditing(false);
-        },
-        onError: () => toast.error("Không thể cập nhật thành tựu"),
-      },
-    );
+  const saveEdit = async () => {
+    setSaving(true);
+    try {
+      await achievementService.updateWithIcon(Number(id), editForm);
+      await queryClient.invalidateQueries({ queryKey: achievementKeys.detail(Number(id)) });
+      toast.success("Đã cập nhật thành tựu");
+      setIsEditing(false);
+    } catch {
+      toast.error("Không thể cập nhật thành tựu");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleDelete = () => {
@@ -166,10 +162,10 @@ export default function AchievementDetailPage() {
         <div className="flex items-center gap-2">
           {isEditing ? (
             <>
-              <Button variant="outline" size="sm" onClick={cancelEdit} disabled={updateMutation.isPending}>
+              <Button variant="outline" size="sm" onClick={cancelEdit} disabled={saving}>
                 <X className="h-4 w-4 mr-1" /> Hủy
               </Button>
-              <Button size="sm" onClick={saveEdit} disabled={updateMutation.isPending}>
+              <Button size="sm" onClick={saveEdit} disabled={saving}>
                 <Save className="h-4 w-4 mr-1" /> Lưu
               </Button>
             </>
@@ -233,27 +229,20 @@ export default function AchievementDetailPage() {
           <div>
             <p className="text-sm text-muted-foreground">Icon</p>
             {isEditing ? (
-              <Input
-                value={editForm.icon}
-                onChange={(e) => setEditForm({ ...editForm, icon: e.target.value })}
-                className="mt-1"
-                placeholder="Emoji hoặc URL"
-              />
+              <div className="mt-1">
+                <ThumbnailUploader
+                  value={editForm.icon}
+                  onChange={(file) => setEditForm({ ...editForm, icon: file ?? "" })}
+                />
+              </div>
             ) : (
-              <p className="font-medium">{achievement.icon || "—"}</p>
-            )}
-          </div>
-          <div>
-            <p className="text-sm text-muted-foreground">Danh mục</p>
-            {isEditing ? (
-              <Input
-                value={editForm.category}
-                onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
-                className="mt-1"
-                placeholder="Progress, Quiz / Knowledge, ..."
-              />
-            ) : (
-              <p className="font-medium">{achievement.category || "—"}</p>
+              <div className="mt-1">
+                {achievement.icon ? (
+                  <img src={achievement.icon} alt={achievement.name} className="max-h-20 max-w-20 rounded-lg object-contain border" />
+                ) : (
+                  <p className="font-medium">—</p>
+                )}
+              </div>
             )}
           </div>
           <div>
