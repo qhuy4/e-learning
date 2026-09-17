@@ -13,4 +13,14 @@ export const studentService = {
     const response = await instructorApi.get("/enrollments", { params });
     return response.data;
   },
+
+  async getStudentDetail(enrollmentId: number) {
+    const response = await instructorApi.get(`/enrollments/${enrollmentId}`);
+    return response.data;
+  },
+
+  async getStudentProgress(enrollmentId: number) {
+    const response = await instructorApi.get(`/enrollments/${enrollmentId}/progress`);
+    return response.data;
+  },
 };

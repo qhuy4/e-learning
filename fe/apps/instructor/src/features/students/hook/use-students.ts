@@ -7,3 +7,19 @@ export function useStudents(params: GetStudentsParams) {
     queryFn: () => studentService.getStudents(params),
   });
 }
+
+export function useStudentDetail(enrollmentId: number) {
+  return useQuery({
+    queryKey: ["instructor-enrollment-detail", enrollmentId],
+    queryFn: () => studentService.getStudentDetail(enrollmentId),
+    enabled: !!enrollmentId,
+  });
+}
+
+export function useStudentProgress(enrollmentId: number) {
+  return useQuery({
+    queryKey: ["instructor-enrollment-progress", enrollmentId],
+    queryFn: () => studentService.getStudentProgress(enrollmentId),
+    enabled: !!enrollmentId,
+  });
+}
