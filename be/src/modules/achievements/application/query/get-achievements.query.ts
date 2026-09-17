@@ -5,5 +5,7 @@ export class GetAchievementsQuery {
     public readonly keyword?: string,
     public readonly sortBy?: string,
     public readonly sortOrder?: string,
+    public readonly criteria?: string,
+    public readonly isActive?: boolean,
   ) {}
 }

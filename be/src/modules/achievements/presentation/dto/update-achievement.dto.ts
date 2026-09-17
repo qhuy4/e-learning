@@ -1,4 +1,5 @@
 import { IsString, IsNotEmpty, IsOptional, IsNumber, Min, IsBoolean } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class UpdateAchievementDto {
   @IsOptional()
@@ -17,14 +18,11 @@ export class UpdateAchievementDto {
 
   @IsOptional()
   @IsString()
-  category?: string;
-
-  @IsOptional()
-  @IsString()
   @IsNotEmpty()
   criteria?: string;
 
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   @Min(1)
   threshold?: number;
@@ -33,6 +31,7 @@ export class UpdateAchievementDto {
   reward?: unknown;
 
   @IsOptional()
+  @Type(() => Boolean)
   @IsBoolean()
   isActive?: boolean;
 }

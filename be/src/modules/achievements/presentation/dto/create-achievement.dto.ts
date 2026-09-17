@@ -1,4 +1,5 @@
 import { IsString, IsNotEmpty, IsOptional, IsNumber, Min, IsEnum } from 'class-validator';
+import { Type } from 'class-transformer';
 import { AchievementCriteria } from '@/modules/achievements/domain/enum/achievement-criteria.enum';
 
 export class CreateAchievementDto {
@@ -14,14 +15,11 @@ export class CreateAchievementDto {
   @IsString()
   icon?: string;
 
-  @IsOptional()
-  @IsString()
-  category?: string;
-
   @IsEnum(AchievementCriteria)
   @IsNotEmpty()
   criteria: AchievementCriteria;
 
+  @Type(() => Number)
   @IsNumber()
   @Min(1)
   threshold: number;

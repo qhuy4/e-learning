@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CqrsModule } from '@nestjs/cqrs';
+import { StorageModule } from '@/common/storage/storage.module';
 import { AchievementOrmEntity } from './infrastructure/entity/achievement.orm-entity';
 import { UserAchievementOrmEntity } from './infrastructure/entity/user-achievement.orm-entity';
 import { AchievementRepository } from './infrastructure/repository/achievement.repository';
@@ -24,6 +25,7 @@ const CommandHandlers = [CreateAchievementHandler, UpdateAchievementHandler, Del
   imports: [
     TypeOrmModule.forFeature([AchievementOrmEntity, UserAchievementOrmEntity]),
     CqrsModule,
+    StorageModule,
   ],
   controllers: [AdminAchievementsController, InstructorAchievementsController],
   providers: [

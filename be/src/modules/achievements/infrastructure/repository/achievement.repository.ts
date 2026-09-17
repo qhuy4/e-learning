@@ -16,8 +16,10 @@ export class AchievementRepository {
     keyword?: string;
     sortBy?: string;
     sortOrder?: string;
+    criteria?: string;
+    isActive?: boolean;
   }) {
-    const { page, limit, keyword, sortBy, sortOrder } = options;
+    const { page, limit, keyword, sortBy, sortOrder, criteria, isActive } = options;
 
     const query = this.repository.createQueryBuilder('a');
 
@@ -30,13 +32,22 @@ export class AchievementRepository {
       );
     }
 
+    if (criteria) {
+      query.andWhere('a.criteria = :criteria', { criteria });
+    }
+
+    if (isActive !== undefined) {
+      query.andWhere('a.is_active = :isActive', { isActive });
+    }
+
     const sortableColumns: Record<string, string> = {
       createdAt: 'a.created_at',
+      updatedAt: 'a.updated_at',
       name: 'a.name',
       threshold: 'a.threshold',
     };
 
-    const sortKey = sortBy && sortableColumns[sortBy] ? sortableColumns[sortBy] : 'a.created_at';
+    const sortKey = sortBy && sortableColumns[sortBy] ? sortableColumns[sortBy] : 'a.updated_at';
     const sortDirection: 'ASC' | 'DESC' = sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
     query
