@@ -32,6 +32,7 @@ import { PremiumSubscriptionsModule } from '@/modules/premium-subscriptions/prem
 import { WishlistsModule } from '@/modules/wishlists/wishlists.module';
 import { AdminDashboardModule } from '@/modules/analytics/admin-dashboard.module';
 import { AchievementsModule } from '@/modules/achievements/achievements.module';
+import { ExamsModule } from '@/modules/exams/exams.module';
 
 @Module({
   imports: [
@@ -73,6 +74,7 @@ import { AchievementsModule } from '@/modules/achievements/achievements.module';
     HomeModule,
     QuizzesModule,
     DictationsModule,
+    ExamsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
