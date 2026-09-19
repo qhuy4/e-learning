@@ -10,6 +10,7 @@ import {
     UserCircle,
     LogOut,
     Trophy,
+    MessageCircleQuestion,
 } from "lucide-react"
 import type { NavGroup, NavItem } from "@/shared/types/navigation"
 
@@ -67,6 +68,11 @@ export const navigation: Navigation = {
                     title: "Thành tựu",
                     url: "/achievements",
                     icon: Trophy,
+                },
+                {
+                    title: "Câu hỏi",
+                    url: "/qa",
+                    icon: MessageCircleQuestion,
                 },
                 {
                     title: "Đăng ký giáo viên",

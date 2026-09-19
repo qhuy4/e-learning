@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import { useStudents } from "@/features/students/hook/use-students";
 import { createStudentColumns } from "@/features/students/columns/student-columns";
 import { DataTable } from "@/components/common/data-table/data-table";
 
 export default function CourseStudentsTab() {
   const { courseId } = useParams<{ courseId: string }>();
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [keyword, setKeyword] = useState("");
@@ -42,6 +43,7 @@ export default function CourseStudentsTab() {
         setKeyword(v);
         setPage(1);
       }}
+      onRowClick={(row) => navigate(`/students/${row.id}`)}
       text={{
         searchPlaceholder: "Tìm theo tên hoặc email...",
       }}
