@@ -89,22 +89,17 @@ export default function RevenuePage() {
       <div>
         <h2 className="text-lg font-semibold mb-4">Doanh thu theo khóa học</h2>
         <DataTable
-          columns={revenueByCourseColumns}
+          columns={revenueByCourseColumns as any}
           data={byCourseData?.data ?? []}
           page={page}
           pageSize={pageSize}
-          total={meta?.total ?? 0}
           totalPages={meta?.totalPages ?? 0}
           onPageChange={setPage}
           onPageSizeChange={(size) => {
             setPageSize(size);
             setPage(1);
           }}
-          isLoading={byCourseLoading}
-          texts={{
-            searchPlaceholder: "Tìm khóa học...",
-            noResults: "Chưa có khóa học nào",
-          }}
+          loading={byCourseLoading}
         />
       </div>
     </div>

@@ -29,7 +29,7 @@ const VARIANT_MAP: Record<string, string> = {
   destructive: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
 };
 
-const payoutColumns: ColumnDef<Payout, any>[] = [
+const payoutColumns: ColumnDef<Payout>[] = [
   {
     accessorKey: "createdAt",
     header: "Ngày yêu cầu",

@@ -8,7 +8,7 @@ function formatCurrency(amount: number) {
   }).format(amount);
 }
 
-export const revenueByCourseColumns: ColumnDef<RevenueByCourse, any>[] = [
+export const revenueByCourseColumns: ColumnDef<RevenueByCourse>[] = [
   {
     accessorKey: "courseTitle",
     header: "Khóa học",

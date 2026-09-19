@@ -28,6 +28,8 @@ import QuestionsPage from "@/pages/qa/questions-page"
 import QuestionDetailPage from "@/pages/qa/question-detail-page"
 import LoginPage from "@/pages/authen/login-page"
 import { CreateLessonPage } from "@/features/lessons/pages/create-lesson-page"
+import CreateQuizPage from "@/features/quizzes/pages/create-quiz-page"
+import CreateDictationPage from "@/features/dictations/pages/create-dictation-page"
 
 export const router = createBrowserRouter([
     {
@@ -69,6 +71,9 @@ export const router = createBrowserRouter([
                     { path: "profile", element: <ProfilePage /> },
                     { path: "lessons/create", element: <CreateLessonPage /> },
                     { path: "lessons/:id/edit", element: <CreateLessonPage /> },
+                    { path: "quizzes/create", element: <CreateQuizPage /> },
+                    { path: "quizzes/:id/edit", element: <CreateQuizPage /> },
+                    { path: "dictations/create", element: <CreateDictationPage /> },
                 ],
             },
         ],

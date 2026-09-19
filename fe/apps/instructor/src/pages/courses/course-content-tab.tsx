@@ -9,12 +9,12 @@ import {
   Headphones,
   FileText,
   HelpCircle,
+  FileQuestion,
   Radio,
   Edit,
   GripVertical,
 } from "lucide-react";
 import { useGetCourseDetail, useCreateSection, useDeleteSection, useDeleteLesson } from "@/features/courses/hook/use-courses";
-import { COURSE_STATUS_CONFIG } from "@/features/courses/types/course.constants";
 import type { Section, Lesson } from "@/features/courses/types/course.types";
 import { getErrorMessage } from "@/shared/utils/error";
 import { Button } from "@fe/components/ui/button";
@@ -22,7 +22,15 @@ import { Input } from "@fe/components/ui/input";
 import { Badge } from "@fe/components/ui/badge";
 import { Card, CardContent } from "@fe/components/ui/card";
 import { Skeleton } from "@fe/components/ui/skeleton";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@fe/components/ui/dropdown-menu";
 import { ConfirmDialog } from "@/components/confirm-dialog";
+import { LessonQuizList } from "./lesson-quiz-list";
+import { LessonDictationList } from "./lesson-dictation-list";
 
 function canEditCourse(status?: number): boolean {
   return status !== 2 && status !== 6;
@@ -48,7 +56,6 @@ function formatDuration(seconds: number): string {
 
 export default function CourseContentTab() {
   const { courseId } = useParams<{ courseId: string }>();
-  const navigate = useNavigate();
   const { data: courseResponse, isLoading } = useGetCourseDetail(courseId);
 
   if (isLoading) {
@@ -178,22 +185,23 @@ function SectionItem({
   index,
   courseId,
   editable,
-  allSections,
-  courseStatus,
 }: {
   section: Section;
   index: number;
   courseId?: number;
   editable: boolean;
-  allSections: Section[];
-  courseStatus?: number;
 }) {
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(true);
+  const [expandedLessons, setExpandedLessons] = useState<Record<string, boolean>>({});
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deletingLessonId, setDeletingLessonId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleValue, setTitleValue] = useState(section.title);
+
+  const toggleLesson = (lessonId: string | number) => {
+    setExpandedLessons(prev => ({ ...prev, [lessonId]: !prev[lessonId] }));
+  };
 
   const lessons: Lesson[] = section.lessons ?? [];
   const { mutateAsync: deleteSectionApi } = useDeleteSection();
@@ -315,46 +323,88 @@ function SectionItem({
                 {lessons.map((lesson, li) => {
                   const Icon = LESSON_TYPE_ICONS[lesson.type] ?? FileText;
                   return (
-                    <div
-                      key={lesson.id}
-                      className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted/20 transition-colors"
-                    >
-                      <span className="text-xs text-muted-foreground w-6 text-right shrink-0">
-                        {String(li + 1).padStart(2, "0")}
-                      </span>
-                      <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
-                      <span className="flex-1 text-sm truncate">{lesson.title}</span>
-                      {lesson.isPreview && (
-                        <Badge variant="secondary" className="text-[10px] px-1.5 h-4 shrink-0">
-                          Free
-                        </Badge>
-                      )}
-                      {lesson.duration != null && (
-                        <span className="text-xs text-muted-foreground tabular-nums shrink-0">
-                          {formatDuration(lesson.duration)}
+                    <div key={lesson.id} className="flex flex-col">
+                      <div 
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted/20 transition-colors cursor-pointer select-none"
+                        onClick={() => toggleLesson(lesson.id)}
+                      >
+                        <button
+                          type="button"
+                          className="p-0.5 shrink-0"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleLesson(lesson.id);
+                          }}
+                        >
+                          <ChevronDown className={`h-3 w-3 text-muted-foreground transition-transform ${expandedLessons[lesson.id] ? "rotate-180" : ""}`} />
+                        </button>
+                        <span className="text-xs text-muted-foreground w-4 text-right shrink-0">
+                          {String(li + 1).padStart(2, "0")}
                         </span>
-                      )}
-                      {editable && (
-                        <div className="flex items-center gap-1 shrink-0">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 text-muted-foreground hover:text-foreground"
-                            onClick={() =>
-                              navigate(`/lessons/${lesson.id}/edit?sectionId=${section.id}&courseId=${courseId}`)
-                            }
-                          >
-                            <Edit className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                            onClick={() => setDeletingLessonId(lesson.id)}
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
+                        <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <span className="flex-1 text-sm truncate">{lesson.title}</span>
+                        {lesson.isPreview && (
+                          <Badge variant="secondary" className="text-[10px] px-1.5 h-4 shrink-0">
+                            Free
+                          </Badge>
+                        )}
+                        {lesson.duration != null && (
+                          <span className="text-xs text-muted-foreground tabular-nums shrink-0">
+                            {formatDuration(lesson.duration)}
+                          </span>
+                        )}
+                        {editable && (
+                          <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  title="Thêm Bài Tập"
+                                  className="h-7 w-7 text-muted-foreground hover:text-primary"
+                                >
+                                  <FileQuestion className="h-3.5 w-3.5" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem 
+                                  onClick={() => navigate(`/quizzes/create?lessonId=${lesson.id}&courseId=${courseId}`)}
+                                >
+                                  Tạo Quiz (Trắc nghiệm)
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  onClick={() => navigate(`/dictations/create?lessonId=${lesson.id}&courseId=${courseId}`)}
+                                >
+                                  Tạo Nghe chép chính tả
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                              onClick={() =>
+                                navigate(`/lessons/${lesson.id}/edit?sectionId=${section.id}&courseId=${courseId}`)
+                              }
+                            >
+                              <Edit className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                              onClick={() => setDeletingLessonId(lesson.id)}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                      {expandedLessons[lesson.id] && (
+                        <>
+                          <LessonQuizList lessonId={lesson.id as number} courseId={courseId!} editable={editable} />
+                          <LessonDictationList lessonId={lesson.id as number} courseId={courseId!} editable={editable} />
+                        </>
                       )}
                     </div>
                   );

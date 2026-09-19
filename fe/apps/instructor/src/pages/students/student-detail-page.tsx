@@ -2,9 +2,6 @@ import { useParams, useNavigate, Link } from "react-router";
 import {
   ArrowLeft,
   User,
-  Mail,
-  Calendar,
-  Clock,
   CheckCircle,
   BookOpen,
   Play,
@@ -221,8 +218,8 @@ export default function StudentDetailPage() {
       ) : sections.length > 0 ? (
         <div className="space-y-4">
           <h3 className="font-semibold">Tiến độ từng bài học</h3>
-          {sections.map((section) => {
-            const sectionCompleted = section.lessons.filter((l) => l.isCompleted).length;
+          {sections.map((section: any) => {
+            const sectionCompleted = section.lessons.filter((l: any) => l.isCompleted).length;
             return (
               <Card key={section.sectionId}>
                 <CardContent className="p-4">
@@ -235,7 +232,7 @@ export default function StudentDetailPage() {
                     </span>
                   </div>
                   <div className="space-y-2">
-                    {section.lessons.map((lesson) => {
+                    {section.lessons.map((lesson: any) => {
                       const Icon = LESSON_TYPE_ICONS[lesson.lessonType] ?? BookOpen;
                       return (
                         <div

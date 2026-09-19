@@ -76,7 +76,7 @@ export default function QuestionDetailPage() {
           <p className="text-sm text-muted-foreground">Chưa có trả lời nào.</p>
         )}
 
-        {question.answers?.map((a) => (
+        {question.answers?.map((a: any) => (
           <div key={a.id} className="rounded-lg border bg-card p-4 space-y-2">
             <div className="flex items-center justify-between">
               <p className="text-xs text-muted-foreground">

@@ -8,6 +8,8 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { UserModule } from '@/modules/users/user.module';
 import { CoursesModule } from '@/modules/courses/courses.module';
 import { TeacherModule } from '@/modules/teacher/teacher.module';
+import { QuizzesModule } from './modules/quizzes/quizzes.module';
+import { DictationsModule } from './modules/dictations/dictations.module';
 import { AuthModule } from '@/modules/auth/auth.module';
 import { SectionsModule } from '@/modules/sections/sections.module';
 import { LessonsModule } from '@/modules/lessons/lessons.module';
@@ -69,6 +71,8 @@ import { AchievementsModule } from '@/modules/achievements/achievements.module';
     LessonProgressModule,
     PaymentsModule,
     HomeModule,
+    QuizzesModule,
+    DictationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
