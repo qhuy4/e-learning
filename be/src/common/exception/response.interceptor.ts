@@ -20,8 +20,9 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, any> {
         ) {
           return {
             success: true,
-            data: result.data,
-            meta: result.meta,
+            data: (result as any).data,
+            ...((result as any).stats !== undefined ? { stats: (result as any).stats } : {}),
+            meta: (result as any).meta,
           };
         }
 

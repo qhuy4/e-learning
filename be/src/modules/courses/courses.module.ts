@@ -49,6 +49,8 @@ import { PreviewCourseQueryHandler } from '@/modules/courses/application/query-h
 import { GetCatalogCoursesHandler } from '@/modules/courses/application/query-handler/get-catalog-courses.handler';
 import { GetRelatedCoursesHandler } from '@/modules/courses/application/query-handler/get-related-courses.handler';
 
+import { EnrollmentOrmEntity } from '@/modules/enrollments/infrastructure/entity/enrollment.orm-entity';
+
 @Module({
   imports: [
     CqrsModule,
@@ -63,6 +65,7 @@ import { GetRelatedCoursesHandler } from '@/modules/courses/application/query-ha
       CourseViewOrmEntity,
       InstructorProfileTypeOrmEntity,
       ReviewOrmEntity,
+      EnrollmentOrmEntity,
     ]),
     forwardRef(() => SectionsModule),
     LessonsModule,

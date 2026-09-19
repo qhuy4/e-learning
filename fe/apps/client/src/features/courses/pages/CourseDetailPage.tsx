@@ -12,13 +12,16 @@ import { useParams } from "react-router-dom";
 import { useCourseBySlug } from "../hooks/use-courses";
 import { useEnrollmentCheck } from "../../enrollment/hooks/use-enrollment";
 import { useAuth } from "../../auth/hooks/use-auth";
+import { CourseReviewsSection } from "../../reviews";
 
 export const CourseDetailPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const { isAuthenticated } = useAuth();
 
   const { data: course, isLoading, isError } = useCourseBySlug(slug ?? "");
-  const courseData = (course as any)?.data ?? course;
+  const rawData = (course as any)?.data ?? course;
+  const courseData = rawData?.data ?? rawData;
+  const courseId = courseData?.id ?? (course as any)?.id;
 
   const { data: enrollmentCheck } = useEnrollmentCheck(
     courseData?.slug,
@@ -44,6 +47,7 @@ export const CourseDetailPage = () => {
             <CourseDescription course={courseData} />
             <CourseContent course={courseData} />
             <CourseInstructor instructor={courseData?.instructor} />
+            {courseId ? <CourseReviewsSection courseId={courseId} /> : null}
           </div>
 
           {/* Right Column - Sidebar */}

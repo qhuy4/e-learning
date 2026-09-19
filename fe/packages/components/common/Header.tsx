@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router";
-import { GraduationCap, Menu, X, LogOut, User, BookOpen, ChevronDown } from "lucide-react";
+import { GraduationCap, Menu, X, LogOut, BookOpen, ChevronDown } from "lucide-react";
 
 interface HeaderProps {
   user?: {

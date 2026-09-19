@@ -45,7 +45,7 @@ export const CoursePreviewPage = () => {
         </div>
 
         {/* Bottom Section */}
-        <RelatedCourses />
+        <RelatedCourses courseSlug={courseData?.slug ?? ""} />
       </div>
     </div>
   );

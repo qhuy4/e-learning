@@ -1,4 +1,4 @@
-import { Star, Users, PlayCircle, Globe, Mail, Link2 } from "lucide-react";
+import { Globe } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@fe/components/ui/avatar";
 import type { CourseDetail } from "../../types/course.type";
 
@@ -23,7 +23,7 @@ export const CourseInstructor = ({ instructor }: CourseInstructorProps) => {
       
       <div className="flex flex-col md:flex-row gap-6 items-start">
         <Avatar className="w-24 h-24 border-4 border-slate-50 shadow-sm">
-          <AvatarImage src={`https://i.pravatar.cc/150?u=${instructor.userId}`} />
+          <AvatarImage src={`https://i.pravatar.cc/150?u=${(instructor as any).userId ?? instructor.id}`} />
           <AvatarFallback>{initials}</AvatarFallback>
         </Avatar>
         

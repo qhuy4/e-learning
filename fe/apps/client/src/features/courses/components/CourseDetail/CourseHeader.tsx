@@ -15,8 +15,18 @@ export const CourseHeader = ({ course }: CourseHeaderProps) => {
     .slice(0, 2)
     .toUpperCase();
 
-  const updatedAt = course?.updatedAt
-    ? new Date(course.updatedAt).toLocaleDateString("vi-VN", { month: "2-digit", year: "numeric" })
+  const rawDate = course?.updatedAt || course?.publishedAt || course?.createdAt;
+  const datePrefix = course?.updatedAt
+    ? "Cập nhật lần cuối:"
+    : course?.publishedAt
+    ? "Ngày xuất bản:"
+    : "Ngày tạo:";
+  const formattedDate = rawDate
+    ? new Date(rawDate).toLocaleDateString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })
     : "";
 
   return (
@@ -39,21 +49,27 @@ export const CourseHeader = ({ course }: CourseHeaderProps) => {
           )}
 
           <div className="flex flex-wrap items-center gap-4 md:gap-6 text-sm text-slate-600 mb-6">
-            {course?.statistics?.averageRating > 0 && (
-              <div className="flex items-center gap-1">
-                <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                <span className="font-semibold text-slate-900">{course.statistics.averageRating}</span>
-                <span>({course.statistics.reviewCount} đánh giá)</span>
-              </div>
-            )}
+            <div className="flex items-center gap-1.5 bg-amber-50/80 px-3 py-1 rounded-full border border-amber-200/60 text-xs font-medium">
+              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+              <span className="font-bold text-slate-900">
+                {course?.statistics?.averageRating && course.statistics.averageRating > 0
+                  ? Number(course.statistics.averageRating).toFixed(1)
+                  : "Chưa có đánh giá"}
+              </span>
+              {course?.statistics?.reviewCount !== undefined && course.statistics.reviewCount > 0 && (
+                <span className="text-slate-500 font-normal">({course.statistics.reviewCount} đánh giá)</span>
+              )}
+            </div>
             <div className="flex items-center gap-1">
               <Users className="w-4 h-4" />
               <span>{course?.statistics?.studentCount ?? 0} học viên</span>
             </div>
-            {updatedAt && (
+            {formattedDate && (
               <div className="flex items-center gap-1">
-                <Clock className="w-4 h-4" />
-                <span>Cập nhật lần cuối: {updatedAt}</span>
+                <Clock className="w-4 h-4 text-slate-500" />
+                <span>
+                  {datePrefix} {formattedDate}
+                </span>
               </div>
             )}
             <div className="flex items-center gap-1">
@@ -64,7 +80,7 @@ export const CourseHeader = ({ course }: CourseHeaderProps) => {
 
           <div className="flex items-center gap-3">
             <Avatar className="w-10 h-10 border-2 border-white shadow-sm">
-              <AvatarImage src={`https://i.pravatar.cc/150?u=${course?.instructor?.userId}`} />
+              <AvatarImage src={`https://i.pravatar.cc/150?u=${(course?.instructor as any)?.userId ?? course?.instructor?.id}`} />
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
             <div>

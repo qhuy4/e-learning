@@ -115,6 +115,7 @@ export const LearningPage = () => {
   return (
     <div className="flex flex-col h-screen bg-white overflow-hidden">
       <LearningHeader
+        courseId={courseData.id}
         courseTitle={courseData.title}
         courseSlug={courseData.slug}
         progress={courseProgress?.totalProgress ?? 0}

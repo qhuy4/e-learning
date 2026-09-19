@@ -1,22 +1,26 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   ParseIntPipe,
   Patch,
   Post,
   Query,
   UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
   Req,
 } from '@nestjs/common';
 
-import { FileInterceptor } from '@nestjs/platform-express';
-
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
+import { extname } from 'path';
+import { randomUUID } from 'crypto';
 
 import { GetCoursesDto } from '@/modules/courses/presentation/dto/get-courses.dto';
 import { GetCoursesQuery } from '@/modules/courses/application/query/get-courses.query';
@@ -51,6 +55,14 @@ import { CancelReviewCourseCommand } from '@/modules/courses/application/command
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CourseViewOrmEntity } from '@/modules/analytics/infrastructure/entity/course-view.orm-entity';
+import {
+  FILE_STORAGE,
+  FileStorage,
+} from '@/common/storage/domain/interface/file-storage.interface';
+
+import { CreateReviewCommand } from '@/modules/reviews/application/command/create-review.command';
+import { GetCourseReviewsQuery } from '@/modules/reviews/application/query/get-course-reviews.query';
+import { CheckReviewEligibilityQuery } from '@/modules/reviews/application/query/check-review-eligibility.query';
 
 @Controller('courses')
 export class CoursesController {
@@ -59,6 +71,8 @@ export class CoursesController {
     private readonly commandBus: CommandBus,
     @InjectRepository(CourseViewOrmEntity)
     private readonly courseViewRepo: Repository<CourseViewOrmEntity>,
+    @Inject(FILE_STORAGE)
+    private readonly fileStorage: FileStorage,
   ) {}
 
   @Get()
@@ -137,6 +151,8 @@ export class CoursesController {
       ),
     );
   }
+
+
 
   @Post(':id/preview-token')
   @UseGuards(JwtAuthGuard)

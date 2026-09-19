@@ -1,14 +1,21 @@
+import { useState } from "react";
 import { Link } from "react-router";
-import { Play, Clock, BookOpen, Bookmark, CheckCircle2, User } from "lucide-react";
+import { Play, Clock, BookOpen, Bookmark, CheckCircle2, User, Star, Edit3 } from "lucide-react";
 import { Button } from "@fe/components/ui/button";
 import type { Enrollment } from "../services/enrollment.service";
+import { ReviewFormModal, useReviewEligibility } from "../../reviews";
 
 interface CourseCardEnrolledProps {
   enrollment: Enrollment;
 }
 
 export const CourseCardEnrolled = ({ enrollment }: CourseCardEnrolledProps) => {
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const isCompleted = enrollment.progress >= 100;
+
+  // Query existing review status for this course
+  const { data: eligibility } = useReviewEligibility(enrollment.courseId, true);
+  const userReview = eligibility?.userReview;
 
   return (
     <div className="group relative bg-white border border-slate-100/80 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full">
@@ -92,14 +99,49 @@ export const CourseCardEnrolled = ({ enrollment }: CourseCardEnrolledProps) => {
             )}
           </div>
 
-          <Link to={`/courses/${enrollment.courseSlug}`} className="block w-full">
-            <Button className="w-full bg-slate-900 hover:bg-emerald-600 text-white font-semibold py-2.5 rounded-2xl text-sm transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer group-hover:bg-emerald-600">
-              <Play className="w-4 h-4 fill-current" />
-              {isCompleted ? "Xem lại khóa học" : "Tiếp tục học"}
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2 pt-1">
+            <Link to={`/courses/${enrollment.courseSlug}`} className="flex-1">
+              <Button className="w-full bg-slate-900 hover:bg-emerald-600 text-white font-semibold py-2.5 rounded-2xl text-xs transition-all duration-300 shadow-sm hover:shadow-md flex items-center justify-center gap-1.5 cursor-pointer">
+                <Play className="w-3.5 h-3.5 fill-current" />
+                {isCompleted ? "Xem lại" : "Học ngay"}
+              </Button>
+            </Link>
+
+            {/* Polished Review Button */}
+            <button
+              type="button"
+              onClick={() => setIsReviewModalOpen(true)}
+              className={`px-3 py-2.5 rounded-2xl text-xs font-bold transition-all shadow-2xs hover:shadow-sm flex items-center gap-1.5 cursor-pointer border shrink-0 ${
+                userReview
+                  ? "bg-amber-50 border-amber-200 text-amber-800 hover:bg-amber-100"
+                  : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-amber-600 hover:border-amber-300"
+              }`}
+            >
+              {userReview ? (
+                <>
+                  <Edit3 className="w-3.5 h-3.5 text-amber-600" />
+                  <span>Đã đánh giá</span>
+                </>
+              ) : (
+                <>
+                  <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
+                  <span>Đánh giá</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Review Modal Form */}
+      {isReviewModalOpen && (
+        <ReviewFormModal
+          courseId={enrollment.courseId}
+          isOpen={isReviewModalOpen}
+          onClose={() => setIsReviewModalOpen(false)}
+          existingReview={userReview}
+        />
+      )}
     </div>
   );
 };

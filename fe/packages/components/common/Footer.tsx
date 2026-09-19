@@ -1,4 +1,4 @@
-import { GraduationCap, Globe, Mail, ExternalLink } from 'lucide-react';
+import { GraduationCap, Globe } from 'lucide-react';
 
 export const Footer = () => {
   return (
