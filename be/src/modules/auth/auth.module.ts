@@ -23,11 +23,18 @@ import { RegisterHandler } from '@/modules/auth/application/command-handler/regi
 import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
 import { PasswordService } from '@/common/service/password.service';
 import { ServiceModule } from '@/common/service/service.module';
+import { RefreshSession } from '@/modules/auth/infrastructure/refresh-session.entity';
+import { RefreshSessionRepository } from '@/modules/auth/infrastructure/repository/refresh-session.repository';
+import { RefreshTokenHandler } from '@/modules/auth/application/command-handler/refresh-token.handler';
 
 @Module({
   imports: [
     // TypeOrmModule.forFeature([User, InstructorInviteEntity]),
-    TypeOrmModule.forFeature([UserOrmEntity, InstructorInviteEntity]),
+    TypeOrmModule.forFeature([
+      UserOrmEntity,
+      InstructorInviteEntity,
+      RefreshSession,
+    ]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     UserModule,
     CqrsModule,
@@ -46,8 +53,24 @@ import { ServiceModule } from '@/common/service/service.module';
       }),
     }),
   ],
-  controllers: [AuthController, AdminAuthController, InstructorAuthController, UserAuthController, UsersController],
-  providers: [AuthService, MailService, JwtStrategy, TokenService, LoginHandler, RegisterHandler, PasswordService],
+  controllers: [
+    AuthController,
+    AdminAuthController,
+    InstructorAuthController,
+    UserAuthController,
+    UsersController,
+  ],
+  providers: [
+    AuthService,
+    MailService,
+    JwtStrategy,
+    TokenService,
+    LoginHandler,
+    RegisterHandler,
+    PasswordService,
+    RefreshSessionRepository,
+    RefreshTokenHandler,
+  ],
   exports: [AuthService, JwtModule, PassportModule],
 })
 export class AuthModule {}
