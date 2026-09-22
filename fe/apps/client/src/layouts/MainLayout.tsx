@@ -1,6 +1,7 @@
 import { Outlet, useNavigate } from "react-router";
-import { Header, Footer } from "@fe/components/common";
-import { useAuth } from "../features/auth/hooks/use-auth";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { useCallback } from "react";
 
 export const MainLayout = () => {
@@ -13,9 +14,9 @@ export const MainLayout = () => {
   }, [logout, navigate]);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="min-h-screen flex flex-col">
       <Header user={user} onLogout={handleLogout} />
-      <main className="flex-grow">
+      <main className="flex-grow pt-20">
         <Outlet />
       </main>
       <Footer />
