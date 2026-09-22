@@ -1,9 +1,18 @@
-import {useState} from "react";
-import {Link} from "react-router";
-import {Bookmark, BookOpen, CheckCircle2, Clock, Edit3, Play, Star, User} from "lucide-react";
-import {Button} from "@fe/components/ui/button";
-import type {Enrollment} from "../services/enrollment.service";
-import {ReviewFormModal, useReviewEligibility} from "../../reviews";
+import { useState } from "react";
+import { Link } from "react-router";
+import {
+  Bookmark,
+  BookOpen,
+  CheckCircle2,
+  Clock,
+  Edit3,
+  Play,
+  Star,
+  User,
+} from "lucide-react";
+import { Button } from "@fe/components/ui/button";
+import type { Enrollment } from "../services/enrollment.service";
+import { ReviewFormModal, useReviewEligibility } from "../../reviews";
 
 interface CourseCardEnrolledProps {
   enrollment: Enrollment;
@@ -65,13 +74,19 @@ export const CourseCardEnrolled = ({ enrollment }: CourseCardEnrolledProps) => {
           {/* Progress section */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-500 font-medium">Tiến độ học tập</span>
-              <span className="text-emerald-600 font-bold">{enrollment.progress}%</span>
+              <span className="text-slate-500 font-medium">
+                Tiến độ học tập
+              </span>
+              <span className="text-emerald-600 font-bold">
+                {enrollment.progress}%
+              </span>
             </div>
             <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
               <div
                 className="bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-400 h-2 rounded-full transition-all duration-500"
-                style={{ width: `${Math.min(100, Math.max(0, enrollment.progress))}%` }}
+                style={{
+                  width: `${Math.min(100, Math.max(0, enrollment.progress))}%`,
+                }}
               />
             </div>
           </div>
