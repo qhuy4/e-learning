@@ -22,6 +22,7 @@ import {
     Heart,
     CreditCard,
     HandCoins,
+    Calendar,
 } from "lucide-react"
 import type { NavGroup, NavItem } from "@/shared/types/navigation"
 
@@ -103,6 +104,11 @@ export const navigation: Navigation = {
                     title: "Thành tựu",
                     url: "/achievements",
                     icon: Trophy,
+                },
+                {
+                    title: "Đặt lịch",
+                    url: "/bookings",
+                    icon: Calendar,
                 },
                 {
                     title: "Chứng chỉ giảng viên",
