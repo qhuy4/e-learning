@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { Link } from "react-router";
-import { Play, Clock, BookOpen, Bookmark, CheckCircle2, User, Star, Edit3 } from "lucide-react";
-import { Button } from "@fe/components/ui/button";
-import type { Enrollment } from "../services/enrollment.service";
-import { ReviewFormModal, useReviewEligibility } from "../../reviews";
+import {useState} from "react";
+import {Link} from "react-router";
+import {Bookmark, BookOpen, CheckCircle2, Clock, Edit3, Play, Star, User} from "lucide-react";
+import {Button} from "@fe/components/ui/button";
+import type {Enrollment} from "../services/enrollment.service";
+import {ReviewFormModal, useReviewEligibility} from "../../reviews";
 
 interface CourseCardEnrolledProps {
   enrollment: Enrollment;
@@ -110,7 +110,8 @@ export const CourseCardEnrolled = ({ enrollment }: CourseCardEnrolledProps) => {
             {/* Polished Review Button */}
             <button
               type="button"
-              onClick={() => setIsReviewModalOpen(true)}
+              disabled
+              title="Reviews are not available yet"
               className={`px-3 py-2.5 rounded-2xl text-xs font-bold transition-all shadow-2xs hover:shadow-sm flex items-center gap-1.5 cursor-pointer border shrink-0 ${
                 userReview
                   ? "bg-amber-50 border-amber-200 text-amber-800 hover:bg-amber-100"

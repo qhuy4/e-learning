@@ -58,6 +58,8 @@ import PaymentsPage from "@/pages/payments/payments-page";
 import PaymentDetailPage from "@/pages/payments/payment-detail-page";
 import PayoutRequestsPage from "@/pages/payout-requests/payout-requests-page";
 import PayoutRequestDetailPage from "@/pages/payout-requests/payout-request-detail-page";
+import BookingsPage from "@/pages/bookings/bookings-page";
+import BookingDetailPage from "@/pages/bookings/booking-detail-page";
 
 export const router = createBrowserRouter([
     {
@@ -315,6 +317,19 @@ export const router = createBrowserRouter([
                             {
                                 path: ":id",
                                 element: <AchievementDetailPage />,
+                            },
+                        ],
+                    },
+                    {
+                        path: "bookings",
+                        children: [
+                            {
+                                index: true,
+                                element: <BookingsPage />,
+                            },
+                            {
+                                path: ":id",
+                                element: <BookingDetailPage />,
                             },
                         ],
                     },

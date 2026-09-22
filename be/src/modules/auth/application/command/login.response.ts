@@ -1,4 +1,4 @@
-export interface LoginResponse {
+export interface LoginHttpResponse {
   accessToken: string;
   user: {
     id: number;

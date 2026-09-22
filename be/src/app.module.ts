@@ -32,6 +32,7 @@ import { PremiumSubscriptionsModule } from '@/modules/premium-subscriptions/prem
 import { WishlistsModule } from '@/modules/wishlists/wishlists.module';
 import { AdminDashboardModule } from '@/modules/analytics/admin-dashboard.module';
 import { AchievementsModule } from '@/modules/achievements/achievements.module';
+import { BookingsModule } from '@/modules/bookings/bookings.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { AchievementsModule } from '@/modules/achievements/achievements.module';
     WishlistsModule,
     AdminDashboardModule,
     AchievementsModule,
+    BookingsModule,
     UserModule,
     AuthModule,
     InstructorModule,

@@ -1,6 +1,5 @@
-import { Star, Users, Clock, Globe } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@fe/components/ui/avatar";
-import type { CourseDetail } from "../../types/course.type";
+import { Clock, BookOpen, Award } from "lucide-react";
+import type { CourseDetail } from "@/features/courses/types/course.type";
 
 interface CourseHeaderProps {
   course: CourseDetail;
@@ -28,70 +27,96 @@ export const CourseHeader = ({ course }: CourseHeaderProps) => {
         year: "numeric",
       })
     : "";
+  const totalLessons = course?.sections?.reduce((acc, s) => acc + (s.lessons?.length || 0), 0) || 0;
+  const totalSections = course?.sections?.length || 0;
 
   return (
-    <div className="bg-rose-50/50 pt-8 pb-12">
-      <div className="container mx-auto px-4 max-w-6xl">
-        <div className="text-sm text-slate-500 mb-4 flex items-center gap-2">
-          <span>Trang chủ</span>
-          <span>&gt;</span>
-          <span className="text-slate-800 font-medium">{course?.title}</span>
+    <section className="bg-white rounded-xl border border-primary/30 shadow-sm overflow-hidden p-6 sm:p-10 flex flex-col md:flex-row gap-8">
+      {/* Left: Course Info */}
+      <div className="flex-1 flex flex-col gap-4">
+        <div className="flex flex-wrap items-center gap-2">
+          {course?.level && (
+            <span className="bg-piemind-green/30 text-m3-secondary px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 border border-piemind-mint">
+              {course.level}
+            </span>
+          )}
+          {totalSections > 0 && (
+            <span className="bg-m3-surface-container-high text-m3-on-surface-variant px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+              <BookOpen className="size-3.5" />
+              {totalSections} Sections
+            </span>
+          )}
+          {totalLessons > 0 && (
+            <span className="bg-m3-surface-container-high text-m3-on-surface-variant px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+              <Clock className="size-3.5" />
+              {totalLessons} Lessons
+            </span>
+          )}
+          {course?.statistics?.averageRating > 0 && (
+            <span className="bg-m3-tertiary-fixed text-m3-on-tertiary-fixed px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+              <Award className="size-3.5" />
+              {course.statistics.averageRating.toFixed(1)} ★
+            </span>
+          )}
         </div>
 
-        <div className="max-w-3xl">
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 leading-tight">
-            {course?.title}
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+            {course?.title || "Course Title"}
           </h1>
-          {course?.description && (
-            <p className="text-slate-600 text-lg mb-6 line-clamp-3">
-              {course.description}
-            </p>
-          )}
+          <p className="text-slate-600 mt-2">
+            {course?.description || "Course description goes here."}
+          </p>
+        </div>
 
-          <div className="flex flex-wrap items-center gap-4 md:gap-6 text-sm text-slate-600 mb-6">
-            <div className="flex items-center gap-1.5 bg-amber-50/80 px-3 py-1 rounded-full border border-amber-200/60 text-xs font-medium">
-              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-              <span className="font-bold text-slate-900">
-                {course?.statistics?.averageRating && course.statistics.averageRating > 0
-                  ? Number(course.statistics.averageRating).toFixed(1)
-                  : "Chưa có đánh giá"}
+        {course?.statistics && (
+          <div className="flex items-center gap-4 text-sm text-slate-500">
+            {course.statistics.studentCount > 0 && (
+              <span>{course.statistics.studentCount} students</span>
+            )}
+            {course.statistics.reviewCount > 0 && (
+              <span>{course.statistics.reviewCount} reviews</span>
+            )}
+          </div>
+        )}
+
+        {course?.instructor && (
+          <div className="flex items-center gap-3 pt-4 border-t border-slate-100 mt-auto">
+            <img
+              className="w-10 h-10 rounded-full object-cover"
+              alt={course.instructor.name || "Instructor"}
+              src={`https://i.pravatar.cc/150?u=${course.instructor.id}`}
+            />
+            <div>
+              <span className="text-sm font-bold text-slate-900">
+                {course.instructor.name || "Instructor"}
               </span>
-              {course?.statistics?.reviewCount !== undefined && course.statistics.reviewCount > 0 && (
-                <span className="text-slate-500 font-normal">({course.statistics.reviewCount} đánh giá)</span>
+              {course.instructor.headline && (
+                <span className="text-xs text-slate-500 block">
+                  {course.instructor.headline}
+                </span>
               )}
             </div>
-            <div className="flex items-center gap-1">
-              <Users className="w-4 h-4" />
-              <span>{course?.statistics?.studentCount ?? 0} học viên</span>
-            </div>
-            {formattedDate && (
-              <div className="flex items-center gap-1">
-                <Clock className="w-4 h-4 text-slate-500" />
-                <span>
-                  {datePrefix} {formattedDate}
-                </span>
-              </div>
-            )}
-            <div className="flex items-center gap-1">
-              <Globe className="w-4 h-4" />
-              <span>Tiếng Việt</span>
-            </div>
           </div>
+        )}
+      </div>
 
-          <div className="flex items-center gap-3">
-            <Avatar className="w-10 h-10 border-2 border-white shadow-sm">
-              <AvatarImage src={`https://i.pravatar.cc/150?u=${(course?.instructor as any)?.userId ?? course?.instructor?.id}`} />
-              <AvatarFallback>{initials}</AvatarFallback>
-            </Avatar>
-            <div>
-              <div className="text-xs text-slate-500">Giảng viên</div>
-              <div className="text-sm font-semibold text-slate-900">
-                {instructorName}
-              </div>
+      {/* Right: Course Image */}
+      <div className="md:w-80 lg:w-96 shrink-0">
+        <div className="rounded-xl overflow-hidden border border-slate-200 aspect-video bg-slate-100">
+          {course?.thumbnail ? (
+            <img
+              className="w-full h-full object-cover"
+              alt={course.title || "Course thumbnail"}
+              src={course.thumbnail}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm">
+              No image
             </div>
-          </div>
+          )}
         </div>
       </div>
-    </div>
+    </section>
   );
 };
