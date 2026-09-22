@@ -5,21 +5,24 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatCurrency(amount: number | string | null | undefined): string {
-  if (amount === null || amount === undefined || amount === "") return "Miễn phí";
+export function formatVND(amount: number | string | null | undefined): string {
+  if (amount === null || amount === undefined || amount === "") return "Free";
   const num = typeof amount === "string" ? Number(amount) : amount;
-  if (isNaN(num) || num <= 0) return "Miễn phí";
-  return `${num.toLocaleString("vi-VN")} đ`;
+  if (isNaN(num) || num <= 0) return "Free";
+  return `${num.toLocaleString("vi-VN")} ₫`;
 }
 
-export function formatDuration(seconds: number | null | undefined): string {
-  if (!seconds || seconds <= 0) return "0 phút";
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
+export function formatCurrency(amount: number | string | null | undefined): string {
+  return formatVND(amount);
+}
 
-  if (hours > 0) {
-    return `${hours} giờ ${minutes} phút`;
-  }
-  return `${minutes} phút`;
+export function formatDuration(minutes: number | null | undefined): string {
+  if (!minutes || minutes <= 0) return "0m";
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+
+  if (h > 0 && m > 0) return `${h}h ${m}m`;
+  if (h > 0) return `${h}h`;
+  return `${m}m`;
 }
 
