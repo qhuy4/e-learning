@@ -76,6 +76,25 @@ export async function initDatabaseTables(dataSource: DataSource) {
       CREATE INDEX IF NOT EXISTS idx_instructor_certificates_user_id ON instructor_certificates(user_id);
     `);
 
+    // 5. Tạo bảng bookings nếu chưa có
+    await dataSource.query(`
+      CREATE TABLE IF NOT EXISTS bookings (
+        id BIGSERIAL PRIMARY KEY,
+        student_id BIGINT NOT NULL,
+        instructor_id BIGINT NOT NULL,
+        booking_date DATE NOT NULL,
+        start_time TIME NOT NULL,
+        end_time TIME NOT NULL,
+        status SMALLINT DEFAULT 1,
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_bookings_student_id ON bookings(student_id);
+      CREATE INDEX IF NOT EXISTS idx_bookings_instructor_id ON bookings(instructor_id);
+      CREATE INDEX IF NOT EXISTS idx_bookings_booking_date ON bookings(booking_date);
+    `);
+
     logger.log('Khởi tạo / kiểm tra các bảng instructor và auth thành công!');
   } catch (error) {
     logger.error(`Lỗi khi khởi tạo bảng database: ${(error as Error).message}`);

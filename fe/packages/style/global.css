@@ -5,6 +5,17 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Local Nunito Font */
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 200; font-display: swap; src: url('../../apps/client/src/font/nunito/Nunito-ExtraLight.ttf') format('truetype'); }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 300; font-display: swap; src: url('../../apps/client/src/font/nunito/Nunito-Light.ttf') format('truetype'); }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 400; font-display: swap; src: url('../../apps/client/src/font/nunito/Nunito-Regular.ttf') format('truetype'); }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 500; font-display: swap; src: url('../../apps/client/src/font/nunito/Nunito-Medium.ttf') format('truetype'); }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 600; font-display: swap; src: url('../../apps/client/src/font/nunito/Nunito-SemiBold.ttf') format('truetype'); }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 700; font-display: swap; src: url('../../apps/client/src/font/nunito/Nunito-Bold.ttf') format('truetype'); }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 800; font-display: swap; src: url('../../apps/client/src/font/nunito/Nunito-ExtraBold.ttf') format('truetype'); }
+@font-face { font-family: 'Nunito'; font-style: normal; font-weight: 900; font-display: swap; src: url('../../apps/client/src/font/nunito/Nunito-Black.ttf') format('truetype'); }
+@font-face { font-family: 'Nunito'; font-style: italic; font-weight: 400; font-display: swap; src: url('../../apps/client/src/font/nunito/Nunito-Italic.ttf') format('truetype'); }
+
 @theme inline {
     --color-background: var(--background);
     --color-foreground: var(--foreground);
@@ -30,6 +41,60 @@
     --color-chart-3: var(--chart-3);
     --color-chart-4: var(--chart-4);
     --color-chart-5: var(--chart-5);
+    --color-piemind-pink: #F38181;
+    --color-piemind-yellow: #FCE38A;
+    --color-piemind-green: #EAFFD0;
+    --color-piemind-mint: #95E1D3;
+
+    /* M3 Primary */
+    --color-m3-primary: #9e3f42;
+    --color-m3-primary-container: #f38181;
+    --color-m3-on-primary: #ffffff;
+    --color-m3-on-primary-container: #6c1a20;
+    --color-m3-primary-fixed: #ffdad8;
+    --color-m3-primary-fixed-dim: #ffb3b1;
+    --color-m3-on-primary-fixed: #410007;
+    --color-m3-on-primary-fixed-variant: #7f282c;
+
+    /* M3 Secondary */
+    --color-m3-secondary: #146a5f;
+    --color-m3-secondary-container: #95E1D3;
+    --color-m3-on-secondary: #ffffff;
+    --color-m3-on-secondary-container: #1e7065;
+    --color-m3-secondary-fixed: #a4f1e3;
+    --color-m3-secondary-fixed-dim: #89d4c7;
+    --color-m3-on-secondary-fixed: #00201c;
+    --color-m3-on-secondary-fixed-variant: #005047;
+
+    /* M3 Tertiary */
+    --color-m3-tertiary: #6f5d11;
+    --color-m3-tertiary-container: #FCE38A;
+    --color-m3-on-tertiary: #ffffff;
+    --color-m3-on-tertiary-container: #453800;
+    --color-m3-tertiary-fixed: #fae189;
+    --color-m3-tertiary-fixed-dim: #ddc570;
+    --color-m3-on-tertiary-fixed: #221b00;
+    --color-m3-on-tertiary-fixed-variant: #554600;
+
+    /* M3 Surface */
+    --color-m3-surface: #f9f9ff;
+    --color-m3-surface-dim: #d0daf0;
+    --color-m3-surface-bright: #f9f9ff;
+    --color-m3-surface-container-lowest: #ffffff;
+    --color-m3-surface-container-low: #f0f3ff;
+    --color-m3-surface-container: #e7eeff;
+    --color-m3-surface-container-high: #dee8ff;
+    --color-m3-surface-container-highest: #d9e3f9;
+    --color-m3-surface-variant: #d9e3f9;
+    --color-m3-on-surface: #121c2c;
+    --color-m3-on-surface-variant: #000000;
+    --color-m3-on-background: #121c2c;
+    --color-m3-inverse-surface: #273141;
+    --color-m3-inverse-on-surface: #ebf1ff;
+    --color-m3-inverse-primary: #ffb3b1;
+    --color-m3-outline: #897271;
+    --color-m3-outline-variant: #dcc0bf;
+
     --radius-sm: calc(var(--radius) * 0.6);
     --radius-md: calc(var(--radius) * 0.8);
     --radius-lg: var(--radius);
@@ -37,6 +102,7 @@
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
+
     --color-sidebar: var(--sidebar);
     --color-sidebar-foreground: var(--sidebar-foreground);
     --color-sidebar-primary: var(--sidebar-primary);
@@ -55,31 +121,35 @@
     --card-foreground: oklch(0.145 0 0);
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
+    --primary: #F38181;
     --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
+    --secondary: #95E1D3;
     --secondary-foreground: oklch(0.205 0 0);
     --muted: oklch(0.97 0 0);
     --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
+    --accent: #FCE38A;
     --accent-foreground: oklch(0.205 0 0);
     --destructive: oklch(0.577 0.245 27.325);
     --border: oklch(0.922 0 0);
     --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.646 0.222 41.116);
-    --chart-2: oklch(0.6 0.118 184.704);
-    --chart-3: oklch(0.398 0.07 227.392);
-    --chart-4: oklch(0.828 0.189 84.429);
-    --chart-5: oklch(0.769 0.188 70.08);
+    --ring: #F38181;
+    --chart-1: #F38181;
+    --chart-2: #FCE38A;
+    --chart-3: #EAFFD0;
+    --chart-4: #95E1D3;
+    --chart-5: oklch(0.646 0.222 41.116);
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
+    --sidebar-primary: #F38181;
     --sidebar-primary-foreground: oklch(0.985 0 0);
     --sidebar-accent: oklch(0.97 0 0);
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+    --sidebar-ring: #F38181;
+    --piemind-pink: #F38181;
+    --piemind-yellow: #FCE38A;
+    --piemind-green: #EAFFD0;
+    --piemind-mint: #95E1D3;
 }
 
 .dark {
@@ -122,5 +192,54 @@
     }
     body {
         @apply bg-background text-foreground;
+        font-family: 'Nunito', system-ui, sans-serif;
     }
+}
+
+/* M3 Typography Scale */
+@layer base {
+    .font-display-lg { font-size: 3rem; line-height: 3.5rem; font-weight: 400; letter-spacing: -0.02em; }
+    .font-headline-lg { font-size: 2rem; line-height: 2.5rem; font-weight: 700; }
+    .font-headline-md { font-size: 1.75rem; line-height: 2.25rem; font-weight: 400; }
+    .font-headline-sm { font-size: 1.25rem; line-height: 1.75rem; font-weight: 400; }
+    .font-body-lg { font-size: 1.125rem; line-height: 1.75rem; font-weight: 400; }
+    .font-body-md { font-size: 1rem; line-height: 1.5rem; font-weight: 400; }
+    .font-body-sm { font-size: 0.875rem; line-height: 1.25rem; font-weight: 400; }
+    .font-label-lg { font-size: 1rem; line-height: 1.5rem; font-weight: 500; }
+    .font-label-md { font-size: 0.875rem; line-height: 1.25rem; font-weight: 500; }
+    .font-label-sm { font-size: 0.75rem; line-height: 1rem; font-weight: 500; }
+}
+
+/* Card hover with M3 theme colors */
+.card-hover-m3 {
+  transition: all 0.2s ease;
+}
+.card-hover-m3:hover {
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    transform: translateY(-3px);
+}
+.card-hover-m3:hover .card-hover-text-primary {
+  color: var(--color-m3-primary-container);
+
+
+}
+.card-hover-m3:hover .card-hover-text-secondary {
+  color: var(--color-m3-secondary-container);
+
+}
+.card-hover-m3:hover .card-hover-text-tertiary {
+  color: var(--color-m3-tertiary-container);
+}
+.card-hover-m3:hover .card-hover-arrow {
+  color: var(--color-m3-primary-container);
+  transform: translateX(4px);
+}
+.card-hover-m3:hover .number-hover-primary {
+  color: var(--color-m3-primary-container);
+}
+.card-hover-m3:hover .number-hover-secondary {
+  color: var(--color-m3-secondary-container);
+}
+.card-hover-m3:hover .number-hover-tertiary {
+  color: var(--color-m3-tertiary-container);
 }

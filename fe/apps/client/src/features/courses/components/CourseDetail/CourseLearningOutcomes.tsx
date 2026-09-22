@@ -1,25 +1,35 @@
 import { Check } from "lucide-react";
+import type { CourseDetail } from "@/features/courses/types/course.type";
 
-export const CourseLearningOutcomes = () => {
+interface CourseLearningOutcomesProps {
+  course?: CourseDetail;
+}
+
+export const CourseLearningOutcomes = ({ course }: CourseLearningOutcomesProps) => {
+  const sections = course?.sections || [];
+  const totalLessons = sections.reduce((acc, s) => acc + (s.lessons?.length || 0), 0);
+
   const outcomes = [
-    "Thành thạo công cụ Figma từ A-Z",
-    "Quy trình thiết kế UI/UX chuyên nghiệp",
-    "Thiết kế Design System bài bản, chuẩn",
-    "Phân tích và cải thiện trải nghiệm người dùng",
-    "Thiết kế Wireframe cho Website & Mobile",
-    "Xuất file và bàn giao cho nhà phát triển"
-  ];
+    course?.level && `Master ${course.level} level English skills`,
+    totalLessons > 0 && `Complete ${totalLessons} structured lessons across ${sections.length} sections`,
+    course?.instructor?.name && `Learn from ${course.instructor.name}`,
+    "Build real-world conversation fluency",
+    "Improve pronunciation and natural rhythm",
+    "Gain confidence in professional settings",
+  ].filter(Boolean) as string[];
+
+  if (outcomes.length === 0) return null;
 
   return (
-    <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6 md:p-8">
-      <h2 className="text-xl font-bold text-slate-900 mb-6">Bạn sẽ học được gì</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="bg-white border border-primary/30 rounded-xl p-6">
+      <h2 className="text-lg font-bold text-slate-900 mb-4">What you&apos;ll learn</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {outcomes.map((item, index) => (
           <div key={index} className="flex items-start gap-3">
-            <div className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-              <Check className="w-3.5 h-3.5 stroke-[3]" />
+            <div className="mt-0.5 shrink-0 w-5 h-5 rounded-full bg-piemind-green/30 flex items-center justify-center">
+              <Check className="size-3 text-m3-secondary stroke-[3]" />
             </div>
-            <span className="text-slate-700 text-sm">{item}</span>
+            <span className="text-sm text-slate-700">{item}</span>
           </div>
         ))}
       </div>

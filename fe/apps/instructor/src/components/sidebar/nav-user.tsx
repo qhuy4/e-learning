@@ -31,7 +31,6 @@ export function NavUser() {
   const {user} = useAuth()
   const handleLogout = ()=>{
     dispatch(logout());
-    localStorage.removeItem("accessToken");
     navigate("/login", { replace: true });
   }
   return (

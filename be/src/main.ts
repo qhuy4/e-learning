@@ -11,7 +11,7 @@ import { initDatabaseTables } from '@/database/init-db';
 
 import * as express from 'express';
 import * as path from 'path';
-
+import cookieParser from 'cookie-parser';
 async function bootstrap() {
   // const app = await NestFactory.create(AppModule);
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -19,12 +19,14 @@ async function bootstrap() {
   const dataSource = app.get(DataSource);
   await initDatabaseTables(dataSource);
 
-  app.use(express.json({
-    verify: (req: any, _res, buf) => {
-      req.rawBody = buf;
-    },
-  }));
-
+  app.use(
+    express.json({
+      verify: (req: any, _res, buf) => {
+        req.rawBody = buf;
+      },
+    }),
+  );
+  app.use(cookieParser());
   app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
   app.useGlobalPipes(

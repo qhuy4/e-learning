@@ -1,21 +1,18 @@
-import type { Course } from "../../types/course.type";
+import type { CourseDetail } from "@/features/courses/types/course.type";
 
 interface CourseDescriptionProps {
-  course: Course;
+  course: CourseDetail;
 }
 
+export const CourseDescription = ({ course }: CourseDescriptionProps) => {
+  if (!course.description) return null;
 
-export const CourseDescription = ({course}:CourseDescriptionProps) => {
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-bold text-slate-900 mb-2">
-        Giới thiệu khóa học
-      </h2>
-      <div className="text-slate-600 text-sm leading-relaxed space-y-4">
-        <p>
-         {course.description}
-        </p>
-      </div>
+    <div className="bg-white border border-primary/30 rounded-xl p-6">
+      <h2 className="text-lg font-bold text-slate-900 mb-3">About this course</h2>
+      <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
+        {course.description}
+      </p>
     </div>
   );
 };

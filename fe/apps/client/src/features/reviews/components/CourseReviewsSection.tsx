@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Edit3, Lock, MessageSquare } from "lucide-react";
-import { useAuth } from "../../auth/hooks/use-auth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { useCourseReviews, useReviewEligibility } from "../hooks/use-reviews";
 import { ReviewStatsSummary } from "./ReviewStatsSummary";
 import { ReviewList } from "./ReviewList";

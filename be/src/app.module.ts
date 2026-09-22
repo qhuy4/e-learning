@@ -33,6 +33,7 @@ import { WishlistsModule } from '@/modules/wishlists/wishlists.module';
 import { AdminDashboardModule } from '@/modules/analytics/admin-dashboard.module';
 import { AchievementsModule } from '@/modules/achievements/achievements.module';
 import { ExamsModule } from '@/modules/exams/exams.module';
+import { BookingsModule } from '@/modules/bookings/bookings.module';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { ExamsModule } from '@/modules/exams/exams.module';
     WishlistsModule,
     AdminDashboardModule,
     AchievementsModule,
+    BookingsModule,
     UserModule,
     AuthModule,
     InstructorModule,
