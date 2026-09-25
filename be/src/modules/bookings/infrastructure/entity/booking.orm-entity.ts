@@ -5,9 +5,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  OneToOne,
   JoinColumn,
 } from 'typeorm';
 import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
+import { MeetingRoomOrmEntity } from '@/modules/bookings/infrastructure/entity/meeting-room.orm-entity';
 
 @Entity('bookings')
 export class BookingOrmEntity {
@@ -48,4 +50,7 @@ export class BookingOrmEntity {
   @ManyToOne(() => UserOrmEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'instructor_id' })
   instructor: UserOrmEntity;
+
+  @OneToOne(() => MeetingRoomOrmEntity, (room) => room.booking)
+  meetingRoom: MeetingRoomOrmEntity | null;
 }

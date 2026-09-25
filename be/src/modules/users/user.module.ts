@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { UsersController } from '@/modules/users/presentation/user.controller';
+import { MeController } from '@/modules/users/presentation/me.controller';
 import { InstructorProfileController } from '@/modules/users/presentation/instructor-profile.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserRepository } from '@/modules/users/infrastructure/repository/user.repository';
@@ -35,7 +36,7 @@ const CommandHandlers = [
     ServiceModule,
     TypeOrmModule.forFeature([UserOrmEntity, UserProfileOrmEntity]),
   ],
-  controllers: [UsersController, InstructorProfileController],
+  controllers: [UsersController, MeController, InstructorProfileController],
   providers: [
     UserRepository,
     UserProfileRepository,
