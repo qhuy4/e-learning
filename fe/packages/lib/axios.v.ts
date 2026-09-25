@@ -28,7 +28,7 @@ export const createApi = (
 
     async function refreshAccessToken(): Promise<string> {
         const response = await refreshClient.post<{
-            accessToken: string;
+            data: { accessToken: string };
         }>(refreshPath);
         const newAccessToken = response.data.data.accessToken;
 
