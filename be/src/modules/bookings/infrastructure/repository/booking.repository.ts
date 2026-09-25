@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Brackets } from 'typeorm';
+import { Repository, Brackets, EntityManager } from 'typeorm';
 import { BookingOrmEntity } from '@/modules/bookings/infrastructure/entity/booking.orm-entity';
 
 @Injectable()
@@ -41,18 +41,30 @@ export class BookingRepository {
     status?: number;
     bookingDate?: string;
   }) {
-    const { page, limit, keyword, instructorId, studentId, status, bookingDate } = options;
+    const {
+      page,
+      limit,
+      keyword,
+      instructorId,
+      studentId,
+      status,
+      bookingDate,
+    } = options;
 
     const query = this.repo
       .createQueryBuilder('b')
       .leftJoinAndSelect('b.student', 'student')
-      .leftJoinAndSelect('b.instructor', 'instructor');
+      .leftJoinAndSelect('b.instructor', 'instructor')
+      .leftJoinAndSelect('b.meetingRoom', 'meetingRoom');
 
     if (keyword) {
       query.andWhere(
         new Brackets((qb) => {
-          qb.where('student.name ILIKE :keyword', { keyword: `%${keyword}%` })
-            .orWhere('instructor.name ILIKE :keyword', { keyword: `%${keyword}%` });
+          qb.where('student.name ILIKE :keyword', {
+            keyword: `%${keyword}%`,
+          }).orWhere('instructor.name ILIKE :keyword', {
+            keyword: `%${keyword}%`,
+          });
         }),
       );
     }
@@ -93,6 +105,16 @@ export class BookingRepository {
       endTime: e.end_time,
       status: e.status,
       notes: e.notes,
+      meetingRoomId: e.meetingRoom ? Number(e.meetingRoom.id) : null,
+      meetingRoom: e.meetingRoom
+        ? {
+            id: Number(e.meetingRoom.id),
+            roomId: e.meetingRoom.roomId,
+            status: e.meetingRoom.status,
+            startedAt: e.meetingRoom.startedAt,
+            endedAt: e.meetingRoom.endedAt,
+          }
+        : null,
       createdAt: e.created_at,
       updatedAt: e.updated_at,
     }));
@@ -106,7 +128,7 @@ export class BookingRepository {
   async findById(id: number) {
     const entity = await this.repo.findOne({
       where: { id },
-      relations: { student: true, instructor: true },
+      relations: { student: true, instructor: true, meetingRoom: true },
     });
     if (!entity) return null;
 
@@ -122,6 +144,16 @@ export class BookingRepository {
       endTime: entity.end_time,
       status: entity.status,
       notes: entity.notes,
+      meetingRoomId: entity.meetingRoom ? Number(entity.meetingRoom.id) : null,
+      meetingRoom: entity.meetingRoom
+        ? {
+            id: Number(entity.meetingRoom.id),
+            roomId: entity.meetingRoom.roomId,
+            status: entity.meetingRoom.status,
+            startedAt: entity.meetingRoom.startedAt,
+            endedAt: entity.meetingRoom.endedAt,
+          }
+        : null,
       createdAt: entity.created_at,
       updatedAt: entity.updated_at,
     };
@@ -133,12 +165,19 @@ export class BookingRepository {
     return this.findById(Number(saved.id));
   }
 
-  async updateStatus(id: number, status: number) {
-    await this.repo.update(id, { status });
-    return this.findById(id);
+  async updateStatus(id: number, status: number, manager: EntityManager) {
+    const repository = manager.getRepository(BookingOrmEntity);
+
+    await repository.update({ id }, { status });
+
+    return repository.findOne({
+      where: { id },
+    });
   }
 
   async delete(id: number) {
     await this.repo.delete(id);
   }
+
+  async updateStatusWithMeetingRoom() {}
 }

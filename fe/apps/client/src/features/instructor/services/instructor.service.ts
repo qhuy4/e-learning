@@ -1,4 +1,4 @@
-import { api } from "@fe/lib/axios";
+import { api } from "@/shared/lib/axios";
 
 export interface RegisterInstructorPayload {
   session: string;

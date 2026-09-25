@@ -1,6 +1,7 @@
 export interface GetMyProfileResponse {
   id: number;
   email: string;
+  name: string;
   profile: {
     avatarUrl: string | null;
     firstName: string | null;

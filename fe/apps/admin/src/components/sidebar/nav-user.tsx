@@ -20,18 +20,15 @@ import {
 } from "@fe/components/ui/sidebar.tsx"
 import { EllipsisVerticalIcon, CircleUserRoundIcon, CreditCardIcon, BellIcon, LogOutIcon } from "lucide-react"
 import {useNavigate} from "react-router";
-import { useDispatch } from "react-redux";
-import  {logout} from "@/features/auth/store/authSlice.ts";
+import {logout} from "@/shared/lib/axios.ts";
 import {useAuth} from "@/features/auth/hook/useAuth.ts";
 
 export function NavUser() {
   const { isMobile } = useSidebar()
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const {user} = useAuth()
   const handleLogout = ()=>{
-    dispatch(logout());
-    localStorage.removeItem("accessToken");
+    logout();
     navigate("/login", { replace: true });
   }
   return (
@@ -44,13 +41,13 @@ export function NavUser() {
             }
           >
             <Avatar className="size-8 rounded-lg grayscale">
-              <AvatarImage src={user.avatar} alt={user.name} />
+              <AvatarImage src={user?.avatar} alt={user?.name} />
 
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-medium">{user.name}</span>
+              <span className="truncate font-medium">{user?.name}</span>
               <span className="truncate text-xs text-foreground/70">
-                {user.email}
+                {user?.email}
               </span>
             </div>
             <EllipsisVerticalIcon className="ml-auto size-4" />
@@ -65,13 +62,13 @@ export function NavUser() {
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                   <Avatar className="size-8">
-                    <AvatarImage src={user.avatar} alt={user.name} />
+                    <AvatarImage src={user?.avatar} alt={user?.name} />
                     <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">{user.name}</span>
+                    <span className="truncate font-medium">{user?.name}</span>
                     <span className="truncate text-xs text-muted-foreground">
-                      {user.email}
+                      {user?.email}
                     </span>
                   </div>
                 </div>

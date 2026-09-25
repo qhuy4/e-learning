@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Repository } from 'typeorm';
+import { IsNull, MoreThan, Not, Repository } from 'typeorm';
 import { RefreshSession } from '@/modules/auth/infrastructure/refresh-session.entity';
 
 
@@ -44,6 +44,42 @@ export class RefreshSessionRepository {
         revokedAt: new Date(),
       },
     );
+  }
+
+  async findActiveByUserId(userId: number): Promise<RefreshSession[]> {
+    return this.repository.find({
+      where: {
+        userId,
+        revokedAt: IsNull(),
+        expiresAt: MoreThan(new Date()),
+      },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async findActiveById(
+    id: string,
+    userId: number,
+  ): Promise<RefreshSession | null> {
+    return this.repository.findOne({
+      where: {
+        id,
+        userId,
+        revokedAt: IsNull(),
+        expiresAt: MoreThan(new Date()),
+      },
+    });
+  }
+
+  async revokeAllForUser(
+    userId: number,
+    exceptId: string | null,
+  ): Promise<void> {
+    const criteria = exceptId
+      ? { userId, revokedAt: IsNull(), id: Not(exceptId) }
+      : { userId, revokedAt: IsNull() };
+
+    await this.repository.update(criteria, { revokedAt: new Date() });
   }
 
   async rotate(
