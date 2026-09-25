@@ -11,6 +11,8 @@ import {
     LogOut,
     Trophy,
     MessageCircleQuestion,
+    CalendarClock,
+    CalendarDays,
 } from "lucide-react"
 import type { NavGroup, NavItem } from "@/shared/types/navigation"
 
@@ -43,6 +45,16 @@ export const navigation: Navigation = {
                     title: "Học viên",
                     url: "/students",
                     icon: Users,
+                },
+                {
+                    title: "Lịch tuần",
+                    url: "/schedule",
+                    icon: CalendarDays,
+                },
+                {
+                    title: "Đặt lịch",
+                    url: "/bookings",
+                    icon: CalendarClock,
                 },
                 {
                     title: "Doanh thu",
