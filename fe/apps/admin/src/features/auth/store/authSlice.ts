@@ -33,6 +33,7 @@ const authSlice = createSlice({
             action: PayloadAction<string>,
         ) {
             state.token = action.payload;
+            localStorage.setItem("accessToken", action.payload);
         },
 
         logout(state) {
