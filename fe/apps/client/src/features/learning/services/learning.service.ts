@@ -1,4 +1,4 @@
-import { api } from '@fe/lib/axios';
+import { api } from '@/shared/lib/axios';
 import type { LessonDetail, LearningCourse, LessonProgress, CourseProgress } from '../types/learning.type';
 
 export const learningService = {

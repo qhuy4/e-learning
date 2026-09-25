@@ -6,27 +6,6 @@ interface CourseHeaderProps {
 }
 
 export const CourseHeader = ({ course }: CourseHeaderProps) => {
-  const instructorName = course?.instructor?.name || "Giảng viên";
-  const initials = instructorName
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-
-  const rawDate = course?.updatedAt || course?.publishedAt || course?.createdAt;
-  const datePrefix = course?.updatedAt
-    ? "Cập nhật lần cuối:"
-    : course?.publishedAt
-    ? "Ngày xuất bản:"
-    : "Ngày tạo:";
-  const formattedDate = rawDate
-    ? new Date(rawDate).toLocaleDateString("vi-VN", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      })
-    : "";
   const totalLessons = course?.sections?.reduce((acc, s) => acc + (s.lessons?.length || 0), 0) || 0;
   const totalSections = course?.sections?.length || 0;
 

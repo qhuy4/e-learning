@@ -1,12 +1,14 @@
 import { createContext, useCallback, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import type { User } from "../types/auth.type";
+import { logout as doLogout } from "@/shared/lib/axios";
 
 export interface AuthContextType {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
   login: (token: string, user: User) => void;
+  updateUser: (user: User) => void;
   logout: () => void;
 }
 
@@ -33,19 +35,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(newUser);
   }, []);
 
+  const updateUser = useCallback((nextUser: User) => {
+    localStorage.setItem("user", JSON.stringify(nextUser));
+    setUser(nextUser);
+  }, []);
+
   const logout = useCallback(() => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("user");
-    setToken(null);
-    setUser(null);
+    doLogout();
   }, []);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("accessToken");
-    if (storedToken && !token) {
-      setToken(storedToken);
-    }
-  }, [token]);
+    const onTokenUpdated = () => {
+      setToken(localStorage.getItem("accessToken"));
+    };
+    const onLogout = () => {
+      setToken(null);
+      setUser(null);
+    };
+    window.addEventListener("auth:token-updated", onTokenUpdated);
+    window.addEventListener("auth:logout", onLogout);
+    return () => {
+      window.removeEventListener("auth:token-updated", onTokenUpdated);
+      window.removeEventListener("auth:logout", onLogout);
+    };
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -54,6 +67,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         token,
         isAuthenticated: !!token && !!user,
         login,
+        updateUser,
         logout,
       }}
     >

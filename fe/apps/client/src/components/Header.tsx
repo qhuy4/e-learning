@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router";
-import { Menu, X, LogOut, BookOpen, ChevronDown, User, ShoppingBag } from "lucide-react";
+import { Menu, X, LogOut, BookOpen, ChevronDown, User, ShoppingBag, CalendarDays, History } from "lucide-react";
 import { Navigation } from "./Navigation";
 import { useCart } from "@/features/cart/hooks/use-cart";
 
@@ -93,6 +93,30 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
                     <BookOpen size={16} />
                     My Courses
                   </Link>
+                  <Link
+                    to="/my-bookings"
+                    onClick={() => setIsDropdownOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-muted-foreground hover:bg-muted transition-colors"
+                  >
+                    <CalendarDays size={16} />
+                    My Bookings
+                  </Link>
+                  <Link
+                    to="/profile"
+                    onClick={() => setIsDropdownOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-muted-foreground hover:bg-muted transition-colors"
+                  >
+                    <User size={16} />
+                    Profile
+                  </Link>
+                  <Link
+                    to="/profile?tab=history"
+                    onClick={() => setIsDropdownOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-muted-foreground hover:bg-muted transition-colors"
+                  >
+                    <History size={16} />
+                    Booking History
+                  </Link>
                   <button
                     onClick={() => {
                       onLogout?.();
@@ -173,6 +197,30 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
                 >
                   <BookOpen size={16} />
                   My Courses
+                </Link>
+                <Link
+                  to="/my-bookings"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-2 px-2 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg"
+                >
+                  <CalendarDays size={16} />
+                  My Bookings
+                </Link>
+                <Link
+                  to="/profile"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-2 px-2 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg"
+                >
+                  <User size={16} />
+                  Profile
+                </Link>
+                <Link
+                  to="/profile?tab=history"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-2 px-2 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg"
+                >
+                  <History size={16} />
+                  Booking History
                 </Link>
                 <button
                   onClick={() => {
