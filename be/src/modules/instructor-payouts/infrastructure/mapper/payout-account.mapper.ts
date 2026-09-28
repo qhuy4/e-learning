@@ -14,6 +14,7 @@ export class PayoutAccountMapper {
       routingCode: entity.routingCode,
       paypalEmail: entity.paypalEmail,
       externalRef: entity.externalRef,
+      casGrantId: entity.casGrantId,
       currency: entity.currency,
       isPrimary: entity.isPrimary,
       isVerified: entity.isVerified,

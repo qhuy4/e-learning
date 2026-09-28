@@ -9,19 +9,32 @@ import { COURSE_QUESTION_REPOSITORY } from '@/modules/course-questions/domain/re
 
 import { GetAdminQuestionsHandler } from '@/modules/course-questions/application/query-handler/get-admin-questions.handler';
 import { GetAdminQuestionDetailHandler } from '@/modules/course-questions/application/query-handler/get-admin-question-detail.handler';
+import { GetInstructorQuestionsHandler } from '@/modules/course-questions/application/query-handler/get-instructor-questions.handler';
+import { GetCourseQuestionsHandler } from '@/modules/course-questions/application/query-handler/get-course-questions.handler';
 import { UpdateQuestionStatusHandler } from '@/modules/course-questions/application/command-handler/update-question-status.handler';
 import { UpdateAnswerStatusHandler } from '@/modules/course-questions/application/command-handler/update-answer-status.handler';
 import { DeleteQuestionHandler } from '@/modules/course-questions/application/command-handler/delete-question.handler';
 import { DeleteAnswerHandler } from '@/modules/course-questions/application/command-handler/delete-answer.handler';
+import { AnswerQuestionHandler } from '@/modules/course-questions/application/command-handler/answer-question.handler';
+import { CreateQuestionHandler } from '@/modules/course-questions/application/command-handler/create-question.handler';
 
 import { AdminCourseQuestionsController } from '@/modules/course-questions/presentation/admin-course-questions.controller';
+import { InstructorCourseQuestionsController } from '@/modules/course-questions/presentation/instructor-course-questions.controller';
+import { StudentCourseQuestionsController } from '@/modules/course-questions/presentation/student-course-questions.controller';
 
-const QueryHandlers = [GetAdminQuestionsHandler, GetAdminQuestionDetailHandler];
+const QueryHandlers = [
+  GetAdminQuestionsHandler,
+  GetAdminQuestionDetailHandler,
+  GetInstructorQuestionsHandler,
+  GetCourseQuestionsHandler,
+];
 const CommandHandlers = [
   UpdateQuestionStatusHandler,
   UpdateAnswerStatusHandler,
   DeleteQuestionHandler,
   DeleteAnswerHandler,
+  AnswerQuestionHandler,
+  CreateQuestionHandler,
 ];
 
 @Module({
@@ -29,7 +42,11 @@ const CommandHandlers = [
     CqrsModule,
     TypeOrmModule.forFeature([CourseQuestionOrmEntity, CourseQuestionAnswerOrmEntity]),
   ],
-  controllers: [AdminCourseQuestionsController],
+  controllers: [
+    AdminCourseQuestionsController,
+    InstructorCourseQuestionsController,
+    StudentCourseQuestionsController,
+  ],
   providers: [
     CourseQuestionRepository,
     {

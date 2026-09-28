@@ -1,11 +1,16 @@
 import { formatCurrency } from "@fe/lib/utils";
-import type { CheckoutCourse } from "../services/checkout.service";
-
 interface OrderSummaryProps {
-  course: CheckoutCourse;
+  course: {
+    title: string;
+    thumbnail: string | null;
+    price: number;
+    instructor?: { headline: string | null } | null;
+    statistics?: { studentCount: number; reviewCount: number } | null;
+  };
+  total?: number;
 }
 
-export const OrderSummary = ({ course }: OrderSummaryProps) => {
+export const OrderSummary = ({ course, total = course.price }: OrderSummaryProps) => {
   return (
     <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm">
       <h3 className="font-bold text-slate-900 mb-4">Tóm tắt đơn hàng</h3>
@@ -45,7 +50,7 @@ export const OrderSummary = ({ course }: OrderSummaryProps) => {
       <div className="border-t border-slate-100 pt-4 space-y-2">
         <div className="flex justify-between text-sm">
           <span className="text-slate-500">Giá gốc</span>
-          <span className="text-slate-700">{formatCurrency(course.price)}</span>
+          <span className="text-slate-700">{formatCurrency(total)}</span>
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-slate-500">Giảm giá</span>
@@ -54,7 +59,7 @@ export const OrderSummary = ({ course }: OrderSummaryProps) => {
         <div className="border-t border-slate-100 pt-2 flex justify-between">
           <span className="font-bold text-slate-900">Tổng cộng</span>
           <span className="font-bold text-rose-500 text-lg">
-            {formatCurrency(course.price)}
+            {formatCurrency(total)}
           </span>
         </div>
       </div>

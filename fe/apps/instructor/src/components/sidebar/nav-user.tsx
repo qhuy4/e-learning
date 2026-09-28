@@ -20,18 +20,15 @@ import {
 } from "@fe/components/ui/sidebar.tsx"
 import { EllipsisVerticalIcon, CircleUserRoundIcon, CreditCardIcon, BellIcon, LogOutIcon } from "lucide-react"
 import {useNavigate} from "react-router";
-import { useDispatch } from "react-redux";
-import  {logout} from "@/features/auth/store/authSlice.ts";
+import {logout} from "@/shared/lib/axios.ts";
 import {useAuth} from "@/features/auth/hook/useAuth.ts";
 
 export function NavUser() {
   const { isMobile } = useSidebar()
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const {user} = useAuth()
   const handleLogout = ()=>{
-    dispatch(logout());
-    localStorage.removeItem("accessToken");
+    logout();
     navigate("/login", { replace: true });
   }
   return (

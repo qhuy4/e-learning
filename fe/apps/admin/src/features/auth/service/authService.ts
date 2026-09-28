@@ -2,7 +2,7 @@ import type {
     LoginRequest,
     LoginResponse,
 } from "@/features/auth/types/login";
-import { adminApi } from "@/shared/lib/axios";
+import {adminApi} from "@/shared/lib/axios.ts";
 
 export const authService = {
     async login(data: LoginRequest): Promise<LoginResponse> {
@@ -14,4 +14,3 @@ export const authService = {
         return response.data;
     },
 };
-

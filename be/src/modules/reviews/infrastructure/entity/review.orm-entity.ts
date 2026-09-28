@@ -1,6 +1,7 @@
-import { Column, Entity, Index, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
 import { CourseOrmEntity } from '@/modules/courses/infrastructure/entity/course.orm-entity';
+import { ReviewImageOrmEntity } from './review-image.orm-entity';
 
 @Entity({
   name: 'reviews',
@@ -9,7 +10,7 @@ import { CourseOrmEntity } from '@/modules/courses/infrastructure/entity/course.
 @Index('idx_reviews_course_id', ['courseId'])
 @Index('idx_reviews_user_id', ['userId'])
 export class ReviewOrmEntity {
-  @PrimaryColumn({
+  @PrimaryGeneratedColumn({
     type: 'bigint',
   })
   id: string;
@@ -71,4 +72,9 @@ export class ReviewOrmEntity {
   @ManyToOne(() => CourseOrmEntity, { nullable: false })
   @JoinColumn({ name: 'course_id' })
   course: CourseOrmEntity;
+
+  @OneToMany(() => ReviewImageOrmEntity, (image) => image.review, {
+    cascade: true,
+  })
+  images: ReviewImageOrmEntity[];
 }

@@ -1,5 +1,5 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { Inject, NotFoundException } from '@nestjs/common';
+import { Inject, HttpStatus } from '@nestjs/common';
 import { GetLessonByIdQuery } from '@/modules/lessons/application/query/get-lesson-by-id.query';
 import { LESSON_REPOSITORY, ILessonRepository } from '@/modules/lessons/domain/repository/lesson.repository';
 import { FileStorage } from '@/common/storage/domain/interface/file-storage.interface';
@@ -19,6 +19,8 @@ async function resolveSignedUrl(
 }
 
 import { LessonDtoMapper } from '../../presentation/mappers/lesson-dto.mapper';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 
 @QueryHandler(GetLessonByIdQuery)
 export class GetLessonByIdHandler implements IQueryHandler<GetLessonByIdQuery> {
@@ -33,7 +35,7 @@ export class GetLessonByIdHandler implements IQueryHandler<GetLessonByIdQuery> {
     const lesson = await this.lessonRepository.findById(query.id);
 
     if (!lesson) {
-      throw new NotFoundException('Lesson not found');
+      throw new AppException(ErrorCode.LESSON_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     const signedUrl = await resolveSignedUrl(lesson.videoSource, this.storage);

@@ -55,7 +55,7 @@ export default function CertificateDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6 max-w-7xl mx-auto p-6">
+      <div className="space-y-6  mx-auto p-6">
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-64 w-full" />
       </div>
@@ -64,7 +64,7 @@ export default function CertificateDetailPage() {
 
   if (!cert) {
     return (
-      <div className="space-y-6 max-w-7xl mx-auto p-6">
+      <div className="space-y-6  mx-auto p-6">
         <p className="text-muted-foreground">Chứng chỉ không tồn tại.</p>
         <Button variant="outline" onClick={() => navigate("/certificates")}>
           Quay lại
@@ -78,7 +78,7 @@ export default function CertificateDetailPage() {
   const StatusIcon = STATUS_ICONS[cert.certificateStatus] || Clock;
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto p-6">
+    <div className="space-y-6  mx-auto p-6">
       <div className="flex items-center gap-3 mb-6">
         <Button
           variant="ghost"

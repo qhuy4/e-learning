@@ -3,7 +3,6 @@ import {
   Body,
   Controller,
   Get,
-  NotFoundException,
   Param,
   ParseIntPipe,
   Patch,
@@ -21,6 +20,9 @@ import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { Role } from '@/common/enum/role.enum';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
+import { HttpStatus } from '@nestjs/common';
 
 @Controller('admin/teachers')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -124,7 +126,7 @@ export class AdminTeacherController {
     });
 
     if (!profile) {
-      throw new NotFoundException('Không tìm thấy hồ sơ giảng viên này.');
+      throw new AppException(ErrorCode.INSTRUCTOR_PROFILE_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     if (profile.approvalStatus === ApprovalStatus.APPROVED) {

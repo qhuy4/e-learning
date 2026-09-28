@@ -1,40 +1,37 @@
-import { useState } from "react";
-import { Plus, Pencil, Trash2, Clock, CalendarOff, X } from "lucide-react";
-import { toast } from "sonner";
+import {useState} from "react";
+import {CalendarOff, Clock, Pencil, Plus, Trash2, X} from "lucide-react";
+import {toast} from "sonner";
 
-import { TimePicker } from "@/components/time-picker";
-import { DayOfWeekPicker } from "@/components/day-of-week-picker";
-import { Toggle } from "@fe/components/ui/toggle";
+import {TimePicker} from "@/components/time-picker";
+import {DayOfWeekPicker} from "@/components/day-of-week-picker";
+import {Toggle} from "@fe/components/ui/toggle";
 
 import {
-  useRecurringAvailability,
-  useExceptionAvailability,
-  useCreateRecurring,
-  useUpdateRecurring,
-  useDeleteRecurring,
   useCreateException,
-  useUpdateException,
+  useCreateRecurring,
   useDeleteException,
+  useDeleteRecurring,
+  useExceptionAvailability,
+  useRecurringAvailability,
+  useUpdateException,
+  useUpdateRecurring,
 } from "@/features/availability/hooks/use-availability";
-import type {
-  RecurringAvailability,
-  ExceptionAvailability,
-} from "@/features/availability/types/availability.types";
+import type {ExceptionAvailability, RecurringAvailability,} from "@/features/availability/types/availability.types";
 import {
   DAY_LABELS,
   DAY_NAMES,
-  recurringStatusConfig,
   exceptionTypeConfig,
+  recurringStatusConfig,
 } from "@/features/availability/config/availability.config";
-import { Button } from "@fe/components/ui/button";
-import { Badge } from "@fe/components/ui/badge";
-import { Input } from "@fe/components/ui/input";
-import { Label } from "@fe/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@fe/components/ui/card";
-import { Popover, PopoverContent, PopoverTrigger } from "@fe/components/ui/popover";
-import { Calendar } from "@fe/components/ui/calendar";
-import { ConfirmDialog } from "@/components/confirm-dialog";
-import { getErrorMessage } from "@/shared/utils/error";
+import {Button} from "@fe/components/ui/button";
+import {Badge} from "@fe/components/ui/badge";
+import {Input} from "@fe/components/ui/input";
+import {Label} from "@fe/components/ui/label";
+import {Card, CardContent, CardHeader, CardTitle} from "@fe/components/ui/card";
+import {Popover, PopoverContent, PopoverTrigger} from "@fe/components/ui/popover";
+import {Calendar} from "@fe/components/ui/calendar";
+import {ConfirmDialog} from "@/components/confirm-dialog";
+import {getErrorMessage} from "@/shared/utils/error";
 
 function parseDate(value: string): Date | undefined {
   if (!value) return undefined;
@@ -44,7 +41,10 @@ function parseDate(value: string): Date | undefined {
 }
 
 function formatDate(date: Date): string {
-  return date.toISOString().split("T")[0];
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
 
 export default function AvailabilityPage() {
@@ -251,13 +251,18 @@ function RecurringTab() {
                       </Button>
                     }
                   />
-                  <PopoverContent className="w-auto overflow-hidden p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={parseDate(form.effective_from)}
-                      defaultMonth={parseDate(form.effective_from) ?? new Date()}
-                      captionLayout="dropdown"
-                      onSelect={(date) => {
+<PopoverContent className="w-auto overflow-hidden p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={parseDate(form.effective_from)}
+                        defaultMonth={parseDate(form.effective_from) ?? new Date()}
+                        captionLayout="dropdown"
+                        disabled={(date) => {
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+                          return date < today;
+                        }}
+                        onSelect={(date) => {
                         if (date) {
                           setForm({ ...form, effective_from: formatDate(date) });
                           setFromOpen(false);
@@ -280,13 +285,22 @@ function RecurringTab() {
                       </Button>
                     }
                   />
-                  <PopoverContent className="w-auto overflow-hidden p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={parseDate(form.effective_until)}
-                      defaultMonth={parseDate(form.effective_until) ?? parseDate(form.effective_from) ?? new Date()}
-                      captionLayout="dropdown"
-                      onSelect={(date) => {
+<PopoverContent className="w-auto overflow-hidden p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={parseDate(form.effective_until)}
+                        defaultMonth={parseDate(form.effective_until) ?? parseDate(form.effective_from) ?? new Date()}
+                        captionLayout="dropdown"
+                        disabled={(date) => {
+                          const minDate = parseDate(form.effective_from);
+                          if (!minDate) return false;
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+                          const floor = minDate > today ? minDate : today;
+                          floor.setHours(0, 0, 0, 0);
+                          return date < floor;
+                        }}
+                        onSelect={(date) => {
                         setForm({ ...form, effective_until: date ? formatDate(date) : "" });
                         setUntilOpen(false);
                       }}
@@ -535,16 +549,21 @@ function ExceptionsTab() {
                 />
                 <PopoverContent className="w-auto overflow-hidden p-0" align="start">
                   <Calendar
-                    mode="single"
-                    selected={parseDate(form.specific_date)}
-                    defaultMonth={parseDate(form.specific_date) ?? new Date()}
-                    captionLayout="dropdown"
-                    onSelect={(date) => {
-                      if (date) {
-                        setForm({ ...form, specific_date: formatDate(date) });
-                        setDateOpen(false);
-                      }
-                    }}
+                      mode="single"
+                      selected={parseDate(form.specific_date)}
+                      defaultMonth={parseDate(form.specific_date) ?? new Date()}
+                      captionLayout="dropdown"
+                      disabled={(date) => {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0); 
+                        return date < today;
+                      }}
+                      onSelect={(date) => {
+                        if (date) {
+                          setForm({ ...form, specific_date: formatDate(date) });
+                          setDateOpen(false);
+                        }
+                      }}
                   />
                 </PopoverContent>
               </Popover>

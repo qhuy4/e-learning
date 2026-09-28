@@ -3,10 +3,16 @@ import {
     BookOpen,
     Users,
     DollarSign,
+    CreditCard,
     Clock,
     Award,
+    GraduationCap,
     UserCircle,
     LogOut,
+    Trophy,
+    MessageCircleQuestion,
+    CalendarClock,
+    CalendarDays,
 } from "lucide-react"
 import type { NavGroup, NavItem } from "@/shared/types/navigation"
 
@@ -41,9 +47,24 @@ export const navigation: Navigation = {
                     icon: Users,
                 },
                 {
+                    title: "Lịch tuần",
+                    url: "/schedule",
+                    icon: CalendarDays,
+                },
+                {
+                    title: "Đặt lịch",
+                    url: "/bookings",
+                    icon: CalendarClock,
+                },
+                {
                     title: "Doanh thu",
                     url: "/revenue",
                     icon: DollarSign,
+                },
+                {
+                    title: "Thanh toán",
+                    url: "/payments",
+                    icon: CreditCard,
                 },
                 {
                     title: "Lịch giảng dạy",
@@ -54,6 +75,21 @@ export const navigation: Navigation = {
                     title: "Chứng chỉ",
                     url: "/certificates",
                     icon: Award,
+                },
+                {
+                    title: "Thành tựu",
+                    url: "/achievements",
+                    icon: Trophy,
+                },
+                {
+                    title: "Câu hỏi",
+                    url: "/qa",
+                    icon: MessageCircleQuestion,
+                },
+                {
+                    title: "Đăng ký giáo viên",
+                    url: "/teacher/register",
+                    icon: GraduationCap,
                 },
             ],
         },

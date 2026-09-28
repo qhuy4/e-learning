@@ -1,4 +1,4 @@
-import { ForbiddenException, Inject, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Inject, HttpStatus } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { PreviewLessonQuery } from '../query/preview-lesson.query';
 import {
@@ -20,6 +20,8 @@ import {
 } from '@/common/storage/domain/interface/file-storage.interface';
 import { LessonDtoMapper } from '../../presentation/mappers/lesson-dto.mapper';
 import { PreviewTokenService } from '@/common/service/preview-token.service';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 
 async function resolveSignedUrl(
   key: string | null,
@@ -60,7 +62,7 @@ export class PreviewLessonHandler implements IQueryHandler<PreviewLessonQuery> {
     }
 
     if (!lesson) {
-      throw new NotFoundException('Lesson không tồn tại');
+      throw new AppException(ErrorCode.LESSON_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     const section = await this.sectionRepository.findById(lesson.sectionId);

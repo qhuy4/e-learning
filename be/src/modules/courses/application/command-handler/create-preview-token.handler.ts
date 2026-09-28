@@ -1,4 +1,6 @@
-import { ForbiddenException, Inject, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, HttpStatus, Inject } from '@nestjs/common';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreatePreviewTokenCommand } from '../command/create-preview-token.command';
 import {
@@ -23,7 +25,7 @@ export class CreatePreviewTokenHandler
     const course = await this.courseRepository.findById(courseId);
 
     if (!course) {
-      throw new NotFoundException('Course không tồn tại');
+      throw new AppException(ErrorCode.COURSE_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     if (user.role === UserRole.ADMIN) {

@@ -1,3 +1,6 @@
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
+import { HttpStatus } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InstructorCertificateRepository } from '@/modules/teacher/infrastructure/repository/instructor-certificate.repository';
 import { InstructorProfileRepository } from '@/modules/teacher/infrastructure/repository/instructor-profile.repository';
@@ -25,13 +28,13 @@ export class GetTeacherRegistrationStatusHandler
 
   async execute(
     query: GetTeacherRegistrationStatusQuery,
-  ): Promise<TeacherRegistrationStatusView | null> {
+  ): Promise<TeacherRegistrationStatusView> {
     const profile = await this.instructorProfileRepository.findByUserId(
       query.userId,
     );
 
     if (!profile) {
-      return null;
+      throw new AppException(ErrorCode.TEACHER_REGISTRATION_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     const certificates =

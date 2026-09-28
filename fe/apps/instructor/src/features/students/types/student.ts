@@ -9,6 +9,55 @@ export interface InstructorEnrollment {
   enrolledAt: string | null;
 }
 
+export interface StudentDetail {
+  id: number;
+  userId: number;
+  userName: string;
+  userEmail: string;
+  courseId: number;
+  courseTitle: string;
+  courseThumbnail: string | null;
+  progress: number;
+  status: number;
+  pricePaid: number | null;
+  currency: string;
+  enrolledAt: string | null;
+  lastAccessedAt: string | null;
+  completedAt: string | null;
+}
+
+export interface LessonProgress {
+  lessonId: number;
+  lessonTitle: string;
+  lessonType: string;
+  lessonDuration: number;
+  lessonPosition: number;
+  watchSeconds: number;
+  progressPercent: number;
+  isCompleted: boolean;
+  completedAt: string | null;
+}
+
+export interface SectionProgress {
+  sectionId: number;
+  sectionTitle: string;
+  sectionPosition: number;
+  lessons: LessonProgress[];
+}
+
+export interface ProgressSummary {
+  totalLessons: number;
+  completedLessons: number;
+  completionPercent: number;
+  totalWatchSeconds: number;
+  totalWatchHours: number;
+}
+
+export interface StudentProgressData {
+  sections: SectionProgress[];
+  summary: ProgressSummary;
+}
+
 export const EnrollmentStatus = {
   INACTIVE: 0,
   ACTIVE: 1,

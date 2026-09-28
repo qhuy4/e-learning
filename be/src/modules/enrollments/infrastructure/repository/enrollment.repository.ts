@@ -239,4 +239,19 @@ export class EnrollmentRepository implements IEnrollmentRepository {
 
     return count > 0;
   }
+
+  async isCourseOwnedByInstructor(courseId: number, instructorId: number): Promise<boolean> {
+    const count = await this.repository
+      .createQueryBuilder('enrollment')
+      .innerJoin('enrollment.course', 'course')
+      .where('course.id = :courseId', { courseId: courseId.toString() })
+      .andWhere('course.instructorId = :instructorId', { instructorId: instructorId.toString() })
+      .getCount();
+
+    return count > 0;
+  }
+
+  async query(sql: string, params?: any[]): Promise<any[]> {
+    return this.repository.query(sql, params);
+  }
 }

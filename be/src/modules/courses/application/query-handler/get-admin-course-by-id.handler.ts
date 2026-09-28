@@ -1,4 +1,6 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetAdminCourseByIdQuery } from '@/modules/courses/application/query/get-admin-course-by-id.query';
 import { AdminCourseRepository } from '@/modules/courses/infrastructure/repository/admin-course.repository';
@@ -29,7 +31,7 @@ export class GetAdminCourseByIdHandler implements IQueryHandler<GetAdminCourseBy
   async execute(query: GetAdminCourseByIdQuery) {
     const entity = await this.adminCourseRepository.findById(query.data.id);
     if (!entity) {
-      throw new NotFoundException(`Course with ID ${query.data.id} not found`);
+      throw new AppException(ErrorCode.COURSE_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
     const course = CourseMapper.toDomain(entity);
     return AdminCourseDtoMapper.toDetailDto(course, this.storage, this.categoryCourseRepo, this.categoryRepo);

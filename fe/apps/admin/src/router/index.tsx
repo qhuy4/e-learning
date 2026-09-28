@@ -8,8 +8,10 @@ import { UserDetailPage } from "@/pages/users/user-detail-page";
 import { UserEditPage } from "@/pages/users/user-edit-page.tsx";
 import { UserCreatePage } from "@/pages/users/user-create-page.tsx";
 import LoginPage from "@/pages/authen/login-page.tsx";
+import LogoutPage from "@/pages/authen/logout-page.tsx";
+import SettingsPage from "@/pages/settings/settings-page.tsx";
 import { ProtectedRoute } from "@/router/protectedRoute.tsx";
-import { PublicRoute } from "@/router/publishRoute.tsx";
+import { PublishRoute } from "@/router/publishRoute.tsx";
 
 import { CreateLessonPage } from "@/features/lessons/pages/create-lesson-page";
 import InstructorsPage from "@/pages/instructors/instructors-page.tsx";
@@ -37,12 +39,13 @@ import CategoryCreatePage from "@/pages/categories/category-create-page";
 import CategoryDetailPage from "@/pages/categories/category-detail-page";
 import CategoryEditPage from "@/pages/categories/category-edit-page";
 import EarningsPage from "@/pages/earnings/earnings-page";
+import PayoutDetailPage from "@/pages/earnings/payout-detail-page";
 import QuestionsPage from "@/pages/questions/questions-page";
 import QuestionDetailPage from "@/pages/questions/question-detail-page";
 import ReviewReportsPage from "@/pages/review-reports/review-reports-page";
 import ReviewReportDetailPage from "@/pages/review-reports/report-detail-page";
-import { StudentCertificatesPage } from "@/pages/student-certificates/student-certificates-page";
-import { StudentCertificateDetailPage } from "@/pages/student-certificates/student-certificate-detail-page";
+import AchievementsPage from "@/pages/achievements/achievements-page";
+import AchievementDetailPage from "@/pages/achievements/achievement-detail-page";
 import { InstructorCertificatesPage } from "@/pages/instructor-certificates/instructor-certificates-page";
 import { InstructorCertificateDetailPage } from "@/pages/instructor-certificates/instructor-certificate-detail-page";
 import { NotificationsPage } from "@/pages/notifications/notifications-page";
@@ -51,6 +54,12 @@ import { PremiumSubscriptionsPage } from "@/pages/premium-subscriptions/premium-
 import { PremiumSubscriptionDetailPage } from "@/pages/premium-subscriptions/premium-subscription-detail-page";
 import { WishlistsPage } from "@/pages/wishlists/wishlists-page";
 import { WishlistDetailPage } from "@/pages/wishlists/wishlist-detail-page";
+import PaymentsPage from "@/pages/payments/payments-page";
+import PaymentDetailPage from "@/pages/payments/payment-detail-page";
+import PayoutRequestsPage from "@/pages/payout-requests/payout-requests-page";
+import PayoutRequestDetailPage from "@/pages/payout-requests/payout-request-detail-page";
+import BookingsPage from "@/pages/bookings/bookings-page";
+import BookingDetailPage from "@/pages/bookings/booking-detail-page";
 
 export const router = createBrowserRouter([
     {
@@ -235,7 +244,42 @@ export const router = createBrowserRouter([
                     },
                     {
                         path: "earnings",
-                        element: <EarningsPage />,
+                        children: [
+                            {
+                                index: true,
+                                element: <EarningsPage />,
+                            },
+                            {
+                                path: "payouts/:id",
+                                element: <PayoutDetailPage />,
+                            },
+                        ],
+                    },
+                    {
+                        path: "payments",
+                        children: [
+                            {
+                                index: true,
+                                element: <PaymentsPage />,
+                            },
+                            {
+                                path: ":id",
+                                element: <PaymentDetailPage />,
+                            },
+                        ],
+                    },
+                    {
+                        path: "payout-requests",
+                        children: [
+                            {
+                                index: true,
+                                element: <PayoutRequestsPage />,
+                            },
+                            {
+                                path: ":id",
+                                element: <PayoutRequestDetailPage />,
+                            },
+                        ],
                     },
                     {
                         path: "questions",
@@ -264,15 +308,28 @@ export const router = createBrowserRouter([
                         ],
                     },
                     {
-                        path: "student-certificates",
+                        path: "achievements",
                         children: [
                             {
                                 index: true,
-                                element: <StudentCertificatesPage />,
+                                element: <AchievementsPage />,
                             },
                             {
                                 path: ":id",
-                                element: <StudentCertificateDetailPage />,
+                                element: <AchievementDetailPage />,
+                            },
+                        ],
+                    },
+                    {
+                        path: "bookings",
+                        children: [
+                            {
+                                index: true,
+                                element: <BookingsPage />,
+                            },
+                            {
+                                path: ":id",
+                                element: <BookingDetailPage />,
                             },
                         ],
                     },
@@ -328,13 +385,21 @@ export const router = createBrowserRouter([
                             },
                         ],
                     },
+                    {
+                        path: "settings",
+                        element: <SettingsPage />,
+                    },
+                    {
+                        path: "logout",
+                        element: <LogoutPage />,
+                    },
                 ],
             },
         ],
     },
 
     {
-        element: <PublicRoute />,
+        element: <PublishRoute />,
         children: [
             {
                 path: "/login",

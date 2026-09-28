@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
 import { useStudents } from "@/features/students/hook/use-students";
 import { createStudentColumns } from "@/features/students/columns/student-columns";
@@ -18,6 +19,7 @@ const STATUS_OPTIONS = [
 ];
 
 export default function StudentsPage() {
+  const navigate = useNavigate();
   const [keyword, setKeyword] = useState("");
   const [status, setStatus] = useState<string>("");
   const [page, setPage] = useState(1);
@@ -36,7 +38,7 @@ export default function StudentsPage() {
   const columns = createStudentColumns();
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto p-6">
+    <div className="space-y-6 mx-auto p-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Học viên</h1>
         <p className="text-sm text-muted-foreground mt-1">Danh sách học viên đã đăng ký khóa học của bạn</p>
@@ -68,6 +70,7 @@ export default function StudentsPage() {
         search={keyword}
         onSearchChange={(v) => { setKeyword(v); setPage(1); }}
         onPageSizeChange={(v) => { setPageSize(v); setPage(1); }}
+        onRowClick={(row) => navigate(`/students/${row.id}`)}
         text={{
           searchPlaceholder: "Tìm kiếm theo tên hoặc email...",
           noResults: "Chưa có học viên nào.",

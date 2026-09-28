@@ -1,4 +1,6 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, ForbiddenException, HttpStatus } from '@nestjs/common';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, MoreThanOrEqual } from 'typeorm';
@@ -57,7 +59,7 @@ export class GetCourseAnalyticsHandler
     const { instructorId, courseId, dateRange, startDate: customStartDate, endDate: customEndDate } = query;
 
     const course = await this.courseRepo.findOne({ where: { id: String(courseId) } });
-    if (!course) throw new NotFoundException('Course not found');
+    if (!course) throw new AppException(ErrorCode.COURSE_NOT_FOUND, HttpStatus.NOT_FOUND);
     if (Number(course.instructorId) !== instructorId)
       throw new ForbiddenException('Access denied');
 

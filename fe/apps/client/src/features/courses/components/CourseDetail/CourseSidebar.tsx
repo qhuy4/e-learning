@@ -1,150 +1,112 @@
-import {
-  Play,
-  Check,
-  MonitorSmartphone,
-  Clock,
-  FileText,
-  Award,
-} from "lucide-react";
-import { Button } from "@fe/components/ui/button";
-import { useNavigate, useParams, useSearchParams } from "react-router";
-import { formatCurrency } from "@fe/lib/utils";
-import type { CourseDetail } from "../../types/course.type";
+import { formatVND } from "@fe/lib/utils";
+import { Link } from "react-router";
+import { useCart } from "@/features/cart/hooks/use-cart";
+import type { CourseDetail } from "@/features/courses/types/course.type";
 
 interface CourseSidebarProps {
   course?: CourseDetail;
   isEnrolled?: boolean;
 }
+
 export const CourseSidebar = ({ course, isEnrolled }: CourseSidebarProps) => {
-  const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
-  const [searchParams] = useSearchParams();
-  const tokenFromUrl = searchParams.get("previewToken");
-  const previewToken = tokenFromUrl || (window.location.pathname.includes('/courses/preview') ? id : null);
+  const { addItem, isInCart } = useCart();
+  const sections = course?.sections || [];
+  const totalLessons = sections.reduce((acc, s) => acc + (s.lessons?.length || 0), 0);
+  const inCart = course ? isInCart(course.id) : false;
 
-  const firstLesson = course?.sections?.flatMap((s) => s.lessons || [])[0];
-  const firstLessonSlug = firstLesson?.slug || '';
-  const courseIdentifier = course?.slug || course?.id || id || 'preview';
-  
-  const previewUrl = firstLessonSlug
-    ? `/learning/${courseIdentifier}/${firstLessonSlug}${previewToken ? `?previewToken=${previewToken}` : ''}`
-    : `/learning/${courseIdentifier}${previewToken ? `?previewToken=${previewToken}` : ''}`;
-
-  const isFree = Number(course?.price) === 0;
+  const addCourseToCart = () => {
+    if (!course || !course.instructor) return;
+    addItem({
+      courseId: course.id,
+      instructorId: course.instructor.id,
+      title: course.title,
+      slug: course.slug,
+      thumbnail: course.thumbnail,
+      price: course.price,
+      instructor: course.instructor,
+      statistics: course.statistics,
+    });
+  };
 
   return (
-    <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] sticky top-24">
-      <div
-        className="relative rounded-2xl overflow-hidden mb-6 aspect-video bg-slate-100 group cursor-pointer block border border-slate-100"
-      >
-        {course?.thumbnail ? (
-          <img
-            src={course.thumbnail}
-            alt={course.title || "Course Thumbnail"}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-slate-100 text-slate-400">
-            <span>Chưa có ảnh</span>
+    <aside className="flex flex-col gap-6 sticky top-24">
+      {/* Course Info Card */}
+      <div className="bg-white rounded-xl border border-primary/30 shadow-sm p-5 flex flex-col gap-4">
+        <h3 className="text-base font-bold text-slate-900">Course Overview</h3>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-m3-surface-container-low p-3 rounded-lg flex flex-col">
+            <span className="text-xs text-slate-500">Sections</span>
+            <span className="text-xl font-bold text-slate-900">{sections.length}</span>
           </div>
+          <div className="bg-m3-surface-container-low p-3 rounded-lg flex flex-col">
+            <span className="text-xs text-slate-500">Lessons</span>
+            <span className="text-xl font-bold text-slate-900">{totalLessons}</span>
+          </div>
+        </div>
+
+        {course?.price != null && (
+          <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+            <span className="text-sm text-slate-500">Price</span>
+            <span className="text-lg font-bold text-piemind-pink">
+              {formatVND(course.price)}
+            </span>
+          </div>
+        )}
+
+        {isEnrolled ? (
+          <Link
+            to={`/learning/${course?.slug}`}
+            className="w-full py-2.5 px-4 rounded-lg bg-piemind-pink text-white font-bold text-sm hover:bg-piemind-pink/90 transition-colors text-center"
+          >
+            Continue Learning
+          </Link>
+        ) : inCart ? (
+          <Link
+            to="/cart"
+            className="w-full py-2.5 px-4 rounded-lg bg-piemind-pink text-white font-bold text-sm hover:bg-piemind-pink/90 transition-colors text-center"
+          >
+            View Cart
+          </Link>
+        ) : (
+          <button
+            type="button"
+            onClick={addCourseToCart}
+            className="w-full py-2.5 px-4 rounded-lg bg-piemind-pink text-white font-bold text-sm hover:bg-piemind-pink/90 transition-colors cursor-pointer"
+          >
+            Add to Cart
+          </button>
         )}
       </div>
 
-      {/* Pricing */}
-      {isEnrolled ? (
-        <div className="mb-6">
-          <div className="flex items-center gap-2 text-emerald-600 font-semibold text-sm mb-2">
-            <Check className="w-4 h-4" />
-            Bạn đã mua khóa học này
+      {/* Instructor */}
+      {course?.instructor && (
+        <div className="bg-white rounded-xl border border-primary/30 shadow-sm p-5 flex flex-col gap-4">
+          <h3 className="text-base font-bold text-slate-900">Instructor</h3>
+          <div className="flex items-center gap-3">
+            <img
+              className="w-12 h-12 rounded-full object-cover shrink-0"
+              alt={course.instructor.name || "Instructor"}
+              src={`https://i.pravatar.cc/150?u=${course.instructor.id}`}
+            />
+            <div className="min-w-0">
+              <h4 className="text-sm font-bold text-slate-900 truncate">
+                {course.instructor.name || "Instructor"}
+              </h4>
+              {course.instructor.headline && (
+                <p className="text-xs text-slate-500 truncate">
+                  {course.instructor.headline}
+                </p>
+              )}
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="flex items-center gap-3 mb-6">
-          <span className="text-3xl font-bold text-slate-900">
-            {isFree ? "Miễn phí" : formatCurrency(course?.price)}
-          </span>
-          {!isFree && (
-            <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full">
-              Chất lượng cao
-            </span>
+          {course.instructor.bio && (
+            <p className="text-xs text-slate-600 leading-relaxed line-clamp-3">
+              {course.instructor.bio}
+            </p>
           )}
         </div>
       )}
-
-      {/* Actions */}
-      <div className="space-y-3 mb-8">
-        {isEnrolled ? (
-          <Button
-            onClick={() => navigate(previewUrl)}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-full py-6 text-base font-semibold shadow-sm shadow-emerald-200 cursor-pointer flex items-center justify-center gap-2"
-          >
-            <Play className="w-5 h-5 fill-current" />
-            Tiếp tục học
-          </Button>
-        ) : isFree ? (
-          <Button
-            onClick={() => navigate(`/checkout/${course?.slug}`)}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-full py-6 text-base font-semibold shadow-sm shadow-emerald-200 cursor-pointer"
-          >
-            Đăng ký miễn phí
-          </Button>
-        ) : (
-          <Button
-            onClick={() => navigate(`/checkout/${course?.slug}`)}
-            className="w-full bg-rose-500 hover:bg-rose-600 text-white rounded-full py-6 text-base font-semibold shadow-sm shadow-rose-200 cursor-pointer"
-          >
-            Mua ngay
-          </Button>
-        )}
-        {!isEnrolled && (
-          <Button
-            onClick={() => navigate(previewUrl)}
-            className="w-full bg-slate-800 hover:bg-slate-900 text-white rounded-full py-6 text-base font-semibold shadow-sm flex items-center justify-center gap-2 cursor-pointer"
-          >
-            <Play className="w-5 h-5 fill-current" />
-            Xem thử bài học
-          </Button>
-        )}
-      </div>
-
-      {/* Features */}
-      <h4 className="font-bold text-slate-900 mb-4">Khóa học bao gồm:</h4>
-      <div className="space-y-4 mb-8">
-        <div className="flex items-center gap-3 text-sm text-slate-600">
-          <Clock className="w-4 h-4 text-emerald-500 shrink-0" />
-          <span>38.5 giờ video theo yêu cầu</span>
-        </div>
-        <div className="flex items-center gap-3 text-sm text-slate-600">
-          <FileText className="w-4 h-4 text-emerald-500 shrink-0" />
-          <span>85 tài nguyên tải xuống</span>
-        </div>
-        <div className="flex items-center gap-3 text-sm text-slate-600">
-          <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-          <span>Truy cập trọn đời</span>
-        </div>
-        <div className="flex items-center gap-3 text-sm text-slate-600">
-          <MonitorSmartphone className="w-4 h-4 text-emerald-500 shrink-0" />
-          <span>Truy cập trên thiết bị di động và TV</span>
-        </div>
-        <div className="flex items-center gap-3 text-sm text-slate-600">
-          <Award className="w-4 h-4 text-emerald-500 shrink-0" />
-          <span>Chứng chỉ hoàn thành</span>
-        </div>
-      </div>
-
-      {/* Corporate Banner */}
-      <div className="bg-slate-50/80 border border-slate-100 rounded-2xl p-5 text-center">
-        <h4 className="font-bold text-slate-900 mb-1">Đào tạo doanh nghiệp</h4>
-        <p className="text-xs text-slate-500 mb-4">
-          Cung cấp khóa học này cho đội ngũ của bạn
-        </p>
-        <a
-          href="#"
-          className="text-sm font-bold text-rose-500 hover:text-rose-600 transition-colors"
-        >
-          Khám phá E-Learning Business
-        </a>
-      </div>
-    </div>
+    </aside>
   );
 };

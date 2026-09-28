@@ -21,22 +21,25 @@ export class StorageController {
 
   @Get('*')
   async getFile(@Req() req: Request, @Res() res: Response) {
-    const key = req.params[0];
+    let key = req.params[0] || (req as any).path || '';
+    if (key.startsWith('/storage/')) {
+      key = key.replace('/storage/', '');
+    }
+    key = key.replace(/^\//, '');
 
     if (!key) {
       throw new NotFoundException('File key is required');
     }
 
-    const exists = await this.storage.exists(key);
-    if (!exists) {
+    try {
+      const downloadUrl = await this.storage.createDownloadUrl({
+        key,
+        expiresIn: 3600, // 1 hour
+      });
+
+      return res.redirect(downloadUrl);
+    } catch (error) {
       throw new NotFoundException('File not found');
     }
-
-    const downloadUrl = await this.storage.createDownloadUrl({
-      key,
-      expiresIn: 3600, // 1 hour
-    });
-
-    return res.redirect(downloadUrl);
   }
 }

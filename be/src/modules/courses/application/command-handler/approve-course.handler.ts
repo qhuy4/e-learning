@@ -1,10 +1,12 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InstructorProfileTypeOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-profile.orm.entity';
 import { ApprovalStatus } from '@/modules/instructors/domain/enum/instructor-profile.status';
 import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
 import { UserRole } from '@/modules/users/domain/enum/user.role';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ApproveCourseCommand } from '../command/approve-course.command';
 import { CourseRepository } from '../../infrastructure/repository/course.repository';
@@ -27,7 +29,7 @@ export class ApproveCourseHandler
     const course = await this.courseRepository.findById(command.id);
 
     if (!course) {
-      throw new NotFoundException('Course not found');
+      throw new AppException(ErrorCode.COURSE_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     const owner = await this.userRepo.findOne({ where: { id: Number(course.instructorId) } });

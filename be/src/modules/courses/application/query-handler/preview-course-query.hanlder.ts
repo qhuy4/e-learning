@@ -1,4 +1,6 @@
-import { ForbiddenException, Inject, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, HttpStatus, Inject } from '@nestjs/common';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { PreviewCourseQuery } from '../query/preview-course.query';
 import {
@@ -29,7 +31,7 @@ export class PreviewCourseQueryHandler implements IQueryHandler<PreviewCourseQue
 
     const course = await this.courseRepository.findById(payload.courseId);
     if (!course) {
-      throw new NotFoundException('Course không tồn tại');
+      throw new AppException(ErrorCode.COURSE_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
     if (payload.role === UserRole.ADMIN) {

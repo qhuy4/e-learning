@@ -1,6 +1,6 @@
-import { Star, Users, PlayCircle, Globe, Mail, Link2 } from "lucide-react";
+import { Globe } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@fe/components/ui/avatar";
-import type { CourseDetail } from "../../types/course.type";
+import type { CourseDetail } from "@/features/courses/types/course.type";
 
 interface CourseInstructorProps {
   instructor?: CourseDetail["instructor"];
@@ -18,34 +18,41 @@ export const CourseInstructor = ({ instructor }: CourseInstructorProps) => {
     .toUpperCase();
 
   return (
-    <div>
-      <h2 className="text-xl font-bold text-slate-900 mb-6">Thông tin giảng viên</h2>
-      
-      <div className="flex flex-col md:flex-row gap-6 items-start">
-        <Avatar className="w-24 h-24 border-4 border-slate-50 shadow-sm">
-          <AvatarImage src={`https://i.pravatar.cc/150?u=${instructor.userId}`} />
-          <AvatarFallback>{initials}</AvatarFallback>
+    <div className="bg-white border border-primary/30 rounded-xl p-6">
+      <h2 className="text-lg font-bold text-slate-900 mb-4">Instructor</h2>
+
+      <div className="flex flex-col md:flex-row gap-5 items-start">
+        <Avatar className="w-20 h-20 border-2 border-primary/20 shrink-0">
+          <AvatarImage src={`https://i.pravatar.cc/150?u=${(instructor as any).userId ?? instructor.id}`} />
+          <AvatarFallback className="bg-piemind-green/30 text-m3-secondary font-bold">
+            {initials}
+          </AvatarFallback>
         </Avatar>
-        
+
         <div className="flex-1">
-          <h3 className="text-lg font-bold text-slate-900">{name}</h3>
+          <h3 className="text-base font-bold text-slate-900">{name}</h3>
           {instructor.headline && (
-            <div className="text-rose-500 font-medium text-sm mb-3">{instructor.headline}</div>
+            <div className="text-piemind-pink font-medium text-sm mt-0.5">
+              {instructor.headline}
+            </div>
           )}
-          
+
           {instructor.bio && (
-            <p className="text-slate-600 text-sm leading-relaxed mb-4">{instructor.bio}</p>
+            <p className="text-slate-600 text-sm leading-relaxed mt-3">
+              {instructor.bio}
+            </p>
           )}
-          
+
           {instructor.websiteUrl && (
-            <div className="flex gap-3">
+            <div className="mt-3">
               <a
                 href={instructor.websiteUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 flex items-center justify-center rounded-full border border-slate-200 text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-piemind-pink hover:underline"
               >
-                <Globe className="w-4 h-4" />
+                <Globe className="size-3.5" />
+                Website
               </a>
             </div>
           )}

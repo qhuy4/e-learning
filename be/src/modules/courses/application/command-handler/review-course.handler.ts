@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InstructorProfileTypeOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-profile.orm.entity';
@@ -7,6 +7,8 @@ import { ApprovalStatus } from '@/modules/instructors/domain/enum/instructor-pro
 import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
 import { UserRole } from '@/modules/users/domain/enum/user.role';
 import { CourseStatus } from '@/modules/courses/domain/enum/course-status.enum';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 import { ReviewCourseCommand } from '@/modules/courses/application/command/review-course.command';
 import { AdminCourseRepository } from '@/modules/courses/infrastructure/repository/admin-course.repository';
 
@@ -24,7 +26,7 @@ export class ReviewCourseHandler implements ICommandHandler<ReviewCourseCommand>
     const { id, status, rejectReason } = command.data;
     const course = await this.adminCourseRepository.findById(id);
     if (!course) {
-      throw new NotFoundException(`Course with ID ${id} not found`);
+      throw new AppException(ErrorCode.COURSE_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
     if (status === CourseStatus.APPROVED || status === CourseStatus.PUBLISHED) {
       const owner = await this.userRepo.findOne({ where: { id: Number(course.instructorId) } });

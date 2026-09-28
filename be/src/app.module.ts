@@ -4,9 +4,12 @@ import { AppService } from '@/app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { databaseConfig } from '@/database/database';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { CqrsModule } from '@nestjs/cqrs';
 import { UserModule } from '@/modules/users/user.module';
 import { CoursesModule } from '@/modules/courses/courses.module';
 import { TeacherModule } from '@/modules/teacher/teacher.module';
+import { QuizzesModule } from './modules/quizzes/quizzes.module';
+import { DictationsModule } from './modules/dictations/dictations.module';
 import { AuthModule } from '@/modules/auth/auth.module';
 import { SectionsModule } from '@/modules/sections/sections.module';
 import { LessonsModule } from '@/modules/lessons/lessons.module';
@@ -24,11 +27,13 @@ import { CategoriesModule } from '@/modules/categories/categories.module';
 import { InstructorPayoutsModule } from '@/modules/instructor-payouts/instructor-payouts.module';
 import { CourseQuestionsModule } from '@/modules/course-questions/course-questions.module';
 import { ReviewReportsModule } from '@/modules/review-reports/review-reports.module';
-import { CertificatesModule } from '@/modules/certificates/certificates.module';
 import { NotificationsModule } from '@/modules/notifications/notifications.module';
 import { PremiumSubscriptionsModule } from '@/modules/premium-subscriptions/premium-subscriptions.module';
 import { WishlistsModule } from '@/modules/wishlists/wishlists.module';
 import { AdminDashboardModule } from '@/modules/analytics/admin-dashboard.module';
+import { AchievementsModule } from '@/modules/achievements/achievements.module';
+import { BookingsModule } from '@/modules/bookings/bookings.module';
+import { MeetingRoomModule } from '@/modules/meeting-room/meeting-room.module';
 
 @Module({
   imports: [
@@ -42,6 +47,7 @@ import { AdminDashboardModule } from '@/modules/analytics/admin-dashboard.module
         return databaseConfig(config);
       },
     }),
+    CqrsModule.forRoot(),
     LocationModule,
     ReviewsModule,
     OrdersModule,
@@ -51,11 +57,12 @@ import { AdminDashboardModule } from '@/modules/analytics/admin-dashboard.module
     InstructorPayoutsModule,
     CourseQuestionsModule,
     ReviewReportsModule,
-    CertificatesModule,
     NotificationsModule,
     PremiumSubscriptionsModule,
     WishlistsModule,
     AdminDashboardModule,
+    AchievementsModule,
+    BookingsModule,
     UserModule,
     AuthModule,
     InstructorModule,
@@ -67,6 +74,9 @@ import { AdminDashboardModule } from '@/modules/analytics/admin-dashboard.module
     LessonProgressModule,
     PaymentsModule,
     HomeModule,
+    QuizzesModule,
+    DictationsModule,
+    MeetingRoomModule,
   ],
   controllers: [AppController],
   providers: [AppService],

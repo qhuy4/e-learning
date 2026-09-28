@@ -15,6 +15,8 @@ const PAGE_TITLES: Record<string, string> = {
   "/instructors": "Giảng viên",
   "/instructors/approvals": "Duyệt Giảng Viên",
   "/earnings": "Doanh thu",
+  "/payments": "Thanh toán",
+  "/payout-requests": "Yêu cầu rút tiền",
   "/questions": "Hỏi đáp",
   "/reviews": "Đánh giá",
   "/review-reports": "Báo cáo đánh giá",
@@ -24,14 +26,14 @@ const PAGE_TITLES: Record<string, string> = {
   "/categories": "Danh mục",
   "/categories/create": "Tạo danh mục",
   "/enrollments": "Ghi danh",
-  "/analytics": "Analytics",
   "/users": "Users",
   "/settings": "Cài đặt",
-  "/student-certificates": "Chứng chỉ học viên",
+  "/achievements": "Thành tựu",
   "/instructor-certificates": "Chứng chỉ giảng viên",
   "/notifications": "Thông báo",
   "/premium-subscriptions": "Gói Premium",
   "/wishlists": "Danh sách yêu thích",
+  "/bookings": "Đặt lịch",
 };
 
 export function SiteHeader() {
@@ -62,11 +64,16 @@ export function SiteHeader() {
     if (location.pathname.startsWith("/categories/") && location.pathname.endsWith("/edit")) return "Chỉnh sửa danh mục";
     if (location.pathname.startsWith("/review-reports/")) return "Chi tiết báo cáo";
     if (location.pathname.startsWith("/questions/")) return "Chi tiết câu hỏi";
-    if (location.pathname.startsWith("/student-certificates/")) return "Chi tiết chứng chỉ học viên";
+    if (location.pathname.startsWith("/achievements/")) return "Chi tiết thành tựu";
     if (location.pathname.startsWith("/instructor-certificates/")) return "Chi tiết chứng chỉ giảng viên";
     if (location.pathname.startsWith("/notifications/")) return "Chi tiết thông báo";
     if (location.pathname.startsWith("/premium-subscriptions/")) return "Chi tiết gói Premium";
     if (location.pathname.startsWith("/wishlists/")) return "Chi tiết danh sách yêu thích";
+    if (location.pathname.startsWith("/bookings/")) return "Chi tiết buổi đặt lịch";
+    if (location.pathname.startsWith("/earnings/payouts/")) return "Chi tiết thanh toán";
+    if (location.pathname.startsWith("/payout-requests/")) return "Chi tiết yêu cầu rút tiền";
+    if (location.pathname.startsWith("/earnings/")) return "Doanh thu";
+    if (location.pathname.startsWith("/payments/")) return "Chi tiết giao dịch";
     if (location.pathname.startsWith("/users/")) {
       if (location.pathname.endsWith("/edit")) return "Chỉnh sửa người dùng";
       return "Chi tiết người dùng";
