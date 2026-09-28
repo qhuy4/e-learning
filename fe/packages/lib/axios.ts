@@ -2,7 +2,7 @@ import axios from "axios";
 import type { InternalAxiosRequestConfig } from "axios";
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || `${window.location.protocol}//${window.location.hostname}:3001`,
+  baseURL: "http://localhost:3001",
   headers: {
     "Content-Type": "application/json",
   },
