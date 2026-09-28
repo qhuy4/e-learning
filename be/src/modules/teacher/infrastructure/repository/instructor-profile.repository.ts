@@ -13,7 +13,7 @@ export class InstructorProfileRepository {
   async findByUserId(
     userId: number,
   ): Promise<InstructorProfileEntity | null> {
-    return this.repository.findOne({ where: { userId } });
+    return this.repository.findOne({ where: { userId }, order: { updatedAt: 'DESC' } });
   }
 
   /**

@@ -1,4 +1,4 @@
-import { Inject, Logger, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Inject, Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
@@ -23,6 +23,10 @@ import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';
 import { CategoryOrmEntity } from '@/modules/categories/infrastructure/entity/category.orm-entity';
 import { CategoryCourseOrmEntity } from '@/modules/categories/infrastructure/entity/category-course.orm-entity';
+import { InstructorProfileTypeOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-profile.orm.entity';
+import { ApprovalStatus } from '@/modules/instructors/domain/enum/instructor-profile.status';
+import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
+import { UserRole } from '@/modules/users/domain/enum/user.role';
 
 const PENDING_REVIEW_STATUS = 2;
 
@@ -48,6 +52,10 @@ export class UpdateCourseHandler implements ICommandHandler<UpdateCourseCommand>
 
     @InjectRepository(CategoryCourseOrmEntity)
     private readonly categoryCourseRepo: Repository<CategoryCourseOrmEntity>,
+    @InjectRepository(InstructorProfileTypeOrmEntity)
+    private readonly profileRepo: Repository<InstructorProfileTypeOrmEntity>,
+    @InjectRepository(UserOrmEntity)
+    private readonly userRepo: Repository<UserOrmEntity>,
   ) {}
 
   async execute(command: UpdateCourseCommand) {
@@ -58,8 +66,19 @@ export class UpdateCourseHandler implements ICommandHandler<UpdateCourseCommand>
     }
 
     const newStatus = command.data.status != null ? Number(command.data.status) : undefined;
+    const owner = newStatus !== undefined
+      ? await this.userRepo.findOne({ where: { id: Number(course.instructorId) } })
+      : null;
+
+    if (owner?.role !== UserRole.ADMIN && newStatus !== undefined && ![1, PENDING_REVIEW_STATUS].includes(newStatus)) {
+      throw new ForbiddenException('Giảng viên chỉ có thể lưu bản nháp hoặc gửi khóa học xét duyệt.');
+    }
 
     if (newStatus != null && !isNaN(newStatus) && newStatus === PENDING_REVIEW_STATUS) {
+      const profile = await this.profileRepo.findOne({ where: { userId: course.instructorId } });
+      if (owner?.role !== UserRole.ADMIN && profile?.approvalStatus !== ApprovalStatus.APPROVED) {
+        throw new ForbiddenException('Hồ sơ giảng viên cần được duyệt trước khi gửi khóa học xét duyệt.');
+      }
       const sectionCount = await this.sectionRepo.count({
         where: { courseId: String(command.id) },
       });

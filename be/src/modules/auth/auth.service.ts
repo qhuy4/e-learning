@@ -19,6 +19,7 @@ import { SendInstructorInviteDto } from '@/modules/auth/dto/send-instructor-invi
 import { RegisterInstructorDto } from '@/modules/auth/dto/register-instructor.dto';
 import { LoginDto } from '@/modules/auth/dto/login.dto';
 import { UserRole } from '@/modules/users/domain/enum/user.role';
+import { UserStatus } from '@/modules/users/domain/enum/user.status';
 
 @Injectable()
 export class AuthService {
@@ -39,9 +40,10 @@ export class AuthService {
    * Bước 1: Nhận email và gửi link chứa session mời đăng ký làm giảng viên
    */
   async sendInstructorInvite(dto: SendInstructorInviteDto) {
-    const existingUser = await this.userRepository.findOne({
-      where: { email: dto.email },
-    });
+    const email = dto.email.trim().toLowerCase();
+    const existingUser = await this.userRepository.createQueryBuilder('user')
+      .where('LOWER(user.email) = :email', { email })
+      .getOne();
 
     if (existingUser) {
       if (existingUser.role === UserRole.INSTRUCTOR) {
@@ -49,9 +51,9 @@ export class AuthService {
           'Email này đã là tài khoản Giảng viên trong hệ thống. Vui lòng đăng nhập.',
         );
       }
-      throw new ConflictException(
-        'Email này đã được đăng ký tài khoản Học viên. Vui lòng đăng nhập để nâng cấp tài khoản.',
-      );
+      if (existingUser.role !== UserRole.STUDENT) {
+        throw new ConflictException('Email này đã có tài khoản trong hệ thống.');
+      }
     }
 
     // Sinh session token ngẫu nhiên
@@ -59,7 +61,7 @@ export class AuthService {
     const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 phút
 
     const invite = this.inviteRepository.create({
-      email: dto.email.toLowerCase().trim(),
+      email,
       token,
       expiresAt,
       isUsed: false,
@@ -67,10 +69,12 @@ export class AuthService {
 
     await this.inviteRepository.save(invite);
 
-    const { registerUrl } = await this.mailService.sendInstructorInvite(
-      invite.email,
-      token,
-    );
+    try {
+      await this.mailService.sendInstructorInvite(invite.email, token);
+    } catch (error) {
+      await this.inviteRepository.delete(invite.id);
+      throw error;
+    }
 
     return {
       success: true,
@@ -78,7 +82,6 @@ export class AuthService {
         'Link đăng ký tài khoản giảng viên đã được gửi tới email của bạn.',
       email: invite.email,
       expiresAt,
-      registerUrl, // Trả về link tiện cho việc test bằng Postman/Dev
     };
   }
 
@@ -100,6 +103,9 @@ export class AuthService {
       valid: true,
       email: invite.email,
       expiresAt: invite.expiresAt,
+      existingAccount: !!(await this.userRepository.createQueryBuilder('user')
+        .where('LOWER(user.email) = :email', { email: invite.email })
+        .getOne()),
     };
   }
 
@@ -124,11 +130,11 @@ export class AuthService {
     }
 
     // Kiểm tra tên đăng nhập / email trùng lặp
-    const existingEmail = await this.userRepository.findOne({
-      where: { email: invite.email },
-    });
+    const existingEmail = await this.userRepository.createQueryBuilder('user')
+      .where('LOWER(user.email) = :email', { email: invite.email })
+      .getOne();
     if (existingEmail) {
-      throw new ConflictException('Email này đã được đăng ký tài khoản.');
+      throw new ConflictException('Email đã có tài khoản. Hãy đăng nhập để nâng cấp.');
     }
 
     const existingName = await this.userRepository.findOne({
@@ -150,11 +156,12 @@ export class AuthService {
       status: 1, // ACTIVE
     });
 
-    const savedUser = await this.userRepository.save(user);
-
-    // Đánh dấu session đã sử dụng
-    invite.isUsed = true;
-    await this.inviteRepository.save(invite);
+    const savedUser = await this.userRepository.manager.transaction(async (manager) => {
+      const saved = await manager.save(user);
+      invite.isUsed = true;
+      await manager.save(invite);
+      return saved;
+    });
 
     this.logger.log(
       `Đã tạo tài khoản Giảng viên mới thành công: User #${savedUser.id} (${savedUser.email})`,
@@ -177,6 +184,38 @@ export class AuthService {
         role: savedUser.role,
       },
       accessToken,
+    };
+  }
+
+  async upgradeInstructor(session: string, userId: number) {
+    if (!session || typeof session !== 'string') {
+      throw new BadRequestException('Thiếu mã đăng ký giảng viên.');
+    }
+    const invite = await this.inviteRepository.findOne({
+      where: { token: session, isUsed: false },
+    });
+    if (!invite || new Date() > invite.expiresAt) {
+      throw new BadRequestException('Liên kết đăng ký không hợp lệ hoặc đã hết hạn.');
+    }
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user || user.email.toLowerCase() !== invite.email) {
+      throw new UnauthorizedException('Hãy đăng nhập bằng tài khoản của email nhận liên kết.');
+    }
+    if (user.role !== UserRole.STUDENT) {
+      throw new ConflictException('Tài khoản này không phải tài khoản học viên.');
+    }
+    if (user.status !== UserStatus.ACTIVE) {
+      throw new UnauthorizedException('Tài khoản học viên chưa hoạt động hoặc đã bị khóa.');
+    }
+    await this.userRepository.manager.transaction(async (manager) => {
+      user.role = UserRole.INSTRUCTOR;
+      await manager.save(user);
+      invite.isUsed = true;
+      await manager.save(invite);
+    });
+    return {
+      accessToken: this.jwtService.sign({ sub: user.id, email: user.email, role: user.role }),
+      user: { id: user.id, email: user.email, name: user.name, role: user.role },
     };
   }
 

@@ -19,12 +19,6 @@ export const InstructorKycPage: React.FC = () => {
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [facebook, setFacebook] = useState("");
   const [linkedin, setLinkedin] = useState("");
-  const [identityNumber, setIdentityNumber] = useState("");
-
-  const [frontFile, setFrontFile] = useState<File | null>(null);
-  const [backFile, setBackFile] = useState<File | null>(null);
-  const [selfieFile, setSelfieFile] = useState<File | null>(null);
-
   const [certificates, setCertificates] = useState<CertItem[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -41,8 +35,10 @@ export const InstructorKycPage: React.FC = () => {
     try {
       const data = await instructorService.getMyStatus();
       setStatusData(data);
-    } catch {
-      // Chưa nộp hồ sơ, giữ statusData = null
+    } catch (err: any) {
+      if (err.response?.status !== 404) {
+        setErrorMessage(err.response?.data?.error?.message || 'Không thể tải trạng thái hồ sơ.');
+      }
     } finally {
       setLoading(false);
     }
@@ -71,21 +67,10 @@ export const InstructorKycPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!frontFile || !backFile || !selfieFile) {
-      setErrorMessage("Vui lòng tải lên đủ 3 ảnh: CCCD mặt trước, mặt sau và ảnh Selfie.");
-      return;
-    }
-
-    if (!identityNumber) {
-      setErrorMessage("Vui lòng nhập số CCCD/CMND.");
-      return;
-    }
-
     setSubmitting(true);
     setErrorMessage(null);
 
     const formData = new FormData();
-    formData.append("identityNumber", identityNumber);
     if (headline) formData.append("headline", headline);
     if (bio) formData.append("bio", bio);
     if (websiteUrl) formData.append("websiteUrl", websiteUrl);
@@ -96,10 +81,6 @@ export const InstructorKycPage: React.FC = () => {
     if (Object.keys(socialLinks).length > 0) {
       formData.append("socialLinks", JSON.stringify(socialLinks));
     }
-
-    formData.append("identity_front", frontFile);
-    formData.append("identity_back", backFile);
-    formData.append("selfie_with_id", selfieFile);
 
     // Xử lý certificates
     const certMeta = certificates
@@ -122,15 +103,15 @@ export const InstructorKycPage: React.FC = () => {
     }
 
     try {
-      const res = await instructorService.submitKyc(formData);
-      setSuccessMessage(res.message || "Đã gửi hồ sơ và xác thực định danh thành công!");
+      await instructorService.submitProfile(formData);
+      setSuccessMessage('Hồ sơ đã được nộp và đang chờ quản trị viên duyệt.');
       fetchStatus();
     } catch (err: any) {
       setErrorMessage(
         err.response?.data?.error?.message ||
           err.response?.data?.message ||
           err.message ||
-          "Có lỗi xảy ra trong quá trình xác thực eKYC.",
+          "Có lỗi xảy ra trong quá trình nộp hồ sơ.",
       );
     } finally {
       setSubmitting(false);
@@ -154,7 +135,7 @@ export const InstructorKycPage: React.FC = () => {
           </div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">Chưa đăng nhập tài khoản</h2>
           <p className="text-sm text-gray-600 mb-6">
-            Để nộp hồ sơ eKYC, trước tiên bạn cần tạo tài khoản Giảng viên từ link kích hoạt trong email.
+            Để nộp hồ sơ, trước tiên bạn cần xác thực email và tạo tài khoản Giảng viên từ liên kết trong email.
           </p>
           <a
             href="/teach"
@@ -172,13 +153,13 @@ export const InstructorKycPage: React.FC = () => {
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
           <span className="inline-block px-3 py-1 text-xs font-semibold text-indigo-700 bg-indigo-100 rounded-full mb-2">
-            Bước 2: Định danh & Bằng cấp (eKYC)
+            Bước 2: Hoàn thiện hồ sơ chuyên môn
           </span>
           <h1 className="text-3xl font-extrabold text-gray-900">
-            Hồ Sơ Xác Minh Giảng Viên
+            Hồ Sơ Đăng Ký Giảng Viên
           </h1>
           <p className="mt-2 text-sm text-gray-600">
-            Xác minh CCCD và bằng cấp chuyên môn để được kích hoạt quyền xuất bản khóa học
+            Bổ sung thông tin và bằng cấp chuyên môn để quản trị viên xét duyệt quyền xuất bản khóa học
           </p>
         </div>
 
@@ -203,25 +184,8 @@ export const InstructorKycPage: React.FC = () => {
                 </span>
               )}
             </h3>
-
-            {statusData.kyc && (
-              <div className="text-sm text-gray-600 space-y-1 mt-3 p-4 bg-gray-50 rounded-xl">
-                <p>
-                  <strong>Kết quả eKYC tự động:</strong>{" "}
-                  {statusData.kyc.status === 2 ? (
-                    <span className="text-green-600 font-semibold">✓ Đã xác thực (VERIFIED)</span>
-                  ) : statusData.kyc.status === 4 ? (
-                    <span className="text-yellow-600 font-semibold">⚠ Cần đối soát thủ công (MANUAL REVIEW)</span>
-                  ) : (
-                    <span className="text-red-600 font-semibold">✗ Không khớp (REJECTED)</span>
-                  )}
-                </p>
-                <p>OCR Đọc CCCD: {statusData.kyc.ocrVerified ? "Thành công" : "Chưa hoàn tất"}</p>
-                <p>So khớp Khuôn mặt: {statusData.kyc.faceVerified ? "Khớp" : "Chưa đạt"}</p>
-                {statusData.kyc.rejectReason && (
-                  <p className="text-red-600">Ghi chú: {statusData.kyc.rejectReason}</p>
-                )}
-              </div>
+            {statusData.approvalStatus === 3 && statusData.reviewReason && (
+              <p className="mt-4 text-red-700 text-sm">Lý do admin từ chối: {statusData.reviewReason}</p>
             )}
 
             {statusData.approvalStatus === 2 ? (
@@ -236,7 +200,7 @@ export const InstructorKycPage: React.FC = () => {
           </div>
         )}
 
-        {/* KYC Submission Form (Only shown if no profile or rejected) */}
+        {/* Submission form: first submission or resubmission after rejection */}
         {(!statusData || statusData.approvalStatus === 3) && (
           <div className="bg-white p-8 rounded-2xl shadow-md border border-gray-200">
             {errorMessage && (
@@ -316,78 +280,11 @@ export const InstructorKycPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Section 2: Identity (eKYC) */}
-              <div>
-                <h2 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  2. Định danh CCCD (FPT.AI eKYC)
-                </h2>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Số CCCD / CMND <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={identityNumber}
-                    onChange={(e) => setIdentityNumber(e.target.value)}
-                    placeholder="VD: 079201001234 (Phải trùng với số trên ảnh)"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-mono"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="border-2 border-dashed border-gray-300 p-4 rounded-xl text-center hover:border-indigo-400 transition-colors">
-                    <label className="cursor-pointer block">
-                      <span className="block text-xs font-bold text-gray-700 mb-1">CCCD Mặt trước *</span>
-                      <span className="block text-xs text-gray-500 mb-2">Ảnh rõ nét, đủ 4 góc</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        required
-                        onChange={(e) => setFrontFile(e.target.files?.[0] || null)}
-                        className="text-xs w-full"
-                      />
-                      {frontFile && <p className="mt-2 text-xs text-green-600 font-semibold truncate">✓ {frontFile.name}</p>}
-                    </label>
-                  </div>
-
-                  <div className="border-2 border-dashed border-gray-300 p-4 rounded-xl text-center hover:border-indigo-400 transition-colors">
-                    <label className="cursor-pointer block">
-                      <span className="block text-xs font-bold text-gray-700 mb-1">CCCD Mặt sau *</span>
-                      <span className="block text-xs text-gray-500 mb-2">Rõ vân tay & ngày cấp</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        required
-                        onChange={(e) => setBackFile(e.target.files?.[0] || null)}
-                        className="text-xs w-full"
-                      />
-                      {backFile && <p className="mt-2 text-xs text-green-600 font-semibold truncate">✓ {backFile.name}</p>}
-                    </label>
-                  </div>
-
-                  <div className="border-2 border-dashed border-gray-300 p-4 rounded-xl text-center hover:border-indigo-400 transition-colors">
-                    <label className="cursor-pointer block">
-                      <span className="block text-xs font-bold text-gray-700 mb-1">Ảnh Selfie Chân dung *</span>
-                      <span className="block text-xs text-gray-500 mb-2">Rõ mặt, không đeo kính râm</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        required
-                        onChange={(e) => setSelfieFile(e.target.files?.[0] || null)}
-                        className="text-xs w-full"
-                      />
-                      {selfieFile && <p className="mt-2 text-xs text-green-600 font-semibold truncate">✓ {selfieFile.name}</p>}
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              {/* Section 3: Certificates */}
+              {/* Section 2: Certificates */}
               <div>
                 <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
                   <h2 className="text-lg font-bold text-gray-900">
-                    3. Bằng cấp & Chứng chỉ Chuyên môn
+                    2. Bằng cấp & Chứng chỉ Chuyên môn
                   </h2>
                   <button
                     type="button"
@@ -464,7 +361,7 @@ export const InstructorKycPage: React.FC = () => {
                 disabled={submitting}
                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl transition-colors duration-200 disabled:opacity-50 text-base shadow-lg shadow-indigo-100"
               >
-                {submitting ? "Đang xử lý eKYC qua FPT AI..." : "Nộp Hồ Sơ & Xác Thực eKYC"}
+                {submitting ? "Đang nộp hồ sơ..." : "Nộp hồ sơ đăng ký giáo viên"}
               </button>
             </form>
           </div>

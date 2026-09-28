@@ -59,7 +59,7 @@ export const navigation: Navigation = {
                     icon: GraduationCap,
                 },
                 {
-                    title: "Duyệt Giảng Viên (eKYC)",
+                    title: "Duyệt Giảng Viên",
                     url: "/instructors/approvals",
                     icon: UserCheck,
                 },

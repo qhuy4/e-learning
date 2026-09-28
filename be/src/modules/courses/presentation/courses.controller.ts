@@ -38,6 +38,9 @@ import { UpdateCourseDto } from '@/modules/courses/presentation/dto/update-cours
 import { UpdateCourseCommand } from '@/modules/courses/application/command/update-course.command';
 import { DeleteCourseCommand } from '@/modules/courses/application/command/delete-course.command';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enum/role.enum';
 import { GetAdminCoursesQuery } from '@/modules/courses/application/query/get-admin-courses.query';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import { PreviewCourseQuery } from '@/modules/courses/application/query/preview-course.query';
@@ -174,7 +177,8 @@ export class CoursesController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.INSTRUCTOR, Role.ADMIN)
   @UseInterceptors(FileInterceptor('thumbnail'))
   async create(
     @CurrentUser() user: User,
@@ -195,6 +199,8 @@ export class CoursesController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.INSTRUCTOR, Role.ADMIN)
   @UseInterceptors(FileInterceptor('thumbnail'))
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -215,6 +221,8 @@ export class CoursesController {
   }
 
   @Post(':id/clone')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.INSTRUCTOR, Role.ADMIN)
   async clone(
     @CurrentUser('id') instructorId: number,
     @Param('id', ParseIntPipe) id: number,
@@ -223,7 +231,8 @@ export class CoursesController {
   }
 
   @Post(':id/approve')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   async approve(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: User,
@@ -234,7 +243,8 @@ export class CoursesController {
   }
 
   @Post(':id/reject')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   async reject(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: User,
@@ -246,6 +256,8 @@ export class CoursesController {
   }
 
   @Post(':id/cancel-review')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.INSTRUCTOR, Role.ADMIN)
   async cancelReview(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.commandBus.execute(new CancelReviewCourseCommand(id));
   }
@@ -269,6 +281,8 @@ export class CoursesController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.INSTRUCTOR, Role.ADMIN)
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.commandBus.execute<DeleteCourseCommand, void>(
       new DeleteCourseCommand(id),

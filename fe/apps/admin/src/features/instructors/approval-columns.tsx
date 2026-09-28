@@ -55,26 +55,14 @@ export function createInstructorApprovalColumns() {
         )
       },
     }),
-    columnHelper.accessor("kyc.kycStatus", {
-      id: "kycStatus",
-      header: "Kết quả eKYC (AI)",
-      cell: (info) => {
-        const kyc = info.row.original.kyc
-        if (!kyc) return <span className="text-xs italic text-muted-foreground">Chưa có eKYC</span>
-
-        const badge = kyc.kycStatus === 2
-          ? {label: "✓ Verified (AI Pass)", className: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"}
-          : kyc.kycStatus === 4
-            ? {label: "⚠ Cần đối soát thủ công", className: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"}
-            : {label: "✕ AI Rejected", className: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"}
-
-        return (
-          <div className="space-y-1">
-            <Badge className={badge.className}>{badge.label}</Badge>
-            <div className="text-xs text-muted-foreground">CCCD: <span className="font-mono">{kyc.identityNumber}</span></div>
-          </div>
-        )
-      },
+    columnHelper.display({
+      id: "emailVerification",
+      header: "Xác thực email",
+      cell: () => (
+        <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+          ✓ Đã xác thực
+        </Badge>
+      ),
     }),
     columnHelper.accessor("certificates", {
       header: "Bằng cấp",

@@ -4,8 +4,11 @@ export const createApi = (
     getToken: () => string | null,
     prefix = "",
 ) => {
+    const apiOrigin = import.meta.env.VITE_API_URL
+        || `${window.location.protocol}//${window.location.hostname}:3001`;
+
     const api = axios.create({
-        baseURL: `${import.meta.env.VITE_API_URL}${prefix}`,
+        baseURL: `${apiOrigin.replace(/\/$/, "")}${prefix}`,
     })
 
     api.interceptors.request.use((config) => {

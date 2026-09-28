@@ -13,7 +13,8 @@ const getMediaUrl = (pathStr: string | null | undefined) => {
   if (!pathStr) return "";
   if (pathStr.startsWith("http")) return pathStr;
   const cleanPath = pathStr.replace(/\\/g, "/").replace(/^\/?/, "");
-  return `http://localhost:3001/${cleanPath}`;
+  const origin = import.meta.env.VITE_API_URL || `${window.location.protocol}//${window.location.hostname}:3001`;
+  return `${origin.replace(/\/$/, "")}/${cleanPath}`;
 };
 
 export const InstructorApprovalsPage: React.FC = () => {
@@ -61,7 +62,7 @@ export const InstructorApprovalsPage: React.FC = () => {
     if (!keyword) return profiles;
 
     return profiles.filter((profile) =>
-      [profile.user?.name, profile.user?.email, profile.headline, profile.bio, profile.kyc?.identityNumber]
+      [profile.user?.name, profile.user?.email, profile.headline, profile.bio]
         .some((value) => value?.toLocaleLowerCase("vi").includes(keyword)),
     );
   }, [profiles, search]);
@@ -143,11 +144,10 @@ export const InstructorApprovalsPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-            Quản Lý & Duyệt Giảng Viên (eKYC)
+            Quản Lý & Duyệt Giảng Viên
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Đối soát thông tin CCCD, kết quả xác thực khuôn mặt FPT.AI và bằng
-            cấp chuyên môn của giảng viên
+            Xem xét thông tin chuyên môn và bằng cấp của tài khoản đã xác thực email
           </p>
         </div>
       </div>
@@ -198,7 +198,7 @@ export const InstructorApprovalsPage: React.FC = () => {
         onRowClick={setSelectedProfile}
         tableMeta={{onView: setSelectedProfile, onApprove: handleApprove, reviewing}}
         text={{
-          searchPlaceholder: "Tìm tên, email, chuyên môn hoặc CCCD...",
+          searchPlaceholder: "Tìm tên, email hoặc chuyên môn...",
           reload: "Làm mới",
           rowsPerPage: "Dòng trên trang",
           noResults: "Không có hồ sơ nào trong mục này.",
@@ -216,7 +216,7 @@ export const InstructorApprovalsPage: React.FC = () => {
             <div className="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
               <div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                  Hồ Sơ Giảng Viên & Bằng Chứng eKYC
+                  Hồ Sơ Đăng Ký Giảng Viên
                 </h3>
                 <p className="text-xs text-gray-500 mt-0.5">
                   Mã hồ sơ: #{selectedProfile.profileId} | User:{" "}
@@ -244,117 +244,13 @@ export const InstructorApprovalsPage: React.FC = () => {
                 <p className="text-sm font-semibold text-indigo-600 truncate">
                   {selectedProfile.websiteUrl || "Không có"}
                 </p>
-              </div>S
+              </div>
               <div className="md:col-span-2">
                 <p className="text-xs text-gray-500">Tiểu sử (Bio):</p>
                 <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
                   {selectedProfile.bio || "Không có"}
                 </p>
               </div>
-            </div>
-
-            {/* eKYC Verification & OCR */}
-            <div className="mb-6">
-              <h4 className="text-base font-bold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-                Kết Quả Định Danh FPT.AI eKYC
-              </h4>
-
-              {selectedProfile.kyc ? (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-indigo-50/50 dark:bg-indigo-950/30 rounded-xl border border-indigo-100 dark:border-indigo-900 text-xs">
-                    <div>
-                      <span className="text-gray-500 block">
-                        Số CCCD Khai báo:
-                      </span>
-                      <strong className="text-gray-900 dark:text-gray-100 font-mono text-sm">
-                        {selectedProfile.kyc.identityNumber}
-                      </strong>
-                    </div>
-                    <div>
-                      <span className="text-gray-500 block">
-                        Số CCCD OCR Đọc:
-                      </span>
-                      <strong className="text-gray-900 dark:text-gray-100 font-mono text-sm">
-                        {selectedProfile.kyc.ocrData?.["ID"] ||
-                          selectedProfile.kyc.ocrData?.["id"] ||
-                          "—"}
-                      </strong>
-                    </div>
-                    <div>
-                      <span className="text-gray-500 block">
-                        Điểm khớp khuôn mặt:
-                      </span>
-                      <strong className="text-indigo-700 dark:text-indigo-400 text-sm">
-                        {selectedProfile.kyc.faceData?.similarity || "—"}%
-                      </strong>
-                    </div>
-                  </div>
-
-                  {/* Image Previews */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden bg-gray-50 dark:bg-gray-800 text-center">
-                      <span className="block text-xs font-semibold text-gray-700 dark:text-gray-300 py-1.5 bg-gray-100 dark:bg-gray-700 border-b">
-                        CCCD Mặt trước (Click xem)
-                      </span>
-                      <img
-                        src={getMediaUrl(selectedProfile.kyc.identityFront)}
-                        alt="CCCD Mặt trước"
-                        className="w-full h-40 object-cover hover:opacity-90 cursor-pointer"
-                        onClick={() =>
-                          window.open(
-                            getMediaUrl(selectedProfile.kyc?.identityFront),
-                            "_blank",
-                          )
-                        }
-                      />
-                    </div>
-                    <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden bg-gray-50 dark:bg-gray-800 text-center">
-                      <span className="block text-xs font-semibold text-gray-700 dark:text-gray-300 py-1.5 bg-gray-100 dark:bg-gray-700 border-b">
-                        CCCD Mặt sau (Click xem)
-                      </span>
-                      <img
-                        src={getMediaUrl(selectedProfile.kyc.identityBack)}
-                        alt="CCCD Mặt sau"
-                        className="w-full h-40 object-cover hover:opacity-90 cursor-pointer"
-                        onClick={() =>
-                          window.open(
-                            getMediaUrl(selectedProfile.kyc?.identityBack),
-                            "_blank",
-                          )
-                        }
-                      />
-                    </div>
-                    <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden bg-gray-50 dark:bg-gray-800 text-center">
-                      <span className="block text-xs font-semibold text-gray-700 dark:text-gray-300 py-1.5 bg-gray-100 dark:bg-gray-700 border-b">
-                        Ảnh Chân dung / Selfie
-                      </span>
-                      <img
-                        src={getMediaUrl(selectedProfile.kyc.selfieWithId)}
-                        alt="Ảnh Selfie"
-                        className="w-full h-40 object-cover hover:opacity-90 cursor-pointer"
-                        onClick={() =>
-                          window.open(
-                            getMediaUrl(selectedProfile.kyc?.selfieWithId),
-                            "_blank",
-                          )
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  {/* Reject Note if any */}
-                  {selectedProfile.kyc.rejectReason && (
-                    <div className="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl text-xs text-amber-800 dark:text-amber-300">
-                      <strong>Ghi chú hệ thống:</strong>{" "}
-                      {selectedProfile.kyc.rejectReason}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <p className="text-sm text-gray-500 italic">
-                  Chưa có dữ liệu eKYC.
-                </p>
-              )}
             </div>
 
             {/* Certificates List */}
@@ -447,7 +343,7 @@ export const InstructorApprovalsPage: React.FC = () => {
               rows={4}
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
-              placeholder="Ví dụ: Ảnh chụp CCCD bị mờ góc hoặc giấy tờ không hợp lệ..."
+              placeholder="Ví dụ: Hồ sơ chuyên môn chưa đầy đủ hoặc chứng chỉ không hợp lệ..."
               className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none dark:bg-gray-800 dark:text-gray-100 mb-4"
             />
 
@@ -481,3 +377,4 @@ export const InstructorApprovalsPage: React.FC = () => {
     </div>
   );
 };
+

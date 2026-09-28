@@ -15,11 +15,6 @@ export class RegisterTeacherCommand {
     public readonly bio: string | undefined,
     public readonly websiteUrl: string | undefined,
     public readonly socialLinks: Record<string, string> | undefined,
-    // --- Thông tin định danh (KYC) ---
-    public readonly identityNumber: string,
-    public readonly identityFrontPath: string,
-    public readonly identityBackPath: string,
-    public readonly selfiePath: string,
     // --- Bằng cấp / chứng chỉ ---
     public readonly certificates: RegisterTeacherCertificateInput[],
   ) {}

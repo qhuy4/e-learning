@@ -20,8 +20,8 @@ export const LoginPage: React.FC = () => {
       if (res.accessToken) {
         localStorage.setItem("accessToken", res.accessToken);
       }
-      // Đăng nhập thành công -> chuyển sang trang eKYC / Studio
-      navigate("/instructor/kyc");
+      // Đăng nhập thành công -> chuyển sang trang hồ sơ / Studio
+      navigate("/instructor/profile");
     } catch (err: any) {
       setErrorMessage(
         err.response?.data?.error?.message ||

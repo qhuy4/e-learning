@@ -13,8 +13,7 @@ import {
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-// import { extname, join, relative, sep } from 'path';
-import { extname, join } from 'path';
+import { extname, join, relative, sep } from 'path';
 import * as fs from 'fs';
 import { randomUUID } from 'crypto';
 import {
@@ -26,15 +25,16 @@ import { TeacherRegistrationStatusView } from '@/modules/teacher/application/que
 import { TeacherRegistrationResult } from '@/modules/teacher/domain/entity/teacher-registration-result.model';
 import { RegisterTeacherDto } from '@/modules/teacher/presentation/dto/register-teacher.dto';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enum/role.enum';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 
 const UPLOAD_ROOT = join(process.cwd(), 'uploads', 'teachers');
-// const UPLOADS_DIR = join(process.cwd(), 'uploads');
-
-// function toPublicUploadUrl(absolutePath: string): string {
-//   const relativePath = relative(UPLOADS_DIR, absolutePath).split(sep).join('/');
-//   return `/uploads/${relativePath}`;
-// }
+const UPLOADS_DIR = join(process.cwd(), 'uploads');
+function toPublicUploadUrl(absolutePath: string): string {
+  return `/uploads/${relative(UPLOADS_DIR, absolutePath).split(sep).join('/')}`;
+}
 
 const imageFileFilter = (
   _req: unknown,
@@ -52,15 +52,12 @@ const imageFileFilter = (
 
 const teacherFileInterceptor = FileFieldsInterceptor(
   [
-    { name: 'identity_front', maxCount: 1 },
-    { name: 'identity_back', maxCount: 1 },
-    { name: 'selfie_with_id', maxCount: 1 },
     { name: 'certificate_files', maxCount: 10 },
   ],
   {
     storage: diskStorage({
       destination: (req: any, file, cb) => {
-        const userId = req.user?.id ?? req.body?.userId ?? 'unknown';
+        const userId = req.user?.id;
         const dir = join(UPLOAD_ROOT, String(userId));
         fs.mkdirSync(dir, { recursive: true });
         cb(null, dir);
@@ -75,9 +72,6 @@ const teacherFileInterceptor = FileFieldsInterceptor(
 );
 
 interface TeacherUploadedFiles {
-  identity_front?: Express.Multer.File[];
-  identity_back?: Express.Multer.File[];
-  selfie_with_id?: Express.Multer.File[];
   certificate_files?: Express.Multer.File[];
 }
 
@@ -89,36 +83,26 @@ export class TeacherController {
   ) {}
 
   /**
-   * Đăng ký & nộp hồ sơ eKYC làm giáo viên.
+   * Nộp hồ sơ chuyên môn sau khi tài khoản đã được xác thực qua email.
    * Content-Type: multipart/form-data
    *
    * Text fields: headline?, bio?, websiteUrl?, socialLinks? (JSON string),
-   *              identityNumber, certificates? (JSON string, mảng CertificateItemDto)
-   * File fields: identity_front (1), identity_back (1), selfie_with_id (1),
-   *              certificate_files (0..10, khớp thứ tự với mảng `certificates`)
+   *              certificates? (JSON string, mảng CertificateItemDto)
+   * File fields: certificate_files (0..10, khớp thứ tự với mảng `certificates`)
    */
   @Post('register')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.INSTRUCTOR)
   @UseInterceptors(teacherFileInterceptor)
   async register(
     @Body() dto: RegisterTeacherDto,
     @UploadedFiles() files: TeacherUploadedFiles,
     @CurrentUser('id') authUserId?: number,
   ): Promise<TeacherRegistrationResult> {
-    const targetUserId = authUserId ?? dto.userId;
+    const targetUserId = authUserId;
 
     if (!targetUserId) {
-      throw new BadRequestException('Vui lòng đăng nhập để thực hiện nộp hồ sơ eKYC.');
-    }
-
-    const identityFront = files.identity_front?.[0];
-    const identityBack = files.identity_back?.[0];
-    const selfie = files.selfie_with_id?.[0];
-
-    if (!identityFront || !identityBack || !selfie) {
-      throw new BadRequestException(
-        'Thiếu ảnh giấy tờ: cần đủ identity_front, identity_back và selfie_with_id.',
-      );
+      throw new BadRequestException('Vui lòng đăng nhập bằng tài khoản đã xác thực email.');
     }
 
     const certificateInputs = dto.certificates ?? [];
@@ -136,8 +120,7 @@ export class TeacherController {
         issuer: cert.issuer,
         issuedAt: cert.issuedAt,
         expiresAt: cert.expiresAt,
-        filePath: certificateFiles[index].path,
-        // filePath: toPublicUploadUrl(certificateFiles[index].path),
+        filePath: toPublicUploadUrl(certificateFiles[index].path),
       }));
 
     const command = new RegisterTeacherCommand(
@@ -146,19 +129,16 @@ export class TeacherController {
       dto.bio,
       dto.websiteUrl,
       dto.socialLinks,
-      dto.identityNumber,
-
-      identityFront.path,
-      identityBack.path,
-      selfie.path,
-      // toPublicUploadUrl(identityFront.path),
-      // toPublicUploadUrl(identityBack.path),
-      // toPublicUploadUrl(selfie.path),
-
       certificates,
     );
 
-    return this.commandBus.execute(command);
+    try {
+      return await this.commandBus.execute(command);
+    } catch (error) {
+      const uploadedFiles = Object.values(files).flat();
+      await Promise.allSettled(uploadedFiles.map((file) => fs.promises.unlink(file.path)));
+      throw error;
+    }
   }
 
   /**
@@ -168,7 +148,7 @@ export class TeacherController {
   @UseGuards(JwtAuthGuard)
   async getMyRegistrationStatus(
     @CurrentUser('id') userId: number,
-  ): Promise<TeacherRegistrationStatusView> {
+  ): Promise<TeacherRegistrationStatusView | null> {
     return this.queryBus.execute(
       new GetTeacherRegistrationStatusQuery(userId),
     );
@@ -176,9 +156,11 @@ export class TeacherController {
 
   /** Kiểm tra trạng thái hồ sơ đăng ký giáo viên theo userId (dành cho test/debug). */
   @Get(':userId/registration-status')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   async getRegistrationStatus(
     @Param('userId', ParseIntPipe) userId: number,
-  ): Promise<TeacherRegistrationStatusView> {
+  ): Promise<TeacherRegistrationStatusView | null> {
     return this.queryBus.execute(
       new GetTeacherRegistrationStatusQuery(userId),
     );

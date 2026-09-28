@@ -9,12 +9,7 @@ export interface RegisterInstructorPayload {
 export interface TeacherRegistrationStatus {
   profileId: number;
   approvalStatus: number; // 1: PENDING, 2: APPROVED, 3: REJECTED
-  kyc: {
-    status: number; // 1: PENDING, 2: VERIFIED, 3: REJECTED, 4: MANUAL_REVIEW
-    ocrVerified: boolean;
-    faceVerified: boolean;
-    rejectReason: string | null;
-  } | null;
+  reviewReason: string | null;
   certificates: {
     id: number;
     certificateName: string;
@@ -41,8 +36,13 @@ export const instructorService = {
     return response.data?.data ?? response.data;
   },
 
-  /** Nộp hồ sơ eKYC CCCD & Bằng cấp (form-data) */
-  submitKyc: async (formData: FormData) => {
+  upgrade: async (session: string) => {
+    const response = await api.post('/auth/instructor/upgrade', { session });
+    return response.data?.data ?? response.data;
+  },
+
+  /** Nộp hồ sơ chuyên môn và bằng cấp (form-data) */
+  submitProfile: async (formData: FormData) => {
     const response = await api.post("/teachers/register", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -52,9 +52,9 @@ export const instructorService = {
   },
 
   /** Lấy trạng thái hồ sơ của user hiện tại */
-  getMyStatus: async (): Promise<TeacherRegistrationStatus> => {
+  getMyStatus: async (): Promise<TeacherRegistrationStatus | null> => {
     const response = await api.get("/teachers/my-status");
-    return response.data?.data ?? response.data;
+    return response.data?.data ?? null;
   },
 
   /** Đăng nhập */

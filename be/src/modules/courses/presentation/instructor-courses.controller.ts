@@ -16,6 +16,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enum/role.enum';
 
 import { GetInstructorCoursesQuery } from '@/modules/courses/application/query/get-instructor-courses.query';
 import { GetCourseByIdQuery } from '@/modules/courses/application/query/get-course-by-id.query';
@@ -28,7 +31,8 @@ import { CancelReviewCourseCommand } from '@/modules/courses/application/command
 import { CreateCourseDto } from '@/modules/courses/presentation/dto/create-course.dto';
 import { UpdateCourseDto } from '@/modules/courses/presentation/dto/update-course.dto';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.INSTRUCTOR)
 @Controller('instructor/courses')
 export class InstructorCoursesController {
   constructor(

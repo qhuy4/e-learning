@@ -37,6 +37,8 @@ export async function initDatabaseTables(dataSource: DataSource) {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
       CREATE INDEX IF NOT EXISTS idx_instructor_profiles_user_id ON instructor_profiles(user_id);
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_instructor_profiles_user_id ON instructor_profiles(user_id);
+      ALTER TABLE instructor_profiles ADD COLUMN IF NOT EXISTS review_reason TEXT;
     `);
 
     // 3. Tạo bảng instructor_kyc nếu chưa có
@@ -58,6 +60,14 @@ export async function initDatabaseTables(dataSource: DataSource) {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
       CREATE INDEX IF NOT EXISTS idx_instructor_kyc_user_id ON instructor_kyc(user_id);
+      CREATE TABLE IF NOT EXISTS instructor_kyc_history (
+        id BIGSERIAL PRIMARY KEY,
+        user_id BIGINT NOT NULL,
+        kyc_snapshot JSONB NOT NULL,
+        certificates_snapshot JSONB NOT NULL,
+        archived_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_instructor_kyc_history_user_id ON instructor_kyc_history(user_id);
     `);
 
     // 4. Tạo bảng instructor_certificates nếu chưa có

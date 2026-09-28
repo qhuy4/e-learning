@@ -74,8 +74,12 @@ const router = createBrowserRouter([
         element: <InstructorRegisterPage />,
       },
       {
-        path: "instructor/kyc",
+        path: "instructor/profile",
         element: <InstructorKycPage />,
+      },
+      {
+        path: "instructor/kyc",
+        element: <Navigate to="/instructor/profile" replace />,
       },
     ],
   },

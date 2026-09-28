@@ -7,12 +7,24 @@ interface AuthState {
     user: User | null;
 }
 
-const initialState: AuthState = {
-    token: localStorage.getItem("accessToken"),
-    user: JSON.parse(
-        localStorage.getItem("user") || "null"
-    ),
+const readStoredAuth = (): AuthState => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return { token: null, user: null };
+
+    try {
+        const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+        if (typeof payload.exp !== "number" || payload.exp * 1000 <= Date.now()) {
+            throw new Error("JWT expired or invalid");
+        }
+        return { token, user: JSON.parse(localStorage.getItem("user") || "null") };
+    } catch {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("user");
+        return { token: null, user: null };
+    }
 };
+
+const initialState: AuthState = readStoredAuth();
 
 const authSlice = createSlice({
     name: "auth",

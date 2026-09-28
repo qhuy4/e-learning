@@ -11,6 +11,9 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enum/role.enum';
 import { InstructorCertificateEntity } from '@/modules/teacher/infrastructure/entity/instructor-certificate.entity';
 import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
 import { CertificateStatus } from '@/modules/teacher/domain/enum/certificate-status.enum';
@@ -19,7 +22,8 @@ import { ErrorCode } from '@/common/enum/error-code.enum';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 
 @Controller('admin/instructor-certificates')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
 export class AdminInstructorCertificatesController {
   constructor(
     @InjectRepository(InstructorCertificateEntity)
