@@ -7,6 +7,7 @@ import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.en
 import { BookingRepository } from './infrastructure/repository/booking.repository';
 import { AdminBookingsController } from './presentation/admin-bookings.controller';
 import { InstructorBookingsController } from './presentation/instructor-bookings.controller';
+import { StudentBookingsController } from './presentation/student-bookings.controller';
 import { CreateBookingHandler } from './application/command-handler/create-booking.handler';
 import { UpdateBookingStatusHandler } from './application/command-handler/update-booking-status.handler';
 import { DeleteBookingHandler } from './application/command-handler/delete-booking.handler';
@@ -52,6 +53,7 @@ const CommandHandlers = [
   controllers: [
     AdminBookingsController,
     InstructorBookingsController,
+    StudentBookingsController,
     AvailabilityController,
   ],
   providers: [

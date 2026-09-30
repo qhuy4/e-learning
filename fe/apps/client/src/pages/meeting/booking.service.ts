@@ -86,8 +86,8 @@ export function useMyBookings(userId?: number) {
     return useQuery({
         queryKey: ["booking-history", userId],
         queryFn: async () => {
-            const res = await api.get("/admin/bookings", {
-                params: { page: 1, limit: 100, studentId: userId! },
+            const res = await api.get("/bookings", {
+                params: { page: 1, limit: 100 },
             });
             return res.data.data as { data: Booking[] };
         },
