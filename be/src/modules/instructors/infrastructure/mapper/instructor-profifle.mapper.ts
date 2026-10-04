@@ -13,6 +13,7 @@ export class InstructorProfileMapperResponseMapper {
     [ApprovalStatus.PENDING]: 'PENDING',
     [ApprovalStatus.APPROVED]: 'APPROVED',
     [ApprovalStatus.SUSPENDED]: 'SUSPENDED',
+    [ApprovalStatus.REJECTED]: 'REJECTED',
   };
 
   static toResponse(

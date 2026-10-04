@@ -35,6 +35,7 @@ export class GetMyProfileHandler implements IQueryHandler<
     return {
       id: user.id,
       email: user.email,
+      name: user.name,
       profile: profile
         ? {
             avatarUrl: profile.avatarUrl,

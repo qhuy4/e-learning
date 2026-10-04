@@ -13,6 +13,9 @@ export function mapApprovalStatus(
     case ApprovalStatus.SUSPENDED:
       return 'SUSPENDED';
 
+    case ApprovalStatus.REJECTED:
+      return 'REJECTED';
+
     default:
       return 'UNKNOWN';
   }

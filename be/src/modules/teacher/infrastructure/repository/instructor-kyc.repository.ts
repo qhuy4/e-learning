@@ -15,7 +15,7 @@ export class InstructorKycRepository {
   ): Promise<InstructorKycEntity | null> {
     return this.repository.findOne({
       where: { userId },
-      order: { createdAt: 'DESC' },
+      order: { updatedAt: 'DESC' },
     });
   }
 

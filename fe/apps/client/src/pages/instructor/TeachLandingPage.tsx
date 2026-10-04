@@ -72,7 +72,7 @@ export const TeachLandingPage: React.FC = () => {
             </div>
             <h3 className="font-bold text-gray-800 mb-2">Xác thực uy tín</h3>
             <p className="text-sm text-gray-500">
-              Định danh eKYC hiện đại giúp chứng nhận hồ sơ giảng viên chuẩn mực, tin cậy.
+              Xác thực email nhanh chóng, sau đó hoàn thiện hồ sơ chuyên môn để quản trị viên xét duyệt.
             </p>
           </div>
         </div>

@@ -66,6 +66,9 @@ export class InstructorProfileEntity {
   })
   approvalStatus: ApprovalStatus;
 
+  @Column({ name: 'review_reason', type: 'text', nullable: true })
+  reviewReason: string | null;
+
   @Column({ name: 'approved_at', type: 'timestamp', nullable: true })
   approvedAt: Date | null;
 

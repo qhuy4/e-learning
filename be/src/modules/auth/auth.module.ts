@@ -26,6 +26,8 @@ import { ServiceModule } from '@/common/service/service.module';
 import { RefreshSession } from '@/modules/auth/infrastructure/refresh-session.entity';
 import { RefreshSessionRepository } from '@/modules/auth/infrastructure/repository/refresh-session.repository';
 import { RefreshTokenHandler } from '@/modules/auth/application/command-handler/refresh-token.handler';
+import { LogoutHandler } from '@/modules/auth/application/command-handler/logout.handler';
+import { AuthSecurityController } from '@/modules/auth/presentation/controllers/auth-security.controller';
 
 @Module({
   imports: [
@@ -59,6 +61,7 @@ import { RefreshTokenHandler } from '@/modules/auth/application/command-handler/
     InstructorAuthController,
     UserAuthController,
     UsersController,
+    AuthSecurityController,
   ],
   providers: [
     AuthService,
@@ -70,6 +73,7 @@ import { RefreshTokenHandler } from '@/modules/auth/application/command-handler/
     PasswordService,
     RefreshSessionRepository,
     RefreshTokenHandler,
+    LogoutHandler,
   ],
   exports: [AuthService, JwtModule, PassportModule],
 })

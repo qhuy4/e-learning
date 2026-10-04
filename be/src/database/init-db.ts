@@ -37,6 +37,8 @@ export async function initDatabaseTables(dataSource: DataSource) {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
       CREATE INDEX IF NOT EXISTS idx_instructor_profiles_user_id ON instructor_profiles(user_id);
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_instructor_profiles_user_id ON instructor_profiles(user_id);
+      ALTER TABLE instructor_profiles ADD COLUMN IF NOT EXISTS review_reason TEXT;
     `);
 
     // 3. Tạo bảng instructor_kyc nếu chưa có
@@ -58,6 +60,14 @@ export async function initDatabaseTables(dataSource: DataSource) {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
       CREATE INDEX IF NOT EXISTS idx_instructor_kyc_user_id ON instructor_kyc(user_id);
+      CREATE TABLE IF NOT EXISTS instructor_kyc_history (
+        id BIGSERIAL PRIMARY KEY,
+        user_id BIGINT NOT NULL,
+        kyc_snapshot JSONB NOT NULL,
+        certificates_snapshot JSONB NOT NULL,
+        archived_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_instructor_kyc_history_user_id ON instructor_kyc_history(user_id);
     `);
 
     // 4. Tạo bảng instructor_certificates nếu chưa có
@@ -94,7 +104,6 @@ export async function initDatabaseTables(dataSource: DataSource) {
       CREATE INDEX IF NOT EXISTS idx_bookings_instructor_id ON bookings(instructor_id);
       CREATE INDEX IF NOT EXISTS idx_bookings_booking_date ON bookings(booking_date);
     `);
-
     // Migration: exam_questions.type (question type is an enum on the question itself)
     try {
       await dataSource.query(`
@@ -242,6 +251,26 @@ export async function initDatabaseTables(dataSource: DataSource) {
       logger.log('Migration exam_options: already dropped or skipped.');
     }
 
+    // 6. Tạo bảng meeting_rooms nếu chưa có
+    await dataSource.query(`
+      DO $$ BEGIN
+        CREATE TYPE meeting_room_status_enum AS ENUM ('WAITING', 'ACTIVE', 'ENDED');
+      EXCEPTION WHEN duplicate_object THEN null;
+      END $$;
+
+      CREATE TABLE IF NOT EXISTS meeting_rooms (
+        id BIGSERIAL PRIMARY KEY,
+        booking_id BIGINT NOT NULL UNIQUE REFERENCES bookings(id) ON DELETE CASCADE,
+        room_id VARCHAR(255) NOT NULL UNIQUE,
+        provider VARCHAR(50) NOT NULL DEFAULT 'internal',
+        status meeting_room_status_enum NOT NULL DEFAULT 'WAITING',
+        started_at TIMESTAMPTZ,
+        ended_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_meeting_rooms_booking_id ON meeting_rooms(booking_id);
+    `);
     logger.log('Khởi tạo / kiểm tra các bảng instructor và auth thành công!');
   } catch (error) {
     logger.error(`Lỗi khi khởi tạo bảng database: ${(error as Error).message}`);

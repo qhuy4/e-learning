@@ -35,6 +35,7 @@ import { AchievementsModule } from '@/modules/achievements/achievements.module';
 import { ExamsModule } from '@/modules/exams/exams.module';
 import { ExamsImportModule } from '@/modules/exams/import/exams-import.module';
 import { BookingsModule } from '@/modules/bookings/bookings.module';
+import { MeetingRoomModule } from '@/modules/meeting-room/meeting-room.module';
 
 @Module({
   imports: [
@@ -79,6 +80,7 @@ import { BookingsModule } from '@/modules/bookings/bookings.module';
     DictationsModule,
     ExamsModule,
     ExamsImportModule,
+    MeetingRoomModule,
   ],
   controllers: [AppController],
   providers: [AppService],

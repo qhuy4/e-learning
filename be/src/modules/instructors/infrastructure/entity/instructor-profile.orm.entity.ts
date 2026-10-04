@@ -65,9 +65,9 @@ export class InstructorProfileTypeOrmEntity {
   @Index()
   @Column({
     name: 'approval_status',
-    type: 'enum',
+    type: 'smallint',
     enum: ApprovalStatus,
-    default: ApprovalStatus.APPROVED,
+    default: ApprovalStatus.PENDING,
   })
   approvalStatus: ApprovalStatus;
 

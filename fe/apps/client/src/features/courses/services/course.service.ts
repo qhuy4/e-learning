@@ -1,4 +1,4 @@
-import { api } from "@fe/lib/axios";
+import { api } from "@/shared/lib/axios";
 import type { Course, CourseDetail, GetCoursesParams } from "../types/course.type";
 import type { CatalogCourse } from "../components/Catalog/types";
 

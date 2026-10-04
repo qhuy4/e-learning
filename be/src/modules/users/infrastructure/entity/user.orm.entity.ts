@@ -6,13 +6,13 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   OneToOne,
+  OneToMany,
 } from 'typeorm';
 import { UserRole } from '@/modules/users/domain/enum/user.role';
 import { UserStatus } from '@/modules/users/domain/enum/user.status';
 import { UserProfileOrmEntity } from '@/modules/users/infrastructure/entity/user-profile.orm.entity';
-import {
-  InstructorProfileTypeOrmEntity
-} from '@/modules/instructors/infrastructure/entity/instructor-profile.orm.entity';
+import { InstructorProfileTypeOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-profile.orm.entity';
+import { ReviewOrmEntity } from '@/modules/reviews/infrastructure/entity/review.orm-entity';
 
 @Entity('users')
 export class UserOrmEntity {
@@ -53,5 +53,12 @@ export class UserOrmEntity {
     cascade: true,
   })
   profile: UserProfileOrmEntity | null;
+
+  @OneToOne(
+    () => InstructorProfileTypeOrmEntity,
+    (instructor) => instructor.user,
+  )
   instructorProfile: InstructorProfileTypeOrmEntity | null;
+  @OneToMany(() => ReviewOrmEntity, (review) => review.user)
+  reviews: ReviewOrmEntity[];
 }

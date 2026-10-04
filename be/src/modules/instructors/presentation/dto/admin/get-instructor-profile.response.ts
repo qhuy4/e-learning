@@ -4,6 +4,7 @@ export const ApprovalStatusResponse = {
   PENDING: 'PENDING',
   APPROVED: 'APPROVED',
   SUSPENDED: 'SUSPENDED',
+  REJECTED: 'REJECTED',
 } as const;
 
 export type ApprovalStatusResponse =

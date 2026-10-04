@@ -27,6 +27,24 @@
 
 ## Project setup
 
+### Luồng đăng ký giáo viên
+
+1. Người dùng nhập một địa chỉ email hợp lệ tại trang "Trở thành giảng viên".
+2. Backend tạo liên kết một lần, có hạn 30 phút, rồi gửi qua SMTP. API không trả token hoặc liên kết đăng ký về frontend.
+3. Người dùng mở liên kết trên bất kỳ thiết bị nào truy cập được `FRONTEND_CLIENT_URL`.
+4. Người dùng mới tạo tài khoản giảng viên; học viên hiện có đăng nhập đúng email để nâng cấp tài khoản. Việc sử dụng thành công liên kết xác nhận quyền sở hữu email.
+5. Người dùng đăng nhập và nộp thông tin chuyên môn cùng bằng cấp/chứng chỉ. Hệ thống không yêu cầu CCCD, selfie và không gọi dịch vụ eKYC.
+6. Hồ sơ chuyển sang `PENDING`. Quản trị viên xem hồ sơ và chọn `APPROVED` hoặc `REJECTED`; khi từ chối phải nhập lý do.
+7. Hồ sơ bị từ chối có thể chỉnh sửa và nộp lại. Chỉ hồ sơ `APPROVED` mới được xuất bản khóa học.
+
+### Đăng ký giảng viên trên điện thoại
+
+Trong `be/.env` hiện có, đặt `FRONTEND_CLIENT_URL` thành địa chỉ mà điện thoại truy cập được (ví dụ `http://192.168.1.8:5173` trên cùng Wi-Fi, hoặc domain HTTPS khi triển khai). Backend dùng địa chỉ này để tạo link có `session` trong email. Khi IP máy thay đổi, cập nhật giá trị và khởi động lại backend. `localhost` chỉ mở được trên chính thiết bị nhận email.
+
+Frontend gọi API tại hostname của trang và cổng `3001` theo mặc định; nếu API nằm ở host khác, đặt `VITE_API_URL` trong cấu hình môi trường Vite. Backend và Vite cần lắng nghe trên địa chỉ mạng truy cập được, và firewall phải cho phép các cổng tương ứng.
+
+`be/.env` không được commit. Mỗi thành viên tự cấu hình URL trong file sẵn có; không cần tạo thêm file môi trường trùng nội dung.
+
 ```bash
 $ npm install
 ```

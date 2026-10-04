@@ -1,4 +1,8 @@
-import { Controller, Get, Param, Patch, Query, Body } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Query, Body, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enum/role.enum';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { PaginationDto } from '@/common/pagination/pagination.dto';
 import { GetAdminCoursesQuery } from '@/modules/courses/application/query/get-admin-courses.query';
@@ -7,6 +11,8 @@ import { ReviewCourseCommand } from '@/modules/courses/application/command/revie
 import { UpdateLessonCommand } from '@/modules/lessons/application/command/update-lesson.command';
 
 @Controller('admin/courses')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
 export class AdminCoursesController {
   constructor(
     private readonly commandBus: CommandBus,

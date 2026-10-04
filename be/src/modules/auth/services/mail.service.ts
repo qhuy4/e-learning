@@ -31,7 +31,10 @@ export class MailService {
       'FRONTEND_CLIENT_URL',
       'http://localhost:5173',
     );
-    const registerUrl = `${frontendUrl}/instructor/register?session=${token}`;
+    if (new URL(frontendUrl).hostname === 'localhost') {
+      this.logger.warn('FRONTEND_CLIENT_URL đang dùng localhost; link email không mở được trên thiết bị khác.');
+    }
+    const registerUrl = `${frontendUrl.replace(/\/$/, '')}/instructor/register?session=${token}`;
 
     const htmlContent = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">

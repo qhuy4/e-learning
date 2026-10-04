@@ -6,10 +6,13 @@ import {
   HttpStatus,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from '@/modules/auth/auth.service';
 import { SendInstructorInviteDto } from '@/modules/auth/dto/send-instructor-invite.dto';
 import { RegisterInstructorDto } from '@/modules/auth/dto/register-instructor.dto';
+import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { CurrentUser } from '@/common/decorators/current-user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -38,5 +41,14 @@ export class AuthController {
   @Post('instructor/register')
   async registerInstructor(@Body() dto: RegisterInstructorDto) {
     return this.authService.registerInstructor(dto);
+  }
+
+  @Post('instructor/upgrade')
+  @UseGuards(JwtAuthGuard)
+  async upgradeInstructor(
+    @Body('session') session: string,
+    @CurrentUser('id') userId: number,
+  ) {
+    return this.authService.upgradeInstructor(session, userId);
   }
 }

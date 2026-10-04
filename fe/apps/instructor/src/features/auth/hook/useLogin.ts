@@ -33,8 +33,12 @@ export function useLogin() {
                 JSON.stringify(loginResp.user)
             );
             return loginResp;
-        } catch (error) {
-            setError("Invalid email or password");
+        } catch (error: any) {
+            setError(
+                error.response?.data?.error?.message
+                || error.response?.data?.message
+                || "Email hoặc mật khẩu không chính xác",
+            );
             throw error;
         } finally {
             setLoading(false);

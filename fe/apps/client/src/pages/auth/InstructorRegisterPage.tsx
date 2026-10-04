@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router";
 import { instructorService } from "@/features/instructor/services/instructor.service";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 
 export const InstructorRegisterPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const sessionToken = searchParams.get("session") || "";
   const navigate = useNavigate();
+  const { isAuthenticated, login } = useAuth();
 
   const [verifying, setVerifying] = useState(true);
   const [email, setEmail] = useState("");
+  const [existingAccount, setExistingAccount] = useState(false);
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -27,6 +30,7 @@ export const InstructorRegisterPage: React.FC = () => {
       try {
         const data = await instructorService.verifySession(sessionToken);
         setEmail(data.email);
+        setExistingAccount(Boolean(data.existingAccount));
       } catch (err: any) {
         setErrorMessage(
           err.response?.data?.error?.message ||
@@ -64,12 +68,10 @@ export const InstructorRegisterPage: React.FC = () => {
         password,
       });
 
-      if (res.accessToken) {
-        localStorage.setItem("accessToken", res.accessToken);
-      }
+      if (res.accessToken) login(res.accessToken, res.user);
 
-      // Điều hướng sang trang định danh eKYC & hoàn tất hồ sơ
-      navigate("/instructor/kyc");
+      // Điều hướng sang trang hoàn tất hồ sơ chuyên môn
+      navigate("/instructor/profile");
     } catch (err: any) {
       setErrorMessage(
         err.response?.data?.error?.message ||
@@ -77,6 +79,20 @@ export const InstructorRegisterPage: React.FC = () => {
           err.message ||
           "Đăng ký thất bại. Vui lòng thử lại.",
       );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpgrade = async () => {
+    setLoading(true);
+    setErrorMessage(null);
+    try {
+      const res = await instructorService.upgrade(sessionToken);
+      login(res.accessToken, res.user);
+      navigate('/instructor/profile');
+    } catch (err: any) {
+      setErrorMessage(err.response?.data?.error?.message || 'Không thể nâng cấp tài khoản.');
     } finally {
       setLoading(false);
     }
@@ -115,7 +131,7 @@ export const InstructorRegisterPage: React.FC = () => {
             </div>
           )}
 
-          {!email && !errorMessage ? (
+          {!email ? (
             <div className="text-center py-4">
               <p className="text-red-600 font-medium">Session không hợp lệ.</p>
               <a
@@ -124,6 +140,27 @@ export const InstructorRegisterPage: React.FC = () => {
               >
                 ← Quay lại trang đăng ký
               </a>
+            </div>
+          ) : existingAccount ? (
+            <div className="space-y-4 text-sm text-gray-700">
+              <p>Email <strong>{email}</strong> đã có tài khoản học viên. Đăng nhập bằng tài khoản này để nâng cấp và tiếp tục nộp hồ sơ.</p>
+              {isAuthenticated ? (
+                <div className="space-y-3">
+                  <button type="button" onClick={handleUpgrade} disabled={loading}
+                    className="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg disabled:opacity-50">
+                    {loading ? 'Đang xử lý...' : 'Nâng cấp tài khoản hiện tại'}
+                  </button>
+                  <a className="block text-center text-indigo-600 underline"
+                    href={`/student/login?redirect=${encodeURIComponent(`/instructor/register?session=${sessionToken}`)}`}>
+                    Đăng nhập bằng tài khoản khác
+                  </a>
+                </div>
+              ) : (
+                <a className="block text-center text-indigo-600 underline"
+                  href={`/student/login?redirect=${encodeURIComponent(`/instructor/register?session=${sessionToken}`)}`}>
+                  Đăng nhập tài khoản học viên
+                </a>
+              )}
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">

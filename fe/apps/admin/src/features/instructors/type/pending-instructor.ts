@@ -13,23 +13,6 @@ export interface PendingInstructorProfile {
     socialLinks: Record<string, string> | null;
     approvalStatus: number;
     createdAt: string;
-    kyc: {
-        id: number;
-        kycStatus: number;
-        identityNumber: string;
-        identityFront: string;
-        identityBack: string;
-        selfieWithId: string;
-        ocrVerified: boolean;
-        faceVerified: boolean;
-        ocrData: Record<string, any> | null;
-        faceData: {
-            similarity?: number;
-            isLive?: boolean;
-            isMatch?: boolean;
-        } | null;
-        rejectReason: string | null;
-    } | null;
     certificates: {
         id: number;
         certificateName: string;

@@ -1,16 +1,14 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { logout } from "@/features/auth/store/authSlice";
+import { logout } from "@/shared/lib/axios";
 
 export default function LogoutPage() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(logout());
+    logout();
     navigate("/login", { replace: true });
-  }, [dispatch, navigate]);
+  }, [navigate]);
 
   return null;
 }

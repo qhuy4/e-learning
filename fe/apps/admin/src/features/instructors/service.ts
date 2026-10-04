@@ -1,4 +1,3 @@
-import { api } from "@fe/lib/axios";
 import type {PendingInstructorProfile} from "@/features/instructors/type/pending-instructor.ts";
 import type {PaginationResponse} from "@/shared/types/pagination.ts";
 import type {User} from "@/features/users/types/user.type.ts";
@@ -9,8 +8,8 @@ import type {Instructor} from "@/features/instructors/type/instructor.ts";
 
 export const adminInstructorService = {
   getPendingProfiles: async (status?: number): Promise<PendingInstructorProfile[]> => {
-    const url = status ? `/admin/teachers/pending-profiles?status=${status}` : "/admin/teachers/pending-profiles";
-    const response = await api.get(url);
+    const url = `/teachers/pending-profiles?status=${status ?? "all"}`;
+    const response = await adminApi.get(url);
     const res = response.data?.data ?? response.data;
     if (Array.isArray(res)) return res;
     if (Array.isArray(res?.data)) return res.data;
@@ -18,7 +17,7 @@ export const adminInstructorService = {
   },
 
   reviewProfile: async (profileId: number, status: number, rejectReason?: string) => {
-    const response = await api.patch(`/admin/teachers/${profileId}/review`, {
+    const response = await adminApi.patch(`/teachers/${profileId}/review`, {
       status,
       rejectReason,
     });
@@ -61,3 +60,4 @@ export const adminInstructorService = {
     return response.data.data;
   },
 };
+

@@ -1,299 +1,213 @@
-import { useState } from "react";
-import { Link, Navigate, useNavigate, useParams } from "react-router";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-    ArrowLeft,
-    Calendar,
-    Check,
-    Clock,
-    Loader2,
-    MessageSquare,
-    Video,
-} from "lucide-react";
-import { Button } from "@fe/components/ui/button";
-import { Input } from "@fe/components/ui/input";
-
-import { api } from "@fe/lib/axios";
+import { useEffect, useMemo, useState } from "react";
+import { Navigate, useNavigate, useParams } from "react-router";
+import { useMutation } from "@tanstack/react-query";
+import { api } from "@/shared/lib/axios";
 import { useAuth } from "@/features/auth/hooks/use-auth";
-
-type Mentor = {
-    userId: number;
-    name: string;
-    avatarUrl: string | null;
-    headline: string | null;
-    bio?: string;
-    rating?: number;
-    reviewCount?: number;
-};
-
-const topics = [
-    { id: "speaking", label: "Speaking confidence", icon: MessageSquare },
-    {
-        id: "pronunciation",
-        label: "Pronunciation & accent",
-        icon: MessageSquare,
-    },
-    { id: "workplace", label: "Workplace English", icon: MessageSquare },
-    { id: "exam", label: "Exam preparation", icon: MessageSquare },
-];
+import {
+    BookingBreadcrumbs,
+    BookingHero,
+    BookingLoading,
+    BookingNotFound,
+    BookingSubmitSection,
+    DateSlotPicker,
+    DiagnosticShareCard,
+    FocusSelectionCard,
+    MentorSummaryCard,
+    QuickNotesCard,
+} from "@/features/mentor/components/booking";
+import { FOCUS_OPTIONS } from "@/features/mentor/config/focus";
+import {
+    formatSummaryDate,
+    getUpcomingDays,
+} from "@/features/mentor/utils/days";
+import {
+    useAvailabilityWindow,
+    useDayWindows,
+    useMentorDetail,
+} from "@/features/mentor/hooks/use-mentors";
+import {
+    addMinutesToTime,
+    type DurationMinutes,
+    DURATIONS,
+    formatSlotLabel,
+    generateStartTimes,
+} from "@/features/mentor/config/slots";
 
 export const BookingProfileDetailPage = () => {
     const { mentorId } = useParams<{ mentorId: string }>();
     const { user, isAuthenticated } = useAuth();
     const navigate = useNavigate();
-    const [date, setDate] = useState("");
-    const [time, setTime] = useState("");
-    const [notes, setNotes] = useState("");
-    const [focus, setFocus] = useState<string[]>([]);
+
+    const daysList = useMemo(() => getUpcomingDays(), []);
+    const initialValidDay = daysList[0];
+
+    const [selectedDate, setSelectedDate] = useState(initialValidDay.dateStr);
+    const [selectedTime, setSelectedTime] = useState("");
+    const [duration, setDuration] = useState<DurationMinutes>(DURATIONS[2]);
+    const [timezone, setTimezone] = useState("CET (GMT+1)");
+    const [selectedFocus, setSelectedFocus] = useState<string[]>([
+        FOCUS_OPTIONS[0].id,
+    ]);
     const [shareReport, setShareReport] = useState(true);
+    const [notes, setNotes] = useState("");
+    const [now, setNow] = useState(() => new Date());
+
+    useEffect(() => {
+        const id = window.setInterval(() => setNow(new Date()), 30_000);
+        return () => window.clearInterval(id);
+    }, []);
+
     const id = Number(mentorId);
 
-    const {
-        data: mentor,
-        isLoading,
-        isError,
-    } = useQuery({
-        queryKey: ["mentor", id],
-        queryFn: async () =>
-            (await api.get(`/admin/instructors/${id}`)).data.data as Mentor,
-        enabled: id > 0,
-    });
+    const { data: mentor, isLoading, isError } = useMentorDetail(id);
+
+    const dayDates = useMemo(() => daysList.map((d) => d.dateStr), [daysList]);
+    const { data: dayWindows, isLoading: daysLoading } = useDayWindows(
+        dayDates,
+        mentor?.id,
+    );
+
+    const { data: availability, isLoading: slotsLoading } =
+        useAvailabilityWindow(selectedDate, mentor?.id);
+
+    const startTimes = useMemo(
+        () =>
+            generateStartTimes({
+                windowStart: availability?.start ?? null,
+                windowEnd: availability?.end ?? null,
+                durationMinutes: duration,
+                busy: availability?.busy ?? [],
+                dateStr: selectedDate,
+                now,
+            }),
+        [availability, duration, selectedDate, now],
+    );
+
+    const activeTime = useMemo(() => {
+        if (selectedTime && startTimes.includes(selectedTime)) {
+            return selectedTime;
+        }
+        return startTimes[0] ?? "";
+    }, [selectedTime, startTimes]);
+
+    const focusTitles = useMemo(
+        () =>
+            selectedFocus
+                .map((fid) => FOCUS_OPTIONS.find((o) => o.id === fid)?.title)
+                .filter(Boolean) as string[],
+        [selectedFocus],
+    );
+
+    const selectedTimeLabel = activeTime ? formatSlotLabel(activeTime) : "";
+    const activeDay = daysList.find((d) => d.dateStr === selectedDate);
+    const summaryDate = formatSummaryDate(activeDay, selectedDate);
 
     const booking = useMutation({
-        mutationFn: () =>
-            api.post("/admin/bookings", {
+        mutationFn: () => {
+            const endTime = addMinutesToTime(activeTime, duration);
+
+            return api.post("/admin/bookings", {
                 studentId: user!.id,
-                instructorId: mentor!.userId,
-                bookingDate: date,
-                startTime: time,
-                endTime: `${String(Number(time.slice(0, 2)) + 1).padStart(2, "0")}:00`,
+                instructorId: mentor!.id,
+                bookingDate: selectedDate,
+                startTime: `${activeTime}:00`,
+                endTime: `${endTime}:00`,
                 notes:
                     [
-                        focus.join(", "),
+                        focusTitles.join(", "),
                         notes,
                         shareReport ? "Diagnostic report shared" : "",
+                        `Timezone: ${timezone}`,
                     ]
                         .filter(Boolean)
                         .join(" — ") || undefined,
-            }),
+            });
+        },
         onSuccess: () => navigate("/mentors"),
     });
 
     if (!isAuthenticated) return <Navigate to="/student/login" replace />;
+    if (isLoading) return <BookingLoading />;
+    if (isError || !mentor) return <BookingNotFound />;
 
-    if (isLoading)
-        return (
-            <main className="max-w-7xl mx-auto px-4 py-8">
-                <div className="h-96 rounded-2xl bg-muted animate-pulse" />
-            </main>
-        );
-
-    if (isError || !mentor)
-        return (
-            <main className="max-w-7xl mx-auto px-4 py-16 text-center">
-                <h1 className="text-2xl font-extrabold">Mentor not found</h1>
-                <Link to="/mentors" className="mt-4 inline-block text-primary">
-                    Back to mentors
-                </Link>
-            </main>
-        );
-    const toggle = (topic: string) =>
-        setFocus((current) =>
-            current.includes(topic)
-                ? current.filter((item) => item !== topic)
-                : [...current, topic],
-        );
     return (
-        <main className="max-w-7xl mx-auto px-4 py-6 md:py-10">
-            <div className="flex justify-between gap-4 text-sm text-muted-foreground">
-                <span>
-                    <Link to="/mentors" className="hover:text-primary">
-                        Mentors
-                    </Link>{" "}
-                    / {mentor.name} / Book session
-                </span>
-                <Link
-                    to="/mentors"
-                    className="inline-flex items-center gap-2 rounded-full bg-muted px-4 py-2 font-medium text-foreground"
-                >
-                    <ArrowLeft className="size-4" />
-                    Back to mentor profile
-                </Link>
-            </div>
-            <header className="mt-7">
-                <div className="flex flex-wrap gap-2 text-xs font-semibold">
-                    <span className="rounded-full bg-secondary-container px-3 py-1 text-secondary">
-                        100% free · no card required
-                    </span>
-                    <span className="rounded-full bg-muted px-3 py-1">
-                        <Clock className="mr-1 inline size-4" />
-                        15 minutes
-                    </span>
-                    <span className="rounded-full bg-muted px-3 py-1">
-                        <Video className="mr-1 inline size-4" />
-                        Live 1-on-1 video
-                    </span>
-                </div>
-                <h1 className="mt-4 text-3xl font-extrabold md:text-4xl">
-                    Book a free discovery session
-                </h1>
-                <p className="mt-2 max-w-3xl text-muted-foreground">
-                    Meet 1-on-1 with {mentor.name} to discuss your learning
-                    goals and create your next speaking plan.
-                </p>
-            </header>
-            <div className="mt-8 grid gap-6 lg:grid-cols-12">
-                <div className="space-y-6 lg:col-span-8">
-                    <section className="rounded-2xl border border-border bg-card p-6">
-                        <h2 className="text-xl font-bold">
-                            1. Select date and time
-                        </h2>
-                        <p className="text-sm text-muted-foreground">
-                            Choose a slot that works for you.
-                        </p>
-                        <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                            <label className="text-sm font-medium">
-                                Date
-                                <Input
-                                    className="mt-2"
-                                    type="date"
-                                    min={new Date().toISOString().slice(0, 10)}
-                                    value={date}
-                                    onChange={(e) => setDate(e.target.value)}
-                                />
-                            </label>
-                            <label className="text-sm font-medium">
-                                Start time
-                                <Input
-                                    className="mt-2"
-                                    type="time"
-                                    step="3600"
-                                    value={time}
-                                    onChange={(e) => setTime(e.target.value)}
-                                />
-                            </label>
-                        </div>
-                    </section>
-                    <section className="rounded-2xl border border-border bg-card p-6">
-                        <h2 className="text-xl font-bold">
-                            2. What would you like to focus on?
-                        </h2>
-                        <p className="text-sm text-muted-foreground">
-                            Select topics for {mentor.name} to tailor your
-                            session.
-                        </p>
-                        <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                            {topics.map((topic) => (
-                                <label
-                                    key={topic.id}
-                                    className={`flex cursor-pointer gap-3 rounded-xl border p-4 ${
-                                        focus.includes(topic.id)
-                                            ? "border-primary bg-primary-container"
-                                            : "border-border"
-                                    }`}
-                                >
-                                    <input
-                                        type="checkbox"
-                                        checked={focus.includes(topic.id)}
-                                        onChange={() => toggle(topic.id)}
-                                        className="accent-primary"
-                                    />
-                                    <span className="text-sm font-semibold">
-                                        {topic.id}
-                                    </span>
-                                </label>
-                            ))}
-                        </div>
-                    </section>
-                    <section className="rounded-2xl border border-border bg-card p-6">
-                        <h2 className="text-xl font-bold">
-                            3. Prepare your session
-                        </h2>
-                        <label className="mt-5 flex cursor-pointer gap-3 rounded-xl bg-secondary-container p-4 text-sm font-semibold">
-                            <input
-                                type="checkbox"
-                                checked={shareReport}
-                                onChange={(e) =>
-                                    setShareReport(e.target.checked)
-                                }
-                                className="accent-secondary"
-                            />
-                            Share my AI diagnostic report with {mentor.name}
-                        </label>
-                        <label className="mt-4 block text-sm font-medium">
-                            Quick notes (optional)
-                            <textarea
-                                className="mt-2 min-h-24 w-full rounded-xl border border-input bg-background p-3 text-sm"
-                                value={notes}
-                                onChange={(e) => setNotes(e.target.value)}
-                                placeholder="Tell your mentor what you would like help with..."
-                            />
-                        </label>
-                    </section>
-                </div>
-                <aside className="lg:col-span-4">
-                    <div className="sticky top-24 rounded-2xl border border-border bg-card p-6">
-                        <div className="flex gap-4">
-                            {mentor.avatarUrl ? (
-                                <img
-                                    src={mentor.avatarUrl}
-                                    alt={mentor.name}
-                                    className="size-20 rounded-2xl object-cover"
-                                />
-                            ) : (
-                                <div className="flex size-20 items-center justify-center rounded-2xl bg-primary-container text-2xl font-bold text-primary">
-                                    {mentor.name[0]}
-                                </div>
-                            )}
-                            <div>
-                                <p className="text-sm text-muted-foreground">
-                                    Your mentor
-                                </p>
-                                <h2 className="text-lg font-bold">
-                                    {mentor.name}
-                                </h2>
-                                <p className="text-sm text-muted-foreground">
-                                    {mentor.headline ||
-                                        "PiEMind language mentor"}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="mt-6 space-y-3 rounded-xl bg-muted p-4 text-sm">
-                            <b>Session details</b>
-                            <p>
-                                <Calendar className="mr-2 inline size-4 text-primary" />
-                                {date || "Choose a date"}
-                            </p>
-                            <p>
-                                <Clock className="mr-2 inline size-4 text-primary" />
-                                {time || "Choose a time"} · 15 minutes
-                            </p>
-                            <p>
-                                <Video className="mr-2 inline size-4 text-primary" />
-                                PiEMind video room
-                            </p>
-                        </div>
-                        {booking.isError && (
-                            <p className="mt-4 text-sm text-destructive">
-                                We couldn't book that time. Try another slot.
-                            </p>
-                        )}
-                        <Button
-                            disabled={!date || !time || booking.isPending}
-                            onClick={() => booking.mutate()}
-                            className="mt-6 w-full cursor-pointer bg-primary hover:bg-primary/90 disabled:cursor-not-allowed"
-                        >
-                            {booking.isPending ? (
-                                <Loader2 className="size-4 animate-spin" />
-                            ) : (
-                                <Check className="size-4" />
-                            )}
-                            {booking.isPending
-                                ? "Booking..."
-                                : "Confirm free session"}
-                        </Button>
+        <main className="w-full bg-background text-foreground min-h-screen pb-20 pt-8">
+            <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6">
+                <div className="absolute -top-16 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none -z-10" />
+                <div className="absolute top-80 left-12 w-80 h-80 bg-secondary/20 rounded-full blur-3xl pointer-events-none -z-10" />
+
+                <BookingBreadcrumbs mentorName={mentor.name} />
+                <BookingHero mentorName={mentor.name} />
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <div className="lg:col-span-8 flex flex-col gap-6">
+                        <DateSlotPicker
+                            daysList={daysList}
+                            activeDay={activeDay}
+                            selectedDate={selectedDate}
+                            onSelectDate={(date) => {
+                                setSelectedDate(date);
+                                setSelectedTime("");
+                            }}
+                            timezone={timezone}
+                            onToggleTimezone={() =>
+                                setTimezone(
+                                    timezone === "CET (GMT+1)"
+                                        ? "ICT (GMT+7)"
+                                        : "CET (GMT+1)",
+                                )
+                            }
+                            slotsLoading={slotsLoading}
+                            window={availability}
+                            dayWindows={dayWindows}
+                            daysLoading={daysLoading}
+                            duration={duration}
+                            onDurationChange={(d) => {
+                                setDuration(d);
+                                setSelectedTime("");
+                            }}
+                            startTimes={startTimes}
+                            activeTime={activeTime}
+                            onSelectTime={setSelectedTime}
+                        />
+
+                        <FocusSelectionCard
+                            mentorName={mentor.name}
+                            selectedFocus={selectedFocus}
+                            onFocusChange={setSelectedFocus}
+                        />
+
+                        <DiagnosticShareCard
+                            mentorName={mentor.name}
+                            studentName={user?.name || ""}
+                            shareReport={shareReport}
+                            onShareReportChange={setShareReport}
+                        />
+
+                        <QuickNotesCard
+                            mentorName={mentor.name}
+                            notes={notes}
+                            onNotesChange={setNotes}
+                        />
+
+                        <BookingSubmitSection
+                            isError={booking.isError}
+                            isPending={booking.isPending}
+                            disabled={!activeTime || booking.isPending}
+                            userEmail={user?.email}
+                            onConfirm={() => booking.mutate()}
+                        />
                     </div>
-                </aside>
+
+                    <aside className="lg:col-span-4 flex flex-col gap-4 sticky top-6">
+                        <MentorSummaryCard
+                            mentor={mentor}
+                            summaryDate={summaryDate}
+                            selectedTimeLabel={selectedTimeLabel}
+                            durationMinutes={duration}
+                        />
+                    </aside>
+                </div>
             </div>
         </main>
     );
