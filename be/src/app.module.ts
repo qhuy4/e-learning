@@ -33,6 +33,7 @@ import { WishlistsModule } from '@/modules/wishlists/wishlists.module';
 import { AdminDashboardModule } from '@/modules/analytics/admin-dashboard.module';
 import { AchievementsModule } from '@/modules/achievements/achievements.module';
 import { ExamsModule } from '@/modules/exams/exams.module';
+import { ExamsImportModule } from '@/modules/exams/import/exams-import.module';
 import { BookingsModule } from '@/modules/bookings/bookings.module';
 
 @Module({
@@ -77,6 +78,7 @@ import { BookingsModule } from '@/modules/bookings/bookings.module';
     QuizzesModule,
     DictationsModule,
     ExamsModule,
+    ExamsImportModule,
   ],
   controllers: [AppController],
   providers: [AppService],

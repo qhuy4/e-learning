@@ -23,8 +23,8 @@ export class ExamOrmEntity {
   @Column({ name: 'is_premium', type: 'boolean', default: false })
   isPremium: boolean;
 
-  @Column({ name: 'duration_seconds', type: 'integer' })
-  durationSeconds: number;
+  @Column({ name: 'duration_seconds', type: 'integer', nullable: true })
+  durationSeconds: number | null;
 
   @Column({ type: 'enum', enum: ExamStatus, default: ExamStatus.DRAFT })
   status: ExamStatus;
@@ -40,4 +40,8 @@ export class ExamOrmEntity {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  /** Soft delete — null = còn hiệu lực; có giá trị = đã xóa (chỉ ẩn, không xóa dữ liệu). */
+  @Column({ name: 'deleted_at', type: 'timestamp', nullable: true })
+  deletedAt: Date | null;
 }

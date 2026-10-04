@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { ExamSectionOrmEntity } from './exam-section.orm-entity';
-import { ExamMaterialOrmEntity } from './exam-material.orm-entity';
-import { ExamQuestionTypeOrmEntity } from './exam-question-type.orm-entity';
+import { ExamQuestionGroupOrmEntity } from './exam-question-group.orm-entity';
+import { QuestionType } from '../../domain/enums/question-type.enum';
 
 @Entity({ name: 'exam_questions', schema: 'public' })
 export class ExamQuestionOrmEntity {
@@ -15,19 +15,15 @@ export class ExamQuestionOrmEntity {
   @JoinColumn({ name: 'section_id' })
   section: ExamSectionOrmEntity;
 
-  @Column({ name: 'material_id', type: 'bigint', nullable: true })
-  materialId: string | null;
+  @Column({ name: 'group_id', type: 'bigint', nullable: true })
+  groupId: string | null;
 
-  @ManyToOne(() => ExamMaterialOrmEntity)
-  @JoinColumn({ name: 'material_id' })
-  material: ExamMaterialOrmEntity | null;
+  @ManyToOne(() => ExamQuestionGroupOrmEntity)
+  @JoinColumn({ name: 'group_id' })
+  group: ExamQuestionGroupOrmEntity | null;
 
-  @Column({ name: 'question_type_id', type: 'bigint' })
-  questionTypeId: string;
-
-  @ManyToOne(() => ExamQuestionTypeOrmEntity)
-  @JoinColumn({ name: 'question_type_id' })
-  questionType: ExamQuestionTypeOrmEntity;
+  @Column({ type: 'varchar', length: 50 })
+  type: QuestionType;
 
   @Column({ type: 'text' })
   question: string;

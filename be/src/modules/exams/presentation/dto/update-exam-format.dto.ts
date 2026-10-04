@@ -8,10 +8,6 @@ import {
 export class UpdateExamFormatDto {
   @IsOptional()
   @IsString()
-  code?: string;
-
-  @IsOptional()
-  @IsString()
   name?: string;
 
   @IsOptional()

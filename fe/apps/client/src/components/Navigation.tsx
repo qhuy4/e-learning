@@ -9,13 +9,16 @@ export function Navigation() {
   return (
     <>
       <NavLink to="/courses" className={getLinkClass}>
-        Courses
+        Khóa học
+      </NavLink>
+      <NavLink to="/exams" className={getLinkClass}>
+        Đề thi
       </NavLink>
       <NavLink to="/mentors" className={getLinkClass}>
-        Mentors
+        Gia sư
       </NavLink>
       <NavLink to="/" end className={getLinkClass}>
-        How It Works
+        Cách hoạt động
       </NavLink>
     </>
   );

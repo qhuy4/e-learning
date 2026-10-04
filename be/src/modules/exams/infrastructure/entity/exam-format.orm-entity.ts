@@ -13,9 +13,6 @@ export class ExamFormatOrmEntity {
   @JoinColumn({ name: 'exam_type_id' })
   examType: ExamTypeOrmEntity;
 
-  @Column({ type: 'varchar', length: 100, unique: true })
-  code: string;
-
   @Column({ type: 'varchar', length: 255 })
   name: string;
 
@@ -25,8 +22,8 @@ export class ExamFormatOrmEntity {
   @Column({ type: 'text', nullable: true })
   description: string | null;
 
-  @Column({ name: 'duration_seconds', type: 'integer' })
-  durationSeconds: number;
+  @Column({ name: 'duration_seconds', type: 'integer', nullable: true })
+  durationSeconds: number | null;
 
   @Column({ name: 'is_active', type: 'boolean', default: true })
   isActive: boolean;
@@ -42,4 +39,8 @@ export class ExamFormatOrmEntity {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  /** Soft delete — null = còn hiệu lực; có giá trị = đã xóa (exam thuộc format này bị ẩn theo). */
+  @Column({ name: 'deleted_at', type: 'timestamp', nullable: true })
+  deletedAt: Date | null;
 }

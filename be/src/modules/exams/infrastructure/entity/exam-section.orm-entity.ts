@@ -21,11 +21,11 @@ export class ExamSectionOrmEntity {
   @JoinColumn({ name: 'format_section_id' })
   formatSection: ExamFormatSectionOrmEntity;
 
-  @Column({ type: 'varchar', length: 50 })
-  code: string;
-
   @Column({ type: 'varchar', length: 255 })
   name: string;
+
+  @Column({ type: 'text', nullable: true })
+  description: string | null;
 
   @Column({ type: 'text', nullable: true })
   instructions: string | null;
@@ -33,8 +33,19 @@ export class ExamSectionOrmEntity {
   @Column({ type: 'integer' })
   position: number;
 
-  @Column({ name: 'duration_seconds', type: 'integer' })
-  durationSeconds: number;
+  @Column({ name: 'duration_seconds', type: 'integer', nullable: true })
+  durationSeconds: number | null;
+
+  @Column({ name: 'question_count', type: 'integer', default: 0 })
+  questionCount: number;
+
+  /**
+   * Kỹ năng của phần thi (kế thừa từ exam_format_sections.section_type khi
+   * gen đề) — LISTENING / READING / WRITING / SPEAKING. FE đọc cột này thay
+   * vì đoán qua tên section.
+   */
+  @Column({ name: 'section_type', type: 'varchar', length: 20, nullable: true })
+  sectionType: string | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

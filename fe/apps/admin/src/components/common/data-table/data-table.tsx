@@ -102,6 +102,10 @@ export function DataTable<TData extends RowData>({
         features,
         data,
         columns,
+        // Trang hiển thị do CHA slice (server trả đúng trang hiện tại, hoặc các
+        // trang client tự cắt) — table không tự cắt theo pageIndex nữa, nếu
+        // không danh sách >10 dòng sẽ "đóng băng" ở 10 dòng đầu dù bấm trang.
+        manualPagination: true,
         meta: {
             sortBy,
             sortOrder,

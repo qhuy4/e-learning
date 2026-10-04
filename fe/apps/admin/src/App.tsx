@@ -26,9 +26,10 @@ function App() {
         }
       >
         <AppSidebar variant="inset" />
-        <SidebarInset>
+        <SidebarInset className="min-w-0">
           <SiteHeader />
-          <main>
+          {/* min-w-0: không cho flex nở theo nội dung; overflow-x-auto: trang rộng tự cuộn trong khung, không phá shell */}
+          <main className="min-w-0 overflow-x-auto">
             <Outlet />
           </main>
         </SidebarInset>

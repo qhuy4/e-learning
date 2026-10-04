@@ -15,6 +15,7 @@ export class ExamMapper {
       publishedAt: entity.publishedAt,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
+      deletedAt: entity.deletedAt,
     });
   }
 }

@@ -34,4 +34,8 @@ export class ExamAnswerRepository implements IExamAnswerRepository {
     );
     await this.repository.save(entities);
   }
+
+  async deleteByAttemptId(attemptId: number): Promise<void> {
+    await this.repository.delete({ attemptId: attemptId.toString() });
+  }
 }

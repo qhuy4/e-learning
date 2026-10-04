@@ -5,11 +5,13 @@ import {
   Put,
   Delete,
   Param,
+  Query,
   Body,
   ParseIntPipe,
   UseGuards,
   Inject,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
@@ -33,27 +35,20 @@ import {
   EXAM_SECTION_REPOSITORY,
 } from '../../domain/repository/exam-section.repository';
 import {
-  IExamMaterialRepository,
-  EXAM_MATERIAL_REPOSITORY,
-} from '../../domain/repository/exam-material.repository';
+  IExamQuestionGroupRepository,
+  EXAM_QUESTION_GROUP_REPOSITORY,
+} from '../../domain/repository/exam-question-group.repository';
 import {
   IExamQuestionRepository,
   EXAM_QUESTION_REPOSITORY,
 } from '../../domain/repository/exam-question.repository';
-import {
-  IExamOptionRepository,
-  EXAM_OPTION_REPOSITORY,
-} from '../../domain/repository/exam-option.repository';
 import { Exam } from '../../domain/entity/exam.entity';
 import { ExamStatus } from '../../domain/enums/exam-status.enum';
 import { ExamSection } from '../../domain/entity/exam-section.entity';
-import { ExamMaterial } from '../../domain/entity/exam-material.entity';
-import { ExamQuestion } from '../../domain/entity/exam-question.entity';
-import { ExamOption } from '../../domain/entity/exam-option.entity';
 import { CreateExamDto } from '../dto/create-exam.dto';
 import { UpdateExamDto } from '../dto/update-exam.dto';
-import { CreateExamMaterialDto } from '../dto/create-exam-material.dto';
-import { CreateExamQuestionDto } from '../dto/create-exam-question.dto';
+import { GetExamDetailQuery } from '../../application/query/get-exam-detail.query';
+import { QueryBus } from '@nestjs/cqrs';
 
 @Controller('admin/exams')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -68,12 +63,11 @@ export class AdminExamController {
     private readonly examFormatSectionRepo: IExamFormatSectionRepository,
     @Inject(EXAM_SECTION_REPOSITORY)
     private readonly examSectionRepo: IExamSectionRepository,
-    @Inject(EXAM_MATERIAL_REPOSITORY)
-    private readonly examMaterialRepo: IExamMaterialRepository,
+    @Inject(EXAM_QUESTION_GROUP_REPOSITORY)
+    private readonly groupRepo: IExamQuestionGroupRepository,
     @Inject(EXAM_QUESTION_REPOSITORY)
-    private readonly examQuestionRepo: IExamQuestionRepository,
-    @Inject(EXAM_OPTION_REPOSITORY)
-    private readonly examOptionRepo: IExamOptionRepository,
+    private readonly questionRepo: IExamQuestionRepository,
+    private readonly queryBus: QueryBus,
   ) {}
 
   @Post()
@@ -105,11 +99,13 @@ export class AdminExamController {
         ExamSection.create({
           examId: savedExam.id!,
           formatSectionId: fs.id!,
-          code: fs.code,
           name: fs.name,
           instructions: fs.instructions,
           position: fs.position,
           durationSeconds: fs.durationSeconds,
+          questionCount: fs.questionCount,
+          // Kỹ năng lấy từ format — gen đề KHÔNG đoán qua tên section.
+          sectionType: fs.sectionType,
         }),
       );
       await this.examSectionRepo.saveAll(sections);
@@ -125,6 +121,15 @@ export class AdminExamController {
     return this.examRepo.findAll();
   }
 
+  /**
+   * Danh sách đề đã xóa mềm — trang "Đã xóa" của admin.
+   * (KHÔNG được đặt sau @Get(':id') — nếu không route ":id" sẽ bắt trước.)
+   */
+  @Get('deleted')
+  async findDeleted() {
+    return this.examRepo.findDeleted();
+  }
+
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const exam = await this.examRepo.findById(id);
@@ -133,6 +138,11 @@ export class AdminExamController {
     }
     const sections = await this.examSectionRepo.findByExamId(id);
     return { ...exam, sections };
+  }
+
+  @Get(':id/detail')
+  async findDetail(@Param('id', ParseIntPipe) id: number) {
+    return this.queryBus.execute(new GetExamDetailQuery(id));
   }
 
   @Put(':id')
@@ -157,12 +167,64 @@ export class AdminExamController {
     return this.examRepo.update(entity);
   }
 
+  /**
+   * Xóa đề thi — mặc định XÓA MỀM: chỉ set `exams.deleted_at`, toàn bộ dữ liệu
+   * liên quan (sections/questions/options/media, exam_attempts, exam_answers)
+   * giữ nguyên 100%. `?force=1` → xóa cứng, CHỈ dùng cho dọn dữ liệu test.
+   */
   @Delete(':id')
   async remove(
     @Param('id', ParseIntPipe) id: number,
+    @Query('force') force?: string,
+  ) {
+    if (force === '1' || force === 'true') {
+      return this.examRepo.delete(id);
+    }
+    const existing = await this.examRepo.findById(id);
+    if (!existing) {
+      throw new NotFoundException('Exam not found');
+    }
+    await this.examRepo.softDelete(id);
+  }
+
+  /**
+   * Khôi phục đề đã xóa mềm (đưa `deleted_at` về null). Danh sách active chỉ
+   * hiển thị lại khi loại đề (exam_types) cũng đang active.
+   */
+  @Post(':id/restore')
+  async restore(@Param('id', ParseIntPipe) id: number) {
+    const existing = await this.examRepo.findById(id);
+    if (!existing) {
+      throw new NotFoundException('Exam not found');
+    }
+    await this.examRepo.restore(id);
+    return this.examRepo.findById(id);
+  }
+
+  /**
+   * Sao chép toàn bộ đề thi (sections/groups/materials/questions/options)
+   * thành 1 đề mới DRAFT — copy chạy trong 1 transaction.
+   */
+  @Post(':id/duplicate')
+  async duplicate(
+    @Param('id', ParseIntPipe) id: number,
     @CurrentUser('id') userId: number,
   ) {
-    return this.examRepo.delete(id);
+    const existing = await this.examRepo.findById(id);
+    if (!existing) {
+      throw new NotFoundException('Exam not found');
+    }
+
+    const copy = await this.examRepo.duplicate(id, {
+      title: `${existing.title} (Bản sao)`,
+      createdBy: userId,
+    });
+    if (!copy || copy.id === null) {
+      throw new NotFoundException('Exam not found');
+    }
+
+    const sections = await this.examSectionRepo.findByExamId(copy.id);
+    return { ...copy, sections };
   }
 
   @Put(':id/publish')
@@ -174,6 +236,17 @@ export class AdminExamController {
     if (!existing) {
       throw new NotFoundException('Exam not found');
     }
+
+    const sections = await this.examSectionRepo.findByExamId(id);
+    for (const section of sections) {
+      const questionCount = await this.questionRepo.countBySectionId(section.id!);
+      if (questionCount !== section.questionCount) {
+        throw new BadRequestException(
+          `Section "${section.name}" có ${questionCount} câu hỏi, cần ${section.questionCount} câu hỏi theo cấu trúc. Vui lòng kiểm tra lại.`,
+        );
+      }
+    }
+
     existing.update({ status: ExamStatus.PUBLISHED });
     return this.examRepo.update(existing);
   }
@@ -191,74 +264,8 @@ export class AdminExamController {
     return this.examRepo.update(existing);
   }
 
-  @Post(':examId/materials')
-  async createMaterial(
-    @Param('examId', ParseIntPipe) examId: number,
-    @Body() dto: CreateExamMaterialDto,
-    @CurrentUser('id') userId: number,
-  ) {
-    const material = ExamMaterial.create({
-      sectionId: examId,
-      type: dto.type,
-      title: dto.title,
-      content: dto.content,
-      fileUrl: dto.fileUrl,
-      transcript: dto.transcript,
-      position: dto.position,
-    });
-    return this.examMaterialRepo.save(material);
-  }
-
   @Get(':examId/sections')
   async getSections(@Param('examId', ParseIntPipe) examId: number) {
     return this.examSectionRepo.findByExamId(examId);
-  }
-
-  @Post(':examId/sections/:sectionId/questions')
-  async createQuestion(
-    @Param('examId', ParseIntPipe) examId: number,
-    @Param('sectionId', ParseIntPipe) sectionId: number,
-    @Body() dto: CreateExamQuestionDto,
-    @CurrentUser('id') userId: number,
-  ) {
-    const question = ExamQuestion.create({
-      sectionId,
-      materialId: dto.materialId,
-      questionTypeId: dto.questionTypeId,
-      question: dto.question,
-      explanation: dto.explanation,
-      points: dto.points,
-      position: dto.position,
-    });
-
-    const savedQuestion = await this.examQuestionRepo.save(question);
-
-    if (dto.options && dto.options.length > 0) {
-      const options = dto.options.map((o) =>
-        ExamOption.create({
-          questionId: savedQuestion.id!,
-          content: o.content,
-          isCorrect: o.isCorrect,
-          position: o.position,
-        }),
-      );
-      await this.examOptionRepo.saveAll(options);
-    }
-
-    return savedQuestion;
-  }
-
-  @Get(':examId/sections/:sectionId/materials')
-  async getMaterials(
-    @Param('sectionId', ParseIntPipe) sectionId: number,
-  ) {
-    return this.examMaterialRepo.findBySectionId(sectionId);
-  }
-
-  @Get(':examId/sections/:sectionId/questions')
-  async getQuestions(
-    @Param('sectionId', ParseIntPipe) sectionId: number,
-  ) {
-    return this.examQuestionRepo.findBySectionId(sectionId);
   }
 }

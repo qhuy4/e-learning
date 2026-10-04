@@ -5,9 +5,6 @@ export class ExamTypeOrmEntity {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: string;
 
-  @Column({ type: 'varchar', length: 50, unique: true })
-  code: string;
-
   @Column({ type: 'varchar', length: 100 })
   name: string;
 
@@ -19,4 +16,8 @@ export class ExamTypeOrmEntity {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  /** Soft delete — null = còn hiệu lực; có giá trị = đã xóa (đề thuộc loại này bị ẩn theo). */
+  @Column({ name: 'deleted_at', type: 'timestamp', nullable: true })
+  deletedAt: Date | null;
 }

@@ -2,25 +2,25 @@ export class ExamFormat {
   private constructor(
     public id: number | null,
     public examTypeId: number,
-    public code: string,
     public name: string,
     public version: number,
     public description: string | null,
-    public durationSeconds: number,
+    public durationSeconds: number | null,
     public isActive: boolean,
     public effectiveFrom: Date | null,
     public effectiveTo: Date | null,
     public createdAt: Date | null,
     public updatedAt: Date | null,
+    /** Soft delete — null = còn hiệu lực; có giá trị = đã xóa mềm. */
+    public deletedAt: Date | null,
   ) {}
 
   static create(params: {
     examTypeId: number;
-    code: string;
     name: string;
     version?: number;
     description?: string | null;
-    durationSeconds: number;
+    durationSeconds?: number | null;
     isActive?: boolean;
     effectiveFrom?: Date | null;
     effectiveTo?: Date | null;
@@ -28,14 +28,14 @@ export class ExamFormat {
     return new ExamFormat(
       null,
       params.examTypeId,
-      params.code,
       params.name,
       params.version ?? 1,
       params.description ?? null,
-      params.durationSeconds,
+      params.durationSeconds ?? null,
       params.isActive ?? true,
       params.effectiveFrom ?? null,
       params.effectiveTo ?? null,
+      null,
       null,
       null,
     );
@@ -44,21 +44,20 @@ export class ExamFormat {
   static restore(params: {
     id: number;
     examTypeId: number;
-    code: string;
     name: string;
     version: number;
     description: string | null;
-    durationSeconds: number;
+    durationSeconds: number | null;
     isActive: boolean;
     effectiveFrom: Date | null;
     effectiveTo: Date | null;
     createdAt: Date | null;
     updatedAt: Date | null;
+    deletedAt?: Date | null;
   }): ExamFormat {
     return new ExamFormat(
       params.id,
       params.examTypeId,
-      params.code,
       params.name,
       params.version,
       params.description,
@@ -68,11 +67,11 @@ export class ExamFormat {
       params.effectiveTo,
       params.createdAt,
       params.updatedAt,
+      params.deletedAt ?? null,
     );
   }
 
-  update(params: Partial<Pick<ExamFormat, 'code' | 'name' | 'version' | 'description' | 'durationSeconds' | 'isActive' | 'effectiveFrom' | 'effectiveTo'>>) {
-    if (params.code !== undefined) this.code = params.code;
+  update(params: Partial<Pick<ExamFormat, 'name' | 'version' | 'description' | 'durationSeconds' | 'isActive' | 'effectiveFrom' | 'effectiveTo'>>) {
     if (params.name !== undefined) this.name = params.name;
     if (params.version !== undefined) this.version = params.version;
     if (params.description !== undefined) this.description = params.description;

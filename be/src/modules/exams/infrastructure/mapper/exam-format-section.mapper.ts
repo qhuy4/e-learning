@@ -6,13 +6,13 @@ export class ExamFormatSectionMapper {
     return ExamFormatSection.restore({
       id: Number(entity.id),
       examFormatId: Number(entity.examFormatId),
-      code: entity.code,
       name: entity.name,
       description: entity.description,
       instructions: entity.instructions,
       position: entity.position,
       durationSeconds: entity.durationSeconds,
       questionCount: entity.questionCount,
+      sectionType: entity.sectionType ?? null,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     });

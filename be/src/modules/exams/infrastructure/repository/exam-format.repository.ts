@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { ExamFormatOrmEntity } from '../entity/exam-format.orm-entity';
 import { ExamFormat } from '../../domain/entity/exam-format.entity';
 import { IExamFormatRepository } from '../../domain/repository/exam-format.repository';
@@ -18,25 +18,27 @@ export class ExamFormatRepository implements IExamFormatRepository {
     return entity ? ExamFormatMapper.toDomain(entity) : null;
   }
 
-  async findByCode(code: string): Promise<ExamFormat | null> {
-    const entity = await this.repository.findOne({ where: { code } });
-    return entity ? ExamFormatMapper.toDomain(entity) : null;
-  }
-
   async findByExamTypeId(examTypeId: number): Promise<ExamFormat[]> {
     const entities = await this.repository.find({ where: { examTypeId: examTypeId.toString() } });
     return entities.map(ExamFormatMapper.toDomain);
   }
 
   async findAll(): Promise<ExamFormat[]> {
-    const entities = await this.repository.find();
+    const entities = await this.repository.find({ where: { deletedAt: IsNull() } });
+    return entities.map(ExamFormatMapper.toDomain);
+  }
+
+  async findDeleted(): Promise<ExamFormat[]> {
+    const entities = await this.repository.find({
+      where: { deletedAt: Not(IsNull()) },
+      order: { deletedAt: 'DESC' },
+    });
     return entities.map(ExamFormatMapper.toDomain);
   }
 
   async create(examFormat: ExamFormat): Promise<ExamFormat> {
     const entity = this.repository.create({
       examTypeId: examFormat.examTypeId.toString(),
-      code: examFormat.code,
       name: examFormat.name,
       version: examFormat.version.toString(),
       description: examFormat.description,
@@ -53,7 +55,6 @@ export class ExamFormatRepository implements IExamFormatRepository {
     const entity = await this.repository.preload({
       id: examFormat.id!.toString(),
       examTypeId: examFormat.examTypeId.toString(),
-      code: examFormat.code,
       name: examFormat.name,
       version: examFormat.version.toString(),
       description: examFormat.description,
@@ -69,5 +70,13 @@ export class ExamFormatRepository implements IExamFormatRepository {
 
   async delete(id: number): Promise<void> {
     await this.repository.delete(id);
+  }
+
+  async softDelete(id: number): Promise<void> {
+    await this.repository.update(id, { deletedAt: new Date() });
+  }
+
+  async restore(id: number): Promise<void> {
+    await this.repository.update(id, { deletedAt: null });
   }
 }

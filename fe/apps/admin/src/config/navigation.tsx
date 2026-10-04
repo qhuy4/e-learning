@@ -23,6 +23,9 @@ import {
     CreditCard,
     HandCoins,
     Calendar,
+    FileText,
+    ClipboardCheck,
+    LayoutList,
 } from "lucide-react"
 import type { NavGroup, NavItem } from "@/shared/types/navigation"
 
@@ -64,6 +67,26 @@ export const navigation: Navigation = {
                     title: "Học viên",
                     url: "/students",
                     icon: UserRound,
+                },
+            ],
+        },
+        {
+            label: "Đề thi",
+            items: [
+                {
+                    title: "Đề thi",
+                    url: "/exams",
+                    icon: ClipboardCheck,
+                },
+                {
+                    title: "Loại đề thi",
+                    url: "/exam-types",
+                    icon: FileText,
+                },
+                {
+                    title: "Định dạng đề thi",
+                    url: "/exam-formats",
+                    icon: LayoutList,
                 },
             ],
         },

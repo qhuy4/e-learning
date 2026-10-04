@@ -5,6 +5,7 @@ import {
   Put,
   Delete,
   Param,
+  Query,
   Body,
   ParseIntPipe,
   UseGuards,
@@ -36,7 +37,6 @@ export class AdminExamTypeController {
   @Post()
   async create(@Body() dto: CreateExamTypeDto) {
     const entity = ExamType.create({
-      code: dto.code,
       name: dto.name,
       description: dto.description,
     });
@@ -46,6 +46,12 @@ export class AdminExamTypeController {
   @Get()
   async findAll() {
     return this.examTypeRepo.findAll();
+  }
+
+  /** Danh sách loại đề đã xóa mềm — trang "Đã xóa" (đặt trước @Get(':id')). */
+  @Get('deleted')
+  async findDeleted() {
+    return this.examTypeRepo.findDeleted();
   }
 
   @Get(':id')
@@ -67,7 +73,6 @@ export class AdminExamTypeController {
       throw new NotFoundException('ExamType not found');
     }
     const entity = ExamType.create({
-      code: dto.code ?? existing.code,
       name: dto.name ?? existing.name,
       description: dto.description ?? existing.description,
     });
@@ -75,8 +80,37 @@ export class AdminExamTypeController {
     return this.examTypeRepo.update(entity);
   }
 
+  /**
+   * Xóa loại đề — mặc định XÓA MỀM: chỉ set `exam_types.deleted_at`, dữ liệu
+   * đề thi liên quan giữ nguyên; các đề thuộc loại này bị ẩn khỏi danh sách
+   * active cho tới khi khôi phục. `?force=1` → xóa cứng (dọn dữ liệu test).
+   */
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    return this.examTypeRepo.delete(id);
+  async remove(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('force') force?: string,
+  ) {
+    if (force === '1' || force === 'true') {
+      return this.examTypeRepo.delete(id);
+    }
+    const existing = await this.examTypeRepo.findById(id);
+    if (!existing) {
+      throw new NotFoundException('ExamType not found');
+    }
+    await this.examTypeRepo.softDelete(id);
+  }
+
+  /**
+   * Khôi phục loại đề đã xóa mềm — các đề THUỘC LOẠI NÀY chưa bị xóa riêng
+   * sẽ hiển thị lại trong danh sách active ngay lập tức.
+   */
+  @Post(':id/restore')
+  async restore(@Param('id', ParseIntPipe) id: number) {
+    const existing = await this.examTypeRepo.findById(id);
+    if (!existing) {
+      throw new NotFoundException('ExamType not found');
+    }
+    await this.examTypeRepo.restore(id);
+    return this.examTypeRepo.findById(id);
   }
 }

@@ -4,14 +4,16 @@ import {
   IsNumber,
   IsBoolean,
   IsArray,
+  IsIn,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class CreateExamFormatSectionDto {
-  @IsString()
-  code: string;
+/** Kỹ năng của phần thi — dùng thay cho so khớp tên khi gen/đổ dữ liệu. */
+export const SECTION_TYPES = ['LISTENING', 'READING', 'WRITING', 'SPEAKING'] as const;
+export type SectionType = (typeof SECTION_TYPES)[number];
 
+export class CreateExamFormatSectionDto {
   @IsString()
   name: string;
 
@@ -33,14 +35,16 @@ export class CreateExamFormatSectionDto {
   @IsOptional()
   @IsNumber()
   questionCount?: number;
+
+  /** LISTENING / READING / WRITING / SPEAKING — null/ bỏ trống = chưa gán. */
+  @IsOptional()
+  @IsIn(SECTION_TYPES)
+  sectionType?: SectionType | null;
 }
 
 export class CreateExamFormatDto {
   @IsNumber()
   examTypeId: number;
-
-  @IsString()
-  code: string;
 
   @IsString()
   name: string;

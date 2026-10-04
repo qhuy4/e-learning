@@ -7,12 +7,14 @@ export class Exam {
     public title: string,
     public description: string | null,
     public isPremium: boolean,
-    public durationSeconds: number,
+    public durationSeconds: number | null,
     public status: ExamStatus,
     public createdBy: number | null,
     public publishedAt: Date | null,
     public createdAt: Date | null,
     public updatedAt: Date | null,
+    /** Soft delete — null = còn hiệu lực; có giá trị = đã xóa mềm. */
+    public deletedAt: Date | null,
   ) {}
 
   static create(params: {
@@ -20,7 +22,7 @@ export class Exam {
     title: string;
     description?: string | null;
     isPremium?: boolean;
-    durationSeconds: number;
+    durationSeconds?: number | null;
     createdBy?: number | null;
   }): Exam {
     return new Exam(
@@ -29,9 +31,10 @@ export class Exam {
       params.title,
       params.description ?? null,
       params.isPremium ?? false,
-      params.durationSeconds,
+      params.durationSeconds ?? null,
       ExamStatus.DRAFT,
       params.createdBy ?? null,
+      null,
       null,
       null,
       null,
@@ -44,12 +47,13 @@ export class Exam {
     title: string;
     description: string | null;
     isPremium: boolean;
-    durationSeconds: number;
+    durationSeconds: number | null;
     status: ExamStatus;
     createdBy: number | null;
     publishedAt: Date | null;
     createdAt: Date | null;
     updatedAt: Date | null;
+    deletedAt?: Date | null;
   }): Exam {
     return new Exam(
       params.id,
@@ -63,6 +67,7 @@ export class Exam {
       params.publishedAt,
       params.createdAt,
       params.updatedAt,
+      params.deletedAt ?? null,
     );
   }
 

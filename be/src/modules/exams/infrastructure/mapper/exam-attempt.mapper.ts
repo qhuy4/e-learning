@@ -7,7 +7,7 @@ export class ExamAttemptMapper {
       id: Number(entity.id),
       examId: Number(entity.examId),
       userId: Number(entity.userId),
-      score: entity.score,
+      score: Number(entity.score),
       correctCount: entity.correctCount,
       totalQuestions: entity.totalQuestions,
       status: entity.status,

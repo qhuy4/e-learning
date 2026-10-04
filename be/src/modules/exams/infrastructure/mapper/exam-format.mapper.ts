@@ -6,7 +6,6 @@ export class ExamFormatMapper {
     return ExamFormat.restore({
       id: Number(entity.id),
       examTypeId: Number(entity.examTypeId),
-      code: entity.code,
       name: entity.name,
       version: Number(entity.version),
       description: entity.description,
@@ -16,6 +15,7 @@ export class ExamFormatMapper {
       effectiveTo: entity.effectiveTo,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
+      deletedAt: entity.deletedAt,
     });
   }
 }

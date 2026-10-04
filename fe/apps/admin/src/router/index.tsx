@@ -61,6 +61,22 @@ import PayoutRequestDetailPage from "@/pages/payout-requests/payout-request-deta
 import BookingsPage from "@/pages/bookings/bookings-page";
 import BookingDetailPage from "@/pages/bookings/booking-detail-page";
 
+import ExamTypesPage from "@/pages/exams/exam-types-page";
+import ExamTypeCreatePage from "@/pages/exams/exam-type-create-page";
+import ExamTypeDetailPage from "@/pages/exams/exam-type-detail-page";
+import ExamTypeEditPage from "@/pages/exams/exam-type-edit-page";
+import ExamFormatsPage from "@/pages/exams/exam-formats-page";
+import ExamFormatCreatePage from "@/pages/exams/exam-format-create-page";
+import ExamFormatDetailPage from "@/pages/exams/exam-format-detail-page";
+import ExamFormatEditPage from "@/pages/exams/exam-format-edit-page";
+import ExamsPage from "@/pages/exams/exams-page";
+import ExamCreatePage from "@/pages/exams/exam-create-page";
+import ExamDetailPage from "@/pages/exams/exam-detail-page";
+import ExamEditPage from "@/pages/exams/exam-edit-page";
+import ExamBuilderPage from "@/pages/exams/exam-builder-page";
+import ExamPreviewPage from "@/pages/exams/exam-preview-page";
+import ExamPackageImportPage from "@/pages/exams/exam-package-import-page";
+
 export const router = createBrowserRouter([
     {
         element: <ProtectedRoute />,
@@ -382,6 +398,81 @@ export const router = createBrowserRouter([
                             {
                                 path: ":id",
                                 element: <WishlistDetailPage />,
+                            },
+                        ],
+                    },
+                    {
+                        path: "exam-types",
+                        children: [
+                            {
+                                index: true,
+                                element: <ExamTypesPage />,
+                            },
+                            {
+                                path: "create",
+                                element: <ExamTypeCreatePage />,
+                            },
+                            {
+                                path: ":id",
+                                element: <ExamTypeDetailPage />,
+                            },
+                            {
+                                path: ":id/edit",
+                                element: <ExamTypeEditPage />,
+                            },
+                        ],
+                    },
+                    {
+                        path: "exam-formats",
+                        children: [
+                            {
+                                index: true,
+                                element: <ExamFormatsPage />,
+                            },
+                            {
+                                path: "create",
+                                element: <ExamFormatCreatePage />,
+                            },
+                            {
+                                path: ":id",
+                                element: <ExamFormatDetailPage />,
+                            },
+                            {
+                                path: ":id/edit",
+                                element: <ExamFormatEditPage />,
+                            },
+                        ],
+                    },
+                    {
+                        path: "exams",
+                        children: [
+                            {
+                                index: true,
+                                element: <ExamsPage />,
+                            },
+                            {
+                                path: "create",
+                                element: <ExamCreatePage />,
+                            },
+                            {
+                                path: ":id",
+                                element: <ExamDetailPage />,
+                            },
+                            {
+                                path: ":id/edit",
+                                element: <ExamEditPage />,
+                            },
+                            {
+                                path: ":id/builder",
+                                element: <ExamBuilderPage />,
+                            },
+                            {
+                                path: ":id/preview",
+                                element: <ExamPreviewPage />,
+                            },
+                            {
+                                path: ":id/import-package",
+                                element: <ExamPackageImportPage />,
                             },
                         ],
                     },

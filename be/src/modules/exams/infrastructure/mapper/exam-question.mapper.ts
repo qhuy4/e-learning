@@ -6,8 +6,8 @@ export class ExamQuestionMapper {
     return ExamQuestion.restore({
       id: Number(entity.id),
       sectionId: Number(entity.sectionId),
-      materialId: entity.materialId ? Number(entity.materialId) : null,
-      questionTypeId: Number(entity.questionTypeId),
+      groupId: entity.groupId ? Number(entity.groupId) : null,
+      type: entity.type,
       question: entity.question,
       explanation: entity.explanation,
       points: Number(entity.points),

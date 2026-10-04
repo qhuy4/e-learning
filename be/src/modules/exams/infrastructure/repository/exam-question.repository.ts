@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, IsNull } from 'typeorm';
 import { ExamQuestionOrmEntity } from '../entity/exam-question.orm-entity';
 import { ExamQuestion } from '../../domain/entity/exam-question.entity';
 import { IExamQuestionRepository } from '../../domain/repository/exam-question.repository';
@@ -15,7 +15,15 @@ export class ExamQuestionRepository implements IExamQuestionRepository {
 
   async findBySectionId(sectionId: number): Promise<ExamQuestion[]> {
     const entities = await this.repository.find({
-      where: { sectionId: sectionId.toString() },
+      where: { sectionId: sectionId.toString(), groupId: IsNull() },
+      order: { position: 'ASC' },
+    });
+    return entities.map(ExamQuestionMapper.toDomain);
+  }
+
+  async findByGroupId(groupId: number): Promise<ExamQuestion[]> {
+    const entities = await this.repository.find({
+      where: { groupId: groupId.toString() },
       order: { position: 'ASC' },
     });
     return entities.map(ExamQuestionMapper.toDomain);
@@ -26,23 +34,31 @@ export class ExamQuestionRepository implements IExamQuestionRepository {
     return entity ? ExamQuestionMapper.toDomain(entity) : null;
   }
 
+  async countBySectionId(sectionId: number): Promise<number> {
+    return this.repository.count({ where: { sectionId: sectionId.toString() } });
+  }
+
   async save(question: ExamQuestion): Promise<ExamQuestion> {
     const entity = this.repository.create({
       id: question.id ? question.id.toString() : undefined,
       sectionId: question.sectionId.toString(),
-      materialId: question.materialId ? question.materialId.toString() : null,
-      questionTypeId: question.questionTypeId.toString(),
+      groupId: question.groupId ? question.groupId.toString() : null,
+      type: question.type,
       question: question.question,
       explanation: question.explanation,
       points: question.points,
       position: question.position,
     });
-    const saved = await this.repository.save(entity);
+    const saved = await this.repository.save(entity) as ExamQuestionOrmEntity;
     return ExamQuestionMapper.toDomain(saved);
   }
 
   async delete(id: number): Promise<void> {
     await this.repository.delete(id);
+  }
+
+  async deleteAllByGroupId(groupId: number): Promise<void> {
+    await this.repository.delete({ groupId: groupId.toString() });
   }
 
   async deleteAllBySectionId(sectionId: number): Promise<void> {

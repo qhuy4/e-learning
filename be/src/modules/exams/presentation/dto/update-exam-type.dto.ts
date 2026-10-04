@@ -3,10 +3,6 @@ import { IsString, IsOptional } from 'class-validator';
 export class UpdateExamTypeDto {
   @IsOptional()
   @IsString()
-  code?: string;
-
-  @IsOptional()
-  @IsString()
   name?: string;
 
   @IsOptional()

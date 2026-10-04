@@ -243,3 +243,25 @@
 .card-hover-m3:hover .number-hover-tertiary {
   color: var(--color-m3-tertiary-container);
 }
+
+/* ------------------------------------------------------------------ *
+ * CBT exam screens (TOEIC / IELTS) — ẩn thanh cuộn khi lướt.
+ * `.scrollbar-none` ẩn scrollbar của từng vùng cuộn bên trong;
+ * `html:has(.exam-screen)` ẩn scrollbar của trang khi đang ở màn hình làm bài.
+ * ------------------------------------------------------------------ */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+html:has(.exam-screen) {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+html:has(.exam-screen)::-webkit-scrollbar {
+  width: 0;
+  display: none;
+}

@@ -13,6 +13,11 @@ export class ExamSectionRepository implements IExamSectionRepository {
     private readonly repository: Repository<ExamSectionOrmEntity>,
   ) {}
 
+  async findById(id: number): Promise<ExamSection | null> {
+    const entity = await this.repository.findOne({ where: { id: id.toString() } });
+    return entity ? ExamSectionMapper.toDomain(entity) : null;
+  }
+
   async findByExamId(examId: number): Promise<ExamSection[]> {
     const entities = await this.repository.find({
       where: { examId: examId.toString() },
@@ -27,11 +32,13 @@ export class ExamSectionRepository implements IExamSectionRepository {
         id: s.id ? s.id.toString() : undefined,
         examId: s.examId.toString(),
         formatSectionId: s.formatSectionId.toString(),
-        code: s.code,
         name: s.name,
+        description: s.description,
         instructions: s.instructions,
         position: s.position,
         durationSeconds: s.durationSeconds,
+        questionCount: s.questionCount,
+        sectionType: s.sectionType,
       }),
     );
     await this.repository.save(entities);

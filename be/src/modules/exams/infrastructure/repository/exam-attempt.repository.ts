@@ -25,6 +25,24 @@ export class ExamAttemptRepository implements IExamAttemptRepository {
     return entity ? ExamAttemptMapper.toDomain(entity) : null;
   }
 
+  /** Mọi attempt của (exam, user), mới nhất trước — dùng cho trang kết quả. */
+  async findByExamAndUserAll(examId: number, userId: number): Promise<ExamAttempt[]> {
+    const entities = await this.repository.find({
+      where: { examId: examId.toString(), userId: userId.toString() },
+      order: { startedAt: 'DESC' },
+    });
+    return entities.map(ExamAttemptMapper.toDomain);
+  }
+
+  async findByUserId(userId: number, limit = 10): Promise<ExamAttempt[]> {
+    const entities = await this.repository.find({
+      where: { userId: userId.toString() },
+      order: { startedAt: 'DESC' },
+      take: limit,
+    });
+    return entities.map(ExamAttemptMapper.toDomain);
+  }
+
   async create(attempt: ExamAttempt): Promise<ExamAttempt> {
     const entity = this.repository.create({
       examId: attempt.examId.toString(),

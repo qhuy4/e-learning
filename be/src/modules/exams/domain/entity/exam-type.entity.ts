@@ -1,23 +1,23 @@
 export class ExamType {
   private constructor(
     public id: number | null,
-    public code: string,
     public name: string,
     public description: string | null,
     public createdAt: Date | null,
     public updatedAt: Date | null,
+    /** Soft delete — null = còn hiệu lực; có giá trị = đã xóa mềm. */
+    public deletedAt: Date | null,
   ) {}
 
   static create(params: {
-    code: string;
     name: string;
     description?: string | null;
   }): ExamType {
     return new ExamType(
       null,
-      params.code,
       params.name,
       params.description ?? null,
+      null,
       null,
       null,
     );
@@ -25,24 +25,23 @@ export class ExamType {
 
   static restore(params: {
     id: number;
-    code: string;
     name: string;
     description: string | null;
     createdAt: Date | null;
     updatedAt: Date | null;
+    deletedAt?: Date | null;
   }): ExamType {
     return new ExamType(
       params.id,
-      params.code,
       params.name,
       params.description,
       params.createdAt,
       params.updatedAt,
+      params.deletedAt ?? null,
     );
   }
 
-  update(params: Partial<Pick<ExamType, 'code' | 'name' | 'description'>>) {
-    if (params.code !== undefined) this.code = params.code;
+  update(params: Partial<Pick<ExamType, 'name' | 'description'>>) {
     if (params.name !== undefined) this.name = params.name;
     if (params.description !== undefined) this.description = params.description;
   }

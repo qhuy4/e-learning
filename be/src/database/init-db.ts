@@ -95,6 +95,153 @@ export async function initDatabaseTables(dataSource: DataSource) {
       CREATE INDEX IF NOT EXISTS idx_bookings_booking_date ON bookings(booking_date);
     `);
 
+    // Migration: exam_questions.type (question type is an enum on the question itself)
+    try {
+      await dataSource.query(`
+        DO $$ BEGIN
+          ALTER TABLE exam_questions ADD COLUMN IF NOT EXISTS type varchar(50) DEFAULT 'MULTIPLE_CHOICE';
+        EXCEPTION WHEN duplicate_column THEN null;
+        END $$;
+      `);
+      await dataSource.query(`
+        ALTER TABLE exam_questions DROP COLUMN IF EXISTS question_type_id;
+      `);
+      await dataSource.query(`
+        DROP TABLE IF EXISTS exam_question_types CASCADE;
+      `);
+      await dataSource.query(`
+        DROP TABLE IF EXISTS exam_format_section_question_types CASCADE;
+      `);
+      logger.log('Migration exam_questions: type column added, question_type_id removed.');
+    } catch (e) {
+      logger.log('Migration exam_questions: already applied or skipped.');
+    }
+
+    // Migration: question_count on exam_sections; no question_type anywhere
+    try {
+      await dataSource.query(`
+        ALTER TABLE exam_sections ADD COLUMN IF NOT EXISTS question_count integer DEFAULT 0;
+      `);
+      await dataSource.query(`
+        ALTER TABLE exam_sections ADD COLUMN IF NOT EXISTS description TEXT;
+      `);
+      await dataSource.query(`
+        ALTER TABLE exam_format_sections DROP COLUMN IF EXISTS question_type;
+      `);
+      await dataSource.query(`
+        ALTER TABLE exam_sections DROP COLUMN IF EXISTS question_type;
+      `);
+      logger.log('Migration sections: question_count added, question_type removed.');
+    } catch (e) {
+      logger.log('Migration sections: already applied or skipped.');
+    }
+
+    // Migration: exam_question_groups (group_type: AUDIO | PASSAGE | IMAGE | CUSTOM)
+    try {
+      await dataSource.query(`
+        CREATE TABLE IF NOT EXISTS exam_question_groups (
+          id BIGSERIAL PRIMARY KEY,
+          section_id BIGINT NOT NULL REFERENCES exam_sections(id) ON DELETE CASCADE,
+          group_type varchar(50) NOT NULL DEFAULT 'CUSTOM',
+          title TEXT,
+          instructions TEXT,
+          position INTEGER NOT NULL DEFAULT 0,
+          created_at TIMESTAMP DEFAULT NOW(),
+          updated_at TIMESTAMP DEFAULT NOW()
+        );
+      `);
+      await dataSource.query(`
+        ALTER TABLE exam_question_groups ADD COLUMN IF NOT EXISTS group_type varchar(50) NOT NULL DEFAULT 'CUSTOM';
+      `);
+      logger.log('Migration exam_question_groups: created with group_type.');
+    } catch (e) {
+      logger.log('Migration exam_question_groups: already applied or skipped.');
+    }
+
+    // Migration: exam_group_materials (replaces the legacy exam_materials table)
+    try {
+      await dataSource.query(`
+        CREATE TABLE IF NOT EXISTS exam_group_materials (
+          id BIGSERIAL PRIMARY KEY,
+          group_id BIGINT NOT NULL REFERENCES exam_question_groups(id) ON DELETE CASCADE,
+          type varchar(50) NOT NULL DEFAULT 'TEXT',
+          title VARCHAR(255),
+          content TEXT,
+          file_url TEXT,
+          transcript TEXT,
+          position INTEGER NOT NULL DEFAULT 0,
+          created_at TIMESTAMP DEFAULT NOW(),
+          updated_at TIMESTAMP DEFAULT NOW()
+        );
+      `);
+      logger.log('Migration exam_group_materials: created.');
+    } catch (e) {
+      logger.log('Migration exam_group_materials: already applied or skipped.');
+    }
+
+    // Migration: exam_questions.section_id required, group_id nullable
+    try {
+      await dataSource.query(`
+        DO $$ BEGIN
+          ALTER TABLE exam_questions ADD COLUMN IF NOT EXISTS section_id BIGINT;
+        EXCEPTION WHEN duplicate_column THEN null;
+        END $$;
+      `);
+      await dataSource.query(`
+        DO $$ BEGIN
+          ALTER TABLE exam_questions ADD COLUMN IF NOT EXISTS group_id BIGINT;
+        EXCEPTION WHEN duplicate_column THEN null;
+        END $$;
+      `);
+
+      // Backfill section_id from the question's group for grouped questions
+      await dataSource.query(`
+        UPDATE exam_questions eq
+        SET section_id = eqg.section_id
+        FROM exam_question_groups eqg
+        WHERE eq.group_id = eqg.id AND eq.section_id IS NULL;
+      `);
+
+      await dataSource.query(`
+        ALTER TABLE exam_questions ALTER COLUMN section_id SET NOT NULL;
+      `);
+      await dataSource.query(`
+        ALTER TABLE exam_questions ALTER COLUMN group_id DROP NOT NULL;
+      `);
+      await dataSource.query(`
+        DO $$ BEGIN
+          ALTER TABLE exam_questions ADD FOREIGN KEY (section_id) REFERENCES exam_sections(id) ON DELETE CASCADE;
+        EXCEPTION WHEN duplicate_object THEN null;
+        END $$;
+      `);
+      await dataSource.query(`
+        DO $$ BEGIN
+          ALTER TABLE exam_questions ADD FOREIGN KEY (group_id) REFERENCES exam_question_groups(id) ON DELETE CASCADE;
+        EXCEPTION WHEN duplicate_object THEN null;
+        END $$;
+      `);
+
+      logger.log('Migration exam_questions: section_id required, group_id nullable.');
+    } catch (e) {
+      logger.log('Migration exam_questions: already applied or skipped.');
+    }
+
+    // Migration: drop the legacy exam_materials table (replaced by exam_group_materials)
+    try {
+      await dataSource.query(`DROP TABLE IF EXISTS exam_materials CASCADE`);
+      logger.log('Migration drop exam_materials: dropped.');
+    } catch (e) {
+      logger.log('Migration drop exam_materials: already dropped or skipped.');
+    }
+
+    // Migration: exam_options — drop legacy option_key (không có trong entity; app định danh option bằng id/position)
+    try {
+      await dataSource.query(`ALTER TABLE exam_options DROP COLUMN IF EXISTS option_key`);
+      logger.log('Migration exam_options: legacy option_key dropped.');
+    } catch (e) {
+      logger.log('Migration exam_options: already dropped or skipped.');
+    }
+
     logger.log('Khởi tạo / kiểm tra các bảng instructor và auth thành công!');
   } catch (error) {
     logger.error(`Lỗi khi khởi tạo bảng database: ${(error as Error).message}`);

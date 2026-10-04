@@ -2,30 +2,30 @@ import { Link } from "react-router";
 import { Globe, Video, ThumbsUp } from "lucide-react";
 
 const exploreLinks = [
-  { label: "Free Courses", to: "/courses" },
-  { label: "Top Mentors", to: "/mentors" },
-  { label: "Certificates", to: "/courses" },
-  { label: "Business", to: "/courses" },
+  { label: "Khóa học miễn phí", to: "/courses" },
+  { label: "Mentor hàng đầu", to: "/mentors" },
+  { label: "Chứng chỉ", to: "/courses" },
+  { label: "Dành cho doanh nghiệp", to: "/courses" },
 ];
 
 const supportLinks = [
-  { label: "Help Center", to: "/help" },
-  { label: "Terms of Use", to: "/terms" },
-  { label: "Privacy Policy", to: "/privacy" },
-  { label: "Contact Us", to: "/contact" },
+  { label: "Trung tâm trợ giúp", to: "/help" },
+  { label: "Điều khoản sử dụng", to: "/terms" },
+  { label: "Chính sách bảo mật", to: "/privacy" },
+  { label: "Liên hệ với chúng tôi", to: "/contact" },
 ];
 
 const companyLinks = [
-  { label: "About Us", to: "/about" },
-  { label: "Careers", to: "/careers" },
-  { label: "Blog", to: "/blog" },
-  { label: "Partners", to: "/partners" },
+  { label: "Về chúng tôi", to: "/about" },
+  { label: "Tuyển dụng", to: "/careers" },
+  { label: "Tin tức", to: "/blog" },
+  { label: "Đối tác", to: "/partners" },
 ];
 
 const socialLinks = [
-  { icon: Globe, label: "Website" },
+  { icon: Globe, label: "Trang web" },
   { icon: Video, label: "Video" },
-  { icon: ThumbsUp, label: "Like" },
+  { icon: ThumbsUp, label: "Yêu thích" },
 ];
 
 export const Footer = () => {
@@ -39,11 +39,12 @@ export const Footer = () => {
           {/* Brand */}
           <div className="flex-[2_1_280px] flex flex-col gap-3">
             <Link to="/" className="flex items-center ">
-              <img alt="PiEMind Logo" className="h-22 w-auto object-contain" src="/logo.webp" />
-              <img alt="PiEMind Brand" className="h-26 w-auto object-contain" src="/brand-name.webp" />
+              <img alt="Logo PiEMind" className="h-22 w-auto object-contain" src="/logo.webp" />
+              <img alt="Tên thương hiệu PiEMind" className="h-26 w-auto object-contain" src="/brand-name.webp" />
             </Link>
             <p className="text-m3-on-surface-variant font-medium text-sm leading-relaxed">
-              Warm, intelligent, and interactive AI-driven English learning tailored to your pace, voice, and fluency goals.
+              Học tiếng Anh cùng AI ấm áp, thông minh và tương tác — được cá nhân hóa theo nhịp
+              độ, giọng nói và mục tiêu trôi chảy của riêng bạn.
             </p>
             <div className="flex gap-3">
               {socialLinks.map((s) => (
@@ -60,7 +61,7 @@ export const Footer = () => {
 
           {/* Explore */}
           <div className="flex-1 min-w-[140px]">
-            <h4 className="text-m3-on-surface font-black text-sm mb-4 tracking-wider uppercase">Explore</h4>
+            <h4 className="text-m3-on-surface font-black text-sm mb-4 tracking-wider uppercase">Khám phá</h4>
             <ul className="flex flex-col gap-3">
               {exploreLinks.map((link) => (
                 <li key={link.label}>
@@ -77,7 +78,7 @@ export const Footer = () => {
 
           {/* Support */}
           <div className="flex-1 min-w-[140px]">
-            <h4 className="text-m3-on-surface font-black text-sm mb-4 tracking-wider uppercase">Support</h4>
+            <h4 className="text-m3-on-surface font-black text-sm mb-4 tracking-wider uppercase">Hỗ trợ</h4>
             <ul className="flex flex-col gap-3">
               {supportLinks.map((link) => (
                 <li key={link.label}>
@@ -94,7 +95,7 @@ export const Footer = () => {
 
           {/* Company */}
           <div className="flex-1 min-w-[140px]">
-            <h4 className="text-m3-on-surface font-black text-sm mb-4 tracking-wider uppercase">Company</h4>
+            <h4 className="text-m3-on-surface font-black text-sm mb-4 tracking-wider uppercase">Công ty</h4>
             <ul className="flex flex-col gap-3">
               {companyLinks.map((link) => (
                 <li key={link.label}>
@@ -113,7 +114,7 @@ export const Footer = () => {
         {/* Bottom bar */}
         <div className="pt-5 border-t border-m3-outline-variant/20 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-m3-on-surface-variant font-bold tracking-wide">
-            © {new Date().getFullYear()} PiEMind. All rights reserved.
+            © {new Date().getFullYear()} PiEMind. Đã đăng ký bản quyền.
           </p>
           <div className="flex gap-6 text-xs font-extrabold text-m3-on-surface-variant uppercase tracking-wider">
             <a className="hover:text-m3-primary transition-colors" href="#">English</a>
