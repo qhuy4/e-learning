@@ -89,7 +89,7 @@ export function useMyBookings(userId?: number) {
             const res = await api.get("/bookings", {
                 params: { page: 1, limit: 100 },
             });
-            return res.data.data as { data: Booking[] };
+            return res.data as { data: Booking[] };
         },
         enabled: !!userId,
         retry: 1,
