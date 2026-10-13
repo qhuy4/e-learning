@@ -19,20 +19,20 @@ export function QuickNotesCard({
                 step={4}
                 title={
                     <>
-                        Quick Notes for Coach {mentorName}{" "}
+                        Ghi chú nhanh cho huấn luyện viên {mentorName}{" "}
                         <span className="text-xs font-normal text-muted-foreground">
-                            (Optional)
+                            (Tùy chọn)
                         </span>
                     </>
                 }
-                description="Mention anything specific: upcoming interview, tricky situations, or target accent"
+                description="Nêu rõ điều bạn quan tâm: buổi phỏng vấn sắp tới, tình huống khó, hoặc giọng bạn muốn hướng tới"
             />
 
             <CardContent className="px-0 pt-6">
                 <Textarea
                     value={notes}
                     onChange={(e) => onNotesChange(e.target.value)}
-                    placeholder="Tell your coach anything specific (e.g. 'I freeze up during sprint meetings when asked to speak spontaneously' or 'Aiming for British RP intonation')..."
+                    placeholder="Chia sẻ với huấn luyện viên điều bạn đang gặp (VD: 'Mình bị đơ khi được yêu cầu nói tự nhiên trong cuộc họp gấp' hoặc 'Đang tập giọng Anh chuẩn Anh Quốc')..."
                     className="min-h-24 rounded-xl border border-input bg-card p-3 text-sm focus-visible:ring-primary"
                 />
             </CardContent>

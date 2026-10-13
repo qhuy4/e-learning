@@ -44,27 +44,27 @@ const statusConfig: Record<
     { label: string; dot: string; text: string }
 > = {
     [ConnectionState.Connected]: {
-        label: "Connected",
+        label: "Đã kết nối",
         dot: "bg-[#89d4c7]",
         text: "text-[#89d4c7]",
     },
     [ConnectionState.Reconnecting]: {
-        label: "Reconnecting",
+        label: "Đang kết nối lại",
         dot: "bg-[#fae189]",
         text: "text-[#fae189]",
     },
     [ConnectionState.SignalReconnecting]: {
-        label: "Reconnecting",
+        label: "Đang kết nối lại",
         dot: "bg-[#fae189]",
         text: "text-[#fae189]",
     },
     [ConnectionState.Connecting]: {
-        label: "Connecting",
+        label: "Đang kết nối",
         dot: "bg-[#a4f1e3]",
         text: "text-[#a4f1e3]",
     },
     [ConnectionState.Disconnected]: {
-        label: "Disconnected",
+        label: "Đã ngắt kết nối",
         dot: "bg-[#F38181]",
         text: "text-[#F38181]",
     },
@@ -139,7 +139,7 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
         const views: ParticipantView[] = [
             {
                 identity: local.identity,
-                name: user?.name || "You",
+                name: user?.name || "Bạn",
                 isLocal: true,
                 hasMic: isMicEnabled(local),
                 hasCam: isCamEnabled(local),
@@ -152,7 +152,7 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
             seen.add(participant.identity);
             views.push({
                 identity: participant.identity,
-                name: displayName(participant, "Coach"),
+                name: displayName(participant, "Giáo viên"),
                 isLocal: false,
                 hasMic: isMicEnabled(participant),
                 hasCam: isCamEnabled(participant),
@@ -434,7 +434,7 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
         } catch (error) {
             if (connectTokenRef.current !== token) return;
             const message =
-                error instanceof Error ? error.message : "Unable to join the meeting";
+                error instanceof Error ? error.message : "Không thể tham gia cuộc họp";
             setJoinError(message);
             setIsJoining(false);
             setConnectionState(ConnectionState.Disconnected);
@@ -491,7 +491,7 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
     const remoteParticipants = participants.filter((item) => !item.isLocal);
     const activeRemote =
         remoteParticipants.find((item) => item.isSpeaking) ?? remoteParticipants[0];
-    const localName = user?.name || "You";
+    const localName = user?.name || "Bạn";
     const localInitials = initialsOf(localName);
 
     if (hasEnded) {
@@ -500,16 +500,16 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
                 <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#F38181]/20 text-[#F38181]">
                     <PhoneOff className="h-7 w-7" />
                 </div>
-                <h1 className="text-xl font-bold">Meeting has ended</h1>
+                <h1 className="text-xl font-bold">Buổi học đã kết thúc</h1>
                 <p className="max-w-md text-sm text-[#dcc0bf]">
-                    The lesson time slot is over. Thank you for attending.
+                    Khung giờ học đã hết. Cảm ơn bạn đã tham gia.
                 </p>
                 <button
                     type="button"
                     onClick={() => navigate("/", { replace: true })}
                     className="rounded-full bg-[#F38181] px-6 py-2.5 text-sm font-bold text-white transition hover:bg-[#9e3f42]"
                 >
-                    Back home
+                    Về trang chủ
                 </button>
             </div>
         );
@@ -521,7 +521,7 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
                 <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#F38181]/20 text-[#F38181]">
                     <WifiOff className="h-7 w-7" />
                 </div>
-                <h1 className="text-xl font-bold">Cannot join lesson</h1>
+                <h1 className="text-xl font-bold">Không thể tham gia buổi học</h1>
                 <p className="max-w-md text-sm text-[#dcc0bf]">{joinError}</p>
                 <div className="flex gap-3">
                     <button
@@ -533,14 +533,14 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
                         }}
                         className="rounded-full bg-[#F38181] px-6 py-2.5 text-sm font-bold text-white transition hover:bg-[#9e3f42]"
                     >
-                        Try again
+                        Thử lại
                     </button>
                     <button
                         type="button"
                         onClick={() => navigate("/")}
                         className="rounded-full border border-white/20 px-6 py-2.5 text-sm font-semibold text-white/90 transition hover:bg-white/10"
                     >
-                        Back home
+                        Về trang chủ
                     </button>
                 </div>
             </div>
@@ -560,7 +560,7 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
                                 PiEMind
                             </span>
                             <span className="text-[11px] font-semibold uppercase tracking-wider text-[#a4f1e3]">
-                                Classroom Live
+                                Lớp học trực tiếp
                             </span>
                         </div>
                     </div>
@@ -568,11 +568,11 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
                     <div className="hidden items-center gap-3 lg:flex">
                         <div className="flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white">
                             <span className="h-2 w-2 animate-pulse rounded-full bg-[#89d4c7]" />
-                            <span>1-on-1 English</span>
+                            <span>Tiếng Anh 1 kèm 1</span>
                             {roomName && (
                                 <>
                                     <span className="text-white/40">•</span>
-                                    <span className="text-white/80">Room {roomName}</span>
+                                    <span className="text-white/80">Phòng {roomName}</span>
                                 </>
                             )}
                         </div>
@@ -623,7 +623,7 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
                     <button
                         type="button"
                         onClick={() => setIsDrawerOpen((open) => !open)}
-                        title="Toggle lesson notes"
+                        title="Bật/tắt ghi chú bài học"
                         className="relative rounded-full bg-white/10 p-2 text-white/90 transition hover:bg-white/20"
                     >
                         <StickyNote className="h-5 w-5" />
@@ -645,7 +645,7 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
                     {isJoining && (
                         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-[#2b3234]/80">
                             <Loader2 className="h-8 w-8 animate-spin text-[#a4f1e3]" />
-                            <p className="text-sm text-white/80">Joining classroom…</p>
+                            <p className="text-sm text-white/80">Đang tham gia lớp học…</p>
                         </div>
                     )}
 
@@ -654,7 +654,7 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
                             <div className="flex h-24 w-24 items-center justify-center rounded-full bg-white/10 text-2xl font-bold">
                                 …
                             </div>
-                            <p className="text-sm">Waiting for the other participant…</p>
+                            <p className="text-sm">Đang chờ người tham gia còn lại…</p>
                         </div>
                     )}
 
@@ -662,7 +662,7 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
                         <div className="absolute left-4 top-4 z-10 flex items-center gap-2 rounded-full bg-black/70 px-3.5 py-1.5 shadow-lg backdrop-blur">
                             <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-[#a4f1e3]" />
                             <span className="text-xs font-semibold uppercase tracking-wider text-[#a4f1e3]">
-                                {activeRemote.isLocal ? "You" : "Coach"} speaking
+                                {activeRemote.isLocal ? "Bạn" : "Giáo viên"} đang nói
                             </span>
                         </div>
                     )}
@@ -682,7 +682,7 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
                                     ) : (
                                         <MicOff className="h-3 w-3 text-[#F38181]" />
                                     )}
-                                    {activeRemote.hasCam ? "Camera on" : "Camera off"}
+                                    {activeRemote.hasCam ? "Đã bật camera" : "Đã tắt camera"}
                                 </span>
                             </div>
                         </div>
@@ -701,12 +701,12 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
                                 <span className="text-xs font-semibold text-white">
                                     {localName}
                                 </span>
-                                <span className="text-[10px] text-white/60">Camera off</span>
+                                <span className="text-[10px] text-white/60">Đã tắt camera</span>
                             </div>
                         )}
                         <div className="absolute left-2.5 top-2.5 flex items-center gap-1.5 rounded-full bg-black/70 px-2 py-0.5 text-[11px] font-semibold text-white">
                             <span className="h-2 w-2 rounded-full bg-[#a4f1e3]" />
-                            <span>You ({localName})</span>
+                            <span>Bạn ({localName})</span>
                         </div>
                         <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-xs">
                             <span className="flex items-center gap-1.5 text-white/90">
@@ -717,7 +717,7 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
                                 )}
                             </span>
                             <span className="text-[10px] font-bold uppercase text-white/60">
-                                Learner
+                                Học viên
                             </span>
                         </div>
                     </div>
@@ -732,10 +732,10 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
                                 </div>
                                 <div>
                                     <h4 className="text-sm font-bold leading-none text-white">
-                                        Lesson Notes
+                                        Ghi chú bài học
                                     </h4>
                                     <span className="text-[10px] text-[#a4f1e3]">
-                                        Private to you
+                                        Chỉ mình bạn thấy
                                     </span>
                                 </div>
                             </div>
@@ -743,7 +743,7 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
                                 type="button"
                                 onClick={() => setIsDrawerOpen(false)}
                                 className="rounded-full p-1 text-white/60 transition hover:text-white"
-                                title="Close panel"
+                                title="Đóng bảng"
                             >
                                 <X className="h-4 w-4" />
                             </button>
@@ -754,10 +754,10 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
                                 <div className="mb-2 flex items-center justify-between">
                                     <span className="flex items-center gap-1.5 font-bold text-white">
                                         <Users className="h-4 w-4 text-[#a4f1e3]" />
-                                        Participants
+                                        Người tham gia
                                     </span>
                                     <span className="rounded-full bg-[#89d4c7]/20 px-2 py-0.5 text-[10px] font-bold text-[#a4f1e3]">
-                                        {participants.length} in room
+                                        {participants.length} trong phòng
                                     </span>
                                 </div>
                                 <ul className="space-y-2">
@@ -778,7 +778,7 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
                                                     {participant.name}
                                                     {participant.isLocal && (
                                                         <span className="ml-1 text-[10px] font-normal text-white/50">
-                                                            (you)
+                                                            (bạn)
                                                         </span>
                                                     )}
                                                 </p>
@@ -800,12 +800,12 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
 
                             <section className="rounded-xl border border-white/10 bg-white/5 p-3.5">
                                 <div className="mb-2 font-bold text-white">
-                                    Collaborative Notes
+                                    Ghi chú chung
                                 </div>
                                 <Textarea
                                     value={notes}
                                     onChange={(event) => setNotes(event.target.value)}
-                                    placeholder="Type private notes or useful expressions here…"
+                                    placeholder="Nhập ghi chú riêng hoặc các biểu đạt hữu ích tại đây…"
                                     className="h-36 resize-none border-white/10 bg-black/30 text-xs text-white placeholder:text-white/40 focus-visible:ring-[#a4f1e3]/40"
                                 />
                             </section>
@@ -820,7 +820,7 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
                         type="button"
                         onClick={() => void toggleMicrophone()}
                         disabled={connectionState !== ConnectionState.Connected}
-                        title="Toggle microphone"
+                        title="Bật/tắt mic"
                         className={`flex h-12 w-12 items-center justify-center rounded-full transition ${
                             isMicOn
                                 ? "bg-white/10 text-[#a4f1e3] hover:bg-white/20"
@@ -837,7 +837,7 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
                         type="button"
                         onClick={() => void toggleCamera()}
                         disabled={connectionState !== ConnectionState.Connected}
-                        title="Toggle camera"
+                        title="Bật/tắt camera"
                         className={`flex h-12 w-12 items-center justify-center rounded-full transition ${
                             isCamOn
                                 ? "bg-white/10 text-white hover:bg-white/20"
@@ -857,7 +857,7 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
                         type="button"
                         onClick={() => void toggleScreenShare()}
                         disabled={connectionState !== ConnectionState.Connected}
-                        title="Share screen"
+                        title="Chia sẻ màn hình"
                         className={`flex h-12 w-12 items-center justify-center rounded-full transition ${
                             isScreenShareOn
                                 ? "bg-[#a4f1e3] text-[#00201c] hover:bg-[#89d4c7]"
@@ -874,7 +874,7 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
                     <button
                         type="button"
                         onClick={() => setIsDrawerOpen((open) => !open)}
-                        title="Toggle notes"
+                        title="Bật/tắt ghi chú"
                         className={`flex h-12 w-12 items-center justify-center rounded-full transition ${
                             isDrawerOpen
                                 ? "bg-[#fae189]/25 text-[#fae189]"
@@ -889,11 +889,11 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
                     <button
                         type="button"
                         onClick={() => setShowLeaveModal(true)}
-                        title="Leave lesson"
+                        title="Rời buổi học"
                         className="flex h-12 items-center gap-2 rounded-full bg-[#F38181] px-5 font-bold text-white shadow-lg shadow-[#9e3f42]/40 transition hover:scale-105 hover:bg-[#9e3f42] active:scale-95"
                     >
                         <PhoneOff className="h-5 w-5" />
-                        <span className="hidden text-sm tracking-wide sm:inline">Leave</span>
+                        <span className="hidden text-sm tracking-wide sm:inline">Rời</span>
                     </button>
                 </div>
             </footer>
@@ -904,10 +904,10 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
                         <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#F38181]/20 text-[#F38181]">
                             <PhoneOff className="h-6 w-6" />
                         </div>
-                        <h3 className="mb-1 text-lg font-bold text-white">Leave lesson?</h3>
+                        <h3 className="mb-1 text-lg font-bold text-white">Rời buổi học?</h3>
                         <p className="mb-6 text-xs text-white/60">
-                            Your session will end for everyone. You can rejoin while the booking
-                            window is still open.
+                            Phiên học sẽ kết thúc đối với tất cả mọi người. Bạn vẫn có thể tham
+                            gia lại trong khi khung giờ đặt lịch còn hiệu lực.
                         </p>
                         <div className="flex gap-3">
                             <button
@@ -915,14 +915,14 @@ export function MeetingRoom({ meetingRoomId }: MeetingRoomProps) {
                                 onClick={() => setShowLeaveModal(false)}
                                 className="flex-1 rounded-xl bg-white/10 px-3 py-2.5 text-xs font-semibold text-white transition hover:bg-white/20"
                             >
-                                Stay in class
+                                Ở lại lớp
                             </button>
                             <button
                                 type="button"
                                 onClick={leaveMeeting}
                                 className="flex-1 rounded-xl bg-[#F38181] px-3 py-2.5 text-xs font-bold text-white shadow-md transition hover:bg-[#9e3f42]"
                             >
-                                Leave now
+                                Rời ngay
                             </button>
                         </div>
                     </div>

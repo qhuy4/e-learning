@@ -68,22 +68,22 @@ export const FindMentorPage = () => {
                 <div>
                     <div className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-piemind-pink text-white text-xs font-bold tracking-wide mb-2 border border-piemind-pink">
                         <Headphones size={14} />
-                        Certified CEFR Mentorship
+                        Mentor CEFR được chứng nhận
                     </div>
                     <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
-                        Find & Book Your Dedicated CEFR Coach
+                        Tìm & đặt lịch cùng huấn luyện viên CEFR của bạn
                     </h1>
                     <p className="text-slate-600 text-base mt-1 font-normal">
-                        Native-level mentors specialized in conversational
-                        rhythm and eliminating speech pauses.
+                        Mentor trình độ bản xứ chuyên về nhịp hội thoại và
+                        khắc phục các khoảng ngừng khi nói.
                     </p>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-semibold text-slate-600 bg-white px-3.5 py-2 rounded-xl border border-slate-200 shadow-sm self-start md:self-auto">
                     <span className="w-2 h-2 rounded-full bg-emerald-500" />
                     <span>
                         {availableLoading
-                            ? "Loading coaches..."
-                            : `${availableTotal} Coaches Available`}
+                            ? "Đang tải huấn luyện viên..."
+                            : `${availableTotal} huấn luyện viên sẵn sàng`}
                     </span>
                 </div>
             </div>
@@ -98,7 +98,7 @@ export const FindMentorPage = () => {
                         />
                         <Input
                             className="pl-11 bg-slate-50 rounded-xl border-slate-200 focus:border-piemind-pink focus:bg-white text-sm font-medium placeholder:text-slate-400"
-                            placeholder="Search mentors by name..."
+                            placeholder="Tìm mentor theo tên..."
                             value={search}
                             onChange={(e) => {
                                 setSearch(e.target.value);
@@ -109,18 +109,18 @@ export const FindMentorPage = () => {
                     <div className="flex items-center gap-3 ml-auto">
                         <div className="flex items-center gap-1 text-xs text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 font-medium">
                             <CheckCircle size={14} className="text-piemind-pink" />
-                            <span>PiEMind Plan Included</span>
+                            <span>Đã bao gồm gói PiEMind</span>
                         </div>
                         <div className="flex items-center gap-1 text-xs text-slate-500">
-                            <span className="font-medium">Sort:</span>
+                            <span className="font-medium">Sắp xếp:</span>
                             <select
                                 className="bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 py-1.5 pl-2.5 pr-6 cursor-pointer outline-none"
                                 value={sortBy}
                                 onChange={(e) => setSortBy(e.target.value)}
                             >
-                                <option value="recommended">AI Recommended</option>
-                                <option value="rating">Highest Rated</option>
-                                <option value="earliest">Earliest Slot</option>
+                                <option value="recommended">Đề xuất bởi AI</option>
+                                <option value="rating">Đánh giá cao nhất</option>
+                                <option value="earliest">Khung giờ sớm nhất</option>
                             </select>
                         </div>
                     </div>
@@ -139,7 +139,7 @@ export const FindMentorPage = () => {
             )}
             {isError && (
                 <div className="rounded-xl border border-border bg-card p-6 text-center text-muted-foreground">
-                    We couldn't load mentors. Please try again.
+                    Không thể tải danh sách mentor. Vui lòng thử lại.
                 </div>
             )}
 
@@ -147,21 +147,21 @@ export const FindMentorPage = () => {
             {!showLoading && !isError && (
                 <div className="flex items-center justify-between text-xs text-slate-500 font-medium px-1">
                     <span>
-                        Showing{" "}
+                        Hiển thị{" "}
                         <strong className="text-slate-800 font-bold">
                             {totalItems === 0
                                 ? 0
                                 : `${(safePage - 1) * limit + 1}–${Math.min(safePage * limit, totalItems)}`}
                         </strong>{" "}
-                        of{" "}
+                        trong{" "}
                         <strong className="text-slate-800 font-bold">
                             {totalItems}
                         </strong>{" "}
-                        available coaches
+                        huấn luyện viên sẵn sàng
                     </span>
                     <span className="text-piemind-pink font-bold flex items-center gap-1">
                         <Zap size={14} />
-                        Instant calendar booking
+                        Đặt lịch tức thì
                     </span>
                 </div>
             )}
@@ -173,12 +173,12 @@ export const FindMentorPage = () => {
                         <Users className="size-8 text-slate-400" />
                     </div>
                     <h2 className="text-lg font-bold text-slate-900 mb-1">
-                        {search ? "No mentors match your search" : "No coaches available right now"}
+                        {search ? "Không có mentor nào khớp tìm kiếm" : "Hiện chưa có huấn luyện viên nào sẵn sàng"}
                     </h2>
                     <p className="text-sm text-slate-500 max-w-sm">
                         {search
-                            ? "Try a different name or clear the search."
-                            : "Check back soon — coaches update their schedules regularly."}
+                            ? "Thử tìm theo tên khác hoặc xóa từ khóa."
+                            : "Hãy quay lại sau — các huấn luyện viên cập nhật lịch thường xuyên."}
                     </p>
                     {search && (
                         <button
@@ -186,7 +186,7 @@ export const FindMentorPage = () => {
                             className="mt-4 text-sm font-bold text-piemind-pink hover:underline"
                             onClick={() => setSearch("")}
                         >
-                            Clear search
+                            Xóa tìm kiếm
                         </button>
                     )}
                 </div>
@@ -214,7 +214,7 @@ export const FindMentorPage = () => {
                                                 {mentor.name}
                                             </h3>
                                             <p className="text-xs text-slate-500 font-medium line-clamp-1">
-                                                {mentor.headline || "CEFR Coach"}
+                                                {mentor.headline || "Huấn luyện viên CEFR"}
                                             </p>
                                             <div className="flex items-center gap-1 mt-1">
                                                 <Star
@@ -225,13 +225,13 @@ export const FindMentorPage = () => {
                                                     {Number(mentor.avgRating || 0).toFixed(1)}
                                                 </span>
                                                 <span className="text-[11px] text-slate-400">
-                                                    ({mentor.totalStudents} students)
+                                                    ({mentor.totalStudents} học viên)
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
                                     <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-piemind-green text-emerald-800 border border-piemind-mint">
-                                        Available
+                                        Sẵn sàng
                                     </span>
                                 </div>
 
@@ -244,10 +244,10 @@ export const FindMentorPage = () => {
                                 <div className="bg-slate-50 rounded-xl px-3.5 py-2.5 border border-slate-100 flex items-center justify-between text-xs">
                                     <div className="flex items-center gap-1.5 text-slate-600">
                                         <Clock size={14} className="text-slate-400" />
-                                        <span>Available today</span>
+                                        <span>Sẵn sàng hôm nay</span>
                                     </div>
                                     <span className="font-bold text-piemind-pink">
-                                        Plan Included
+                                        Đã bao gồm gói
                                     </span>
                                 </div>
                             </div>
@@ -257,13 +257,13 @@ export const FindMentorPage = () => {
                                     to={`/mentors/${mentor.id}/book`}
                                     className="flex-1 py-2.5 px-3 rounded-xl bg-piemind-pink hover:bg-piemind-pink/90 text-white text-xs font-bold transition-all text-center cursor-pointer"
                                 >
-                                    Book Discovery
+                                    Đặt buổi tư vấn
                                 </Link>
                                 <Link
                                     to={`/mentors/${mentor.id}/book`}
                                     className="px-3.5 py-2.5 rounded-xl border border-border hover:bg-muted text-foreground text-xs font-bold transition-colors whitespace-nowrap cursor-pointer"
                                 >
-                                    View Profile
+                                    Xem hồ sơ
                                 </Link>
                             </div>
                         </article>
@@ -278,7 +278,7 @@ export const FindMentorPage = () => {
                     onPageChange={setCurrentPage}
                     totalPages={totalPages}
                     totalItems={totalItems}
-                    itemLabel="mentors"
+                    itemLabel="mentor"
                     limit={limit}
                     onLimitChange={(next) => {
                         setLimit(next);

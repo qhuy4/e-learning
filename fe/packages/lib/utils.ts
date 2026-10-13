@@ -6,9 +6,9 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatVND(amount: number | string | null | undefined): string {
-  if (amount === null || amount === undefined || amount === "") return "Free";
+  if (amount === null || amount === undefined || amount === "") return "Miễn phí";
   const num = typeof amount === "string" ? Number(amount) : amount;
-  if (isNaN(num) || num <= 0) return "Free";
+  if (isNaN(num) || num <= 0) return "Miễn phí";
   return `${num.toLocaleString("vi-VN")} ₫`;
 }
 

@@ -30,8 +30,8 @@ export const ReviewList: React.FC<ReviewListProps> = ({
 
   if (!reviews || reviews.length === 0) {
     return (
-      <div className="text-center py-12 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-        <p className="text-slate-500 font-medium text-sm">
+      <div className="text-center py-16 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+        <p className="text-slate-500 font-medium text-base">
           Chưa có đánh giá nào cho khóa học này.
         </p>
       </div>
@@ -65,30 +65,33 @@ export const ReviewList: React.FC<ReviewListProps> = ({
         return (
           <div
             key={review.id}
-            className="bg-white rounded-xl p-5 border border-slate-200 shadow-2xs hover:shadow-xs transition-shadow space-y-3"
+            className="bg-white rounded-2xl p-6 border border-slate-200 shadow-2xs hover:shadow-xs transition-shadow space-y-4"
           >
             {/* Header: User Avatar, Name, Rating Stars, Date, Delete button */}
             <div className="flex items-start justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-100 border border-slate-200 shrink-0 flex items-center justify-center">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-100 border border-slate-200 shrink-0 flex items-center justify-center">
                   {avatar ? (
                     <img
                       src={avatar}
                       alt={name}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
                     />
                   ) : (
-                    <User className="w-5 h-5 text-slate-400" />
+                    <User className="w-6 h-6 text-slate-400" />
                   )}
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900">{name}</h4>
-                  <div className="flex items-center gap-2 mt-0.5">
+                  <h4 className="text-base font-bold text-slate-900">{name}</h4>
+                  <div className="flex items-center gap-2 mt-1">
                     <div className="flex items-center text-amber-400 gap-0.5">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Star
                           key={star}
-                          className={`w-3.5 h-3.5 ${
+                          className={`w-4 h-4 ${
                             star <= review.rating
                               ? "fill-amber-400 text-amber-400"
                               : "text-slate-300"
@@ -96,7 +99,7 @@ export const ReviewList: React.FC<ReviewListProps> = ({
                         />
                       ))}
                     </div>
-                    <span className="text-xs text-slate-400">{dateFormatted}</span>
+                    <span className="text-sm text-slate-400">{dateFormatted}</span>
                   </div>
                 </div>
               </div>
@@ -115,20 +118,20 @@ export const ReviewList: React.FC<ReviewListProps> = ({
 
             {/* Comment Content */}
             {review.comment && (
-              <p className="text-sm text-slate-700 leading-relaxed font-normal whitespace-pre-line">
+              <p className="text-base text-slate-700 leading-relaxed font-normal whitespace-pre-line">
                 {review.comment}
               </p>
             )}
 
             {/* Review Image Gallery */}
             {review.images && review.images.length > 0 && (
-              <div className="flex flex-wrap gap-2 pt-1">
+              <div className="flex flex-wrap gap-2.5 pt-1">
                 {review.images.map((img) => (
                   <button
                     key={img.id}
                     type="button"
                     onClick={() => setSelectedImage(img.imageUrl)}
-                    className="w-20 h-20 rounded-lg overflow-hidden border border-slate-200 hover:opacity-95 hover:ring-2 hover:ring-indigo-500 transition-all group shrink-0 cursor-pointer"
+                    className="w-24 h-24 rounded-lg overflow-hidden border border-slate-200 hover:opacity-95 hover:ring-2 hover:ring-indigo-500 transition-all group shrink-0 cursor-pointer"
                   >
                     <img
                       src={img.imageUrl}

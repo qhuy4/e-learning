@@ -50,7 +50,7 @@ export const Pagination = ({
           </>
         )}
         <span>
-          Showing {start}–{end} of {totalItems} {itemLabel}
+          Hiển thị {start}–{end} trong {totalItems} {itemLabel}
         </span>
       </div>
       <div className="flex items-center gap-1.5">

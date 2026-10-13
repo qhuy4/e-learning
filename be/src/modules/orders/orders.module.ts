@@ -18,6 +18,7 @@ import { AdminOrdersController } from '@/modules/orders/presentation/admin-order
 import { StudentOrdersController } from '@/modules/orders/presentation/student-orders.controller';
 
 import { EnrollmentsModule } from '@/modules/enrollments/enrollments.module';
+import { CouponsModule } from '@/modules/coupons/coupons.module';
 
 const QueryHandlers = [GetAdminOrdersHandler, GetAdminOrderByIdHandler, GetMyOrdersHandler, GetMyOrderByIdHandler];
 const CommandHandlers = [UpdateOrderStatusHandler, CreateOrderHandler];
@@ -27,6 +28,7 @@ const CommandHandlers = [UpdateOrderStatusHandler, CreateOrderHandler];
     CqrsModule,
     TypeOrmModule.forFeature([OrderOrmEntity, OrderItemOrmEntity]),
     EnrollmentsModule,
+    CouponsModule,
   ],
   controllers: [AdminOrdersController, StudentOrdersController],
   providers: [

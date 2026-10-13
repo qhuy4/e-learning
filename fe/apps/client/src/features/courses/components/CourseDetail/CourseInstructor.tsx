@@ -19,11 +19,11 @@ export const CourseInstructor = ({ instructor }: CourseInstructorProps) => {
 
   return (
     <div className="bg-white border border-primary/30 rounded-xl p-6">
-      <h2 className="text-lg font-bold text-slate-900 mb-4">Instructor</h2>
+      <h2 className="text-lg font-bold text-slate-900 mb-4">Giảng viên</h2>
 
       <div className="flex flex-col md:flex-row gap-5 items-start">
         <Avatar className="w-20 h-20 border-2 border-primary/20 shrink-0">
-          <AvatarImage src={`https://i.pravatar.cc/150?u=${(instructor as any).userId ?? instructor.id}`} />
+          <AvatarImage src={instructor.avatar ?? undefined} />
           <AvatarFallback className="bg-piemind-green/30 text-m3-secondary font-bold">
             {initials}
           </AvatarFallback>

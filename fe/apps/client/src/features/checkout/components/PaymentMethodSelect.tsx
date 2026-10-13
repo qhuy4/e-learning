@@ -1,5 +1,3 @@
-import { CreditCard } from "lucide-react";
-
 interface PaymentMethodSelectProps {
   value: string;
   onChange: (value: string) => void;
@@ -15,44 +13,57 @@ export const PaymentMethodSelect = ({
   onChange,
 }: PaymentMethodSelectProps) => {
   return (
-    <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm">
-      <h3 className="font-bold text-slate-900 mb-4">Phương thức thanh toán</h3>
+    <div>
+      <h3 className="mb-3 text-base font-bold text-slate-900">
+        Phương thức thanh toán
+      </h3>
 
-      <div className="space-y-3">
-        {METHODS.map((method) => (
-          <label
-            key={method.id}
-            className={`flex items-center gap-3 p-4 border-2 rounded-xl cursor-pointer transition-all ${
-              value === method.id
-                ? "border-rose-400 bg-rose-50"
-                : "border-slate-100 hover:border-slate-200"
-            }`}
-          >
-            <input
-              type="radio"
-              name="paymentMethod"
-              value={method.id}
-              checked={value === method.id}
-              onChange={() => onChange(method.id)}
-              className="sr-only"
-            />
-            <div
-              className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                value === method.id
-                  ? "bg-rose-400 text-white"
-                  : "bg-slate-100 text-slate-400"
+      {/* Radio card — 2 cột trên tablet/desktop, 1 cột trên mobile */}
+      <div className="grid gap-3 sm:grid-cols-2">
+        {METHODS.map((method) => {
+          const active = value === method.id;
+          return (
+            <label
+              key={method.id}
+              className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-all ${
+                active
+                  ? "border-piemind-pink bg-piemind-pink/[0.04] ring-1 ring-piemind-pink"
+                  : "border-slate-200 bg-white hover:border-slate-300"
               }`}
             >
-              <CreditCard className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="font-semibold text-slate-900 text-sm">
-                {method.label}
-              </p>
-              <p className="text-xs text-slate-500">{method.desc}</p>
-            </div>
-          </label>
-        ))}
+              <input
+                type="radio"
+                name="paymentMethod"
+                value={method.id}
+                checked={active}
+                onChange={() => onChange(method.id)}
+                className="sr-only"
+              />
+              {/* Radio indicator */}
+              <span
+                className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
+                  active ? "border-piemind-pink" : "border-slate-300"
+                }`}
+              >
+                {active && (
+                  <span className="h-2.5 w-2.5 rounded-full bg-piemind-pink" />
+                )}
+              </span>
+              <span className="min-w-0">
+                <span
+                  className={`block text-sm font-semibold ${
+                    active ? "text-slate-900" : "text-slate-700"
+                  }`}
+                >
+                  {method.label}
+                </span>
+                <span className="mt-0.5 block text-xs text-slate-500">
+                  {method.desc}
+                </span>
+              </span>
+            </label>
+          );
+        })}
       </div>
     </div>
   );

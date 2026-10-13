@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { Star, Heart } from "lucide-react";
+import { BookOpen, Star, Heart } from "lucide-react";
 import { useRelatedCourses } from "@/features/courses/hooks/use-courses";
 import { formatVND } from "@fe/lib/utils";
 import type { CatalogCourse } from "../Catalog/types";
@@ -14,7 +14,7 @@ export const RelatedCourses = ({ courseSlug }: RelatedCoursesProps) => {
   if (isLoading) {
     return (
       <div className="pt-8 border-t border-slate-200 mt-6">
-        <h2 className="text-lg font-bold text-slate-900 mb-6">Related Courses</h2>
+        <h2 className="text-lg font-bold text-slate-900 mb-6">Khóa học liên quan</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="animate-pulse">
@@ -33,7 +33,7 @@ export const RelatedCourses = ({ courseSlug }: RelatedCoursesProps) => {
 
   return (
     <div className="pt-8 border-t border-slate-200 mt-6">
-      <h2 className="text-lg font-bold text-slate-900 mb-6">Related Courses</h2>
+      <h2 className="text-lg font-bold text-slate-900 mb-6">Khóa học liên quan</h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {courses.map((course: CatalogCourse) => (
@@ -43,11 +43,19 @@ export const RelatedCourses = ({ courseSlug }: RelatedCoursesProps) => {
             className="group bg-white rounded-xl border border-primary/30 shadow-sm overflow-hidden hover:shadow-md transition-all cursor-pointer"
           >
             <div className="relative aspect-[4/3] bg-slate-100 overflow-hidden">
-              <img
-                src={course.thumbnail || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&auto=format&fit=crop"}
-                alt={course.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <BookOpen className="w-8 h-8 text-slate-300" />
+              </div>
+              {course.thumbnail && (
+                <img
+                  src={course.thumbnail}
+                  alt={course.title}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                  }}
+                />
+              )}
               <button
                 onClick={(e) => e.preventDefault()}
                 className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur shadow-sm flex items-center justify-center text-slate-400 hover:text-piemind-pink hover:bg-white transition-colors"

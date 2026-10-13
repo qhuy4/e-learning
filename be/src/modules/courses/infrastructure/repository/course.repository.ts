@@ -82,6 +82,7 @@ export class CourseRepository implements ICourseRepository {
       .leftJoinAndSelect('course.sections', 'section')
       .leftJoinAndSelect('section.lessons', 'lesson')
       .leftJoinAndSelect('course.instructorUser', 'instructorUser')
+      .leftJoinAndSelect('instructorUser.profile', 'userProfile')
       .where('course.slug = :slug', { slug })
       .andWhere('course.status = :status', { status: CourseStatus.PUBLISHED })
       .andWhere('course.deletedAt IS NULL')

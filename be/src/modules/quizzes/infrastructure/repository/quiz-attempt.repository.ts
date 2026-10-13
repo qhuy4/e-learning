@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { QuizAttemptOrmEntity } from '../entity/quiz-attempt.orm-entity';
 import { QuizAttempt } from '../../domain/entity/quiz-attempt.entity';
+import { QuizAttemptStatus } from '../../domain/enums/quiz-attempt-status.enum';
 import { IQuizAttemptRepository } from '../../domain/repository/quiz-attempt.repository';
 import { QuizAttemptMapper } from '../mapper/quiz-attempt.mapper';
 
@@ -36,5 +37,15 @@ export class QuizAttemptRepository implements IQuizAttemptRepository {
     });
     const saved = await this.repository.save(entity!);
     return QuizAttemptMapper.toDomain(saved);
+  }
+
+  async countByQuizAndUser(quizId: number, userId: number): Promise<number> {
+    return this.repository.count({
+      where: {
+        quizId: quizId.toString(),
+        userId: userId.toString(),
+        status: QuizAttemptStatus.SUBMITTED,
+      },
+    });
   }
 }

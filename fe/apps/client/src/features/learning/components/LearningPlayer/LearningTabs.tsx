@@ -2,32 +2,51 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@fe/components/ui/tabs
 import { FileText, MessageSquare } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@fe/components/ui/avatar';
 import type { LessonDetail } from '../../types/learning.type';
+import { useAuth } from '@/features/auth/hooks/use-auth';
 
 interface LearningTabsProps {
   lesson: LessonDetail;
 }
 
 export const LearningTabs = ({ lesson }: LearningTabsProps) => {
+  const { user } = useAuth();
+  const userInitials =
+    (user?.name || user?.email || 'Học viên')
+      .split(/[\s@.]+/)
+      .filter(Boolean)
+      .map((w) => w[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2) || 'HV';
+
   return (
     <div className="p-4 md:p-6 lg:p-8 max-w-4xl mx-auto lg:mx-0 w-full font-sans">
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="w-full sm:w-fit flex-wrap sm:flex-nowrap justify-start p-1.5 h-auto bg-slate-100 rounded-lg mb-6 gap-1">
-          <TabsTrigger value="overview" className="rounded-sm py-3 px-6 sm:px-8 text-base font-semibold transition-all hover:bg-slate-200/50 data-[state=active]:shadow-sm">
-            Tổng quan
-          </TabsTrigger>
-          <TabsTrigger value="notes" className="rounded-sm py-3 px-6 sm:px-8 text-base font-semibold transition-all hover:bg-slate-200/50 data-[state=active]:shadow-sm">
-            Ghi chú
-          </TabsTrigger>
-          <TabsTrigger value="qa" className="rounded-sm py-3 px-6 sm:px-8 text-base font-semibold transition-all hover:bg-slate-200/50 data-[state=active]:shadow-sm">
-            Hỏi đáp
-          </TabsTrigger>
-          <TabsTrigger value="resources" className="rounded-sm py-3 px-6 sm:px-8 text-base font-semibold transition-all hover:bg-slate-200/50 data-[state=active]:shadow-sm">
-            Tài liệu
-          </TabsTrigger>
+        {/* Tab strip kiểu chuyên nghiệp: chữ trái + gạch dưới hồng khi chọn */}
+        <TabsList
+          variant="line"
+          className="w-full justify-start gap-5 sm:gap-8 flex-wrap p-0 group-data-horizontal/tabs:h-auto border-b border-slate-200"
+        >
+          {(
+            [
+              ['overview', 'Tổng quan'],
+              ['notes', 'Ghi chú'],
+              ['qa', 'Hỏi đáp'],
+              ['resources', 'Tài liệu'],
+            ] as const
+          ).map(([value, label]) => (
+            <TabsTrigger
+              key={value}
+              value={value}
+              className="flex-none rounded-none px-1 pt-2 pb-3.5 text-sm font-bold text-slate-400 hover:text-slate-700 data-active:text-piemind-pink data-active:after:opacity-100 after:bg-piemind-pink group-data-horizontal/tabs:after:bottom-[-2px] group-data-horizontal/tabs:after:h-[3px]"
+            >
+              {label}
+            </TabsTrigger>
+          ))}
         </TabsList>
 
         {/* TAB TỔNG QUAN */}
-        <TabsContent value="overview" className="focus-visible:outline-none focus-visible:ring-0 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <TabsContent value="overview" className="pt-4 focus-visible:outline-none focus-visible:ring-0 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Về bài học này</h2>
           <p className="text-slate-600 leading-relaxed text-sm md:text-base">
             {lesson.content ?? 'Chưa có mô tả cho bài học này.'}
@@ -35,7 +54,7 @@ export const LearningTabs = ({ lesson }: LearningTabsProps) => {
         </TabsContent>
 
         {/* TAB GHI CHÚ */}
-        <TabsContent value="notes" className="focus-visible:outline-none focus-visible:ring-0 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <TabsContent value="notes" className="pt-4 focus-visible:outline-none focus-visible:ring-0 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center mb-8 bg-slate-50 p-4 rounded-2xl border border-slate-100">
             <input
               type="text"
@@ -51,7 +70,7 @@ export const LearningTabs = ({ lesson }: LearningTabsProps) => {
         </TabsContent>
 
         {/* TAB HỎI ĐÁP */}
-        <TabsContent value="qa" className="focus-visible:outline-none focus-visible:ring-0 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <TabsContent value="qa" className="pt-4 focus-visible:outline-none focus-visible:ring-0 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
             Bình luận <MessageSquare className="w-4 h-4 text-slate-400" />
           </h3>
@@ -59,8 +78,10 @@ export const LearningTabs = ({ lesson }: LearningTabsProps) => {
           {/* Form bình luận */}
           <div className="flex gap-4 mb-8">
             <Avatar className="w-10 h-10 shrink-0 border border-slate-100">
-              <AvatarImage src="https://i.pravatar.cc/150?u=my_user" />
-              <AvatarFallback>ME</AvatarFallback>
+              <AvatarImage src={user?.avatar ?? undefined} />
+              <AvatarFallback className="bg-emerald-100 text-emerald-700 text-xs font-bold">
+                {userInitials}
+              </AvatarFallback>
             </Avatar>
             <div className="flex-1 flex flex-col items-end gap-3">
               <textarea
@@ -79,7 +100,7 @@ export const LearningTabs = ({ lesson }: LearningTabsProps) => {
         </TabsContent>
 
         {/* TAB TÀI LIỆU */}
-        <TabsContent value="resources" className="focus-visible:outline-none focus-visible:ring-0 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <TabsContent value="resources" className="pt-4 focus-visible:outline-none focus-visible:ring-0 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <p className="text-sm text-slate-400 text-center py-8">Chưa có tài liệu đính kèm.</p>
           <div className="flex items-center justify-between p-4 border border-slate-200 rounded-2xl hover:border-emerald-200 hover:shadow-md transition-all cursor-pointer bg-white group">
             <div className="flex items-center gap-4">

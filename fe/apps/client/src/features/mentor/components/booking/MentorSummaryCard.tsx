@@ -51,7 +51,7 @@ export function MentorSummaryCard({
                         <ShieldCheck className="size-4 text-m3-secondary" />
                     </div>
                     <span className="text-xs text-muted-foreground font-semibold">
-                        {mentor.headline || "Cambridge Certified ESL Coach"}
+                        {mentor.headline || "Huấn luyện viên ESL được chứng nhận Cambridge"}
                     </span>
                     <div className="flex items-center gap-1.5 mt-1 text-xs">
                         <div className="flex items-center text-accent-foreground font-bold">
@@ -62,7 +62,7 @@ export function MentorSummaryCard({
                         </div>
                         <span className="text-muted-foreground">•</span>
                         <span className="text-muted-foreground">
-                            {mentor.totalStudents} students
+                            {mentor.totalStudents} học viên
                         </span>
                     </div>
                 </div>
@@ -73,13 +73,13 @@ export function MentorSummaryCard({
                     variant="outline"
                     className="bg-muted text-foreground border-border font-semibold px-2.5 py-1 text-xs rounded-full"
                 >
-                    CEFR Coach
+                    Huấn luyện viên CEFR
                 </Badge>
                 <Badge
                     variant="outline"
                     className="bg-muted text-foreground border-border font-semibold px-2.5 py-1 text-xs rounded-full"
                 >
-                    {mentor.totalStudents} students
+                    {mentor.totalStudents} học viên
                 </Badge>
             </div>
 
@@ -88,7 +88,7 @@ export function MentorSummaryCard({
                 <p>
                     "
                     {mentor.bio ||
-                        "In our 15 minutes, we won't do boring grammar drills. We'll speak naturally, identify what holds back your flow, and give you 3 instant quick-wins."}
+                        "Trong 15 phút này, chúng ta sẽ không làm những bài tập ngữ pháp nhàm chán. Chúng ta sẽ nói tự nhiên, chỉ ra điều đang cản trở nhịp nói của bạn, và đưa bạn 3 mẹo nhỏ áp dụng ngay."}
                     "
                 </p>
             </div>
@@ -97,43 +97,43 @@ export function MentorSummaryCard({
                 <div className="flex items-center justify-between pb-2 border-b border-border">
                     <span className="text-muted-foreground flex items-center gap-1.5">
                         <CalendarIcon className="size-4 text-primary" />
-                        Date & Time
+                        Ngày & giờ
                     </span>
                     <span className="font-bold text-foreground text-right">
                         {summaryDate}
                         {selectedTimeLabel
                             ? ` • ${selectedTimeLabel}`
-                            : " • Select a time"}
+                            : " • Chọn giờ"}
                     </span>
                 </div>
 
                 <div className="flex items-center justify-between pb-2 border-b border-border">
                     <span className="text-muted-foreground flex items-center gap-1.5">
                         <Clock className="size-4 text-accent-foreground" />
-                        Duration
+                        Thời lượng
                     </span>
                     <span className="font-bold text-foreground flex items-center gap-1.5">
                         <span className="px-2 py-0.5 bg-m3-secondary/15 text-m3-secondary text-[11px] font-bold rounded-full">
-                            {durationMinutes} min
+                            {durationMinutes} phút
                         </span>
-                        {durationMinutes} Minutes
+                        {durationMinutes} phút
                     </span>
                 </div>
 
                 <div className="flex items-center justify-between pb-2 border-b border-border">
                     <span className="text-muted-foreground flex items-center gap-1.5">
                         <ShieldCheck className="size-4 text-m3-secondary" />
-                        Session Cost
+                        Chi phí buổi học
                     </span>
                     <span className="font-extrabold text-m3-secondary text-sm">
-                        FREE ($0.00)
+                        MIỄN PHÍ ($0.00)
                     </span>
                 </div>
 
                 <div className="flex items-center justify-between">
                     <span className="text-muted-foreground flex items-center gap-1.5">
                         <Video className="size-4 text-muted-foreground" />
-                        Format
+                        Hình thức
                     </span>
                     <span className="font-semibold text-foreground">
                         PiEMind Web Video

@@ -18,4 +18,9 @@ export interface ICouponRepository {
   softDelete(id: number): Promise<void>;
   toggleActive(id: number): Promise<any>;
   syncCourses(id: number, courseIds: number[]): Promise<void>;
+
+  /** Mã đang hiệu lực (active + trong hạn + còn lượt) — sắp xếp mới nhất. */
+  findActiveApplicable(courseId?: number): Promise<any[]>;
+  /** Tăng used_count sau khi ghi nhận sử dụng mã. */
+  incrementUsedCount(id: number): Promise<void>;
 }

@@ -26,7 +26,6 @@ import { BookingProfileDetailPage } from "../pages/mentor/BookingProfileDetailPa
 import { CheckoutPage } from "../pages/checkout/CheckoutPage";
 import { PaymentResultPage } from "../pages/payment/PaymentResultPage";
 import { MyCoursesPage } from "../pages/my-courses/MyCoursesPage";
-import { CartPage } from "../pages/cart/CartPage";
 
 import { ExamListPage } from "../features/exams/pages/ExamListPage";
 import { ExamDetailPage } from "../features/exams/pages/ExamDetailPage";
@@ -107,10 +106,6 @@ const router = createBrowserRouter([
         element: <CheckoutPage />,
       },
       {
-        path: "checkout",
-        element: <CheckoutPage />,
-      },
-      {
         path: "payment/result",
         element: <PaymentResultPage />,
       },
@@ -133,10 +128,6 @@ const router = createBrowserRouter([
       {
         path: "profile",
         element: <ProfilePage />,
-      },
-      {
-        path: "cart",
-        element: <CartPage />,
       },
       {
         path: "mentors",

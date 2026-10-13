@@ -5,6 +5,7 @@ import { CouponOrmEntity } from '@/modules/coupons/infrastructure/entity/coupon.
 import { CouponCourseOrmEntity } from '@/modules/coupons/infrastructure/entity/coupon-course.orm-entity';
 import { ICouponRepository } from '@/modules/coupons/domain/repository/coupon.repository';
 import { CouponMapper } from '@/modules/coupons/infrastructure/mapper/coupon.mapper';
+import { CouponScope } from '@/modules/coupons/domain/enum/coupon-scope.enum';
 
 @Injectable()
 export class CouponRepository implements ICouponRepository {
@@ -145,5 +146,37 @@ export class CouponRepository implements ICouponRepository {
       );
       await this.couponCourseRepository.save(couponCourses);
     }
+  }
+
+  async findActiveApplicable(courseId?: number) {
+    const now = new Date();
+    const qb = this.repository
+      .createQueryBuilder('coupon')
+      .leftJoinAndSelect('coupon.couponCourses', 'cc')
+      .leftJoinAndSelect('cc.course', 'course')
+      .where('coupon.is_active = :isActive', { isActive: true })
+      .andWhere('coupon.valid_from <= :now', { now })
+      .andWhere('(coupon.valid_until IS NULL OR coupon.valid_until >= :now)', { now })
+      .andWhere('(coupon.usage_limit IS NULL OR coupon.used_count < coupon.usage_limit)')
+      .orderBy('coupon.created_at', 'DESC');
+
+    if (courseId !== undefined && courseId !== null) {
+      qb.andWhere(
+        `(coupon.scope = :allScope OR EXISTS (
+           SELECT 1 FROM coupon_courses ccr
+           WHERE ccr.coupon_id = coupon.id AND ccr.course_id = :courseId
+         ))`,
+        { allScope: CouponScope.ALL, courseId: courseId.toString() },
+      );
+    } else {
+      qb.andWhere('coupon.scope = :allScope', { allScope: CouponScope.ALL });
+    }
+
+    const entities = await qb.getMany();
+    return entities.map((entity) => CouponMapper.toDomain(entity));
+  }
+
+  async incrementUsedCount(id: number) {
+    await this.repository.increment({ id: id.toString() }, 'usedCount', 1);
   }
 }

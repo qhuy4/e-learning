@@ -14,6 +14,7 @@ export class CourseDetailResponseDto {
     id: number;
     userId: number;
     name: string | null;
+    avatar: string | null;
     headline: string | null;
     bio: string | null;
     websiteUrl: string | null;

@@ -40,6 +40,11 @@ export interface LearningCourse {
   slug: string;
   thumbnail: string | null;
   sections: LearningSection[];
+  instructor?: {
+    id?: number;
+    name?: string | null;
+    headline?: string | null;
+  } | null;
 }
 
 // ─── Lesson Progress ────────────────────────────────────────────────────────

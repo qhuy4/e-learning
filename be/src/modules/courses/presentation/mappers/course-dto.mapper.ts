@@ -37,6 +37,7 @@ export class CourseDtoMapper {
         id: instructorProfile?.id ?? 0,
         userId: instructorUser.id,
         name: instructorUser.name ?? null,
+        avatar: ((instructorUser as any).profile?.avatarUrl as string | null) ?? null,
         headline: instructorProfile?.headline ?? null,
         bio: instructorProfile?.bio ?? null,
         websiteUrl: instructorProfile?.websiteUrl ?? null,

@@ -14,31 +14,31 @@ export function BookingHero({ mentorName }: BookingHeroProps) {
                     className="bg-secondary text-secondary-foreground font-semibold px-3 py-1 text-xs rounded-full inline-flex items-center gap-1.5"
                 >
                     <ShieldCheck className="size-3.5" />
-                    100% Free · No Card Required
+                    Miễn phí 100% · Không cần thẻ
                 </Badge>
                 <Badge
                     variant="outline"
                     className="bg-card text-foreground border-border font-semibold px-3 py-1 text-xs rounded-full inline-flex items-center gap-1.5"
                 >
                     <Clock className="size-3.5 text-muted-foreground" />
-                    Flexible Duration
+                    Thời lượng linh hoạt
                 </Badge>
                 <Badge
                     variant="outline"
                     className="bg-card text-foreground border-border font-semibold px-3 py-1 text-xs rounded-full inline-flex items-center gap-1.5"
                 >
                     <Video className="size-3.5 text-muted-foreground" />
-                    Live 1-on-1 Web Video Room
+                    Phòng video 1-1 trực tuyến
                 </Badge>
             </div>
 
             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
-                Book Free Discovery Session
+                Đặt lịch buổi tư vấn miễn phí
             </h1>
             <p className="mt-2.5 max-w-3xl text-muted-foreground text-base leading-relaxed">
-                Meet 1-on-1 with {mentorName} to assess your conversational flow,
-                pinpoint hesitation blockers, and map your personalized roadmap
-                with zero commitment.
+                Gặp gỡ 1-1 với {mentorName} để đánh giá nhịp hội thoại của bạn,
+                xác định các điểm gây ngập ngừng và xây dựng lộ trình cá nhân
+                hóa — hoàn toàn không ràng buộc.
             </p>
         </header>
     );

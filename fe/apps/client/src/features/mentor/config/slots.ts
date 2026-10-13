@@ -1,8 +1,8 @@
 export const DURATION_OPTIONS = [
-    { minutes: 15, label: "Free Discovery", hint: "Free Discovery" },
-    { minutes: 30, label: "Practice", hint: "Practice" },
-    { minutes: 60, label: "Standard", hint: "Standard" },
-    { minutes: 90, label: "Deep Dive", hint: "Deep Dive" },
+    { minutes: 15, label: "Trải nghiệm miễn phí", hint: "Trải nghiệm miễn phí" },
+    { minutes: 30, label: "Luyện tập", hint: "Luyện tập" },
+    { minutes: 60, label: "Tiêu chuẩn", hint: "Tiêu chuẩn" },
+    { minutes: 90, label: "Chuyên sâu", hint: "Chuyên sâu" },
 ] as const;
 
 export const DURATIONS = [15, 30, 60, 90] as const;

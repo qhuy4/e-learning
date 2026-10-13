@@ -12,7 +12,7 @@ export const CoursePreviewPage = () => {
 
   const courseData = (course as any)?.data ?? course;
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div>Đang tải...</div>;
 
   if (isError || !course) {
     return <div>Không tìm thấy khóa học hoặc không có quyền xem thử</div>;
@@ -24,10 +24,10 @@ export const CoursePreviewPage = () => {
       <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-m3-on-surface-variant font-label-lg">
         <Link to="/courses" className="hover:text-m3-primary transition-colors flex items-center gap-1">
           <School className="size-4" />
-          <span>Courses</span>
+          <span>Khóa học</span>
         </Link>
         <ChevronRight className="size-4 text-m3-outline-variant" />
-        <span className="text-m3-on-surface font-bold">Preview</span>
+        <span className="text-m3-on-surface font-bold">Xem thử</span>
       </nav>
 
       {/* Course Header Hero */}

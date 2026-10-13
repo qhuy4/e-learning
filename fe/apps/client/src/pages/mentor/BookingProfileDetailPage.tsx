@@ -116,8 +116,8 @@ export const BookingProfileDetailPage = () => {
                     [
                         focusTitles.join(", "),
                         notes,
-                        shareReport ? "Diagnostic report shared" : "",
-                        `Timezone: ${timezone}`,
+                        shareReport ? "Đã chia sẻ báo cáo chẩn đoán" : "",
+                        `Múi giờ: ${timezone}`,
                     ]
                         .filter(Boolean)
                         .join(" — ") || undefined,

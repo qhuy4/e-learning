@@ -33,9 +33,9 @@ export const MyBookingsPage = () => {
     return (
       <main className="min-h-screen bg-background pt-28 pb-16">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <p className="text-muted-foreground">Please sign in to view bookings.</p>
+          <p className="text-muted-foreground">Vui lòng đăng nhập để xem lịch đặt.</p>
           <Button className="mt-4" onClick={() => navigate("/student/login")}>
-            Login
+            Đăng nhập
           </Button>
         </div>
       </main>
@@ -49,9 +49,9 @@ export const MyBookingsPage = () => {
       <div className="max-w-3xl mx-auto px-4 sm:px-6">
         <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">My bookings</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Lịch đặt của tôi</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Upcoming and past 1:1 sessions with your coach
+              Các buổi học 1:1 sắp tới và đã qua với huấn luyện viên của bạn
             </p>
           </div>
           <Button
@@ -72,9 +72,9 @@ export const MyBookingsPage = () => {
         ) : bookings.length === 0 ? (
           <Card>
             <CardContent className="p-8 text-center text-muted-foreground">
-              No bookings yet. Find a mentor to get started.
+              Chưa có lịch đặt nào. Hãy tìm mentor để bắt đầu.
               <div className="mt-4">
-                <Button onClick={() => navigate("/mentors")}>Find a mentor</Button>
+                <Button onClick={() => navigate("/mentors")}>Tìm mentor</Button>
               </div>
             </CardContent>
           </Card>
@@ -108,7 +108,7 @@ export const MyBookingsPage = () => {
                       className="rounded-full bg-[#F38181] text-white hover:bg-[#e56d6d] shrink-0"
                       onClick={() => navigate(`/meeting/${b.meetingRoomId}`)}
                     >
-                      <Video className="h-4 w-4 mr-1" /> Join lesson
+                      <Video className="h-4 w-4 mr-1" /> Vào lớp học
                     </Button>
                   )}
                 </CardContent>
