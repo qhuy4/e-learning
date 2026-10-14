@@ -91,7 +91,7 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-muted-foreground hover:bg-muted transition-colors"
                   >
                     <BookOpen size={16} />
-                    My Courses
+                    Khóa học của tôi
                   </Link>
                   <Link
                     to="/my-bookings"
@@ -125,7 +125,7 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
                     className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-destructive/10 transition-colors"
                   >
                     <LogOut size={16} />
-                    Sign Out
+                    Đăng xuất
                   </button>
                 </div>
               )}
@@ -136,13 +136,13 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
                 to="/student/login"
                 className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors px-3 py-2"
               >
-                Login
+                Đăng nhập
               </Link>
               <Link
                 to="/student/register"
                 className="text-sm font-semibold text-primary-foreground bg-primary hover:opacity-90 rounded-full px-5 py-2.5 shadow-sm hover:shadow transition-all active:translate-y-0.5"
               >
-                Get Started
+                Bắt đầu
               </Link>
               <div className="w-9 h-9 rounded-full bg-muted border border-border flex items-center justify-center text-muted-foreground">
                 <User size={18} />
@@ -173,7 +173,7 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
               className="flex items-center gap-2 px-2 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg"
             >
               <ShoppingBag size={16} />
-              Cart
+              Giỏ hàng
               {itemCount > 0 && (
                 <span className="ml-auto bg-[#F38181] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
                   {itemCount}
@@ -196,7 +196,7 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
                   className="flex items-center gap-2 px-2 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg"
                 >
                   <BookOpen size={16} />
-                  My Courses
+                  Khóa học của tôi
                 </Link>
                 <Link
                   to="/my-bookings"
@@ -230,7 +230,7 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
                   className="flex items-center gap-2 px-2 py-2.5 text-sm font-medium text-destructive hover:bg-destructive/10 rounded-lg"
                 >
                   <LogOut size={16} />
-                  Sign Out
+                  Đăng xuất
                 </button>
               </>
             ) : (
@@ -240,14 +240,14 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="w-full text-muted-foreground font-medium py-2 border border-border rounded-full hover:bg-muted transition-colors text-center"
                 >
-                  Login
+                  Đăng nhập
                 </Link>
                 <Link
                   to="/student/register"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="w-full bg-primary text-primary-foreground font-medium py-2 rounded-full hover:opacity-90 transition-colors text-center"
                 >
-                  Get Started
+                  Bắt đầu
                 </Link>
               </>
             )}
