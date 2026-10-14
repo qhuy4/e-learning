@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, MoreThan, Not, Repository } from 'typeorm';
+import { randomUUID } from 'crypto';
 import { RefreshSession } from '@/modules/auth/infrastructure/refresh-session.entity';
 
 
@@ -136,6 +137,7 @@ export class RefreshSessionRepository {
       );
 
       const newSession = manager.create(RefreshSession, {
+        id: randomUUID(),
         userId: session.userId,
         tokenHash: newTokenHash,
         tokenFamily: session.tokenFamily,

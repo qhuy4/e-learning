@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { authService } from "@/features/auth/services/auth.service";
 import {
   User,
   Mail,
@@ -17,8 +18,12 @@ export const StudentRegisterPage = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const passwordStrength = (() => {
     let score = 0;
@@ -46,9 +51,23 @@ export const StudentRegisterPage = () => {
           ? "text-m3-tertiary"
           : "text-m3-secondary";
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!agreedToTerms) return;
+    if (password !== confirmPassword) {
+      setError("Password confirmation does not match.");
+      return;
+    }
+    setError("");
+    setIsSubmitting(true);
+    try {
+      await authService.register({ name: fullName, email, password, confirmPassword });
+      navigate(`/student/verify-email?email=${encodeURIComponent(email)}`);
+    } catch {
+      setError("Unable to create your account. The email may already be registered or the password is invalid.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -291,6 +310,26 @@ export const StudentRegisterPage = () => {
                   </div>
 
                   {/* Terms Checkbox */}
+                  <div>
+                    <label className="block font-label-md text-m3-on-surface mb-1.5" htmlFor="confirmPasswordInput">
+                      Confirm Password
+                    </label>
+                    <div className="relative flex items-center rounded-xl border border-transparent hover:border-slate-300 focus-within:border-[#f38181] focus-within:ring-2 focus-within:ring-[#f38181]/20">
+                      <Lock className="size-5 absolute left-4 text-m3-on-surface-variant pointer-events-none" />
+                      <input
+                        className="w-full h-[52px] pl-12 pr-4 rounded-xl bg-m3-surface-container-low focus:outline-none"
+                        id="confirmPasswordInput"
+                        required
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {error && <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-600">{error}</p>}
+
+                  {/* Terms Checkbox */}
                   <div className="pt-1">
                     <label className="flex items-start gap-2.5 cursor-pointer select-none group">
                       <input
@@ -322,9 +361,9 @@ export const StudentRegisterPage = () => {
                           : "bg-[#F38181]/60 cursor-not-allowed"
                       }`}
                       type="submit"
-                      disabled={!agreedToTerms}
+                      disabled={!agreedToTerms || isSubmitting}
                     >
-                      <span>Get Started Free</span>
+                      <span>{isSubmitting ? "Creating account..." : "Get Started Free"}</span>
                       <ArrowRight className="size-5" />
                     </button>
                   </div>

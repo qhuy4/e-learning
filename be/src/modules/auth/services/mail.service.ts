@@ -26,6 +26,40 @@ export class MailService {
     }
   }
 
+  async sendEmailVerification(email: string, token: string): Promise<void> {
+    const frontendUrl = this.configService.get<string>(
+      'FRONTEND_CLIENT_URL',
+      'http://localhost:5173',
+    );
+    const verificationUrl = `${frontendUrl.replace(/\/$/, '')}/student/verify-email?token=${encodeURIComponent(token)}`;
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px;">
+        <h2 style="color: #f38181;">Xác minh địa chỉ email</h2>
+        <p>Cảm ơn bạn đã đăng ký PiEMind. Nhấn nút bên dưới để kích hoạt tài khoản:</p>
+        <p style="margin: 28px 0;">
+          <a href="${verificationUrl}" style="background: #f38181; color: white; padding: 12px 24px; border-radius: 999px; text-decoration: none; font-weight: bold;">Xác minh email</a>
+        </p>
+        <p>Liên kết có hiệu lực trong 24 giờ. Nếu bạn không tạo tài khoản, hãy bỏ qua email này.</p>
+        <p style="word-break: break-all; color: #666; font-size: 13px;">${verificationUrl}</p>
+      </div>
+    `;
+
+    if (!this.transporter) {
+      this.logger.warn(`Email verification link for ${email}: ${verificationUrl}`);
+      return;
+    }
+
+    await this.transporter.sendMail({
+      from: this.configService.get<string>(
+        'MAIL_FROM',
+        `"E-Learning Platform" <${this.configService.get<string>('SMTP_USER')}>`,
+      ),
+      to: email,
+      subject: 'Xác minh email - PiEMind',
+      html: htmlContent,
+    });
+  }
+
   async sendInstructorInvite(email: string, token: string): Promise<{ registerUrl: string }> {
     const frontendUrl = this.configService.get<string>(
       'FRONTEND_CLIENT_URL',

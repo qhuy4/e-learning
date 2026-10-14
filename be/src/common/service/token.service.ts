@@ -45,6 +45,21 @@ export class TokenService {
     return this.jwtService.verify(token);
   }
 
+  generateEmailVerificationToken(userId: number, email: string): string {
+    return this.jwtService.sign(
+      { sub: userId, email, type: 'email-verification' },
+      { expiresIn: '24h' },
+    );
+  }
+
+  verifyEmailVerificationToken(token: string): {
+    sub: number;
+    email: string;
+    type: string;
+  } {
+    return this.jwtService.verify(token);
+  }
+
   hashRefreshToken(token: string): string {
     return createHash('sha256').update(token).digest('hex');
   }

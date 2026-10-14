@@ -71,6 +71,7 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
      const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
     await this.refreshTokenRepository.create({
+      id: randomUUID(),
       userId: user.id,
       tokenHash,
       tokenFamily,

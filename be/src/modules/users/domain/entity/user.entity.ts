@@ -106,4 +106,11 @@ export class User {
     this.blockReason = null;
     this.blockedAt = null;
   }
+
+  activate(): void {
+    this.status = UserStatus.ACTIVE;
+    this.blockReason = null;
+    this.blockedAt = null;
+    this.updatedAt = new Date();
+  }
 }

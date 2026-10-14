@@ -8,14 +8,20 @@ import { RegisterCommand } from '@/modules/auth/application/command/register.com
 import { PasswordService } from '@/common/service/password.service';
 import { User } from '@/modules/users/domain/entity/user.entity';
 import { UserProfile } from '@/modules/users/domain/entity/user-profile.entity';
-import { HttpStatus } from '@nestjs/common';
+import { HttpStatus, Logger } from '@nestjs/common';
+import { TokenService } from '@/common/service/token.service';
+import { MailService } from '@/modules/auth/services/mail.service';
 
 @CommandHandler(RegisterCommand)
 export class RegisterHandler implements ICommandHandler<RegisterCommand> {
+  private readonly logger = new Logger(RegisterHandler.name);
+
   constructor(
     private readonly userRepository: UserRepository,
     private readonly userProfileRepository: UserProfileRepository,
     private readonly passwordService: PasswordService,
+    private readonly tokenService: TokenService,
+    private readonly mailService: MailService,
   ) {}
 
   /**
@@ -27,7 +33,8 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
    * the email already exists, or user creation fails.
    */
   async execute(command: RegisterCommand): Promise<void> {
-    const { name, email, password, confirmPassword } = command;
+    const { name, password, confirmPassword } = command;
+    const email = command.email.trim().toLowerCase();
 
     if (password !== confirmPassword) {
       throw new AppException(ErrorCode.PASSWORD_MISMATCH, HttpStatus.NOT_FOUND);
@@ -60,5 +67,23 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
     });
 
     await this.userProfileRepository.create(profile);
+
+    const verificationToken = this.tokenService.generateEmailVerificationToken(
+      createdUser.id,
+      createdUser.email,
+    );
+    try {
+      await this.mailService.sendEmailVerification(
+        createdUser.email,
+        verificationToken,
+      );
+    } catch (error) {
+      // The account is already persisted. Keep registration successful so the
+      // user can retry delivery through the resend endpoint.
+      this.logger.error(
+        `Failed to send verification email to ${createdUser.email}`,
+        error instanceof Error ? error.stack : undefined,
+      );
+    }
   }
 }

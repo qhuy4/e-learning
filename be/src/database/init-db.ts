@@ -126,6 +126,21 @@ export async function initDatabaseTables(dataSource: DataSource) {
       CREATE INDEX IF NOT EXISTS idx_meeting_rooms_booking_id ON meeting_rooms(booking_id);
     `);
 
+    // 7. Lưu refresh token theo phiên đăng nhập
+    await dataSource.query(`
+      CREATE TABLE IF NOT EXISTS refresh_sessions (
+        id UUID PRIMARY KEY,
+        user_id BIGINT NOT NULL,
+        token_hash VARCHAR(255) NOT NULL,
+        token_family UUID NOT NULL,
+        expires_at TIMESTAMPTZ NOT NULL,
+        revoked_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_refresh_sessions_user_id ON refresh_sessions(user_id);
+      CREATE INDEX IF NOT EXISTS idx_refresh_sessions_token_hash ON refresh_sessions(token_hash);
+    `);
+
     logger.log('Khởi tạo / kiểm tra các bảng instructor và auth thành công!');
   } catch (error) {
     logger.error(`Lỗi khi khởi tạo bảng database: ${(error as Error).message}`);

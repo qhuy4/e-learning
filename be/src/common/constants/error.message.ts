@@ -11,6 +11,9 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   [ErrorCode.PASSWORD_MISMATCH]: 'Mật khẩu không khớp',
   [ErrorCode.EMAIL_ALREADY_EXISTS]: 'Email đã tồn tại',
   [ErrorCode.INVALID_CREDENTIALS]: 'Thông tin đăng nhập không hợp lệ',
+  [ErrorCode.EMAIL_ALREADY_VERIFIED]: 'Email đã được xác minh',
+  [ErrorCode.INVALID_EMAIL_VERIFICATION_TOKEN]:
+    'Liên kết xác minh email không hợp lệ hoặc đã hết hạn',
 
   [ErrorCode.AVAILABILITY_CONFLICT]: 'Lịch đã tồn tại khung giờ này',
 
