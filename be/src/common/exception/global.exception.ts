@@ -21,7 +21,11 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     const isExpectedInvalidPassword =
       exception instanceof AppException &&
-      exception.code === ErrorCode.INVALID_PASSWORD;
+      [
+        ErrorCode.INVALID_PASSWORD,
+        ErrorCode.EMAIL_VERIFICATION_REQUIRED,
+        ErrorCode.ACCOUNT_BLOCKED,
+      ].includes(exception.code);
 
     if (isExpectedInvalidPassword) {
       // Wrong credentials are an expected client-side outcome. The API still

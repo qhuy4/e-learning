@@ -10,6 +10,7 @@ import { HttpStatus } from '@nestjs/common';
 import { RefreshSessionRepository } from '@/modules/auth/infrastructure/repository/refresh-session.repository';
 import { randomUUID } from 'crypto';
 import { LoginResult } from '@/modules/auth/application/command/login.result';
+import { UserStatus } from '@/modules/users/domain/enum/user.status';
 
 @CommandHandler(LoginCommand)
 export class LoginHandler implements ICommandHandler<LoginCommand> {
@@ -49,6 +50,17 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 
     if (!isPasswordValid) {
       throw new AppException(ErrorCode.INVALID_PASSWORD, HttpStatus.FORBIDDEN);
+    }
+    if (user.status === UserStatus.PENDING) {
+      throw new AppException(
+        ErrorCode.EMAIL_VERIFICATION_REQUIRED,
+        HttpStatus.FORBIDDEN,
+      );
+    }
+    if (user.status === UserStatus.BLOCKED) {
+      throw new AppException(ErrorCode.ACCOUNT_BLOCKED, HttpStatus.FORBIDDEN, {
+        reason: user.blockReason,
+      });
     }
     if (user.id === null) {
       throw new AppException(

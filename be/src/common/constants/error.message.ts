@@ -16,6 +16,9 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
     'Liên kết xác minh email không hợp lệ hoặc đã hết hạn',
   [ErrorCode.INVALID_PASSWORD_RESET_TOKEN]:
     'Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn',
+  [ErrorCode.EMAIL_VERIFICATION_REQUIRED]:
+    'Vui lòng xác minh email trước khi đăng nhập',
+  [ErrorCode.ACCOUNT_BLOCKED]: 'Tài khoản đã bị khóa',
 
   [ErrorCode.AVAILABILITY_CONFLICT]: 'Lịch đã tồn tại khung giờ này',
 

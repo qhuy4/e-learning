@@ -12,6 +12,14 @@ export const StudentLoginPage = () => {
   const navigate = useNavigate();
   const loginMutation = useLogin();
 
+  const loginError = loginMutation.error as {
+    response?: { data?: { error?: { code?: string; message?: string; details?: { reason?: string | null } } } };
+  } | null;
+  const loginErrorCode = loginError?.response?.data?.error?.code;
+  const loginErrorMessage =
+    loginError?.response?.data?.error?.message || "Email hoặc mật khẩu không chính xác.";
+  const blockReason = loginError?.response?.data?.error?.details?.reason;
+
   const redirectTo = searchParams.get("redirect") || "/";
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -145,7 +153,20 @@ export const StudentLoginPage = () => {
                 {loginMutation.isError && (
                   <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 flex items-center gap-2 font-body-sm font-semibold">
                     <CheckCircle className="size-5 text-red-500" />
-                    Email hoặc mật khẩu không chính xác.
+                    <div>
+                      <p>{loginErrorMessage}</p>
+                      {loginErrorCode === "EMAIL_VERIFICATION_REQUIRED" && (
+                        <Link
+                          className="mt-1 inline-block underline"
+                          to={`/student/verify-email?email=${encodeURIComponent(email)}`}
+                        >
+                          Resend verification email
+                        </Link>
+                      )}
+                      {loginErrorCode === "ACCOUNT_BLOCKED" && blockReason && (
+                        <p className="mt-1 text-sm font-normal">Reason: {blockReason}</p>
+                      )}
+                    </div>
                   </div>
                 )}
 
