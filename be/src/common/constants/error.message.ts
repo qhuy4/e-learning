@@ -14,6 +14,8 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   [ErrorCode.EMAIL_ALREADY_VERIFIED]: 'Email đã được xác minh',
   [ErrorCode.INVALID_EMAIL_VERIFICATION_TOKEN]:
     'Liên kết xác minh email không hợp lệ hoặc đã hết hạn',
+  [ErrorCode.INVALID_PASSWORD_RESET_TOKEN]:
+    'Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn',
 
   [ErrorCode.AVAILABILITY_CONFLICT]: 'Lịch đã tồn tại khung giờ này',
 

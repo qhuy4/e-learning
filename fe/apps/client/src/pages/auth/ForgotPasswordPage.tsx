@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
+import { authService } from "@/features/auth/services/auth.service";
 import {
   ArrowLeft,
   ArrowRight,
@@ -17,12 +18,23 @@ import {
 
 export const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
-  const [method, setMethod] = useState<"magic" | "sms">("magic");
+  const [method] = useState<"magic">("magic");
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+    setError("");
+    try {
+      await authService.forgotPassword(email);
+      setSubmitted(true);
+    } catch {
+      setError("Unable to send reset instructions right now. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -111,20 +123,15 @@ export const ForgotPasswordPage = () => {
                             : "text-m3-on-surface-variant hover:text-m3-on-surface hover:bg-white/50"
                         }`}
                         type="button"
-                        onClick={() => setMethod("magic")}
                       >
                         <MailCheck className="size-4" />
                         <span>Magic Reset Link</span>
                         <span className="bg-white/40 text-[#146a5f] text-[10px] px-1.5 py-0.5 rounded-full uppercase tracking-wider">Recommended</span>
                       </button>
                       <button
-                        className={`w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-full text-xs font-bold transition-all ${
-                          method === "sms"
-                            ? "bg-[#95E1D3] text-[#146a5f] shadow-sm"
-                            : "text-m3-on-surface-variant hover:text-m3-on-surface hover:bg-white/50"
-                        }`}
+                        className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-full text-xs font-bold text-m3-on-surface-variant opacity-60 cursor-not-allowed"
                         type="button"
-                        onClick={() => setMethod("sms")}
+                        disabled
                       >
                         <MessageSquare className="size-4" />
                         <span>6-digit SMS / OTP Code</span>
@@ -160,7 +167,7 @@ export const ForgotPasswordPage = () => {
                   </div>
 
                   {/* Phone Field (SMS mode) */}
-                  <div className={`${method === "sms" ? "block" : "hidden"} space-y-1`}>
+                  <div className="hidden space-y-1">
                     <label className="text-m3-on-surface font-bold" htmlFor="recovery-phone">Registered Phone Number</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
@@ -179,9 +186,9 @@ export const ForgotPasswordPage = () => {
                   <button
                     className="w-full mt-2 py-3.5 px-6 rounded-full bg-[#f38181] hover:bg-[#e76f6f] active:scale-[0.99] text-white font-bold text-base shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group cursor-pointer"
                     type="submit"
-                    disabled={submitted}
+                    disabled={submitted || submitting}
                   >
-                    <span>{method === "magic" ? "Send Password Reset Link" : "Send 6-Digit SMS Code"}</span>
+                    <span>{submitting ? "Sending..." : "Send Password Reset Link"}</span>
                     <ArrowRight className="size-5 group-hover:translate-x-1 transition-transform" />
                   </button>
 
@@ -197,6 +204,7 @@ export const ForgotPasswordPage = () => {
                       </div>
                     </div>
                   )}
+                  {error && <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-600">{error}</p>}
                 </form>
 
                 {/* Alternative Actions */}

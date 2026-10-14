@@ -15,6 +15,7 @@ import { StudentLoginPage } from "../pages/auth/StudentLoginPage";
 import { StudentRegisterPage } from "../pages/auth/StudentRegisterPage";
 import { ForgotPasswordPage } from "../pages/auth/ForgotPasswordPage";
 import { VerifyEmailPage } from "../pages/auth/VerifyEmailPage";
+import { ResetPasswordPage } from "../pages/auth/ResetPasswordPage";
 import { FindMentorPage } from "../pages/mentor/FindMentorPage";
 import { BookingProfileDetailPage } from "../pages/mentor/BookingProfileDetailPage";
 import { CheckoutPage } from "../pages/checkout/CheckoutPage";
@@ -122,6 +123,10 @@ const router = createBrowserRouter([
             {
                 path: "student/forgot-password",
                 element: <ForgotPasswordPage />,
+            },
+            {
+                path: "student/reset-password",
+                element: <ResetPasswordPage />,
             },
             {
                 path: "student/verify-email",

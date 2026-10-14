@@ -60,6 +60,40 @@ export class MailService {
     });
   }
 
+  async sendPasswordReset(email: string, token: string): Promise<void> {
+    const frontendUrl = this.configService.get<string>(
+      'FRONTEND_CLIENT_URL',
+      'http://localhost:5173',
+    );
+    const resetUrl = `${frontendUrl.replace(/\/$/, '')}/student/reset-password?token=${encodeURIComponent(token)}`;
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px;">
+        <h2 style="color: #f38181;">Đặt lại mật khẩu</h2>
+        <p>Chúng tôi nhận được yêu cầu đặt lại mật khẩu PiEMind của bạn.</p>
+        <p style="margin: 28px 0;">
+          <a href="${resetUrl}" style="background: #f38181; color: white; padding: 12px 24px; border-radius: 999px; text-decoration: none; font-weight: bold;">Đặt lại mật khẩu</a>
+        </p>
+        <p>Liên kết có hiệu lực trong 1 giờ. Nếu bạn không yêu cầu thao tác này, hãy bỏ qua email.</p>
+        <p style="word-break: break-all; color: #666; font-size: 13px;">${resetUrl}</p>
+      </div>
+    `;
+
+    if (!this.transporter) {
+      this.logger.warn(`Password reset link for ${email}: ${resetUrl}`);
+      return;
+    }
+
+    await this.transporter.sendMail({
+      from: this.configService.get<string>(
+        'MAIL_FROM',
+        `"E-Learning Platform" <${this.configService.get<string>('SMTP_USER')}>`,
+      ),
+      to: email,
+      subject: 'Đặt lại mật khẩu - PiEMind',
+      html: htmlContent,
+    });
+  }
+
   async sendInstructorInvite(email: string, token: string): Promise<{ registerUrl: string }> {
     const frontendUrl = this.configService.get<string>(
       'FRONTEND_CLIENT_URL',

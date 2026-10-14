@@ -60,6 +60,22 @@ export class TokenService {
     return this.jwtService.verify(token);
   }
 
+  generatePasswordResetToken(userId: number, email: string): string {
+    return this.jwtService.sign(
+      { sub: userId, email, type: 'password-reset' },
+      { expiresIn: '1h' },
+    );
+  }
+
+  verifyPasswordResetToken(token: string): {
+    sub: number;
+    email: string;
+    type: string;
+    iat: number;
+  } {
+    return this.jwtService.verify(token);
+  }
+
   hashRefreshToken(token: string): string {
     return createHash('sha256').update(token).digest('hex');
   }

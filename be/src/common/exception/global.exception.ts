@@ -19,7 +19,14 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    if (exception instanceof Error) {
+    const isExpectedInvalidPassword =
+      exception instanceof AppException &&
+      exception.code === ErrorCode.INVALID_PASSWORD;
+
+    if (isExpectedInvalidPassword) {
+      // Wrong credentials are an expected client-side outcome. The API still
+      // returns its normal error response, but avoid polluting server logs.
+    } else if (exception instanceof Error) {
       this.logger.error(`${request.method} ${request.url}`, exception.stack);
     } else {
       this.logger.error(

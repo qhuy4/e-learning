@@ -19,6 +19,10 @@ import { TokenService } from '@/common/service/token.service';
 import { MailService } from '@/modules/auth/services/mail.service';
 import { UserRepository } from '@/modules/users/infrastructure/repository/user.repository';
 import { UserStatus } from '@/modules/users/domain/enum/user.status';
+import { ForgotPasswordDto } from '@/modules/auth/presentation/dto/forgot-password.dto';
+import { ResetPasswordDto } from '@/modules/auth/presentation/dto/reset-password.dto';
+import { PasswordService } from '@/common/service/password.service';
+import { RefreshSessionRepository } from '@/modules/auth/infrastructure/repository/refresh-session.repository';
 
 const COOKIE_OPTIONS = {
   httpOnly: true,
@@ -35,6 +39,8 @@ export class UserAuthController {
     private readonly tokenService: TokenService,
     private readonly mailService: MailService,
     private readonly userRepository: UserRepository,
+    private readonly passwordService: PasswordService,
+    private readonly refreshSessionRepository: RefreshSessionRepository,
   ) {}
 
   @Post('login')
@@ -119,7 +125,11 @@ export class UserAuthController {
       if (payload.type !== 'email-verification') throw new Error('Invalid token type');
 
       const user = await this.userRepository.findById(Number(payload.sub));
-      if (!user || user.email.toLowerCase() !== payload.email.toLowerCase()) {
+      if (
+        !user ||
+        user.id === null ||
+        user.email.toLowerCase() !== payload.email.toLowerCase()
+      ) {
         throw new Error('Token does not match current email');
       }
       if (user.status === UserStatus.BLOCKED) {
@@ -160,5 +170,62 @@ export class UserAuthController {
     return {
       message: 'If the account is pending, a verification email has been sent',
     };
+  }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  async forgotPassword(
+    @Body() dto: ForgotPasswordDto,
+  ): Promise<{ message: string }> {
+    const user = await this.userRepository.findByEmail(dto.email.trim().toLowerCase());
+
+    // Do not reveal whether an account exists for the supplied email.
+    if (user?.id) {
+      const token = this.tokenService.generatePasswordResetToken(user.id, user.email);
+      try {
+        await this.mailService.sendPasswordReset(user.email, token);
+      } catch {
+        // Preserve the generic response. The user can safely retry later.
+      }
+    }
+
+    return { message: 'If an account exists, password reset instructions have been sent' };
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(
+    @Body() dto: ResetPasswordDto,
+  ): Promise<{ message: string }> {
+    try {
+      const payload = this.tokenService.verifyPasswordResetToken(dto.token);
+      if (payload.type !== 'password-reset') throw new Error('Invalid token type');
+
+      const user = await this.userRepository.findById(Number(payload.sub));
+      if (
+        !user ||
+        user.id === null ||
+        user.email.toLowerCase() !== payload.email.toLowerCase()
+      ) {
+        throw new Error('Token does not match the user');
+      }
+
+      // A newer user update means the reset token has already been consumed.
+      if (user.updatedAt && user.updatedAt.getTime() / 1000 > payload.iat) {
+        throw new Error('Token has already been used');
+      }
+
+      user.update({ password: await this.passwordService.hash(dto.password) });
+      await this.userRepository.save(user);
+      await this.refreshSessionRepository.revokeAllForUser(user.id, null);
+
+      return { message: 'Password reset successfully' };
+    } catch (error) {
+      if (error instanceof AppException) throw error;
+      throw new AppException(
+        ErrorCode.INVALID_PASSWORD_RESET_TOKEN,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }
