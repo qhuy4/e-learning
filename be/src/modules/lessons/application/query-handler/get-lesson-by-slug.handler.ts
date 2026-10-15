@@ -97,8 +97,13 @@ export class GetLessonBySlugHandler implements IQueryHandler<GetLessonBySlugQuer
       ? await resolveSignedUrl(lesson.videoSource, this.storage, this.logger)
       : null;
 
+    // Poster chỉ cần khi video xem được (giống quyền xem video)
+    const signedThumbnailUrl = canViewVideo
+      ? await resolveSignedUrl(lesson.thumbnail, this.storage, this.logger)
+      : null;
+
     this.logger.debug(`Result: signedUrl=${signedUrl ? 'present' : 'null'}`);
 
-    return LessonDtoMapper.toDetailDto(lesson, signedUrl);
+    return LessonDtoMapper.toDetailDto(lesson, signedUrl, signedThumbnailUrl);
   }
 }

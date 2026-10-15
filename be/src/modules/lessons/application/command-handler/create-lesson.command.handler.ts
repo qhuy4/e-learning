@@ -27,7 +27,8 @@ import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';
 import { extractDuration } from '@/common/utils/media-duration.util';
 
-const EDITABLE_STATUSES = [1, 4];
+// DRAFT(1), APPROVED(3), REJECTED(4), PUBLISHED(5) — chặn PENDING_REVIEW(2) & ARCHIVED(6)
+const EDITABLE_STATUSES = [1, 3, 4, 5];
 
 @CommandHandler(CreateLessonCommand)
 export class CreateLessonHandler implements ICommandHandler<CreateLessonCommand> {
@@ -90,6 +91,20 @@ export class CreateLessonHandler implements ICommandHandler<CreateLessonCommand>
       }
     }
 
+    // Ảnh xem trước (poster) — tải lên R2 trước, lưu key vào DB
+    let thumbnailKey: string | null = null;
+    if (command.thumbnail) {
+      const extension = extname(command.thumbnail.originalname).toLowerCase();
+      thumbnailKey = ['lessons', 'thumbnails', `${randomUUID()}${extension}`].join('/');
+
+      await this.storage.upload({
+        key: thumbnailKey,
+        body: command.thumbnail.buffer,
+        contentType: command.thumbnail.mimetype,
+        contentLength: command.thumbnail.size,
+      });
+    }
+
     try {
       const lesson = Lesson.create({
         sectionId: command.sectionId,
@@ -98,6 +113,7 @@ export class CreateLessonHandler implements ICommandHandler<CreateLessonCommand>
         type: command.type,
         videoProvider: command.videoProvider,
         videoSource: videoSource,
+        thumbnail: thumbnailKey,
         duration,
         content: command.content,
         position: command.position,
@@ -108,6 +124,9 @@ export class CreateLessonHandler implements ICommandHandler<CreateLessonCommand>
     } catch (error) {
       if (command.video && videoSource) {
         await this.storage.delete(videoSource);
+      }
+      if (thumbnailKey) {
+        await this.storage.delete(thumbnailKey).catch(() => undefined);
       }
       throw error;
     }

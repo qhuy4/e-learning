@@ -56,3 +56,11 @@ export const useCourseProgress = (courseId: number | undefined, enabled = true) 
     enabled: enabled && !!courseId,
   });
 };
+
+export const useLessonMaterials = (lessonId: number | undefined, enabled = true) => {
+  return useQuery({
+    queryKey: ['lesson-materials', lessonId],
+    queryFn: () => learningService.getLessonMaterials(lessonId!),
+    enabled: enabled && !!lessonId,
+  });
+};

@@ -4,7 +4,6 @@ import { CqrsModule } from '@nestjs/cqrs';
 
 import { LessonOrmEntity } from '@/modules/lessons/infrastructure/entity/lesson.orm-entity';
 import { LessonRepository } from '@/modules/lessons/infrastructure/repository/lesson.repository';
-
 import { LESSON_REPOSITORY } from '@/modules/lessons/domain/repository/lesson.repository';
 
 // Command handlers
@@ -14,6 +13,9 @@ import { DeleteLessonHandler } from '@/modules/lessons/application/command-handl
 
 import { LessonController } from '@/modules/lessons/presentation/lesson.controller';
 import { InstructorLessonController } from '@/modules/lessons/presentation/instructor-lesson.controller';
+import { InstructorLessonMaterialController } from '@/modules/lessons/presentation/instructor-lesson-material.controller';
+import { LessonMaterialController } from '@/modules/lessons/presentation/lesson-material.controller';
+import { LessonMaterialOrmEntity } from '@/modules/lessons/infrastructure/entity/lesson-material.orm-entity';
 
 import { GetLessonByIdHandler } from '@/modules/lessons/application/query-handler/get-lesson-by-id.handler';
 
@@ -42,7 +44,11 @@ const QueryHandlers = [
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([LessonOrmEntity, SectionOrmEntity]),
+    TypeOrmModule.forFeature([
+      LessonOrmEntity,
+      LessonMaterialOrmEntity,
+      SectionOrmEntity,
+    ]),
     SectionsModule,
     forwardRef(() => CoursesModule),
     StorageModule,
@@ -50,7 +56,13 @@ const QueryHandlers = [
     EnrollmentsModule,
   ],
 
-  controllers: [LessonController, LessonPublicController, InstructorLessonController],
+  controllers: [
+    LessonController,
+    LessonPublicController,
+    InstructorLessonController,
+    InstructorLessonMaterialController,
+    LessonMaterialController,
+  ],
 
   providers: [
     LessonRepository,

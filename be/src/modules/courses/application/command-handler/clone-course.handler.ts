@@ -112,6 +112,7 @@ export class CloneCourseHandler implements ICommandHandler<CloneCourseCommand> {
           type: originalLesson.type,
           videoProvider: originalLesson.videoProvider,
           videoSource: originalLesson.videoSource,
+          thumbnail: originalLesson.thumbnail,
           duration: originalLesson.duration,
           content: originalLesson.content,
           position: originalLesson.position,

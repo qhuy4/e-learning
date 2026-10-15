@@ -12,6 +12,7 @@ export class LessonMapper {
       type: entity.type as LessonType,
       videoProvider: entity.videoProvider,
       videoSource: entity.videoSource,
+      thumbnail: entity.thumbnail,
       duration: entity.duration,
       content: entity.content,
       position: entity.position,

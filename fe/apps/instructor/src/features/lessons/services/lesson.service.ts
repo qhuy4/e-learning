@@ -48,6 +48,9 @@ export const lessonService = {
     }
     if (payload.thumbnail instanceof File) {
       formData.append("thumbnail", payload.thumbnail);
+    } else if (payload.thumbnail === undefined || payload.thumbnail === "") {
+      // Ảnh bị xóa hoặc chưa từng có → sentinel '' báo backend xóa ảnh xem trước
+      formData.append("thumbnail", "");
     }
     if (payload.duration !== undefined && payload.duration !== "") {
       formData.append("duration", String(payload.duration));
@@ -62,6 +65,29 @@ export const lessonService = {
 
   deleteLesson: async (id: number) => {
     const response = await api.delete(`/sections/0/lessons/${id}`);
+    return response.data;
+  },
+
+  // ─── Tài liệu đính kèm bài học (lesson_materials / R2) ────────────────────
+  getMaterials: async (lessonId: number) => {
+    const response = await api.get(`/instructor/lessons/${lessonId}/materials`);
+    return response.data;
+  },
+
+  uploadMaterial: async (lessonId: number, file: File, title?: string) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    if (title) formData.append("title", title);
+    return postFormData(`/instructor/lessons/${lessonId}/materials`, formData);
+  },
+
+  updateMaterial: async (id: number, payload: { title?: string; description?: string }) => {
+    const response = await api.patch(`/instructor/lessons/materials/${id}`, payload);
+    return response.data;
+  },
+
+  deleteMaterial: async (id: number) => {
+    const response = await api.delete(`/instructor/lessons/materials/${id}`);
     return response.data;
   },
 };

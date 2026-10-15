@@ -166,6 +166,7 @@ export const LearningPage = () => {
           ) : (
             <VideoPlayer
               videoSource={lessonData.videoSource}
+              posterUrl={lessonData.thumbnail}
               title={lessonData.title}
               initialPosition={currentLessonProgress?.isCompleted ? 0 : currentLessonProgress?.watchSeconds}
               onProgressUpdate={handleProgressUpdate}

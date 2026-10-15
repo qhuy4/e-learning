@@ -66,6 +66,7 @@ export class LessonRepository implements ILessonRepository {
       type: lesson.type,
       videoProvider: lesson.videoProvider,
       videoSource: lesson.videoSource,
+      thumbnail: lesson.thumbnail,
       duration: lesson.duration,
       content: lesson.content,
       position: lesson.position,
@@ -76,7 +77,14 @@ export class LessonRepository implements ILessonRepository {
 
     const saved = await this.repository.save(entity);
 
-    return LessonMapper.toDomain(saved);
+    // lessons.id do DB tự sinh (BIGSERIAL nextval) — entity dùng @PrimaryColumn
+    // (không phải @PrimaryGeneratedColumn) nên TypeORM không populate id sau
+    // INSERT → đọc lại bản ghi để trả về id thật (tránh id=NaN → null trong JSON)
+    const persisted = await this.repository.findOne({
+      where: { slug: saved.slug, sectionId: saved.sectionId },
+    });
+
+    return LessonMapper.toDomain(persisted ?? saved);
   }
 
   async update(lesson: Lesson): Promise<Lesson> {
@@ -88,6 +96,7 @@ export class LessonRepository implements ILessonRepository {
       type: lesson.type,
       videoProvider: lesson.videoProvider,
       videoSource: lesson.videoSource,
+      thumbnail: lesson.thumbnail,
       duration: lesson.duration,
       content: lesson.content,
       position: lesson.position,

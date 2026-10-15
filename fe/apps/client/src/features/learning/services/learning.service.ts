@@ -1,5 +1,5 @@
 import { api } from '@/shared/lib/axios';
-import type { LessonDetail, LearningCourse, LessonProgress, CourseProgress } from '../types/learning.type';
+import type { LessonDetail, LearningCourse, LessonProgress, CourseProgress, LessonMaterial } from '../types/learning.type';
 
 export const learningService = {
   getLessonBySlug: async (lessonSlug: string): Promise<LessonDetail> => {
@@ -40,6 +40,11 @@ export const learningService = {
 
   getCourseProgress: async (courseId: number): Promise<CourseProgress> => {
     const { data: res } = await api.get(`/lesson-progress/course/${courseId}`);
+    return res.data;
+  },
+
+  getLessonMaterials: async (lessonId: number): Promise<LessonMaterial[]> => {
+    const { data: res } = await api.get(`/lessons/${lessonId}/materials`);
     return res.data;
   },
 };

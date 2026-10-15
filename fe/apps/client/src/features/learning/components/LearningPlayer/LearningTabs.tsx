@@ -1,8 +1,21 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@fe/components/ui/tabs';
-import { FileText, MessageSquare } from 'lucide-react';
+import { FileText, MessageSquare, Download } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@fe/components/ui/avatar';
 import type { LessonDetail } from '../../types/learning.type';
 import { useAuth } from '@/features/auth/hooks/use-auth';
+import { useLessonMaterials } from '../../hooks/use-learning';
+
+const formatFileSize = (bytes?: number | null) => {
+  if (!bytes || bytes <= 0) return '';
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
+const fileExt = (name: string) => {
+  const i = name.lastIndexOf('.');
+  return i > 0 ? name.slice(i + 1).toUpperCase() : 'FILE';
+};
 
 interface LearningTabsProps {
   lesson: LessonDetail;
@@ -10,6 +23,11 @@ interface LearningTabsProps {
 
 export const LearningTabs = ({ lesson }: LearningTabsProps) => {
   const { user } = useAuth();
+  const {
+    data: materials,
+    isLoading: materialsLoading,
+    isError: materialsError,
+  } = useLessonMaterials(lesson.id);
   const userInitials =
     (user?.name || user?.email || 'Học viên')
       .split(/[\s@.]+/)
@@ -101,23 +119,54 @@ export const LearningTabs = ({ lesson }: LearningTabsProps) => {
 
         {/* TAB TÀI LIỆU */}
         <TabsContent value="resources" className="pt-4 focus-visible:outline-none focus-visible:ring-0 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <p className="text-sm text-slate-400 text-center py-8">Chưa có tài liệu đính kèm.</p>
-          <div className="flex items-center justify-between p-4 border border-slate-200 rounded-2xl hover:border-emerald-200 hover:shadow-md transition-all cursor-pointer bg-white group">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
-                <FileText className="w-6 h-6" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-sm text-slate-900 group-hover:text-emerald-700 transition-colors">
-                  {lesson.title}_Resources.pdf
-                </h4>
-                <p className="text-xs text-slate-500 mt-0.5 font-medium">Tài liệu tham khảo</p>
-              </div>
+          {materialsLoading ? (
+            <p className="text-sm text-slate-400 text-center py-8">Đang tải tài liệu...</p>
+          ) : materialsError ? (
+            <p className="text-sm text-slate-400 text-center py-8">
+              Không thể tải tài liệu. Vui lòng đăng nhập và ghi danh khóa học.
+            </p>
+          ) : !materials || materials.length === 0 ? (
+            <p className="text-sm text-slate-400 text-center py-8">Chưa có tài liệu đính kèm.</p>
+          ) : (
+            <div className="space-y-3">
+              {materials.map((m) => {
+                const size = formatFileSize(m.fileSize);
+                return (
+                  <div
+                    key={m.id}
+                    className="flex items-center justify-between gap-4 p-4 border border-slate-200 rounded-2xl hover:border-piemind-pink/30 hover:shadow-md transition-all bg-white group"
+                  >
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div className="w-12 h-12 bg-piemind-pink/10 text-piemind-pink rounded-xl flex items-center justify-center shrink-0 group-hover:bg-piemind-pink/15 transition-colors">
+                        <FileText className="w-6 h-6" />
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="font-semibold text-sm text-slate-900 truncate">
+                          {m.title}
+                        </h4>
+                        <p className="text-xs text-slate-500 mt-0.5 font-medium truncate">
+                          {fileExt(m.fileName)}
+                          {size && ` · ${size}`}
+                          {m.description ? ` · ${m.description}` : ''}
+                        </p>
+                      </div>
+                    </div>
+                    {m.downloadUrl && (
+                      <a
+                        href={m.downloadUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0 flex items-center gap-2 text-sm font-semibold text-piemind-pink px-5 py-2.5 border-2 border-piemind-pink/20 rounded-xl hover:bg-piemind-pink hover:border-piemind-pink hover:text-white transition-colors shadow-sm"
+                      >
+                        <Download className="w-4 h-4" />
+                        Tải xuống
+                      </a>
+                    )}
+                  </div>
+                );
+              })}
             </div>
-            <button className="text-sm font-semibold text-emerald-600 hover:text-white px-5 py-2.5 border-2 border-emerald-100 hover:border-emerald-500 rounded-xl bg-emerald-50/50 hover:bg-emerald-500 transition-colors shadow-sm">
-              Tải xuống
-            </button>
-          </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>

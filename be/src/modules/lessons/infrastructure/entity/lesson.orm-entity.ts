@@ -50,6 +50,9 @@ export class LessonOrmEntity {
   })
   videoSource: string | null;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  thumbnail: string | null;
+
   @Column({ type: 'integer', nullable: true })
   duration: number | null;
 

@@ -5,6 +5,7 @@ import { ChevronLeft, BookOpen, Layers } from "lucide-react";
 import { useNavigate, useSearchParams, useParams } from "react-router";
 import { LessonForm } from "@/features/lessons/components/lesson-form";
 import { useCreateLesson, useGetLesson, useUpdateLesson } from "../hook/use-lessons";
+import { lessonService } from "../services/lesson.service";
 import { useGetCourseDetail } from "@/features/courses/hook/use-courses";
 import { toast } from "sonner";
 import type { LessonType } from "../types/lesson.types";
@@ -30,7 +31,7 @@ export function CreateLessonPage() {
 
   const toCourse = () => navigate(`/courses/${courseId}`, { state: { refresh: Date.now() } });
 
-  const handleSave = (data: { title: string; type: LessonType; duration?: number; position?: number; content?: string; isPreview: boolean; videoSource?: File | string; thumbnail?: File | string }) => {
+  const handleSave = (data: { title: string; type: LessonType; duration?: number; position?: number; content?: string; isPreview: boolean; videoSource?: File | string; thumbnail?: File | string; materials?: File[] }) => {
     if (isEditing) {
       const tid = toast.loading("Đang cập nhật bài học...");
       updateLesson(
@@ -54,8 +55,36 @@ export function CreateLessonPage() {
       createLesson(
         { sectionId: Number(sectionId), data: { ...data, sectionId: Number(sectionId), courseId: Number(courseId) } as any },
         {
-          onSuccess: () => {
-            toast.success("Đã tạo bài học thành công!", { id: tid });
+          onSuccess: async (res: any) => {
+            const lessonId = res?.data?.id ?? res?.id;
+            const materials: File[] = data.materials ?? [];
+            if (materials.length > 0 && lessonId) {
+              // Bài học đã tạo xong → tải các tài liệu đính kèm lên
+              toast.loading(`Đang tải ${materials.length} tài liệu lên...`, { id: tid });
+              let failed = 0;
+              for (const file of materials) {
+                try {
+                  await lessonService.uploadMaterial(Number(lessonId), file);
+                } catch {
+                  failed++;
+                }
+              }
+              if (failed > 0) {
+                toast.error(
+                  `Đã tạo bài học, nhưng ${failed} tài liệu tải lên thất bại. Bạn có thể bổ sung sau trong trang Chỉnh sửa.`,
+                  { id: tid },
+                );
+              } else {
+                toast.success(`Đã tạo bài học và ${materials.length} tài liệu đính kèm!`, { id: tid });
+              }
+            } else if (materials.length > 0) {
+              toast.warning(
+                "Đã tạo bài học nhưng không tải được tài liệu. Hãy bổ sung trong trang Chỉnh sửa.",
+                { id: tid },
+              );
+            } else {
+              toast.success("Đã tạo bài học thành công!", { id: tid });
+            }
             toCourse();
           },
           onError: (err) => {
@@ -90,24 +119,33 @@ export function CreateLessonPage() {
         </div>
       </div>
 
-      {(course || section) && (
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="space-y-2">
-            <Label className="font-medium flex items-center gap-2">
-              <BookOpen className="h-4 w-4 text-muted-foreground" />
-              Khóa học
-            </Label>
-            <Input value={course?.title ?? ""} disabled className="bg-muted/50" />
-          </div>
-          <div className="space-y-2">
-            <Label className="font-medium flex items-center gap-2">
-              <Layers className="h-4 w-4 text-muted-foreground" />
-              Chương
-            </Label>
-            <Input value={section?.title ?? ""} disabled className="bg-muted/50" />
-          </div>
+      {/* Luôn hiển thị (kể cả lúc đang tải) — không ẩn/hiện gây mất tên khóa học/chương */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="space-y-2">
+          <Label className="font-medium flex items-center gap-2">
+            <BookOpen className="h-4 w-4 text-muted-foreground" />
+            Khóa học
+          </Label>
+          <Input
+            value={course?.title ?? ""}
+            placeholder={courseData ? "" : "Đang tải..."}
+            disabled
+            className="bg-muted/50"
+          />
         </div>
-      )}
+        <div className="space-y-2">
+          <Label className="font-medium flex items-center gap-2">
+            <Layers className="h-4 w-4 text-muted-foreground" />
+            Chương
+          </Label>
+          <Input
+            value={section?.title ?? ""}
+            placeholder={courseData ? "" : "Đang tải..."}
+            disabled
+            className="bg-muted/50"
+          />
+        </div>
+      </div>
 
       <LessonForm initialData={lessonData?.data} onSave={handleSave} onCancel={() => navigate(-1)} isSaving={isSaving} />
     </div>

@@ -26,7 +26,8 @@ import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';
 import { extractDuration } from '@/common/utils/media-duration.util';
 
-const EDITABLE_STATUSES = [1, 4];
+// DRAFT(1), APPROVED(3), REJECTED(4), PUBLISHED(5) — chặn PENDING_REVIEW(2) & ARCHIVED(6)
+const EDITABLE_STATUSES = [1, 3, 4, 5];
 
 @CommandHandler(UpdateLessonCommand)
 export class UpdateLessonHandler implements ICommandHandler<UpdateLessonCommand> {
@@ -63,6 +64,11 @@ export class UpdateLessonHandler implements ICommandHandler<UpdateLessonCommand>
       ? SlugUtil.generate(command.data.title)
       : undefined;
 
+    // Ảnh xem trước (poster): giữ ảnh cũ để xóa sau khi lưu thành công
+    const oldThumbnail = lesson.thumbnail;
+    let newThumbnailKey: string | null = null;
+    const clearThumbnail = command.data.thumbnail === '';
+
     let videoSource = command.data.videoSource ?? lesson.videoSource;
     let oldVideoSource: string | null = null;
     let duration = command.data.duration;
@@ -91,12 +97,34 @@ export class UpdateLessonHandler implements ICommandHandler<UpdateLessonCommand>
       }
     }
 
+    // Ảnh xem trước mới (nếu có file) — thất bại thì dọn luôn video vừa tải
+    if (command.data.thumbnailFile) {
+      const extension = extname(command.data.thumbnailFile.originalname).toLowerCase();
+      newThumbnailKey = ['lessons', 'thumbnails', `${randomUUID()}${extension}`].join('/');
+
+      try {
+        await this.storage.upload({
+          key: newThumbnailKey,
+          body: command.data.thumbnailFile.buffer,
+          contentType: command.data.thumbnailFile.mimetype,
+          contentLength: command.data.thumbnailFile.size,
+        });
+      } catch (err) {
+        if (command.data.video && videoSource) {
+          await this.storage.delete(videoSource).catch(() => undefined);
+        }
+        throw err;
+      }
+    }
+
     try {
       lesson.update({
         ...command.data,
         videoSource,
         duration,
         slug,
+        // File mới > FE xóa ('') > không gửi → giữ nguyên
+        thumbnail: newThumbnailKey ?? (clearThumbnail ? null : undefined),
       });
 
       const updatedLesson = await this.lessonRepository.update(lesson);
@@ -106,10 +134,17 @@ export class UpdateLessonHandler implements ICommandHandler<UpdateLessonCommand>
         this.storage.delete(oldVideoSource).catch(console.error);
       }
 
+      if (oldThumbnail && (newThumbnailKey !== null || clearThumbnail)) {
+        this.storage.delete(oldThumbnail).catch(console.error);
+      }
+
       return updatedLesson;
     } catch (error) {
       if (command.data.video && videoSource) {
         await this.storage.delete(videoSource).catch(console.error);
+      }
+      if (newThumbnailKey) {
+        await this.storage.delete(newThumbnailKey).catch(console.error);
       }
       throw error;
     }
