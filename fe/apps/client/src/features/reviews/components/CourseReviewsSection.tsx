@@ -54,15 +54,15 @@ export const CourseReviewsSection: React.FC<CourseReviewsSectionProps> = ({
   const userReview = eligibility?.userReview;
 
   return (
-    <div className="mt-14 pt-10 border-t border-slate-200">
+    <div className="mt-12 pt-8 border-t border-slate-200">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
-          <h2 className="text-3xl font-bold text-slate-900 flex items-center gap-2.5">
-            <MessageSquare className="w-7 h-7 text-indigo-600" />
+          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <MessageSquare className="w-5 h-5 text-piemind-pink" />
             Đánh giá từ học viên
           </h2>
-          <p className="text-base text-slate-500 mt-2">
+          <p className="text-sm text-slate-500 mt-1">
             Ý kiến đánh giá trung thực từ các học viên đã tham gia khóa học.
           </p>
         </div>
@@ -72,14 +72,14 @@ export const CourseReviewsSection: React.FC<CourseReviewsSectionProps> = ({
           {canReview ? (
             <button
               onClick={() => setIsFormOpen(true)}
-              className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-base rounded-xl shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
+              className="px-5 py-2.5 bg-piemind-pink hover:bg-piemind-pink/90 text-white font-bold text-sm rounded-xl shadow-[0_4px_16px_rgba(243,129,129,0.3)] hover:shadow-lg hover:shadow-piemind-pink/25 transition-all flex items-center gap-2 cursor-pointer"
             >
-              <Edit3 className="w-5 h-5" />
+              <Edit3 className="w-4 h-4" />
               {userReview ? "Chỉnh sửa đánh giá của bạn" : "Viết đánh giá"}
             </button>
           ) : (
-            <div className="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-50 border border-amber-200 text-amber-800 text-sm font-medium rounded-xl">
-              <Lock className="w-4 h-4 text-amber-600 shrink-0" />
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-piemind-yellow/25 border border-piemind-yellow/60 text-slate-700 text-sm font-medium rounded-xl">
+              <Lock className="w-4 h-4 text-slate-500 shrink-0" />
               <span>Cần mua/đăng ký khóa học để viết đánh giá</span>
             </div>
           )}
@@ -97,7 +97,7 @@ export const CourseReviewsSection: React.FC<CourseReviewsSectionProps> = ({
       />
 
       {/* Filter Controls Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-7 p-5 bg-slate-50 rounded-2xl border border-slate-200 text-sm font-medium text-slate-700">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-5 p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-sm font-medium text-slate-700">
         <div className="flex flex-wrap items-center gap-2">
           <span className="font-bold text-slate-900 mr-1">Bộ lọc:</span>
 
@@ -107,9 +107,9 @@ export const CourseReviewsSection: React.FC<CourseReviewsSectionProps> = ({
               setHasImage((prev) => !prev);
               setPage(1);
             }}
-            className={`px-4 py-2 rounded-lg border transition-all flex items-center gap-1.5 cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 cursor-pointer ${
               hasImage
-                ? "bg-indigo-600 text-white border-indigo-600 font-bold shadow-xs"
+                ? "bg-piemind-pink text-white border-piemind-pink font-bold shadow-xs"
                 : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
             }`}
           >
@@ -123,7 +123,7 @@ export const CourseReviewsSection: React.FC<CourseReviewsSectionProps> = ({
                 setHasImage(false);
                 setPage(1);
               }}
-              className="px-3 py-2 text-slate-500 hover:text-rose-600 underline font-semibold cursor-pointer"
+              className="px-3 py-1.5 text-slate-500 hover:text-piemind-pink underline font-semibold cursor-pointer"
             >
               Xóa bộ lọc
             </button>
@@ -139,7 +139,7 @@ export const CourseReviewsSection: React.FC<CourseReviewsSectionProps> = ({
               setSortOrder(e.target.value as "desc" | "asc");
               setPage(1);
             }}
-            className="px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+            className="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-piemind-pink/40 cursor-pointer"
           >
             <option value="desc">Mới nhất</option>
             <option value="asc">Cũ nhất</option>
@@ -149,7 +149,7 @@ export const CourseReviewsSection: React.FC<CourseReviewsSectionProps> = ({
 
       {/* Reviews List */}
       {isLoading ? (
-        <div className="text-center py-14 text-slate-400 font-medium text-base">
+        <div className="text-center py-10 text-slate-400 font-medium text-sm">
           Đang tải đánh giá...
         </div>
       ) : (
@@ -162,21 +162,21 @@ export const CourseReviewsSection: React.FC<CourseReviewsSectionProps> = ({
 
       {/* Pagination Controls */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-3 mt-9">
+        <div className="flex items-center justify-center gap-3 mt-7">
           <button
             onClick={() => setPage((p) => Math.max(p - 1, 1))}
             disabled={page === 1}
-            className="px-5 py-2.5 text-base font-medium rounded-lg border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 cursor-pointer"
+            className="px-4 py-2 text-sm font-medium rounded-lg border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 cursor-pointer"
           >
             Trang trước
           </button>
-          <span className="text-base font-semibold text-slate-700 px-2">
+          <span className="text-sm font-semibold text-slate-700 px-2">
             Trang {page} / {totalPages}
           </span>
           <button
             onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
             disabled={page === totalPages}
-            className="px-5 py-2.5 text-base font-medium rounded-lg border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 cursor-pointer"
+            className="px-4 py-2 text-sm font-medium rounded-lg border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 cursor-pointer"
           >
             Trang sau
           </button>

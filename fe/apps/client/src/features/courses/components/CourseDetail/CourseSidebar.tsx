@@ -28,7 +28,7 @@ export const CourseSidebar = ({ course, isEnrolled }: CourseSidebarProps) => {
           </div>
         </div>
 
-        {course?.price != null && (
+        {!isEnrolled && course?.price != null && (
           <div className="flex items-center justify-between pt-3 border-t border-slate-100">
             <span className="text-sm text-slate-500">Học phí</span>
             <span className="text-lg font-bold text-piemind-pink">

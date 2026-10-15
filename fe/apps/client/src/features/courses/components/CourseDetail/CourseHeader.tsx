@@ -11,8 +11,6 @@ export const CourseHeader = ({ course }: CourseHeaderProps) => {
 
   return (
     <section className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_4px_20px_rgba(15,23,42,0.06)] p-6 sm:p-10 flex flex-col md:flex-row gap-8">
-      {/* Dải màu tông PieMind */}
-      <span className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-piemind-pink via-piemind-mint to-piemind-pink/40" />
       {/* Left: Course Info */}
       <div className="flex-1 flex flex-col gap-4">
         <div className="flex flex-wrap items-center gap-2">
