@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Play, Pause, Volume2, VolumeX, Maximize, Settings, Rewind, FastForward } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Maximize, Settings, Rewind, FastForward, Loader2 } from 'lucide-react';
 
 interface VideoProgressInfo {
   currentTime: number;
@@ -27,6 +27,16 @@ const formatTime = (seconds: number): string => {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 };
 
+// presigned đổi chữ ký mỗi refetch → chỉ so origin+pathname, cùng file thì không reload
+const videoKey = (url: string): string => {
+  try {
+    const u = new URL(url);
+    return `${u.origin}${u.pathname}`;
+  } catch {
+    return url;
+  }
+};
+
 export const VideoPlayer = ({
   videoSource,
   posterUrl,
@@ -50,31 +60,63 @@ export const VideoPlayer = ({
   const [playbackRate, setPlaybackRate] = useState(1);
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  // Đang tải data lúc play/tua → hiện spinner giữa video (controls gốc đã bị ẩn).
+  const [isBuffering, setIsBuffering] = useState(false);
+
+  const [activeSrc, setActiveSrc] = useState<string | null>(videoSource);
+  const seekAppliedRef = useRef(false);
+  // Người dùng tự tua bằng slider/nút → không seek tự động nữa (bấm play bình thường không chặn).
+  const userSeekedRef = useRef(false);
 
   useEffect(() => {
+    setActiveSrc((prev) => {
+      if (!videoSource) return null;
+      if (prev && videoKey(prev) === videoKey(videoSource)) return prev;
+      return videoSource;
+    });
+  }, [videoSource]);
+
+  // Chữ ký presigned hết hạn → video báo lỗi → thay bằng URL mới nhất.
+  const handleSourceError = useCallback(() => {
+    setActiveSrc((prev) => (videoSource && prev !== videoSource ? videoSource : prev));
+  }, [videoSource]);
+
+  useEffect(() => {
+    seekAppliedRef.current = false;
+    userSeekedRef.current = false;
     setIsPlaying(false);
     setProgress(0);
     setCurrentTime(0);
-  }, [videoSource]);
+    setDuration(0);
+    setFlash(null);
+    setIsBuffering(false);
+  }, [activeSrc]);
 
+  // Seek vị trí đã học: chạy lại khi initialPosition về muộn, chỉ 1 lần mỗi nguồn.
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || initialPosition <= 0) return;
+    if (!video || !activeSrc || initialPosition <= 0 || seekAppliedRef.current) return;
 
-    const seekIfNeeded = () => {
-      if (videoRef.current && videoRef.current === video) {
-        videoRef.current.currentTime = initialPosition;
-        setProgress(duration > 0 ? (initialPosition / duration) * 100 : 0);
-        setCurrentTime(initialPosition);
-      }
+    const applySeek = () => {
+      const v = videoRef.current;
+      if (!v || seekAppliedRef.current || userSeekedRef.current) return;
+      // Đã chạy qua vị trí lưu → không kéo ngược lại.
+      if (v.currentTime > initialPosition) return;
+      const target = v.duration
+        ? Math.min(initialPosition, Math.max(0, v.duration - 0.5))
+        : initialPosition;
+      if (target <= 0) return;
+      v.currentTime = target;
+      seekAppliedRef.current = true;
+      setCurrentTime(target);
+      setProgress(v.duration ? (target / v.duration) * 100 : 0);
     };
 
-    if (video.readyState >= 1) seekIfNeeded();
-    else video.addEventListener('loadedmetadata', seekIfNeeded, { once: true });
+    if (video.readyState >= 1) applySeek();
+    else video.addEventListener('loadedmetadata', applySeek, { once: true });
 
-    return () => video.removeEventListener('loadedmetadata', seekIfNeeded);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [videoSource]);
+    return () => video.removeEventListener('loadedmetadata', applySeek);
+  }, [activeSrc, initialPosition]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -134,6 +176,7 @@ export const VideoPlayer = ({
   const skip = useCallback((delta: number) => {
     const video = videoRef.current;
     if (!video) return;
+    userSeekedRef.current = true;
     video.currentTime = Math.min(Math.max(0, video.currentTime + delta), video.duration || Infinity);
   }, []);
 
@@ -154,6 +197,7 @@ export const VideoPlayer = ({
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     const video = videoRef.current;
     if (!video || !video.duration) return;
+    userSeekedRef.current = true;
     const value = Number(e.target.value);
     video.currentTime = (value / 100) * video.duration;
     setProgress(value);
@@ -209,19 +253,31 @@ export const VideoPlayer = ({
       >
         <video
           ref={videoRef}
-          src={videoSource}
+          src={activeSrc ?? undefined}
           poster={posterUrl || undefined}
           title={title}
           className="h-full w-full object-contain"
           onClick={handleVideoClick}
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
+          onWaiting={() => setIsBuffering(true)}
+          onPlaying={() => setIsBuffering(false)}
+          onCanPlay={() => setIsBuffering(false)}
+          onPause={() => setIsBuffering(false)}
+          onError={handleSourceError}
           onEnded={() => {
             setIsPlaying(false);
             onVideoEnd?.();
           }}
           preload="metadata"
         />
+
+        {/* Đang tải/buffer khi vừa bấm play hoặc tua */}
+        {isBuffering && isPlaying && (
+          <span aria-hidden className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+            <Loader2 className="h-10 w-10 animate-spin text-white/90 drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]" />
+          </span>
+        )}
 
         {/* Hiệu ứng giữa video khi bấm (play/pause) */}
         {flash && (

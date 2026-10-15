@@ -106,6 +106,20 @@ export const LearningPage = () => {
 
   const totalLessons = allLessons.length;
   const completedLessons = courseProgress?.completedLessons ?? 0;
+  // Cùng công thức BE (giây đã xem / tổng giây) — tính từ cache để chip % chạy theo
+  // heartbeat 15s mà không cần refetch mạng.
+  const totalCourseSeconds = allLessons.reduce((sum: number, l: any) => sum + (l.duration || 0), 0);
+  // Cache cũ còn dòng trùng (lessonId string/number) → dedupe lấy max như BE Math.max.
+  const watchedByLesson = new Map<number, number>();
+  (courseProgress?.lessons ?? []).forEach((lp) => {
+    const id = Number(lp.lessonId);
+    watchedByLesson.set(id, Math.max(watchedByLesson.get(id) ?? 0, lp.watchSeconds || 0));
+  });
+  const totalWatchedSeconds = [...watchedByLesson.values()].reduce((sum, s) => sum + s, 0);
+  const progressPercent =
+    totalCourseSeconds > 0
+      ? Math.min(Math.round((totalWatchedSeconds / totalCourseSeconds) * 100), 100)
+      : (courseProgress?.totalProgress ?? 0);
   const remainingMinutes = Math.round(
     allLessons
       .filter((l: any) => !lessonProgressMap.get(Number(l.id))?.isCompleted)
@@ -124,7 +138,7 @@ export const LearningPage = () => {
   if (isCourseLoading || isLessonLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-slate-50">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+        <Loader2 className="h-8 w-8 animate-spin text-piemind-pink" />
       </div>
     );
   }
@@ -146,7 +160,7 @@ export const LearningPage = () => {
         courseId={courseData.id}
         courseTitle={courseData.title}
         courseSlug={courseData.slug}
-        progress={courseProgress?.totalProgress ?? 0}
+        progress={progressPercent}
         sectionTitle={currentSection?.title}
         completedLessons={isEnrolled ? completedLessons : undefined}
         totalLessons={isEnrolled ? totalLessons : undefined}

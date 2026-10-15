@@ -56,7 +56,7 @@ export const LearningTabs = ({ lesson }: LearningTabsProps) => {
             <TabsTrigger
               key={value}
               value={value}
-              className="flex-none rounded-none px-1 pt-2 pb-3.5 text-sm font-bold text-slate-400 hover:text-slate-700 data-active:text-piemind-pink data-active:after:opacity-100 after:bg-piemind-pink group-data-horizontal/tabs:after:bottom-[-2px] group-data-horizontal/tabs:after:h-[3px]"
+              className="flex-none rounded-none px-1 pt-2 pb-3.5 text-sm font-bold text-slate-500 hover:text-slate-800 data-active:text-piemind-pink data-active:after:opacity-100 after:bg-piemind-pink group-data-horizontal/tabs:after:bottom-[-2px] group-data-horizontal/tabs:after:h-[3px]"
             >
               {label}
             </TabsTrigger>
@@ -65,7 +65,7 @@ export const LearningTabs = ({ lesson }: LearningTabsProps) => {
 
         {/* TAB TỔNG QUAN */}
         <TabsContent value="overview" className="pt-4 focus-visible:outline-none focus-visible:ring-0 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">Về bài học này</h2>
+          <h2 className="text-lg font-bold text-slate-900 mb-3">Về bài học này</h2>
           <p className="text-slate-600 leading-relaxed text-sm md:text-base">
             {lesson.content ?? 'Chưa có mô tả cho bài học này.'}
           </p>
@@ -77,56 +77,56 @@ export const LearningTabs = ({ lesson }: LearningTabsProps) => {
             <input
               type="text"
               placeholder={`Thêm ghi chú mới tại ${lesson.duration ? Math.floor(lesson.duration / 60) + ':' + String(lesson.duration % 60).padStart(2, '0') : '00:00'}...`}
-              className="flex-1 w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 bg-white"
+              className="flex-1 w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-piemind-pink focus:ring-1 focus:ring-piemind-pink/40 bg-white"
             />
-            <button className="bg-slate-900 hover:bg-slate-800 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-colors w-full sm:w-auto shrink-0 shadow-sm">
+            <button className="bg-piemind-pink hover:bg-piemind-pink/90 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-colors w-full sm:w-auto shrink-0 shadow-[0_4px_16px_rgba(243,129,129,0.3)]">
               Lưu ghi chú
             </button>
           </div>
 
-          <p className="text-sm text-slate-400 text-center py-8">Chưa có ghi chú nào.</p>
+          <p className="text-sm text-slate-500 text-center py-8">Chưa có ghi chú nào.</p>
         </TabsContent>
 
         {/* TAB HỎI ĐÁP */}
         <TabsContent value="qa" className="pt-4 focus-visible:outline-none focus-visible:ring-0 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-            Bình luận <MessageSquare className="w-4 h-4 text-slate-400" />
+            Bình luận <MessageSquare className="w-4 h-4 text-piemind-pink" />
           </h3>
 
           {/* Form bình luận */}
           <div className="flex gap-4 mb-8">
             <Avatar className="w-10 h-10 shrink-0 border border-slate-100">
               <AvatarImage src={user?.avatar ?? undefined} />
-              <AvatarFallback className="bg-emerald-100 text-emerald-700 text-xs font-bold">
+              <AvatarFallback className="bg-piemind-pink/10 text-piemind-pink text-xs font-bold">
                 {userInitials}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 flex flex-col items-end gap-3">
               <textarea
                 placeholder="Bạn có thắc mắc gì về bài học này?"
-                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 min-h-[90px] resize-y bg-slate-50/50 focus:bg-white transition-colors"
+                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-piemind-pink focus:ring-1 focus:ring-piemind-pink/40 min-h-[90px] resize-y bg-slate-50/50 focus:bg-white transition-colors"
               />
-              <button className="bg-slate-900 hover:bg-slate-800 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-colors shadow-sm">
+              <button className="bg-piemind-pink hover:bg-piemind-pink/90 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-[0_4px_16px_rgba(243,129,129,0.3)]">
                 Gửi câu hỏi
               </button>
             </div>
           </div>
 
           <div className="space-y-8">
-            <p className="text-sm text-slate-400 text-center py-8">Chưa có câu hỏi nào.</p>
+            <p className="text-sm text-slate-500 text-center py-8">Chưa có câu hỏi nào.</p>
           </div>
         </TabsContent>
 
         {/* TAB TÀI LIỆU */}
         <TabsContent value="resources" className="pt-4 focus-visible:outline-none focus-visible:ring-0 animate-in fade-in slide-in-from-bottom-2 duration-300">
           {materialsLoading ? (
-            <p className="text-sm text-slate-400 text-center py-8">Đang tải tài liệu...</p>
+            <p className="text-sm text-slate-500 text-center py-8">Đang tải tài liệu...</p>
           ) : materialsError ? (
-            <p className="text-sm text-slate-400 text-center py-8">
+            <p className="text-sm text-slate-500 text-center py-8">
               Không thể tải tài liệu. Vui lòng đăng nhập và ghi danh khóa học.
             </p>
           ) : !materials || materials.length === 0 ? (
-            <p className="text-sm text-slate-400 text-center py-8">Chưa có tài liệu đính kèm.</p>
+            <p className="text-sm text-slate-500 text-center py-8">Chưa có tài liệu đính kèm.</p>
           ) : (
             <div className="space-y-3">
               {materials.map((m) => {

@@ -64,7 +64,8 @@ export const useVideoProgress = ({
     sendProgress({
       courseId,
       lessonId,
-      watchSeconds: data.duration,
+      // duration của <video> là số thực → DTO watchSeconds @IsInt (400 nếu gửi lẻ)
+      watchSeconds: Math.floor(data.duration),
       progressPercent: 100,
     });
   }, [courseId, lessonId, sendProgress]);

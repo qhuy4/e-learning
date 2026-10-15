@@ -65,12 +65,15 @@ export class UpdateLessonProgressHandler implements ICommandHandler<UpdateLesson
     );
 
     if (result.isCompleted) {
-      this.eventBus
-        .publish(
-          new LearningEvent(command.userId, AchievementCriteria.LESSONS_COMPLETED, {
-            courseId: command.courseId,
-            lessonId: command.lessonId,
-          }),
+      // @nestjs/cqrs v11: publish trả void → không chain .catch trực tiếp.
+      void Promise.resolve()
+        .then(() =>
+          this.eventBus.publish(
+            new LearningEvent(command.userId, AchievementCriteria.LESSONS_COMPLETED, {
+              courseId: command.courseId,
+              lessonId: command.lessonId,
+            }),
+          ),
         )
         .catch((err) =>
           this.logger.error(`Failed to publish learning event: ${(err as Error).message}`),
