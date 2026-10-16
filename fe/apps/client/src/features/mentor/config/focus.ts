@@ -7,32 +7,32 @@ export interface FocusOption {
 export const FOCUS_OPTIONS: FocusOption[] = [
   {
     id: "hesitation",
-    title: "Overcome Speaking Hesitation & Filler Pauses",
+    title: "Khơi phục độ ngập ngừng khi nói & thói quen dùng từ đệm",
     description:
-      'Techniques to reduce "um", silence gaps, and formulate thoughts fluently',
+      'Kỹ thuật giảm "ừm", khoảng lặng và rèn cách diễn đạt ý nghĩ trôi chảy',
   },
   {
     id: "idioms",
-    title: "Idiomatic Phrasing & Natural B2 Transitions",
+    title: "Cụm từ tự nhiên & cách chuyển tiếp mượt (trình độ B2)",
     description:
-      "Sounding authentic instead of textbook-formal in everyday dialogue",
+      "Nghe tự nhiên như người bản ngữ thay vì kiểu sách giáo khoa trong hội thoại hằng ngày",
   },
   {
     id: "pronunciation",
-    title: "Pronunciation & Intonation Fine-Tuning",
+    title: "Hoàn thiện phát âm & ngữ điệu",
     description:
-      "Word linking, sentence stress rhythms, and soft vowel clarity",
+      "Liên âm giữa từ, nhịp nhấn câu và độ rõ của các nguyên âm mềm",
   },
   {
     id: "ielts",
-    title: "IELTS / Cambridge Speaking Test Strategy",
+    title: "Chiến lược thi nói IELTS / Cambridge",
     description:
-      "Rubric expectations, Part 2 & 3 pacing, and vocabulary elevation",
+      "Đúng tiêu chí chấm, cách quản lý thời gian Part 2 & 3 và nâng tầm từ vựng",
   },
   {
     id: "general",
-    title: "Other / General Diagnostic Assessment",
+    title: "Khác / Đánh giá chẩn đoán tổng quát",
     description:
-      "Open conversation to benchmark live conversational ease against PiEMind metrics",
+      "Hội thoại mở để so sánh độ trôi chảy thực chiến với chỉ số PiEMind",
   },
 ];

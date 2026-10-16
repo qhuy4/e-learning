@@ -12,5 +12,6 @@ export class CreateLessonCommand {
     public readonly position?: number,
     public readonly isPreview?: boolean,
     public readonly video?: Express.Multer.File,
+    public readonly thumbnail?: Express.Multer.File,
   ) {}
 }

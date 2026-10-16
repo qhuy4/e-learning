@@ -11,7 +11,7 @@ export interface DayOption {
 export function getUpcomingDays(): DayOption[] {
     const days: DayOption[] = [];
     const now = new Date();
-    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const dayNames = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
 
     for (let i = 0; i <= 7; i++) {
         const d = new Date();
@@ -22,10 +22,7 @@ export function getUpcomingDays(): DayOption[] {
             dateStr,
             dayName: dayNames[d.getDay()],
             dayNum: String(d.getDate()).padStart(2, "0"),
-            monthYear: d.toLocaleDateString("en-US", {
-                month: "long",
-                year: "numeric",
-            }),
+            monthYear: `Tháng ${d.getMonth() + 1}, ${d.getFullYear()}`,
             isPast: false,
         });
     }
@@ -34,5 +31,5 @@ export function getUpcomingDays(): DayOption[] {
 
 export function formatSummaryDate(day: DayOption | undefined, fallback: string) {
     if (!day) return fallback;
-    return `${day.dayName}, ${day.monthYear.split(" ")[0]} ${day.dayNum}`;
+    return `${day.dayName}, ngày ${day.dayNum} ${day.monthYear.replace("Tháng", "tháng")}`;
 }

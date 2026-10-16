@@ -57,7 +57,10 @@ export class GetLessonBySlugHandler implements IQueryHandler<GetLessonBySlugQuer
   async execute(query: GetLessonBySlugQuery) {
     this.logger.debug(`getLessonBySlug: slug=${query.slug}, userId=${query.userId}`);
 
-    const lesson = await this.lessonRepository.findGlobalBySlug(query.slug);
+    const lesson = await this.lessonRepository.findGlobalBySlug(
+      query.slug,
+      query.courseSlug,
+    );
 
     if (!lesson) {
       this.logger.debug(`Lesson not found: slug=${query.slug}`);
@@ -97,8 +100,13 @@ export class GetLessonBySlugHandler implements IQueryHandler<GetLessonBySlugQuer
       ? await resolveSignedUrl(lesson.videoSource, this.storage, this.logger)
       : null;
 
+    // Poster chỉ cần khi video xem được (giống quyền xem video)
+    const signedThumbnailUrl = canViewVideo
+      ? await resolveSignedUrl(lesson.thumbnail, this.storage, this.logger)
+      : null;
+
     this.logger.debug(`Result: signedUrl=${signedUrl ? 'present' : 'null'}`);
 
-    return LessonDtoMapper.toDetailDto(lesson, signedUrl);
+    return LessonDtoMapper.toDetailDto(lesson, signedUrl, signedThumbnailUrl);
   }
 }

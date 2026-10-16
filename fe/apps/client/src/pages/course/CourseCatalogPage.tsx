@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type SyntheticEvent } from "react";
 import { Link } from "react-router";
 import {
   Search,
@@ -22,26 +22,27 @@ import { useCatalogCourses, useCatalogStats } from "@/features/courses/hooks/use
 import type { CatalogCourse } from "@/features/courses/components/Catalog/types";
 
 const levelMap: Record<number, { label: string; cefr: string; group: string }> = {
-  1: { label: "Beginner", cefr: "A1-A2", group: "beginner" },
-  2: { label: "Intermediate", cefr: "B1-B2", group: "intermediate" },
-  3: { label: "Advanced", cefr: "B2-C1", group: "advanced" },
+  1: { label: "Cơ bản", cefr: "A1-A2", group: "beginner" },
+  2: { label: "Trung cấp", cefr: "B1-B2", group: "intermediate" },
+  3: { label: "Nâng cao", cefr: "B2-C1", group: "advanced" },
 };
 
 const skillTags = [
-  { label: "Speaking Fluency", icon: "🗣" },
-  { label: "Pronunciation & Phonemes", icon: "🎵" },
-  { label: "Workplace & Business", icon: "💼" },
-  { label: "IELTS / TOEFL Prep", icon: "🎓" },
-  { label: "Grammar & Sentence Agility", icon: "✍" },
+  { label: "Lưu loát giao tiếp", icon: "🗣" },
+  { label: "Phát âm & âm tố", icon: "🎵" },
+  { label: "Công sở & kinh doanh", icon: "💼" },
+  { label: "Luyện thi IELTS / TOEFL", icon: "🎓" },
+  { label: "Ngữ pháp & độ linh hoạt câu", icon: "✍" },
 ];
 
 const formatPrice = (price: number) => {
-  if (price === 0) return "Free";
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-  }).format(price / 1000);
+  if (price === 0) return "Miễn phí";
+  return `${price.toLocaleString("vi-VN")} ₫`;
+};
+
+/** Ẩn ảnh nếu load lỗi (URL chết/hết hạn) để lộ placeholder phía dưới. */
+const hideBrokenImg = (e: SyntheticEvent<HTMLImageElement>) => {
+  e.currentTarget.style.display = "none";
 };
 
 const getInitials = (name: string | null) => {
@@ -73,10 +74,10 @@ export const CourseCatalogPage = () => {
   });
 
   const levelTabs = [
-    { id: "all", label: "All Levels", count: stats?.total ?? 0 },
-    { id: "beginner", label: "Beginner A1-A2", count: stats?.beginner ?? 0 },
-    { id: "intermediate", label: "Intermediate B1-B2", count: stats?.intermediate ?? 0 },
-    { id: "advanced", label: "Advanced C1", count: stats?.advanced ?? 0 },
+    { id: "all", label: "Tất cả trình độ", count: stats?.total ?? 0 },
+    { id: "beginner", label: "Cơ bản A1-A2", count: stats?.beginner ?? 0 },
+    { id: "intermediate", label: "Trung cấp B1-B2", count: stats?.intermediate ?? 0 },
+    { id: "advanced", label: "Nâng cao C1", count: stats?.advanced ?? 0 },
   ];
 
   const courses = data?.data ?? [];
@@ -112,16 +113,16 @@ export const CourseCatalogPage = () => {
 
       {/* 1. BREADCRUMBS & HERO */}
       <section className="mb-12">
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 font-label-lg text-sm text-m3-on-surface-variant mb-6">
+        <nav aria-label="Đường dẫn" className="flex items-center gap-2 font-label-lg text-sm text-m3-on-surface-variant mb-6">
           <Link to="/" className="hover:text-m3-primary transition-colors flex items-center gap-1">
             <Home size={16} />
-            Home
+            Trang chủ
           </Link>
           <ChevronRight size={14} className="text-m3-outline-variant" />
-          <span className="text-m3-on-surface font-bold">Course Catalog</span>
+          <span className="text-m3-on-surface font-bold">Danh mục khóa học</span>
           <span className="ml-3 px-2.5 py-0.5 rounded-full bg-m3-surface-container-high text-xs font-semibold text-m3-secondary flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-m3-secondary animate-pulse" />
-            Guest Explorer Mode
+            Chế độ khách tham quan
           </span>
         </nav>
 
@@ -130,19 +131,19 @@ export const CourseCatalogPage = () => {
           <div className="lg:col-span-7 flex flex-col justify-center space-y-5">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-piemind-pink text-white text-xs font-bold self-start">
               <Sparkles size={16} />
-              CEFR-Aligned · Powered by PiEMind Acoustics™
+              Chuẩn CEFR · Được vận hành bởi PiEMind Acoustics™
             </div>
             <h1 className="text-3xl lg:text-4xl font-extrabold tracking-tight text-m3-on-surface leading-tight">
-              Find Your Ideal English Path —{" "}
+              Tìm lộ trình tiếng Anh lý tưởng cho bạn —{" "}
               <br className="hidden sm:inline" />
               <span className="text-piemind-pink underline decoration-m3-primary-fixed decoration-wavy decoration-2 underline-offset-4">
-                Powered by Adaptive AI
+                Được vận hành bởi AI thích ứng
               </span>
             </h1>
             <p className="text-sm text-m3-on-surface-variant max-w-xl leading-relaxed">
-              Browse structured CEFR-aligned courses from A1 beginner to C1 native proficiency.
-              Not sure where your fluency stands? Pie listens to your natural voice and builds a
-              bespoke curriculum in minutes.
+              Khám phá các khóa học có cấu trúc theo chuẩn CEFR, từ trình độ A1 sơ cấp đến C1
+              chuẩn người bản ngữ. Chưa biết mình đang ở mức lưu loát nào? Pie lắng nghe giọng
+              nói tự nhiên của bạn và dựng lộ trình riêng chỉ trong vài phút.
             </p>
             {/* Quick Stat Counters */}
             <div className="pt-2 flex flex-wrap items-center gap-6">
@@ -151,8 +152,8 @@ export const CourseCatalogPage = () => {
                   <BookOpen size={20} />
                 </div>
                 <div>
-                  <p className="font-bold text-m3-on-surface text-lg">{stats?.total ?? 0} Courses</p>
-                  <p className="text-xs text-m3-on-surface-variant">A1 to C1 Fluency Tracks</p>
+                  <p className="font-bold text-m3-on-surface text-lg">{stats?.total ?? 0} khóa học</p>
+                  <p className="text-xs text-m3-on-surface-variant">Lộ trình lưu loát từ A1 đến C1</p>
                 </div>
               </div>
               <div className="w-px h-8 bg-m3-outline-variant/50 hidden sm:block" />
@@ -161,8 +162,8 @@ export const CourseCatalogPage = () => {
                   <BarChart3 size={20} />
                 </div>
                 <div>
-                  <p className="font-bold text-m3-on-surface text-lg">94.8% Agility</p>
-                  <p className="text-xs text-m3-on-surface-variant">Average Pause Reduction</p>
+                  <p className="font-bold text-m3-on-surface text-lg">94.8% độ linh hoạt</p>
+                  <p className="text-xs text-m3-on-surface-variant">Mức giảm ngập ngừng trung bình</p>
                 </div>
               </div>
               <div className="w-px h-8 bg-m3-outline-variant/50 hidden sm:block" />
@@ -171,8 +172,8 @@ export const CourseCatalogPage = () => {
                   <LockOpen size={20} />
                 </div>
                 <div>
-                  <p className="font-bold text-m3-on-surface text-lg">Free Previews</p>
-                  <p className="text-xs text-m3-on-surface-variant">No Credit Card Needed</p>
+                  <p className="font-bold text-m3-on-surface text-lg">Xem trước miễn phí</p>
+                  <p className="text-xs text-m3-on-surface-variant">Không cần thẻ tín dụng</p>
                 </div>
               </div>
             </div>
@@ -184,22 +185,22 @@ export const CourseCatalogPage = () => {
             <div className="relative z-10 flex items-start justify-between gap-4">
               <div className="bg-m3-surface-container-lowest rounded-2xl px-4 py-2.5 text-xs text-m3-on-surface-variant font-medium max-w-[210px] relative border border-m3-outline-variant/30">
                 <p className="text-m3-on-surface font-semibold mb-0.5">
-                  "Hi friend! Let's skip the guesswork."
+                  "Chào bạn! Bỏ qua đoán mò nhé."
                 </p>
                 <p className="text-[11px] text-m3-on-surface-variant">
-                  I can analyze your cadence in 10 minutes.
+                  Mình phân tích nhịp nói của bạn chỉ trong 10 phút.
                 </p>
                 <div className="absolute -bottom-1.5 left-5 w-3 h-3 bg-m3-surface-container-lowest transform rotate-45" />
               </div>
               <span className="px-3 py-1 rounded-full bg-m3-secondary text-m3-on-secondary text-xs font-bold whitespace-nowrap">
-                Zero Pressure Test
+                Kiểm tra không áp lực
               </span>
             </div>
             <div className="relative z-10 flex items-center justify-center my-3">
               <div className="relative group">
                 <div className="w-36 h-36 rounded-full bg-gradient-to-tr from-m3-primary-container via-m3-tertiary-fixed to-m3-secondary-fixed p-1.5 transform transition-transform group-hover:scale-105 duration-300">
                   <img
-                    alt="Pie AI Mascot"
+                    alt="Linh vật Pie AI"
                     className="w-full h-full object-cover rounded-full bg-m3-surface-container-high"
                     src="/logo.webp"
                   />
@@ -213,10 +214,10 @@ export const CourseCatalogPage = () => {
             <div className="relative z-10 space-y-3">
               <div className="text-center">
                 <h2 className="text-base font-bold text-m3-on-surface">
-                  Instant Spoken Pause Analysis
+                  Phân tích điểm ngập ngừng khi nói tức thì
                 </h2>
                 <p className="text-xs text-m3-on-surface-variant mt-0.5">
-                  Detects CEFR grammar agility, lexical reach, and phoneme clarity
+                  Nhận diện độ linh hoạt ngữ pháp theo CEFR, độ rộng từ vựng và độ rõ âm tố
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row items-stretch gap-2.5 pt-1">
@@ -225,14 +226,14 @@ export const CourseCatalogPage = () => {
                   className="flex-1 bg-m3-primary-container text-white font-bold py-2.5 px-4 rounded-full text-center hover:opacity-90 transition-all flex items-center justify-center gap-1.5 text-sm cursor-pointer"
                 >
                   <Mic size={16} />
-                  Take Free Test
+                  Làm bài kiểm tra miễn phí
                 </Link>
                 <Button
                   variant="outline"
                   className="rounded-full font-semibold text-sm border-m3-surface-container-high hover:bg-m3-surface-variant cursor-pointer"
                 >
                   <BarChart3 size={16} className="mr-1" />
-                  How It Works
+                  Cách hoạt động
                 </Button>
               </div>
             </div>
@@ -247,7 +248,7 @@ export const CourseCatalogPage = () => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-m3-outline" size={20} />
             <Input
               className="pl-12 pr-10 py-3.5 rounded-lg bg-m3-surface-container-low text-m3-on-surface placeholder:text-m3-outline text-sm focus:outline-none focus:bg-m3-surface transition-all border border-border cursor-text"
-              placeholder="Search by course title, skill, IELTS/CEFR goal, or keyword..."
+              placeholder="Tìm theo tên khóa học, kỹ năng, mục tiêu IELTS/CEFR hoặc từ khóa..."
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -257,7 +258,7 @@ export const CourseCatalogPage = () => {
           </div>
           <div className="lg:col-span-4 flex items-center justify-between lg:justify-end gap-3">
             <div className="flex items-center gap-2">
-              <span className="text-xs text-m3-on-surface-variant whitespace-nowrap font-semibold">Sort by:</span>
+              <span className="text-xs text-m3-on-surface-variant whitespace-nowrap font-semibold">Sắp xếp theo:</span>
               <select
                 className="appearance-none bg-m3-surface-container-low text-m3-on-surface text-xs font-semibold py-2 pl-3 pr-8 rounded-full cursor-pointer focus:outline-none focus:bg-m3-surface-container-high transition-colors"
                 value={sort}
@@ -266,14 +267,14 @@ export const CourseCatalogPage = () => {
                   setPage(1);
                 }}
               >
-                <option value="popular">Most Popular</option>
-                <option value="newest">Newest Curriculum</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
+                <option value="popular">Phổ biến nhất</option>
+                <option value="newest">Chương trình mới nhất</option>
+                <option value="price-asc">Giá: Thấp đến cao</option>
+                <option value="price-desc">Giá: Cao đến thấp</option>
               </select>
             </div>
             <div className="text-xs text-m3-on-surface-variant font-semibold whitespace-nowrap px-3 py-1.5 rounded-full bg-m3-surface-container-low">
-              Showing <strong className="text-m3-on-surface font-bold">{(page - 1) * limit + 1}–{Math.min(page * limit, totalItems)}</strong> of{" "}
+              Hiển thị <strong className="text-m3-on-surface font-bold">{(page - 1) * limit + 1}–{Math.min(page * limit, totalItems)}</strong> trong tổng số{" "}
               {totalItems}
             </div>
           </div>
@@ -283,7 +284,7 @@ export const CourseCatalogPage = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pt-2 border-t border-transparent">
           <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
             <span className="text-xs font-bold text-m3-on-surface mr-1 flex items-center gap-1">
-              <BarChart3 size={14} className="text-m3-primary" /> Level:
+              <BarChart3 size={14} className="text-m3-primary" /> Trình độ:
             </span>
             {levelTabs.map((tab) => (
               <button
@@ -309,13 +310,13 @@ export const CourseCatalogPage = () => {
             }}
             className="text-xs text-m3-primary font-bold hover:underline self-end md:self-auto flex items-center gap-1 cursor-pointer"
           >
-            <ArrowLeft size={12} /> Reset Filters
+            <ArrowLeft size={12} /> Đặt lại bộ lọc
           </button>
         </div>
 
         {/* Skill Tag Chips */}
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs text-m3-on-surface-variant font-semibold">Focus Areas:</span>
+          <span className="text-xs text-m3-on-surface-variant font-semibold">Chủ đề trọng tâm:</span>
           {skillTags.map((tag) => (
             <button
               key={tag.label}
@@ -358,7 +359,7 @@ export const CourseCatalogPage = () => {
         ) : (
           <div className="text-center py-20">
             <Search size={48} className="mx-auto text-m3-outline-variant mb-4" />
-            <p className="text-m3-on-surface-variant text-lg font-semibold">No courses found</p>
+            <p className="text-m3-on-surface-variant text-lg font-semibold">Không tìm thấy khóa học nào</p>
             <button
               onClick={() => {
                 setSearch("");
@@ -368,7 +369,7 @@ export const CourseCatalogPage = () => {
               }}
               className="mt-4 text-m3-primary font-bold hover:underline cursor-pointer"
             >
-              Reset filters
+              Đặt lại bộ lọc
             </button>
           </div>
         )}
@@ -380,7 +381,7 @@ export const CourseCatalogPage = () => {
         onPageChange={setPage}
         totalPages={totalPages}
         totalItems={totalItems}
-        itemLabel="courses"
+        itemLabel="khóa học"
         limit={limit}
         onLimitChange={setLimit}
         limitOptions={[8, 16, 24]}
@@ -394,14 +395,14 @@ export const CourseCatalogPage = () => {
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-8 space-y-3">
               <span className="inline-block px-3.5 py-1 rounded-full bg-white/10 text-m3-primary-fixed text-xs font-bold backdrop-blur-sm">
-                Instant Access · No Credit Card
+                Truy cập ngay · Không cần thẻ tín dụng
               </span>
               <h2 className="text-2xl lg:text-3xl font-extrabold text-white leading-snug">
-                Ready to speak English naturally without mid-clause hesitation?
+                Sẵn sàng nói tiếng Anh tự nhiên, không vấp giữa câu?
               </h2>
               <p className="text-sm text-m3-surface-variant max-w-2xl leading-relaxed">
-                Create a free guest account in 30 seconds to unlock the first lesson of all 36
-                courses and receive a detailed diagnostic voice report from Pie.
+                Tạo tài khoản khách miễn phí trong 30 giây để mở khóa bài học đầu tiên của cả 36
+                khóa học và nhận báo cáo chẩn đoán giọng nói chi tiết từ Pie.
               </p>
             </div>
             <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3">
@@ -410,14 +411,14 @@ export const CourseCatalogPage = () => {
                 className="w-full bg-m3-primary-container hover:opacity-95 text-white font-extrabold py-3.5 px-6 rounded-full text-center transition-all flex items-center justify-center gap-2 text-sm cursor-pointer"
               >
                 <Sparkles size={18} />
-                Create Free Account
+                Tạo tài khoản miễn phí
               </Link>
               <Link
                 to="/student/register"
                 className="w-full bg-white/10 hover:bg-white/15 text-white font-bold py-3.5 px-6 rounded-full text-center backdrop-blur-sm transition-all flex items-center justify-center gap-2 border border-white/20 text-sm cursor-pointer"
               >
                 <Mic size={18} />
-                Take AI Placement Test
+                Làm bài kiểm tra xếp trình độ AI
               </Link>
             </div>
           </div>
@@ -439,16 +440,16 @@ function CourseCard({ course }: { course: CatalogCourse }) {
       <div>
         {/* Image */}
         <div className="relative h-48 w-full overflow-hidden bg-m3-surface-container-high">
-          {course.thumbnail ? (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <BookOpen size={40} className="text-m3-outline-variant" />
+          </div>
+          {course.thumbnail && (
             <img
               alt={course.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               src={course.thumbnail}
+              onError={hideBrokenImg}
             />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <BookOpen size={40} className="text-m3-outline-variant" />
-            </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
           <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs font-medium">
@@ -470,25 +471,24 @@ function CourseCard({ course }: { course: CatalogCourse }) {
           <h3 className="text-lg font-semibold text-m3-on-surface line-clamp-2 group-hover:text-m3-primary transition-colors leading-snug">
             {course.title}
           </h3>
-          <p className="text-sm text-m3-on-surface-variant line-clamp-2">
-            Master English fluency with AI-powered lessons and real-time feedback.
-          </p>
 
           {/* Instructor */}
           <div className="pt-2 flex items-center gap-2">
-            {course.instructorAvatar ? (
-              <img
-                alt={course.instructorName || ""}
-                className="w-6 h-6 rounded-full object-cover"
-                src={course.instructorAvatar}
-              />
-            ) : (
-              <div className="w-6 h-6 rounded-full bg-m3-surface-container-high flex items-center justify-center text-[10px] font-bold text-m3-on-surface">
+            <div className="relative w-6 h-6 shrink-0">
+              <div className="absolute inset-0 rounded-full bg-m3-surface-container-high flex items-center justify-center text-[10px] font-bold text-m3-on-surface">
                 {getInitials(course.instructorName)}
               </div>
-            )}
+              {course.instructorAvatar && (
+                <img
+                  alt={course.instructorName || ""}
+                  className="absolute inset-0 w-full h-full rounded-full object-cover"
+                  src={course.instructorAvatar}
+                  onError={hideBrokenImg}
+                />
+              )}
+            </div>
             <span className="text-xs text-m3-on-surface-variant font-medium">
-              {course.instructorName || "Instructor"}
+              {course.instructorName || "Giảng viên"}
             </span>
           </div>
         </div>
@@ -498,11 +498,11 @@ function CourseCard({ course }: { course: CatalogCourse }) {
       <div className="p-5 pt-0">
         <div className="flex items-baseline justify-between mb-3">
           <span className="font-bold text-lg text-m3-on-surface">
-            {course.price === 0 ? "Free" : formatPrice(course.price)}
+            {course.price === 0 ? "Miễn phí" : formatPrice(course.price)}
           </span>
           {course.price === 0 && (
             <span className="text-[11px] font-bold text-m3-secondary bg-m3-secondary-fixed/50 px-2 py-0.5 rounded-full">
-              Lesson 1 Free
+              Bài học 1 miễn phí
             </span>
           )}
         </div>
@@ -510,7 +510,7 @@ function CourseCard({ course }: { course: CatalogCourse }) {
           className="w-full rounded-lg bg-primary text-primary-foreground hover:opacity-90 font-bold text-xs cursor-pointer"
           size="sm"
         >
-          Start Free Preview
+          {course.price === 0 ? "Bắt đầu học miễn phí" : "Xem khóa học"}
         </Button>
       </div>
     </Link>

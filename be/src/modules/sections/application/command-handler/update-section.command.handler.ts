@@ -18,7 +18,8 @@ import {
 import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';
 
-const EDITABLE_STATUSES = [1, 4];
+// DRAFT(1), APPROVED(3), REJECTED(4), PUBLISHED(5) — chặn PENDING_REVIEW(2) & ARCHIVED(6)
+const EDITABLE_STATUSES = [1, 3, 4, 5];
 
 @CommandHandler(UpdateSectionCommand)
 export class UpdateSectionHandler implements ICommandHandler<UpdateSectionCommand> {

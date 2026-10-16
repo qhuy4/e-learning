@@ -1,10 +1,10 @@
 import { BadgeCheck, CircleCheck, BookA, Megaphone, Ear, Mic } from "lucide-react";
 
 const skills = [
-  { label: "Grammar", icon: CircleCheck, color: "text-m3-tertiary", percent: 72, barColor: "bg-m3-tertiary-fixed", desc: "Solid structural baseline with complex tense clarity.", highlight: false },
-  { label: "Vocabulary", icon: BookA, color: "text-m3-secondary", percent: 81, barColor: "bg-m3-secondary-fixed-dim", desc: "Strong functional lexicon for daily & work contexts.", highlight: false },
-  { label: "Speaking", icon: Megaphone, color: "text-m3-primary", percent: 54, barColor: "bg-m3-primary-container", desc: "Hesitation pauses on spontaneous conversation.", highlight: true },
-  { label: "Listening", icon: Ear, color: "text-m3-secondary", percent: 68, barColor: "bg-m3-secondary-container", desc: "Understands main ideas in native-speed audio clips.", highlight: false },
+  { label: "Ngữ pháp", icon: CircleCheck, color: "text-m3-tertiary", percent: 72, barColor: "bg-m3-tertiary-fixed", desc: "Nền tảng cấu trúc vững chắc, các thì phức tạp sử dụng rõ ràng.", highlight: false },
+  { label: "Từ vựng", icon: BookA, color: "text-m3-secondary", percent: 81, barColor: "bg-m3-secondary-fixed-dim", desc: "Kho từ vựng thực dụng phong phú cho đời sống và công việc.", highlight: false },
+  { label: "Nói", icon: Megaphone, color: "text-m3-primary", percent: 54, barColor: "bg-m3-primary-container", desc: "Hay ngập ngừng, ngắt quãng khi hội thoại tự nhiên.", highlight: true },
+  { label: "Nghe", icon: Ear, color: "text-m3-secondary", percent: 68, barColor: "bg-m3-secondary-container", desc: "Hiểu được ý chính trong các đoạn âm thanh nói tốc độ nhanh.", highlight: false },
 ];
 
 export const AssessmentSection = () => {
@@ -13,13 +13,13 @@ export const AssessmentSection = () => {
       <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
           <div>
-            <span className="font-label-sm uppercase tracking-wider text-m3-primary font-bold">Precision Diagnostic</span>
-            <h2 className="font-headline-lg text-m3-on-surface mt-1">Your English, understood.</h2>
-            <p className="font-body-md text-m3-on-surface-variant mt-1">See the exact diagnostic breakdown our AI engine creates after a 10-minute diagnostic.</p>
+            <span className="font-label-sm uppercase tracking-wider text-m3-primary font-bold">Chẩn đoán chính xác</span>
+            <h2 className="font-headline-lg text-m3-on-surface mt-1">Tiếng Anh của bạn, được chúng tôi thấu hiểu.</h2>
+            <p className="font-body-md text-m3-on-surface-variant mt-1">Xem bảng phân tích chi tiết mà hệ thống AI của chúng tôi tạo ra sau bài chẩn đoán 10 phút.</p>
           </div>
           <div className="inline-flex items-center gap-2 bg-m3-surface-container px-4 py-2 rounded-full self-start md:self-auto">
             <BadgeCheck className="w-[18px] h-[18px] text-m3-secondary" />
-            <span className="font-label-md text-m3-on-surface">CEFR Certified Analysis</span>
+            <span className="font-label-md text-m3-on-surface">Phân tích chuẩn CEFR</span>
           </div>
         </div>
 
@@ -32,14 +32,14 @@ export const AssessmentSection = () => {
               <div>
                 <div className="flex items-center gap-2">
                   <h4 className="font-headline-sm text-m3-on-surface font-bold">Alex M.</h4>
-                  <span className="font-label-sm px-2.5 py-0.5 rounded-full font-bold" style={{ backgroundColor: "rgb(234, 255, 208)", color: "rgb(20, 106, 95)" }}>Diagnostic Completed</span>
+                  <span className="font-label-sm px-2.5 py-0.5 rounded-full font-bold" style={{ backgroundColor: "rgb(234, 255, 208)", color: "rgb(20, 106, 95)" }}>Đã hoàn thành chẩn đoán</span>
                 </div>
-                <p className="font-body-sm text-m3-on-surface-variant">Profile ID: #PIE-8821 • Evaluated by Red Panda AI Engine</p>
+                <p className="font-body-sm text-m3-on-surface-variant">Mã hồ sơ: #PIE-8821 • Đánh giá bởi hệ thống Red Panda AI</p>
               </div>
             </div>
             <div className="flex items-center gap-3 bg-m3-surface-container-low px-5 py-2.5 rounded-2xl">
-              <span className="font-label-md text-m3-on-surface-variant">Current Level:</span>
-              <span className="font-headline-sm font-bold bg-m3-primary-container text-m3-on-primary px-3 py-1 rounded-xl">B1 Intermediate</span>
+              <span className="font-label-md text-m3-on-surface-variant">Trình độ hiện tại:</span>
+              <span className="font-headline-sm font-bold bg-m3-primary-container text-m3-on-primary px-3 py-1 rounded-xl">B1 Trung cấp</span>
             </div>
           </div>
 
@@ -73,14 +73,14 @@ export const AssessmentSection = () => {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-headline-sm text-m3-on-surface font-bold">Your main area to improve: Speaking</span>
-                  <span className="font-label-sm px-2.5 py-0.5 rounded-full font-bold" style={{ backgroundColor: "#ffdad8", color: "#9e3f42" }}>Primary Target</span>
+                  <span className="font-headline-sm text-m3-on-surface font-bold">Điểm bạn cần cải thiện nhất: Kỹ năng nói</span>
+                  <span className="font-label-sm px-2.5 py-0.5 rounded-full font-bold" style={{ backgroundColor: "#ffdad8", color: "#9e3f42" }}>Mục tiêu chính</span>
                 </div>
-                <p className="font-body-md text-m3-on-surface-variant mt-1 max-w-2xl">Based on your assessment, PiEMind recommends focusing on speaking confidence and conversation practice with native-level coaches.</p>
+                <p className="font-body-md text-m3-on-surface-variant mt-1 max-w-2xl">Dựa trên kết quả đánh giá, PiEMind khuyên bạn nên tập trung vào sự tự tin khi nói và luyện hội thoại cùng các huấn luyện viên trình độ bản địa.</p>
               </div>
             </div>
             <a href="#courses" className="w-full md:w-auto font-label-lg text-white rounded-full px-8 py-3.5 shadow-[0_4px_0_#9e3f42] active:translate-y-1 active:shadow-none hover:brightness-105 transition-all text-center whitespace-nowrap" style={{ backgroundColor: "#F38181" }}>
-              See My Learning Path →
+              Xem lộ trình học của tôi →
             </a>
           </div>
         </div>

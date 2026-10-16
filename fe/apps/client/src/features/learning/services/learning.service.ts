@@ -1,9 +1,15 @@
 import { api } from '@/shared/lib/axios';
-import type { LessonDetail, LearningCourse, LessonProgress, CourseProgress } from '../types/learning.type';
+import type { LessonDetail, LearningCourse, LessonProgress, CourseProgress, LessonMaterial } from '../types/learning.type';
 
 export const learningService = {
-  getLessonBySlug: async (lessonSlug: string): Promise<LessonDetail> => {
-    const { data: res } = await api.get(`/lessons/slug/${lessonSlug}`);
+  getLessonBySlug: async (
+    lessonSlug: string,
+    courseSlug?: string,
+  ): Promise<LessonDetail> => {
+    // courseSlug để không load nhầm bài của version/course trùng slug
+    const { data: res } = await api.get(`/lessons/slug/${lessonSlug}`, {
+      params: courseSlug ? { courseSlug } : undefined,
+    });
     return res.data;
   },
 
@@ -40,6 +46,11 @@ export const learningService = {
 
   getCourseProgress: async (courseId: number): Promise<CourseProgress> => {
     const { data: res } = await api.get(`/lesson-progress/course/${courseId}`);
+    return res.data;
+  },
+
+  getLessonMaterials: async (lessonId: number): Promise<LessonMaterial[]> => {
+    const { data: res } = await api.get(`/lessons/${lessonId}/materials`);
     return res.data;
   },
 };

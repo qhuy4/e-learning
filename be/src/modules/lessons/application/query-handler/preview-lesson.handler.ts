@@ -75,7 +75,11 @@ export class PreviewLessonHandler implements IQueryHandler<PreviewLessonQuery> {
         lesson.videoSource,
         this.storage,
       );
-      return LessonDtoMapper.toDetailDto(lesson, signedUrl);
+      const signedThumbnailUrl = await resolveSignedUrl(
+        lesson.thumbnail,
+        this.storage,
+      );
+      return LessonDtoMapper.toDetailDto(lesson, signedUrl, signedThumbnailUrl);
     }
 
     if (payload.role === UserRole.INSTRUCTOR) {
@@ -89,7 +93,11 @@ export class PreviewLessonHandler implements IQueryHandler<PreviewLessonQuery> {
         lesson.videoSource,
         this.storage,
       );
-      return LessonDtoMapper.toDetailDto(lesson, signedUrl);
+      const signedThumbnailUrl = await resolveSignedUrl(
+        lesson.thumbnail,
+        this.storage,
+      );
+      return LessonDtoMapper.toDetailDto(lesson, signedUrl, signedThumbnailUrl);
     }
 
     throw new ForbiddenException('Bạn không có quyền preview lesson này');

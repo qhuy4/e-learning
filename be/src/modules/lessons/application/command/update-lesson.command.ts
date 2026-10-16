@@ -14,6 +14,10 @@ export class UpdateLessonCommand {
       status?: number;
       isPreview?: boolean;
       video?: Express.Multer.File;
+      /** Text sentinel từ FE: '' = xóa ảnh xem trước, không gửi = giữ nguyên */
+      thumbnail?: string;
+      /** File ảnh xem trước mới (thay thế ảnh cũ) */
+      thumbnailFile?: Express.Multer.File;
     },
   ) {}
 }

@@ -27,7 +27,11 @@ export class LessonPublicController {
   }
 
   @Get('slug/:slug')
-  getBySlug(@Param('slug') slug: string, @Req() req: Request) {
+  getBySlug(
+    @Param('slug') slug: string,
+    @Query('courseSlug') courseSlug: string | undefined,
+    @Req() req: Request,
+  ) {
     let userId: number | undefined;
     const authHeader = req.headers.authorization;
     this.logger.debug(`GET slug/${slug} - Authorization: ${authHeader ? 'present (length=' + authHeader.length + ')' : 'MISSING'}`);
@@ -44,7 +48,9 @@ export class LessonPublicController {
     } catch (err) {
       this.logger.warn(`JWT verification FAILED for slug/${slug}: ${err}`);
     }
-    return this.queryBus.execute(new GetLessonBySlugQuery(slug, userId));
+    return this.queryBus.execute(
+      new GetLessonBySlugQuery(slug, userId, courseSlug),
+    );
   }
 
   @Get(':id')

@@ -48,6 +48,7 @@ export class CourseMapper {
               type: lessonOrm.type as LessonType,
               videoProvider: lessonOrm.videoProvider ?? null,
               videoSource: lessonOrm.videoSource ?? null,
+              thumbnail: lessonOrm.thumbnail ?? null,
               content: lessonOrm.content ?? null,
               publishedAt: lessonOrm.publishedAt ?? null,
               status: lessonOrm.status ?? 1,

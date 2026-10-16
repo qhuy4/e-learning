@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router";
-import { Menu, X, LogOut, BookOpen, ChevronDown, User, ShoppingBag, CalendarDays, History } from "lucide-react";
+import { Menu, X, LogOut, BookOpen, ChevronDown, User, CalendarDays, History } from "lucide-react";
 import { Navigation } from "./Navigation";
-import { useCart } from "@/features/cart/hooks/use-cart";
 
 interface HeaderProps {
   user?: {
@@ -16,7 +15,6 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { itemCount } = useCart();
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -52,17 +50,6 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-4">
-          <Link
-            to="/cart"
-            className="relative p-2 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ShoppingBag size={20} />
-            {itemCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 bg-[#F38181] text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none">
-                {itemCount}
-              </span>
-            )}
-          </Link>
           {user ? (
             <div className="relative" ref={dropdownRef}>
               <button
@@ -99,7 +86,7 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-muted-foreground hover:bg-muted transition-colors"
                   >
                     <CalendarDays size={16} />
-                    My Bookings
+                    Lịch đặt của tôi
                   </Link>
                   <Link
                     to="/profile"
@@ -107,7 +94,7 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-muted-foreground hover:bg-muted transition-colors"
                   >
                     <User size={16} />
-                    Profile
+                    Hồ sơ
                   </Link>
                   <Link
                     to="/profile?tab=history"
@@ -115,7 +102,7 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-muted-foreground hover:bg-muted transition-colors"
                   >
                     <History size={16} />
-                    Booking History
+                    Lịch sử đặt
                   </Link>
                   <button
                     onClick={() => {
@@ -167,19 +154,6 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
             <Navigation />
           </nav>
           <div className="flex flex-col gap-3 pt-4 border-t border-border">
-            <Link
-              to="/cart"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="flex items-center gap-2 px-2 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg"
-            >
-              <ShoppingBag size={16} />
-              Giỏ hàng
-              {itemCount > 0 && (
-                <span className="ml-auto bg-[#F38181] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                  {itemCount}
-                </span>
-              )}
-            </Link>
             {user ? (
               <>
                 <div className="flex items-center gap-3 px-2 py-2">
@@ -204,7 +178,7 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
                   className="flex items-center gap-2 px-2 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg"
                 >
                   <CalendarDays size={16} />
-                  My Bookings
+                  Lịch đặt của tôi
                 </Link>
                 <Link
                   to="/profile"
@@ -212,7 +186,7 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
                   className="flex items-center gap-2 px-2 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg"
                 >
                   <User size={16} />
-                  Profile
+                  Hồ sơ
                 </Link>
                 <Link
                   to="/profile?tab=history"
@@ -220,7 +194,7 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
                   className="flex items-center gap-2 px-2 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg"
                 >
                   <History size={16} />
-                  Booking History
+                  Lịch sử đặt
                 </Link>
                 <button
                   onClick={() => {

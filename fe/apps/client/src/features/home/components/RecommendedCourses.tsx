@@ -2,37 +2,37 @@ import { Clock } from "lucide-react";
 
 const courses = [
   {
-    title: "Speak with Confidence",
+    title: "Tự tin khi nói",
     level: "B1 → B2",
     lessons: 8,
     description:
-      "Master natural transitions, everyday idioms, and voice intonation to break speaking hesitation in real conversation.",
-    focus: "Speaking Focus",
-    levelLabel: "Intermediate",
-    duration: "3 weeks",
+      "Chinh phục cách chuyển lời tự nhiên, thành ngữ hằng ngày và giọng điệu để phá bỏ sự ngập ngừng khi giao tiếp thực tế.",
+    focus: "Tập trung luyện nói",
+    levelLabel: "Trung cấp",
+    duration: "3 tuần",
     featured: true,
-    badge: "Top Pick for B1",
+    badge: "Lựa chọn hàng đầu cho B1",
   },
   {
-    title: "Grammar Foundations",
+    title: "Nền tảng ngữ pháp",
     level: "A2 → B1",
     lessons: 10,
     description:
-      "Clarify conditional structures, passive voice, and complex prepositions with interactive visual sentence puzzles.",
-    focus: "Grammar Focus",
-    levelLabel: "Elementary+",
-    duration: "4 weeks",
+      "Làm rõ cấu trúc câu điều kiện, câu bị động và giới từ phức tạp qua các trò giải đố câu chuyện trực quan, tương tác.",
+    focus: "Tập trung ngữ pháp",
+    levelLabel: "Sơ cấp+",
+    duration: "4 tuần",
     featured: false,
   },
   {
-    title: "Everyday English",
+    title: "Tiếng Anh hằng ngày",
     level: "B1",
     lessons: 12,
     description:
-      "Prepare for practical real-life scenarios: workplace banter, ordering at cafes, travel questions, and casual networking.",
-    focus: "Vocab + Fluency",
-    levelLabel: "Real-life",
-    duration: "5 weeks",
+      "Chuẩn bị cho các tình huống thực tế đời thường: chuyện phiếm nơi công sở, gọi món ở quán cà phê, hỏi đường khi du lịch và kết nối bạn bè.",
+    focus: "Từ vựng + Lưu loát",
+    levelLabel: "Đời thực",
+    duration: "5 tuần",
     featured: false,
   },
 ];
@@ -44,18 +44,18 @@ export const RecommendedCourses = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
           <div>
             <span className="font-label-sm uppercase tracking-wider text-m3-secondary bg-m3-secondary-container/60 px-3 py-1 rounded-full font-bold">
-              Tailored Pathways
+              Lộ trình thiết kế riêng
             </span>
             <h2 className="font-headline-lg text-m3-on-surface mt-2">
-              A learning path made for you.
+              Lộ trình học được tạo ra cho bạn.
             </h2>
             <p className="font-body-md text-m3-on-surface-variant mt-1">
-              Curated curriculum adapting dynamically to your placement results.
+              Chương trình được tuyển chọn, tự động điều chỉnh theo kết quả kiểm tra xếp lớp của bạn.
             </p>
           </div>
           <div className="inline-flex items-center gap-2 bg-m3-secondary-fixed/50 px-3 py-1.5 rounded-full self-start md:self-auto">
             <span className="w-2 h-2 rounded-full bg-m3-secondary" />
-            <span className="font-label-sm text-m3-on-surface font-bold">Synced with diagnostic</span>
+            <span className="font-label-sm text-m3-on-surface font-bold">Đồng bộ với bài chẩn đoán</span>
           </div>
         </div>
 
@@ -75,11 +75,11 @@ export const RecommendedCourses = () => {
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-2">
                   <span className="font-label-sm font-bold text-m3-on-surface bg-m3-surface-container-high px-2.5 py-0.5 rounded-md">
-                    Level: {c.level}
+                    Trình độ: {c.level}
                   </span>
                   <span className="font-label-sm text-m3-on-surface-variant flex items-center gap-1">
                     <Clock className="w-[15px] h-[15px]" />
-                    {c.lessons} lessons
+                    {c.lessons} bài học
                   </span>
                 </div>
                 <h3 className="font-headline-sm text-m3-on-surface font-bold">{c.title}</h3>
@@ -94,7 +94,7 @@ export const RecommendedCourses = () => {
               </div>
               <div className="flex items-center justify-between pt-4 border-t border-m3-outline-variant/30">
                 <div className="flex flex-col">
-                  <span className="font-label-sm text-m3-on-surface-variant font-medium">Duration</span>
+                  <span className="font-label-sm text-m3-on-surface-variant font-medium">Thời lượng</span>
                   <span className="font-label-md font-bold text-m3-on-surface">{c.duration}</span>
                 </div>
                 <button
@@ -104,7 +104,7 @@ export const RecommendedCourses = () => {
                       : "bg-m3-surface-container text-m3-on-surface hover:bg-m3-primary-container hover:text-m3-on-primary"
                   }`}
                 >
-                  {c.featured ? "Start Course" : "Explore"}
+                  {c.featured ? "Bắt đầu khóa học" : "Khám phá"}
                 </button>
               </div>
             </div>

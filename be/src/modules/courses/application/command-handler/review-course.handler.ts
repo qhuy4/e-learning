@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { ForbiddenException, HttpStatus } from '@nestjs/common';
+import { ConflictException, ForbiddenException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InstructorProfileTypeOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-profile.orm.entity';
@@ -11,11 +11,13 @@ import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';
 import { ReviewCourseCommand } from '@/modules/courses/application/command/review-course.command';
 import { AdminCourseRepository } from '@/modules/courses/infrastructure/repository/admin-course.repository';
+import { CourseRepository } from '@/modules/courses/infrastructure/repository/course.repository';
 
 @CommandHandler(ReviewCourseCommand)
 export class ReviewCourseHandler implements ICommandHandler<ReviewCourseCommand> {
   constructor(
     private readonly adminCourseRepository: AdminCourseRepository,
+    private readonly courseRepository: CourseRepository,
     @InjectRepository(InstructorProfileTypeOrmEntity)
     private readonly profileRepo: Repository<InstructorProfileTypeOrmEntity>,
     @InjectRepository(UserOrmEntity)
@@ -33,6 +35,19 @@ export class ReviewCourseHandler implements ICommandHandler<ReviewCourseCommand>
       const profile = await this.profileRepo.findOne({ where: { userId: Number(course.instructorId) } });
       if (owner?.role !== UserRole.ADMIN && profile?.approvalStatus !== ApprovalStatus.APPROVED) {
         throw new ForbiddenException('Hồ sơ giảng viên chưa được duyệt để xuất bản khóa học.');
+      }
+    }
+    if (status === CourseStatus.PUBLISHED) {
+      if (![CourseStatus.PENDING_REVIEW, CourseStatus.APPROVED].includes(course.status)) {
+        throw new ConflictException(
+          'Chỉ có thể xuất bản khóa học đang chờ duyệt hoặc đã duyệt.',
+        );
+      }
+      const domainCourse = await this.courseRepository.findById(Number(id));
+      if (domainCourse) {
+        domainCourse.publishedAt = new Date();
+        await this.courseRepository.update(domainCourse);
+        await this.courseRepository.archiveAncestorChain(domainCourse.parentId ?? null);
       }
     }
     return this.adminCourseRepository.review(id, status, rejectReason);

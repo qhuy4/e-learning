@@ -23,16 +23,16 @@ export function BookingNotFound() {
     return (
         <main className="max-w-7xl mx-auto px-4 py-20 text-center">
             <h1 className="text-3xl font-extrabold text-foreground">
-                Mentor not found
+                Không tìm thấy mentor
             </h1>
             <p className="text-muted-foreground mt-2">
-                The mentor profile you requested could not be loaded.
+                Không thể tải hồ sơ mentor bạn yêu cầu.
             </p>
             <Link
                 to="/mentors"
                 className="mt-6 inline-flex h-9 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
             >
-                Back to mentors
+                Quay lại danh sách mentor
             </Link>
         </main>
     );

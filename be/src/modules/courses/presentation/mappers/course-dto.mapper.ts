@@ -26,6 +26,8 @@ export class CourseDtoMapper {
     dto.price = Number(courseOrEntity.price);
     dto.publishedAt = courseOrEntity.publishedAt;
     dto.createdAt = courseOrEntity.createdAt;
+    dto.status = Number(courseOrEntity.status);
+    dto.version = Number(courseOrEntity.version ?? 1);
 
     const ormEntity = courseOrEntity as CourseOrmEntity;
     const instructorUser = (ormEntity as any).instructorUser as
@@ -37,6 +39,7 @@ export class CourseDtoMapper {
         id: instructorProfile?.id ?? 0,
         userId: instructorUser.id,
         name: instructorUser.name ?? null,
+        avatar: ((instructorUser as any).profile?.avatarUrl as string | null) ?? null,
         headline: instructorProfile?.headline ?? null,
         bio: instructorProfile?.bio ?? null,
         websiteUrl: instructorProfile?.websiteUrl ?? null,

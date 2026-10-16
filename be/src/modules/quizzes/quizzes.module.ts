@@ -25,6 +25,7 @@ import { GetQuizByIdHandler } from './application/query-handler/get-quiz-by-id.h
 import { GetQuizListHandler } from './application/query-handler/get-quiz-list.handler';
 import { GetMyQuizzesHandler } from './application/query-handler/get-my-quizzes.handler';
 import { GetLessonQuizzesHandler } from './application/query-handler/get-lesson-quizzes.handler';
+import { GetStudentLessonQuizzesHandler } from './application/query-handler/get-student-lesson-quizzes.handler';
 
 import { QuizRepository } from './infrastructure/repository/quiz.repository';
 import { QUIZ_REPOSITORY } from './domain/repository/quiz.repository';
@@ -63,6 +64,7 @@ const queryHandlers = [
   GetQuizListHandler,
   GetMyQuizzesHandler,
   GetLessonQuizzesHandler,
+  GetStudentLessonQuizzesHandler,
 ];
 
 const repositories = [

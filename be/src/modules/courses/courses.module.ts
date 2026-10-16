@@ -50,6 +50,11 @@ import { GetCatalogCoursesHandler } from '@/modules/courses/application/query-ha
 import { GetRelatedCoursesHandler } from '@/modules/courses/application/query-handler/get-related-courses.handler';
 
 import { EnrollmentOrmEntity } from '@/modules/enrollments/infrastructure/entity/enrollment.orm-entity';
+import { LessonMaterialOrmEntity } from '@/modules/lessons/infrastructure/entity/lesson-material.orm-entity';
+import { LessonQuizOrmEntity } from '@/modules/quizzes/infrastructure/entity/lesson-quiz.orm-entity';
+import { QuizOrmEntity } from '@/modules/quizzes/infrastructure/entity/quiz.orm-entity';
+import { QuizQuestionOrmEntity } from '@/modules/quizzes/infrastructure/entity/quiz-question.orm-entity';
+import { QuizOptionOrmEntity } from '@/modules/quizzes/infrastructure/entity/quiz-option.orm-entity';
 
 @Module({
   imports: [
@@ -66,6 +71,11 @@ import { EnrollmentOrmEntity } from '@/modules/enrollments/infrastructure/entity
       InstructorProfileTypeOrmEntity,
       ReviewOrmEntity,
       EnrollmentOrmEntity,
+      LessonMaterialOrmEntity,
+      LessonQuizOrmEntity,
+      QuizOrmEntity,
+      QuizQuestionOrmEntity,
+      QuizOptionOrmEntity,
     ]),
     forwardRef(() => SectionsModule),
     LessonsModule,

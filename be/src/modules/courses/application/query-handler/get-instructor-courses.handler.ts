@@ -21,12 +21,14 @@ export class GetInstructorCoursesHandler
   ) {}
 
   async execute(query: GetInstructorCoursesQuery) {
+    const page = Math.max(1, Number(query.page) || 1);
+    const limit = Math.min(100, Math.max(1, Number(query.limit) || 10));
     const [courses, total] =
       await this.courseRepository.findCoursesByInstructorId(
         query.instructorId,
         {
-          page: query.page,
-          limit: query.limit,
+          page,
+          limit,
           level: query.level,
           keyword: query.keyword,
           status: query.status,
@@ -42,10 +44,10 @@ export class GetInstructorCoursesHandler
     return {
       data,
       meta: {
-        page: query.page,
-        limit: query.limit,
+        page,
+        limit,
         total,
-        totalPages: Math.ceil(total / query.limit),
+        totalPages: Math.ceil(total / limit),
       },
     };
   }

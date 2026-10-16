@@ -22,11 +22,11 @@ const steps: {
 }[] = [
   {
     number: "01",
-    label: "Step 01 • Diagnostic",
-    title: "10-Min AI Diagnostic",
+    label: "Bước 01 • Chẩn đoán",
+    title: "Chẩn đoán AI 10 phút",
     description:
-      "Engage in an adaptive interactive conversation. The AI tests pronunciation, grammar breadth, response cadence, and idiom retrieval.",
-    footer: "Voice & Vocabulary Profiling",
+      "Trò chuyện tương tác theo hướng thích ứng. AI kiểm tra phát âm, độ rộng ngữ pháp, nhịp phản hồi và khả năng dùng thành ngữ.",
+    footer: "Hồ sơ giọng nói & từ vựng",
     icon: Ear,
     iconBg: "bg-gradient-to-tr from-rose-50 to-orange-50 border border-rose-200/60",
     iconColor: "text-m3-primary",
@@ -36,11 +36,11 @@ const steps: {
   },
   {
     number: "02",
-    label: "Step 02 • Analysis",
-    title: "In-Depth Gap Analysis",
+    label: "Bước 02 • Phân tích",
+    title: "Phân tích lỗ hổng chuyên sâu",
     description:
-      "Uncover the exact structural patterns and phonemes causing hesitation, accurately correlated to official CEFR descriptors.",
-    footer: "CEFR Matrix & Acoustic Map",
+      "Khám phá chính xác các mẫu cấu trúc và âm tố gây ngập ngừng, được đối chiếu chuẩn xác với tiêu chuẩn CEFR chính thức.",
+    footer: "Ma trận CEFR & bản đồ âm thanh",
     icon: Lightbulb,
     iconBg: "bg-gradient-to-tr from-teal-50 to-emerald-50 border border-teal-200/60",
     iconColor: "text-m3-secondary",
@@ -50,11 +50,11 @@ const steps: {
   },
   {
     number: "03",
-    label: "Step 03 • Action",
-    title: "Targeted Mentorship",
+    label: "Bước 03 • Hành động",
+    title: "Cố vấn đúng trọng tâm",
     description:
-      "Receive a 100% custom-curated pathway and 1-on-1 sessions with native educators specifically calibrated for your growth spots.",
-    footer: "Zero Wasted Time",
+      "Nhận lộ trình được thiết kế 100% riêng cho bạn và các buổi học 1-1 cùng giáo viên bản ngữ, được tinh chỉnh đúng cho điểm phát triển của bạn.",
+    footer: "Không lãng phí thời gian",
     icon: GraduationCap,
     iconBg: "bg-gradient-to-tr from-amber-50 to-orange-50 border border-amber-200/60",
     iconColor: "text-m3-tertiary",
@@ -70,14 +70,14 @@ export const HowItWorksSection = () => {
       <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-12 flex flex-col items-center gap-2.5">
           <span className="font-label-sm uppercase tracking-wider text-m3-primary bg-m3-primary-fixed/50 px-3.5 py-1 rounded-full font-bold">
-            Pedagogical Framework
+            Khung phương pháp sư phạm
           </span>
           <h2 className="font-headline-lg text-m3-on-surface">
-            A smarter, data-driven way to master English.
+            Cách thông minh hơn, dựa trên dữ liệu để chinh phục tiếng Anh.
           </h2>
           <p className="font-body-md text-m3-on-surface-variant">
-            Traditional apps rely on repetitive flashcards. PiEMind analyzes your neural speech
-            patterns and pairs you with tailored native lessons.
+            Các ứng dụng truyền thống dựa vào thẻ ghi nhớ lặp đi lặp lại. PiEMind phân tích mẫu
+            giao tiếp của bạn và ghép bạn với các bài học bản ngữ được thiết kế riêng.
           </p>
         </div>
 

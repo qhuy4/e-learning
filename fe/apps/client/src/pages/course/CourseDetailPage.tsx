@@ -5,6 +5,7 @@ import { CourseContent } from "@/features/courses/components/CourseDetail/Course
 import { CourseSidebar } from "@/features/courses/components/CourseDetail/CourseSidebar";
 import { CourseLearningOutcomes } from "@/features/courses/components/CourseDetail/CourseLearningOutcomes";
 import { RelatedCourses } from "@/features/courses/components/CourseDetail/RelatedCourses";
+import { CourseReviewsSection } from "@/features/reviews/components/CourseReviewsSection";
 import { useCourseBySlug } from "@/features/courses/hooks/use-courses";
 import { useEnrollmentCheck } from "@/features/enrollment/hooks/use-enrollment";
 import { useAuth } from "@/features/auth/hooks/use-auth";
@@ -46,9 +47,9 @@ export const CourseDetailPage = () => {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-6">
         <div className="bg-white rounded-xl border border-primary/30 shadow-sm p-12 text-center">
-          <p className="text-slate-500 text-lg">Course not found</p>
+          <p className="text-slate-500 text-lg">Không tìm thấy khóa học</p>
           <Link to="/courses" className="text-piemind-pink font-bold text-sm mt-2 inline-block hover:underline">
-            Browse courses
+            Khám phá khóa học
           </Link>
         </div>
       </div>
@@ -61,7 +62,7 @@ export const CourseDetailPage = () => {
       <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-slate-500">
         <Link to="/courses" className="hover:text-piemind-pink transition-colors flex items-center gap-1">
           <School className="size-4" />
-          <span>Courses</span>
+          <span>Khóa học</span>
         </Link>
         <ChevronRight className="size-4 text-slate-300" />
         <span className="text-slate-900 font-bold">{courseData.title}</span>
@@ -85,6 +86,9 @@ export const CourseDetailPage = () => {
           <CourseSidebar course={courseData} isEnrolled={isEnrolled} />
         </div>
       </div>
+
+      {/* Đánh giá từ học viên */}
+      <CourseReviewsSection courseId={courseData.id} />
 
       {/* Related Courses */}
       {slug && <RelatedCourses courseSlug={slug} />}

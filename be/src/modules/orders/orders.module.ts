@@ -4,6 +4,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 
 import { OrderOrmEntity } from '@/modules/orders/infrastructure/entity/order.orm-entity';
 import { OrderItemOrmEntity } from '@/modules/orders/infrastructure/entity/order-item.orm-entity';
+import { CourseOrmEntity } from '@/modules/courses/infrastructure/entity/course.orm-entity';
 import { OrderRepository } from '@/modules/orders/infrastructure/repository/order.repository';
 import { ORDER_REPOSITORY } from '@/modules/orders/domain/repository/order.repository';
 
@@ -18,6 +19,7 @@ import { AdminOrdersController } from '@/modules/orders/presentation/admin-order
 import { StudentOrdersController } from '@/modules/orders/presentation/student-orders.controller';
 
 import { EnrollmentsModule } from '@/modules/enrollments/enrollments.module';
+import { CouponsModule } from '@/modules/coupons/coupons.module';
 
 const QueryHandlers = [GetAdminOrdersHandler, GetAdminOrderByIdHandler, GetMyOrdersHandler, GetMyOrderByIdHandler];
 const CommandHandlers = [UpdateOrderStatusHandler, CreateOrderHandler];
@@ -25,8 +27,9 @@ const CommandHandlers = [UpdateOrderStatusHandler, CreateOrderHandler];
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([OrderOrmEntity, OrderItemOrmEntity]),
+    TypeOrmModule.forFeature([OrderOrmEntity, OrderItemOrmEntity, CourseOrmEntity]),
     EnrollmentsModule,
+    CouponsModule,
   ],
   controllers: [AdminOrdersController, StudentOrdersController],
   providers: [

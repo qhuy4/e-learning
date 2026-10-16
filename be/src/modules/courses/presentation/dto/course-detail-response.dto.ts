@@ -9,11 +9,14 @@ export class CourseDetailResponseDto {
   price: number;
   publishedAt: Date | null;
   createdAt: Date | null;
+  status: number;
+  version: number;
 
   instructor: {
     id: number;
     userId: number;
     name: string | null;
+    avatar: string | null;
     headline: string | null;
     bio: string | null;
     websiteUrl: string | null;

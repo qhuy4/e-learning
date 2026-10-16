@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router";
-import { ChevronLeft, Save, SendHorizonal, Copy } from "lucide-react";
+import { ChevronLeft, Save, SendHorizonal } from "lucide-react";
 import { toast } from "sonner";
 
 import type { Course } from "@/features/courses/types/course.types";
@@ -27,9 +27,7 @@ export default function CreateCoursePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { courseId } = useParams<{ courseId: string }>();
-  const cloneData = (location.state as any)?.cloneData;
   const isEditMode = Boolean(courseId);
-  const isCloneMode = Boolean(cloneData) && !courseId;
 
   const { mutate: createCourse, isPending: isCreating } = useCreateCourse();
   const { mutate: updateCourse, isPending: isUpdating } = useUpdateCourse();
@@ -53,27 +51,17 @@ export default function CreateCoursePage() {
   });
 
   useEffect(() => {
-    if (isCloneMode && cloneData) {
-      setCourseData({
-        title: cloneData.title,
-        description: cloneData.description,
-        price: cloneData.price,
-        level: cloneData.level,
-        thumbnail: cloneData.thumbnail,
-        categories: cloneData.categories,
-        sections: cloneData.sections ?? [],
-      });
-    } else if (courseResponse?.data) {
+    if (courseResponse?.data) {
       setCourseData(courseResponse.data);
     }
-  }, [courseResponse, isCloneMode, cloneData]);
+  }, [courseResponse]);
 
   const updateCourseData = (newData: Partial<Course>) =>
     setCourseData((prev) => ({ ...prev, ...newData }));
 
   const currentStatus = courseData.status ?? 1;
   const statusCfg = COURSE_STATUS_CONFIG[currentStatus];
-  const canEdit = isCloneMode || !isEditMode || isEditable(currentStatus);
+  const canEdit = !isEditMode || isEditable(currentStatus);
 
   const createFormData = (data: Course): FormData => {
     const formData = new FormData();
@@ -144,7 +132,7 @@ export default function CreateCoursePage() {
   };
 
   const renderActions = () => {
-    if (!isEditMode || isCloneMode) {
+    if (!isEditMode) {
       return (
         <Button variant="outline" onClick={handleCreateDraft} disabled={isBusy} className="px-5">
           <Save className="w-4 h-4 mr-2" />
@@ -190,14 +178,8 @@ export default function CreateCoursePage() {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-xl font-semibold tracking-tight">
-              {isCloneMode ? "Nhân bản khóa học" : isEditMode ? "Chỉnh sửa khóa học" : "Tạo khóa học mới"}
+              {isEditMode ? "Chỉnh sửa khóa học" : "Tạo khóa học mới"}
             </h1>
-            {isCloneMode && (
-              <Badge variant="outline" className="text-xs gap-1.5 text-emerald-600 border-emerald-300 dark:border-emerald-700">
-                <Copy className="w-3.5 h-3.5" />
-                Nhân bản
-              </Badge>
-            )}
             {isEditMode && statusCfg && (
               <Badge
                 variant={statusCfg.variant}
@@ -212,17 +194,15 @@ export default function CreateCoursePage() {
             )}
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {isCloneMode
-              ? "Chỉnh sửa thông tin từ khóa học gốc và nhấn Tạo để tạo bản sao."
-              : !isEditMode
-                ? "Điền thông tin để tạo khóa học mới. Sau khi tạo bạn có thể thêm bài học."
-                : canEdit
-                  ? "Cập nhật thông tin và nội dung khóa học của bạn."
-                  : currentStatus === 2
-                    ? "Khóa học đang chờ admin duyệt. Bạn không thể chỉnh sửa trong lúc này."
-                    : currentStatus === 5
-                      ? "Khóa học đã được xuất bản. Liên hệ admin nếu cần chỉnh sửa."
-                      : ""}
+            {!isEditMode
+              ? "Điền thông tin để tạo khóa học mới. Sau khi tạo bạn có thể thêm bài học."
+              : canEdit
+                ? "Cập nhật thông tin và nội dung khóa học của bạn."
+                : currentStatus === 2
+                  ? "Khóa học đang chờ admin duyệt. Bạn không thể chỉnh sửa trong lúc này."
+                  : currentStatus === 5
+                    ? "Khóa học đã được xuất bản. Liên hệ admin nếu cần chỉnh sửa."
+                    : ""}
           </p>
         </div>
 
@@ -244,7 +224,7 @@ export default function CreateCoursePage() {
 
           <TabsTrigger
             value="chapters"
-            disabled={!courseId && !isCloneMode}
+            disabled={!courseId}
             className="rounded-sm px-8 py-2 data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 text-sm font-medium transition-all disabled:opacity-40"
           >
             Chương trình học

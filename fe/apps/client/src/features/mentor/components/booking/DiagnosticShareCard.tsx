@@ -21,8 +21,8 @@ export function DiagnosticShareCard({
         <Card className="rounded-2xl border border-border bg-card p-6 sm:p-7">
             <StepHeader
                 step={3}
-                title="Share Your AI Diagnostic Baseline"
-                description={`Allows Coach ${mentorName} to review your speaking telemetry before the session`}
+                title="Chia sẻ dữ liệu chẩn đoán AI của bạn"
+                description={`Cho phép huấn luyện viên ${mentorName} xem dữ liệu nói của bạn trước buổi học`}
             />
 
             <CardContent className="px-0 pt-6">
@@ -34,12 +34,12 @@ export function DiagnosticShareCard({
                             </div>
                             <div>
                                 <span className="text-sm font-bold text-foreground block">
-                                    Share my AI Diagnostic Report with Coach{" "}
-                                    {mentorName}
+                                    Chia sẻ Báo cáo Chẩn đoán AI của tôi với huấn
+                                    luyện viên {mentorName}
                                 </span>
                                 <p className="text-xs text-muted-foreground mt-0.5">
-                                    Recommended for a personalized, data-backed
-                                    15-minute diagnostic
+                                    Nên bật để có buổi chẩn đoán 15 phút cá nhân
+                                    hóa, dựa trên dữ liệu
                                 </p>
                             </div>
                         </div>
@@ -59,29 +59,29 @@ export function DiagnosticShareCard({
                                     variant="secondary"
                                     className="bg-primary/20 text-primary font-bold px-2 py-0.5 text-xs rounded-full"
                                 >
-                                    {studentName || "Student"}
+                                    {studentName || "Học viên"}
                                 </Badge>
                                 <span className="font-semibold text-foreground">
-                                    CEFR B1 Intermediate
+                                    CEFR B1 – Trung cấp
                                 </span>
                             </div>
                             <div className="flex flex-wrap items-center gap-4 text-muted-foreground">
                                 <span className="inline-flex items-center gap-1">
                                     <span className="size-2 rounded-full bg-secondary" />
-                                    Fluency:{" "}
+                                    Trôi chảy:{" "}
                                     <strong className="text-foreground">
                                         69/100
                                     </strong>
                                 </span>
                                 <span className="inline-flex items-center gap-1">
                                     <span className="size-2 rounded-full bg-accent-foreground" />
-                                    Speaking:{" "}
+                                    Kỹ năng nói:{" "}
                                     <strong className="text-foreground">
                                         54%
                                     </strong>
                                 </span>
                                 <span className="inline-flex items-center gap-1 text-primary font-semibold">
-                                    Hesitation Alert: +1.8s delay on transitions
+                                    Cảnh báo ngập ngừng: chậm +1,8s khi chuyển ý
                                 </span>
                             </div>
                         </div>

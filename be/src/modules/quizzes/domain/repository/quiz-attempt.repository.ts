@@ -4,4 +4,6 @@ export interface IQuizAttemptRepository {
   findById(id: number): Promise<QuizAttempt | null>;
   create(attempt: QuizAttempt): Promise<QuizAttempt>;
   update(attempt: QuizAttempt): Promise<QuizAttempt>;
+  /** Số lần học viên đã NỘP bài cho quiz này. */
+  countByQuizAndUser(quizId: number, userId: number): Promise<number>;
 }

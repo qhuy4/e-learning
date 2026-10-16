@@ -117,9 +117,9 @@ export const Footer = () => {
             © {new Date().getFullYear()} PiEMind. Đã đăng ký bản quyền.
           </p>
           <div className="flex gap-6 text-xs font-extrabold text-m3-on-surface-variant uppercase tracking-wider">
-            <a className="hover:text-m3-primary transition-colors" href="#">English</a>
-            <span className="text-m3-outline-variant/40 font-light">|</span>
             <a className="hover:text-m3-primary transition-colors" href="#">Tiếng Việt</a>
+            <span className="text-m3-outline-variant/40 font-light">|</span>
+            <a className="hover:text-m3-primary transition-colors" href="#">English</a>
           </div>
         </div>
       </div>

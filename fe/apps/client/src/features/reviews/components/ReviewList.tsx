@@ -30,7 +30,7 @@ export const ReviewList: React.FC<ReviewListProps> = ({
 
   if (!reviews || reviews.length === 0) {
     return (
-      <div className="text-center py-12 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+      <div className="text-center py-10 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
         <p className="text-slate-500 font-medium text-sm">
           Chưa có đánh giá nào cho khóa học này.
         </p>
@@ -48,7 +48,7 @@ export const ReviewList: React.FC<ReviewListProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {reviews.map((review) => {
         const isOwner =
           currentUserId && String(currentUserId) === String(review.userId);
@@ -65,10 +65,10 @@ export const ReviewList: React.FC<ReviewListProps> = ({
         return (
           <div
             key={review.id}
-            className="bg-white rounded-xl p-5 border border-slate-200 shadow-2xs hover:shadow-xs transition-shadow space-y-3"
+            className="bg-white rounded-2xl p-4 md:p-5 border border-slate-200 shadow-[0_4px_20px_rgba(15,23,42,0.06)] hover:shadow-[0_6px_24px_rgba(15,23,42,0.09)] transition-shadow space-y-3"
           >
             {/* Header: User Avatar, Name, Rating Stars, Date, Delete button */}
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-100 border border-slate-200 shrink-0 flex items-center justify-center">
                   {avatar ? (
@@ -76,6 +76,9 @@ export const ReviewList: React.FC<ReviewListProps> = ({
                       src={avatar}
                       alt={name}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
                     />
                   ) : (
                     <User className="w-5 h-5 text-slate-400" />
@@ -115,20 +118,20 @@ export const ReviewList: React.FC<ReviewListProps> = ({
 
             {/* Comment Content */}
             {review.comment && (
-              <p className="text-sm text-slate-700 leading-relaxed font-normal whitespace-pre-line">
+              <p className="text-sm text-slate-600 leading-relaxed font-normal whitespace-pre-line">
                 {review.comment}
               </p>
             )}
 
             {/* Review Image Gallery */}
             {review.images && review.images.length > 0 && (
-              <div className="flex flex-wrap gap-2 pt-1">
+              <div className="flex flex-wrap gap-2 pt-0.5">
                 {review.images.map((img) => (
                   <button
                     key={img.id}
                     type="button"
                     onClick={() => setSelectedImage(img.imageUrl)}
-                    className="w-20 h-20 rounded-lg overflow-hidden border border-slate-200 hover:opacity-95 hover:ring-2 hover:ring-indigo-500 transition-all group shrink-0 cursor-pointer"
+                    className="w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border border-slate-200 hover:opacity-95 hover:ring-2 hover:ring-piemind-pink transition-all group shrink-0 cursor-pointer"
                   >
                     <img
                       src={img.imageUrl}

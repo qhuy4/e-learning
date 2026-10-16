@@ -41,6 +41,7 @@ interface CourseRow {
   level: number;
   price: number;
   status: number;
+  version: number | null;
 }
 
 export default function CoursesListPage() {
@@ -85,9 +86,11 @@ export default function CoursesListPage() {
   };
 
   const handleClone = async (id: string) => {
+    const tid = toast.loading("Đang sao chép khóa học...");
     try {
-      const res = await courseService.getCourseById(id);
-      navigate("/courses/create", { state: { cloneData: res.data } });
+      const res = await courseService.cloneCourse(id);
+      toast.success("Đã sao chép khóa học (bản nháp).", { id: tid });
+      navigate(`/courses/${res.data.id}/edit`);
     } catch (err) {
       toast.error(getErrorMessage(err), { id: tid });
     }
@@ -124,6 +127,15 @@ export default function CoursesListPage() {
       header: "Cấp độ",
       cell: ({ row }) => (
         <span className="text-sm">{LEVEL_LABELS[row.original.level] ?? "—"}</span>
+      ),
+    },
+    {
+      accessorKey: "version",
+      header: "Phiên bản",
+      cell: ({ row }) => (
+        <Badge variant="outline" className="text-xs font-medium tabular-nums">
+          v{row.original.version ?? 1}
+        </Badge>
       ),
     },
     {
@@ -171,8 +183,9 @@ export default function CoursesListPage() {
               variant="ghost"
               size="icon"
               onClick={(e) => { e.stopPropagation(); handleClone(course.id); }}
-              className="h-8 w-8 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 rounded-lg"
-              title="Nhân bản"
+              disabled={course.status === 6}
+              className="h-8 w-8 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 rounded-lg disabled:opacity-40"
+              title={course.status === 6 ? "Version cũ đã lưu trữ, không sao chép được" : "Nhân bản"}
             >
               <Copy className="h-4 w-4" />
             </Button>
@@ -211,22 +224,24 @@ export default function CoursesListPage() {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
-        <Select value={level} onValueChange={(v) => { setLevel(v ?? ""); setPage(1); }}>
+        <Select value={level || "all"} onValueChange={(v) => { setLevel(v === "all" ? "" : v); setPage(1); }}>
           <SelectTrigger className="h-9 min-w-[160px]">
             {level ? LEVEL_LABELS[Number(level)] : "Tất cả cấp độ"}
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="all">Tất cả cấp độ</SelectItem>
             <SelectItem value="1">Cơ bản</SelectItem>
             <SelectItem value="2">Trung bình</SelectItem>
             <SelectItem value="3">Nâng cao</SelectItem>
           </SelectContent>
         </Select>
 
-        <Select value={status} onValueChange={(v) => { setStatus(v ?? ""); setPage(1); }}>
+        <Select value={status || "all"} onValueChange={(v) => { setStatus(v === "all" ? "" : v); setPage(1); }}>
           <SelectTrigger className="h-9 min-w-[160px]">
             {status ? STATUS_LABELS[Number(status)] : "Tất cả trạng thái"}
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="all">Tất cả trạng thái</SelectItem>
             <SelectItem value="1">Bản nháp</SelectItem>
             <SelectItem value="2">Chờ duyệt</SelectItem>
             <SelectItem value="3">Đã duyệt</SelectItem>

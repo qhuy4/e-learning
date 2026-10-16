@@ -25,8 +25,8 @@ export function FocusSelectionCard({
         <Card className="rounded-2xl border border-border bg-card p-6 sm:p-7">
             <StepHeader
                 step={2}
-                title="What would you like to focus on?"
-                description={`Select one or more topics for ${mentorName} to tailor your session`}
+                title="Bạn muốn tập trung vào điều gì?"
+                description={`Chọn một hoặc nhiều chủ đề để ${mentorName} điều chỉnh buổi học cho bạn`}
             />
 
             <CardContent className="px-0 pt-6">

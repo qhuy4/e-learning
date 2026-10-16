@@ -16,6 +16,8 @@ import { DeleteCouponHandler } from '@/modules/coupons/application/command-handl
 import { ToggleCouponActiveHandler } from '@/modules/coupons/application/command-handler/toggle-coupon-active.handler';
 
 import { AdminCouponsController } from '@/modules/coupons/presentation/admin-coupons.controller';
+import { CouponsController } from '@/modules/coupons/presentation/coupons.controller';
+import { CouponRedemptionService } from '@/modules/coupons/application/coupon-redemption.service';
 
 const QueryHandlers = [GetAdminCouponsHandler, GetAdminCouponByIdHandler];
 const CommandHandlers = [
@@ -30,16 +32,17 @@ const CommandHandlers = [
     CqrsModule,
     TypeOrmModule.forFeature([CouponOrmEntity, CouponCourseOrmEntity, CouponUsageOrmEntity]),
   ],
-  controllers: [AdminCouponsController],
+  controllers: [AdminCouponsController, CouponsController],
   providers: [
     CouponRepository,
     {
       provide: COUPON_REPOSITORY,
       useExisting: CouponRepository,
     },
+    CouponRedemptionService,
     ...QueryHandlers,
     ...CommandHandlers,
   ],
-  exports: [COUPON_REPOSITORY],
+  exports: [COUPON_REPOSITORY, CouponRedemptionService],
 })
 export class CouponsModule {}

@@ -70,8 +70,8 @@ export function DateSlotPicker({
         <div className="rounded-2xl border border-border bg-card p-6 sm:p-7">
             <StepHeader
                 step={1}
-                title="Select Date & Timezone"
-                description="Pick duration and a start time inside the teacher's window"
+                title="Chọn ngày & múi giờ"
+                description="Chọn thời lượng và giờ bắt đầu trong khung giờ của huấn luyện viên"
                 action={
                     <button
                         type="button"
@@ -81,7 +81,7 @@ export function DateSlotPicker({
                         <Globe className="size-3.5 text-primary" />
                         <span>{timezone}</span>
                         <span className="text-[10px] text-muted-foreground">
-                            (click to toggle)
+                            (nhấn để đổi)
                         </span>
                     </button>
                 }
@@ -92,17 +92,17 @@ export function DateSlotPicker({
                     <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                             <span className="font-bold text-foreground text-sm sm:text-base">
-                                {activeDay?.monthYear || "Upcoming Days"}
+                                {activeDay?.monthYear || "Những ngày tới"}
                             </span>
                             <Badge
                                 variant="outline"
                                 className="bg-card text-muted-foreground text-[11px] font-medium border-border"
                             >
                                 {slotsLoading
-                                    ? "Checking availability..."
+                                    ? "Đang kiểm tra lịch trống..."
                                     : hasWindow
-                                      ? `${startTimes.length} start times`
-                                      : "Unavailable"}
+                                      ? `${startTimes.length} khung giờ`
+                                      : "Không khả dụng"}
                             </Badge>
                         </div>
                         <div className="flex items-center gap-1 text-muted-foreground">
@@ -180,13 +180,13 @@ export function DateSlotPicker({
                                         }`}
                                     >
                                         {day.isPast ? (
-                                            "Past"
+                                            "Đã qua"
                                         ) : daysLoading || dayWin == null ? (
                                             <span className="text-muted-foreground">
                                                 ···
                                             </span>
                                         ) : !dayOpen ? (
-                                            "Off"
+                                            "Nghỉ"
                                         ) : isSelected ? (
                                             ""
                                         ) : (
@@ -213,10 +213,10 @@ export function DateSlotPicker({
                 {!slotsLoading && !hasWindow && (
                     <div className="rounded-xl border border-border bg-muted/40 p-6 text-center">
                         <p className="text-sm font-semibold text-foreground">
-                            Teacher not available on this date
+                            Huấn luyện viên không rảnh trong ngày này
                         </p>
                         <p className="text-xs text-muted-foreground mt-1">
-                            Try another day from the calendar above.
+                            Hãy chọn ngày khác trong lịch phía trên.
                         </p>
                     </div>
                 )}
@@ -227,7 +227,7 @@ export function DateSlotPicker({
                             <div className="flex items-center gap-2">
                                 <Clock className="size-4 text-m3-secondary" />
                                 <span className="font-bold text-foreground">
-                                    Coach Daily Window:
+                                    Khung giờ hằng ngày của huấn luyện viên:
                                 </span>
                                 <span className="font-bold text-sm text-m3-secondary px-2 py-0.5 bg-card rounded-full border border-secondary/20">
                                     {formatTimeLabel(win.start)} –{" "}
@@ -237,8 +237,8 @@ export function DateSlotPicker({
                             <div className="flex items-center gap-1.5 text-muted-foreground text-[11px]">
                                 <span className="size-2 rounded-full bg-m3-secondary animate-pulse" />
                                 <span className="text-black font-semibold">
-                                    Active schedule · {startTimes.length} open
-                                    starts
+                                    Đang mở lịch · {startTimes.length} khung giờ
+                                    trống
                                 </span>
                             </div>
                         </div>
@@ -247,16 +247,16 @@ export function DateSlotPicker({
                             <div className="flex items-center justify-between">
                                 <span className="text-sm font-bold text-foreground flex items-center gap-1.5">
                                     <Timer className="size-5 text-primary" />
-                                    Session Duration
+                                    Thời lượng buổi học
                                 </span>
                                 <span className="text-[14px] text-muted-foreground">
-                                    Select meeting length
+                                    Chọn thời lượng buổi họp
                                 </span>
                             </div>
                             <div
                                 className="grid grid-cols-2 sm:grid-cols-4 gap-2"
                                 role="group"
-                                aria-label="Duration"
+                                aria-label="Thời lượng"
                             >
                                 {DURATION_OPTIONS.map((opt) => {
                                     const selected = duration === opt.minutes;
@@ -279,7 +279,7 @@ export function DateSlotPicker({
                                                 {selected && (
                                                     <Check className="size-3 inline mr-1" />
                                                 )}
-                                                {opt.minutes} min
+                                                {opt.minutes} phút
                                             </span>
                                             <span
                                                 className={`text-[12px] font-semibold ${
@@ -300,14 +300,14 @@ export function DateSlotPicker({
                             <div className="flex items-center justify-between">
                                 <span className="text-[14px] font-bold text-foreground flex items-center gap-1.5">
                                     <AlarmClock className="size-4 text-primary" />
-                                    Select Start Time{" "}
+                                    Chọn giờ bắt đầu{" "}
                                     <span className="text-muted-foreground font-normal">
-                                        ({duration}-min window)
+                                        (khung {duration} phút)
                                     </span>
                                 </span>
                                 <span className="text-[14px] text-primary font-semibold">
-                                    {activeDay?.dayName}, {activeDay?.monthYear}{" "}
-                                    Slots
+                                    Khung giờ {activeDay?.dayName},{" "}
+                                    {activeDay?.monthYear}
                                 </span>
                             </div>
                             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 text-xs">
@@ -339,7 +339,7 @@ export function DateSlotPicker({
                                 })}
                                 {startTimes.length === 0 && (
                                     <p className="col-span-full text-sm text-muted-foreground py-3 text-center">
-                                        No free starts for this duration.
+                                        Không có giờ bắt đầu trống cho thời lượng này.
                                     </p>
                                 )}
                             </div>
@@ -359,7 +359,7 @@ export function DateSlotPicker({
                                         )}
                                     </span>
                                     <span className="text-xs font-bold text-[#F38181] bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-full">
-                                        ({duration} mins)
+                                        ({duration} phút)
                                     </span>
                                 </div>
                             )}

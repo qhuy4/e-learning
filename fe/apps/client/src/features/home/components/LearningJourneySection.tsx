@@ -10,12 +10,12 @@ const steps: {
   iconBg: string;
   iconColor: string;
 }[] = [
-  { step: "Step 01", icon: ClipboardList, title: "Assessment", desc: "10-min adaptive test", color: "text-m3-primary", iconBg: "bg-m3-primary-fixed", iconColor: "text-m3-primary" },
-  { step: "Step 02", icon: Brain, title: "AI Profile", desc: "Skill diagnostics mapped", color: "text-m3-secondary", iconBg: "bg-m3-secondary-fixed", iconColor: "text-m3-secondary" },
-  { step: "Step 03", icon: BookOpen, title: "Target Course", desc: "Customized curriculum", color: "text-m3-tertiary", iconBg: "bg-m3-tertiary-fixed", iconColor: "text-m3-tertiary" },
-  { step: "Step 04", icon: Users, title: "Match Teacher", desc: "Coaches aligned to you", color: "text-m3-secondary", iconBg: "bg-m3-secondary-container", iconColor: "text-m3-on-secondary-container" },
-  { step: "Step 05", icon: Video, title: "1-on-1 Session", desc: "Live conversational practice", color: "text-m3-primary", iconBg: "bg-m3-primary-fixed-dim", iconColor: "text-m3-on-primary-fixed-variant" },
-  { step: "Step 06", icon: Award, title: "Re-assessment", desc: "Track CEFR progression", color: "text-m3-secondary", iconBg: "bg-m3-secondary-fixed-dim", iconColor: "text-m3-secondary" },
+  { step: "Bước 01", icon: ClipboardList, title: "Đánh giá", desc: "Bài kiểm tra thích ứng 10 phút", color: "text-m3-primary", iconBg: "bg-m3-primary-fixed", iconColor: "text-m3-primary" },
+  { step: "Bước 02", icon: Brain, title: "Hồ sơ AI", desc: "Phân tích chi tiết từng kỹ năng", color: "text-m3-secondary", iconBg: "bg-m3-secondary-fixed", iconColor: "text-m3-secondary" },
+  { step: "Bước 03", icon: BookOpen, title: "Khóa học phù hợp", desc: "Chương trình được cá nhân hóa", color: "text-m3-tertiary", iconBg: "bg-m3-tertiary-fixed", iconColor: "text-m3-tertiary" },
+  { step: "Bước 04", icon: Users, title: "Ghép giảng viên", desc: "Huấn luyện viên hợp với bạn", color: "text-m3-secondary", iconBg: "bg-m3-secondary-container", iconColor: "text-m3-on-secondary-container" },
+  { step: "Bước 05", icon: Video, title: "Buổi học 1-1", desc: "Luyện hội thoại trực tiếp", color: "text-m3-primary", iconBg: "bg-m3-primary-fixed-dim", iconColor: "text-m3-on-primary-fixed-variant" },
+  { step: "Bước 06", icon: Award, title: "Kiểm tra lại", desc: "Theo dõi tiến độ CEFR", color: "text-m3-secondary", iconBg: "bg-m3-secondary-fixed-dim", iconColor: "text-m3-secondary" },
 ];
 
 export const LearningJourneySection = () => {
@@ -23,9 +23,9 @@ export const LearningJourneySection = () => {
     <section className="w-full py-8 lg:py-16 bg-m3-surface-container-low overflow-hidden">
       <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-12 flex flex-col items-center gap-1">
-          <span className="font-label-sm uppercase tracking-wider text-m3-primary font-bold">Full Lifecycle</span>
-          <h2 className="font-headline-lg text-m3-on-surface">Your Step-by-Step Learning Journey</h2>
-          <p className="font-body-md text-m3-on-surface-variant">From first question to fluent conversation, guided every step by our red panda engine.</p>
+          <span className="font-label-sm uppercase tracking-wider text-m3-primary font-bold">Toàn bộ hành trình</span>
+          <h2 className="font-headline-lg text-m3-on-surface">Hành trình học tập từng bước của bạn</h2>
+          <p className="font-body-md text-m3-on-surface-variant">Từ câu hỏi đầu tiên đến cuộc hội thoại trôi chảy, được dẫn dắt từng bước bởi hệ thống red panda của chúng tôi.</p>
         </div>
 
         <div className="relative">

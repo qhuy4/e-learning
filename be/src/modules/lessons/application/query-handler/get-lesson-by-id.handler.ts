@@ -39,7 +39,8 @@ export class GetLessonByIdHandler implements IQueryHandler<GetLessonByIdQuery> {
     }
 
     const signedUrl = await resolveSignedUrl(lesson.videoSource, this.storage);
+    const signedThumbnailUrl = await resolveSignedUrl(lesson.thumbnail, this.storage);
 
-    return LessonDtoMapper.toDetailDto(lesson, signedUrl);
+    return LessonDtoMapper.toDetailDto(lesson, signedUrl, signedThumbnailUrl);
   }
 }

@@ -9,6 +9,7 @@ export class Lesson {
     public type: LessonType,
     public videoProvider: string | null,
     public videoSource: string | null,
+    public thumbnail: string | null,
     public duration: number | null,
     public content: string | null,
     public position: number,
@@ -27,6 +28,7 @@ export class Lesson {
     type?: LessonType;
     videoProvider?: string | null;
     videoSource?: string | null;
+    thumbnail?: string | null;
     duration?: number | null;
     content?: string | null;
     position?: number;
@@ -41,6 +43,7 @@ export class Lesson {
       params.type ?? LessonType.VIDEO,
       params.videoProvider ?? null,
       params.videoSource ?? null,
+      params.thumbnail ?? null,
       params.duration ?? null,
       params.content ?? null,
       params.position ?? 0,
@@ -61,6 +64,7 @@ export class Lesson {
     type: LessonType;
     videoProvider: string | null;
     videoSource: string | null;
+    thumbnail: string | null;
     duration: number | null;
     content: string | null;
     position: number;
@@ -79,6 +83,7 @@ export class Lesson {
       params.type,
       params.videoProvider,
       params.videoSource,
+      params.thumbnail,
       params.duration,
       params.content,
       params.position,
@@ -97,6 +102,7 @@ export class Lesson {
     type?: LessonType;
     videoProvider?: string | null;
     videoSource?: string | null;
+    thumbnail?: string | null;
     duration?: number | null;
     content?: string | null;
     position?: number;
@@ -121,6 +127,10 @@ export class Lesson {
 
     if (params.videoSource !== undefined) {
       this.videoSource = params.videoSource;
+    }
+
+    if (params.thumbnail !== undefined) {
+      this.thumbnail = params.thumbnail;
     }
 
     if (params.duration !== undefined) {
@@ -151,6 +161,7 @@ export class Lesson {
       type: this.type,
       videoProvider: this.videoProvider,
       videoSource: this.videoSource,
+      thumbnail: this.thumbnail,
       duration: this.duration,
       content: this.content,
       position: this.position,

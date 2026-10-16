@@ -7,6 +7,8 @@ export interface LessonDetail {
   type: 'video' | 'reading' | string;
   videoProvider: string | null;
   videoSource: string | null;
+  /** Ảnh xem trước (poster) — hiển thị trước khi bấm phát */
+  thumbnail: string | null;
   duration: number | null;
   content: string | null;
   position: number;
@@ -40,6 +42,11 @@ export interface LearningCourse {
   slug: string;
   thumbnail: string | null;
   sections: LearningSection[];
+  instructor?: {
+    id?: number;
+    name?: string | null;
+    headline?: string | null;
+  } | null;
 }
 
 // ─── Lesson Progress ────────────────────────────────────────────────────────
@@ -62,4 +69,17 @@ export interface CourseProgress {
   completedLessons: number;
   totalLessons: number;
   lessons: LessonProgress[];
+}
+
+// ─── Lesson Materials (tài liệu đính kèm theo bài học) ─────────────────────
+export interface LessonMaterial {
+  id: number;
+  lessonId: number;
+  title: string;
+  description: string | null;
+  fileName: string;
+  fileSize: number | null;
+  mimeType: string | null;
+  downloadUrl: string | null;
+  createdAt: string | null;
 }

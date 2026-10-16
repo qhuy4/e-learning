@@ -29,6 +29,13 @@ export class UpdateLessonDto {
   @IsString()
   videoSource?: string | null;
 
+  // Sentinel từ FE: '' = xóa ảnh xem trước; không gửi = giữ nguyên ảnh hiện tại
+  // (file ảnh mới đi qua @UploadedFiles, không qua field này)
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  thumbnail?: string;
+
   @IsOptional()
   @Transform(({ value }) => {
     if (value === '' || value === null || value === 'null' || value === 'undefined') {

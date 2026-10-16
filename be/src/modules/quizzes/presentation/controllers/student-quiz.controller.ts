@@ -1,7 +1,8 @@
-import { Controller, Post, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { StartQuizCommand } from '../../application/command/start-quiz.command';
 import { SubmitQuizCommand } from '../../application/command/submit-quiz.command';
+import { GetStudentLessonQuizzesQuery } from '../../application/query/get-student-lesson-quizzes.query';
 import { SubmitQuizDto } from '../dto/submit-quiz.dto';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
@@ -14,6 +15,11 @@ import { CurrentUser } from '@/common/decorators/current-user.decorator';
 @Controller('student/quizzes')
 export class StudentQuizController {
   constructor(private readonly commandBus: CommandBus, private readonly queryBus: QueryBus) {}
+
+  @Get('lesson/:lessonId')
+  async getLessonQuizzes(@Param('lessonId') lessonId: string, @CurrentUser('id') studentId: number) {
+    return this.queryBus.execute(new GetStudentLessonQuizzesQuery(lessonId, studentId));
+  }
 
   @Post(':quizId/start')
   async startQuiz(@Param('quizId') quizId: string, @CurrentUser('id') studentId: number) {

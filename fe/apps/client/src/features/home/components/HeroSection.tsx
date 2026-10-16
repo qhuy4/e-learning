@@ -14,14 +14,14 @@ export const HeroSection = () => {
             <div className="inline-flex items-center gap-1 rounded-full px-4 py-1.5 shadow-sm border border-m3-secondary">
               <span className="font-label-md flex items-center gap-1.5 font-bold text-m3-secondary">
                 <Sparkles className="w-4 h-4 text-m3-secondary" />
-                AI-powered English learning
+                Học tiếng Anh với trí tuệ nhân tạo
               </span>
             </div>
 
             <h1 className="font-display-lg text-m3-on-surface tracking-tight max-w-xl font-extrabold">
-              Learn English that{" "}
+              Học tiếng Anh theo cách{" "}
               <span className="text-m3-primary-container relative inline-block">
-                fits you.
+                phù hợp với bạn.
                 <svg className="absolute -bottom-2 left-0 w-full text-m3-primary-container/40" height="8" preserveAspectRatio="none" viewBox="0 0 100 8">
                   <path d="M0,5 Q50,0 100,5" fill="transparent" stroke="currentColor" strokeLinecap="round" strokeWidth="4" />
                 </svg>
@@ -29,7 +29,7 @@ export const HeroSection = () => {
             </h1>
 
             <p className="font-body-lg text-m3-on-surface-variant max-w-lg leading-relaxed">
-              PiEMind uses AI to understand your English strengths and weaknesses, then connects you with the right learning path, courses, and teachers.
+              PiEMind sử dụng AI để nhận biết điểm mạnh và điểm yếu tiếng Anh của bạn, từ đó kết nối bạn với lộ trình, khóa học và giảng viên phù hợp.
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-1">
@@ -37,14 +37,14 @@ export const HeroSection = () => {
                 to="/courses"
                 className="font-label-lg bg-m3-primary-container text-m3-on-primary rounded-full px-8 py-4 hover:bg-m3-primary/90 transition-all flex items-center gap-2"
               >
-                Take Placement Test
+                Làm bài kiểm tra xếp lớp
                 <ArrowRight className="w-5 h-5" />
               </Link>
               <Link
                 to="/courses"
                 className="font-label-lg bg-m3-surface-container-lowest text-m3-on-surface rounded-full px-7 py-3.5 shadow-sm hover:shadow-md hover:bg-m3-surface-container-low transition-all flex items-center gap-2"
               >
-                Explore Courses
+                Khám phá khóa học
                 <Compass className="w-[18px] h-[18px] text-m3-on-surface-variant" />
               </Link>
             </div>
@@ -56,7 +56,7 @@ export const HeroSection = () => {
                 ))}
               </div>
               <p className="font-label-md text-m3-on-surface-variant">
-                <strong className="text-m3-on-surface font-headline-sm">4.9/5</strong> from 12,000+ active learners
+                <strong className="text-m3-on-surface font-headline-sm">4.9/5</strong> từ 12,000+ học viên đang học
               </p>
             </div>
           </div>
@@ -65,7 +65,7 @@ export const HeroSection = () => {
             <div className="relative w-full max-w-[480px]">
               <div className="relative z-10 w-full rounded-2xl overflow-hidden shadow-md bg-m3-surface-container-lowest">
                 <img
-                  alt="PiEMind Red Panda mascot studying on tablet"
+                  alt="Linh vật Red Panda của PiEMind đang học trên máy tính bảng"
                   className="w-full h-auto object-cover transform hover:scale-[1.02] transition-transform duration-500"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnUfyOx8zHRsgIU7JVD1Gn-VCMIXnZgtAQH10V0Xeayvg8MzYHCf4-dVDlRpxiJqjfRvcGtwXMJs7IrdykM6vfzlXVEHnKIYdqmiUVlG7BKzbprdlJ3IdNNQKNmIS-0u80sfmooeBfSgAr9BJxNvExSvVF7dAaUvzf4cunj1uk_00eBK-Z3r8Zl9U0k0KwN-Exze1ZgqjqjEVE5Q3pIgWSNaZrHPI_CAJ8P7NW_P-aT9ncNe3FZs9w"
                 />
@@ -75,7 +75,7 @@ export const HeroSection = () => {
                 <div className="flex items-center justify-between">
                   <span className="font-label-md text-m3-on-surface flex items-center gap-1.5">
                     <CheckCircle className="w-4 h-4 text-m3-tertiary" />
-                    Grammar
+                    Ngữ pháp
                   </span>
                   <span className="font-label-md font-bold text-m3-tertiary">72%</span>
                 </div>
@@ -88,7 +88,7 @@ export const HeroSection = () => {
                 <div className="flex items-center justify-between">
                   <span className="font-label-md text-m3-on-surface flex items-center gap-1.5">
                     <BookOpen className="w-4 h-4 text-m3-secondary" />
-                    Vocabulary
+                    Từ vựng
                   </span>
                   <span className="font-label-md font-bold text-m3-secondary">81%</span>
                 </div>
@@ -101,7 +101,7 @@ export const HeroSection = () => {
                 <div className="flex items-center justify-between">
                   <span className="font-label-md text-m3-on-surface flex items-center gap-1.5">
                     <Mic className="w-4 h-4 text-m3-primary" />
-                    Speaking
+                    Nói
                   </span>
                   <span className="font-label-md font-bold text-m3-primary">54%</span>
                 </div>
@@ -109,7 +109,7 @@ export const HeroSection = () => {
                   <div className="bg-m3-primary-container h-full rounded-full" style={{ width: "54%" }} />
                 </div>
                 <span className="font-label-sm text-m3-primary font-bold flex items-center gap-1">
-                  <CircleAlert className="w-3.5 h-3.5" /> Priority Focus
+                  <CircleAlert className="w-3.5 h-3.5" /> Ưu tiên tập trung
                 </span>
               </div>
 
@@ -118,7 +118,7 @@ export const HeroSection = () => {
                 style={{ backgroundColor: "#ffff", borderColor: "rgba(149, 225, 211, 0.6)", color: "rgb(30, 41, 59)" }}
               >
                 <span className="w-3 h-3 rounded-full animate-ping" style={{ backgroundColor: "#146a5f" }} />
-                <span className="font-label-sm uppercase tracking-wider font-bold" style={{ color: "#1e293b" }}>Level</span>
+                <span className="font-label-sm uppercase tracking-wider font-bold" style={{ color: "#1e293b" }}>Trình độ</span>
                 <span className="font-headline-sm font-bold" style={{ color: "#1e293b" }}>B1</span>
               </div>
 
@@ -127,7 +127,7 @@ export const HeroSection = () => {
                 style={{ backgroundColor: "#ffff", borderColor: "rgb(149, 225, 211)", color: "rgb(20, 106, 95)" }}
               >
                 <Target className="w-4 h-4" />
-                <span className="font-label-sm font-bold">Recommended: Speaking Practice</span>
+                <span className="font-label-sm font-bold">Gợi ý: Luyện nói</span>
               </div>
             </div>
           </div>

@@ -11,6 +11,14 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
+    proxy: {
+      // Ảnh upload (avatar, thumbnail) BE trả về dạng /storage/img/...
+      // → chuyển tiếp về BE khi dev.
+      "/storage": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+      },
+    },
   },
   plugins: [
     react(),

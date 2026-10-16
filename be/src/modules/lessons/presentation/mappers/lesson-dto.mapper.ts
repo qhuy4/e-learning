@@ -13,7 +13,11 @@ export class LessonDtoMapper {
     };
   }
 
-  static toDetailDto(lesson: Lesson, signedVideoUrl: string | null = null) {
+  static toDetailDto(
+    lesson: Lesson,
+    signedVideoUrl: string | null = null,
+    signedThumbnailUrl: string | null = null,
+  ) {
     return {
       id: lesson.id,
       sectionId: lesson.sectionId,
@@ -22,6 +26,7 @@ export class LessonDtoMapper {
       type: lesson.type,
       videoProvider: lesson.videoProvider,
       videoSource: signedVideoUrl,
+      thumbnail: signedThumbnailUrl,
       duration: lesson.duration,
       content: lesson.content,
       position: lesson.position,

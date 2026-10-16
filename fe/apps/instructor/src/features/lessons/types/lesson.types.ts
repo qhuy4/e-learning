@@ -31,3 +31,16 @@ export interface Lesson {
   videoSource?: File | string;
   thumbnail?: File | string;
 }
+
+export interface LessonMaterial {
+  id: number;
+  lessonId: number;
+  title: string;
+  description: string | null;
+  fileName: string;
+  fileSize: number | null;
+  mimeType: string | null;
+  position?: number;
+  downloadUrl: string | null;
+  createdAt?: string | null;
+}

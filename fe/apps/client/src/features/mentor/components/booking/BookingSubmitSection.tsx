@@ -20,8 +20,8 @@ export function BookingSubmitSection({
         <div className="flex flex-col gap-3 pt-2">
             {isError && (
                 <p className="text-sm text-destructive font-medium bg-destructive/10 p-3 rounded-lg border border-destructive/20">
-                    We couldn't book that time slot. Please choose another date or
-                    time.
+                    Không thể đặt khung giờ đó. Vui lòng chọn ngày hoặc giờ
+                    khác.
                 </p>
             )}
 
@@ -37,17 +37,17 @@ export function BookingSubmitSection({
                 )}
                 <span>
                     {isPending
-                        ? "Confirming Session..."
-                        : "Confirm Free Discovery Session"}
+                        ? "Đang xác nhận buổi học..."
+                        : "Xác nhận buổi tư vấn miễn phí"}
                 </span>
             </Button>
 
             <div className="flex items-center justify-center gap-2 text-center text-xs text-muted-foreground">
                 <ShieldCheck className="size-4 text-secondary shrink-0" />
                 <span>
-                    Instant confirmation sent to{" "}
-                    <strong>{userEmail || "your email"}</strong>. Free cancellation
-                    or reschedule up to 2 hours prior.
+                    Xác nhận ngay sẽ được gửi tới{" "}
+                    <strong>{userEmail || "email của bạn"}</strong>. Hủy hoặc đổi
+                    lịch miễn phí trước buổi học ít nhất 2 giờ.
                 </span>
             </div>
         </div>

@@ -10,31 +10,31 @@ export const CTASection = () => {
 
           <div className="inline-flex items-center gap-2 bg-m3-surface-container-lowest px-4 py-2 rounded-full shadow-sm">
             <span className="text-2xl">🐾</span>
-            <span className="font-label-md text-m3-on-surface font-bold">Your Companion is Waiting</span>
+            <span className="font-label-md text-m3-on-surface font-bold">Người bạn đồng hành của bạn đang chờ</span>
           </div>
 
           <div className="max-w-2xl flex flex-col gap-2">
-            <h2 className="font-display-lg text-m3-on-surface font-bold tracking-tight">Ready to learn smarter?</h2>
-            <p className="font-body-lg text-m3-on-surface-variant">Start by understanding your English. Join thousands improving their fluency with zero guesswork.</p>
+            <h2 className="font-display-lg text-m3-on-surface font-bold tracking-tight">Sẵn sàng học thông minh hơn?</h2>
+            <p className="font-body-lg text-m3-on-surface-variant">Hãy bắt đầu bằng việc hiểu trình độ tiếng Anh của bạn. Cùng hàng nghìn người cải thiện độ trôi chảy mà không cần đoán mò.</p>
           </div>
 
           <a href="#assessment" className="font-label-lg bg-m3-primary-container text-m3-on-primary rounded-full px-10 py-4 shadow-[0_6px_0_#9e3f42] active:translate-y-1 active:shadow-none hover:brightness-105 transition-all flex items-center gap-2 text-lg">
-            Take Your Placement Test
+            Làm bài kiểm tra xếp lớp
             <ArrowRight className="w-[22px] h-[22px]" />
           </a>
 
           <div className="flex flex-wrap items-center justify-center gap-6 pt-4 text-m3-on-surface-variant">
             <div className="flex items-center gap-2 font-label-md">
               <CircleCheck className="w-5 h-5 text-m3-secondary" />
-              Free 10-Minute Assessment
+              Chẩn đoán miễn phí 10 phút
             </div>
             <div className="flex items-center gap-2 font-label-md">
               <CreditCard className="w-5 h-5 text-m3-secondary" />
-              No Credit Card Required
+              Không cần thẻ tín dụng
             </div>
             <div className="flex items-center gap-2 font-label-md">
               <Star className="w-5 h-5 text-m3-secondary" />
-              Instant CEFR Level
+              Biết ngay trình độ CEFR
             </div>
           </div>
         </div>

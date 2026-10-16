@@ -287,6 +287,29 @@ export async function initDatabaseTables(dataSource: DataSource) {
       CREATE INDEX IF NOT EXISTS idx_refresh_sessions_token_hash ON refresh_sessions(token_hash);
     `);
 
+    // 8. lesson_materials - tai lieu dinh kem tung bai hoc (file luu tren R2)
+    await dataSource.query(`
+      CREATE TABLE IF NOT EXISTS lesson_materials (
+        id BIGSERIAL PRIMARY KEY,
+        lesson_id BIGINT NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        file_key VARCHAR(500) NOT NULL,
+        file_name VARCHAR(255) NOT NULL,
+        file_size BIGINT,
+        mime_type VARCHAR(100),
+        position INTEGER NOT NULL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_lesson_materials_lesson_id ON lesson_materials (lesson_id);
+    `);
+
+    // 9. lessons.thumbnail - anh xem truoc khi phat video (file luu tren R2)
+    await dataSource.query(`
+      ALTER TABLE lessons ADD COLUMN IF NOT EXISTS thumbnail VARCHAR(255);
+    `);
+
     logger.log('Khởi tạo / kiểm tra các bảng instructor và auth thành công!');
   } catch (error) {
     logger.error(`Lỗi khi khởi tạo bảng database: ${(error as Error).message}`);
