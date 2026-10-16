@@ -48,7 +48,7 @@ export const LearningPage = () => {
   const allLessons = courseData?.sections?.flatMap((s: any) => s.lessons || []) || [];
   const currentLessonObj = allLessons.find((l: any) => l.slug === targetLessonSlug);
 
-  const regularLessonQuery = useLessonBySlug(targetLessonSlug);
+  const regularLessonQuery = useLessonBySlug(targetLessonSlug, courseSlug);
   const previewLessonQuery = usePreviewLesson(
     previewToken ?? undefined,
     currentLessonObj?.id,

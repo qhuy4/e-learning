@@ -1,4 +1,10 @@
-import { ForbiddenException, HttpStatus, Inject, Logger } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  HttpStatus,
+  Inject,
+  Logger,
+} from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
@@ -25,6 +31,7 @@ import { InstructorProfileTypeOrmEntity } from '@/modules/instructors/infrastruc
 import { ApprovalStatus } from '@/modules/instructors/domain/enum/instructor-profile.status';
 import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
 import { UserRole } from '@/modules/users/domain/enum/user.role';
+import { CourseStatus } from '@/modules/courses/domain/enum/course-status.enum';
 
 const PENDING_REVIEW_STATUS = 2;
 
@@ -70,6 +77,12 @@ export class UpdateCourseHandler implements ICommandHandler<UpdateCourseCommand>
 
     if (owner?.role !== UserRole.ADMIN && newStatus !== undefined && ![1, PENDING_REVIEW_STATUS].includes(newStatus)) {
       throw new ForbiddenException('Giảng viên chỉ có thể lưu bản nháp hoặc gửi khóa học xét duyệt.');
+    }
+
+    if (newStatus !== undefined && newStatus !== course.status && course.status === CourseStatus.ARCHIVED) {
+      throw new ConflictException(
+        'Version này đã bị thay thế bởi version mới hơn. Hãy sao chép thành version mới để chỉnh sửa.',
+      );
     }
 
     if (newStatus != null && !isNaN(newStatus) && newStatus === PENDING_REVIEW_STATUS) {

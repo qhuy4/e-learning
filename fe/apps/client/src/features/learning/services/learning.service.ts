@@ -2,8 +2,14 @@ import { api } from '@/shared/lib/axios';
 import type { LessonDetail, LearningCourse, LessonProgress, CourseProgress, LessonMaterial } from '../types/learning.type';
 
 export const learningService = {
-  getLessonBySlug: async (lessonSlug: string): Promise<LessonDetail> => {
-    const { data: res } = await api.get(`/lessons/slug/${lessonSlug}`);
+  getLessonBySlug: async (
+    lessonSlug: string,
+    courseSlug?: string,
+  ): Promise<LessonDetail> => {
+    // courseSlug để không load nhầm bài của version/course trùng slug
+    const { data: res } = await api.get(`/lessons/slug/${lessonSlug}`, {
+      params: courseSlug ? { courseSlug } : undefined,
+    });
     return res.data;
   },
 

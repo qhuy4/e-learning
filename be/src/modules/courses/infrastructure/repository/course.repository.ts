@@ -84,7 +84,10 @@ export class CourseRepository implements ICourseRepository {
       .leftJoinAndSelect('course.instructorUser', 'instructorUser')
       .leftJoinAndSelect('instructorUser.profile', 'userProfile')
       .where('course.slug = :slug', { slug })
-      .andWhere('course.status = :status', { status: CourseStatus.PUBLISHED })
+      // Version cũ đã lưu trữ vẫn mở cho học viên đã mua truy cập
+      .andWhere('course.status IN (:...statuses)', {
+        statuses: [CourseStatus.PUBLISHED, CourseStatus.ARCHIVED],
+      })
       .andWhere('course.deletedAt IS NULL')
       .andWhere('section.deletedAt IS NULL')
       .andWhere('section.isActive = true')
@@ -207,6 +210,18 @@ export class CourseRepository implements ICourseRepository {
     return CourseMapper.toDomain(updated);
   }
 
+  async archiveAncestorChain(parentId: number | null): Promise<void> {
+    const seen = new Set<number>();
+    while (parentId && !seen.has(parentId)) {
+      seen.add(parentId);
+      const parent = await this.findById(parentId);
+      if (!parent) break;
+      parent.status = CourseStatus.ARCHIVED;
+      await this.update(parent);
+      parentId = parent.parentId ?? null;
+    }
+  }
+
   async delete(id: number): Promise<void> {
     await this.repository.softDelete(id);
   }
@@ -280,16 +295,8 @@ export class CourseRepository implements ICourseRepository {
     const query = this.repository
       .createQueryBuilder('course')
       .where('course.deletedAt IS NULL')
-      .andWhere((qb) => {
-        const subQuery = qb
-          .subQuery()
-          .select('1')
-          .from('courses', 'child')
-          .where('child.parent_id = course.id')
-          .andWhere('child.deleted_at IS NULL')
-          .getQuery();
-
-        return `NOT EXISTS ${subQuery}`;
+      .andWhere('course.status != :archived', {
+        archived: CourseStatus.ARCHIVED,
       });
 
     if (instructorId) {

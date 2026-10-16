@@ -44,12 +44,25 @@ export class LessonRepository implements ILessonRepository {
     return LessonMapper.toDomain(entity);
   }
 
-  async findGlobalBySlug(slug: string): Promise<Lesson | null> {
-    const entity = await this.repository.findOne({
-      where: {
-        slug,
-      },
-    });
+  async findGlobalBySlug(
+    slug: string,
+    courseSlug?: string,
+  ): Promise<Lesson | null> {
+    const qb = this.repository
+      .createQueryBuilder('lesson')
+      .where('lesson.slug = :slug', { slug })
+      .andWhere('lesson.deleted_at IS NULL');
+
+    if (courseSlug) {
+      // Trùng slug giữa version/course → resolve đúng lesson của courseSlug đang mở
+      qb.innerJoin('sections', 'section', 'section.id = lesson.section_id')
+        .innerJoin('courses', 'course', 'course.id = section.course_id')
+        .andWhere('course.slug = :courseSlug', { courseSlug })
+        .andWhere('course.deleted_at IS NULL')
+        .andWhere('section.deleted_at IS NULL');
+    }
+
+    const entity = await qb.getOne();
 
     if (!entity) {
       return null;

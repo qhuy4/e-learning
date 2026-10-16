@@ -1,6 +1,7 @@
 import { formatVND } from "@fe/lib/utils";
 import { Link } from "react-router";
 import type { CourseDetail } from "@/features/courses/types/course.type";
+import { CourseStatus } from "@/features/courses/types/course.enums";
 
 interface CourseSidebarProps {
   course?: CourseDetail;
@@ -10,6 +11,9 @@ interface CourseSidebarProps {
 export const CourseSidebar = ({ course, isEnrolled }: CourseSidebarProps) => {
   const sections = course?.sections || [];
   const totalLessons = sections.reduce((acc, s) => acc + (s.lessons?.length || 0), 0);
+  // Version cũ đã lưu trữ: không hiển thị giá và nút mua nữa
+  const isForSale =
+    course?.status == null || course.status === CourseStatus.PUBLISHED;
 
   return (
     <aside className="flex flex-col gap-6 sticky top-24">
@@ -28,7 +32,7 @@ export const CourseSidebar = ({ course, isEnrolled }: CourseSidebarProps) => {
           </div>
         </div>
 
-        {!isEnrolled && course?.price != null && (
+        {!isEnrolled && isForSale && course?.price != null && (
           <div className="flex items-center justify-between pt-3 border-t border-slate-100">
             <span className="text-sm text-slate-500">Học phí</span>
             <span className="text-lg font-bold text-piemind-pink">
@@ -44,14 +48,14 @@ export const CourseSidebar = ({ course, isEnrolled }: CourseSidebarProps) => {
           >
             Tiếp tục học
           </Link>
-        ) : (
+        ) : isForSale ? (
           <Link
             to={`/checkout/${course?.slug}`}
             className="w-full py-3 px-4 rounded-xl bg-piemind-pink text-white font-bold text-sm hover:bg-piemind-pink/90 transition-all shadow-[0_4px_16px_rgba(243,129,129,0.3)] hover:shadow-lg hover:shadow-piemind-pink/25 text-center"
           >
             {Number(course?.price) === 0 ? "Đăng ký miễn phí" : "Mua ngay"}
           </Link>
-        )}
+        ) : null}
       </div>
 
       {/* Instructor */}

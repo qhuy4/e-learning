@@ -1,4 +1,9 @@
-import { ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InstructorProfileTypeOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-profile.orm.entity';
@@ -32,6 +37,16 @@ export class ApproveCourseHandler
       throw new AppException(ErrorCode.COURSE_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
+    if (
+      ![CourseStatus.PENDING_REVIEW, CourseStatus.APPROVED].includes(
+        course.status,
+      )
+    ) {
+      throw new ConflictException(
+        'Chỉ có thể xuất bản khóa học đang chờ duyệt hoặc đã duyệt.',
+      );
+    }
+
     const owner = await this.userRepo.findOne({ where: { id: Number(course.instructorId) } });
     const profile = await this.profileRepo.findOne({ where: { userId: course.instructorId } });
     if (owner?.role !== UserRole.ADMIN && profile?.approvalStatus !== ApprovalStatus.APPROVED) {
@@ -44,13 +59,7 @@ export class ApproveCourseHandler
     course.reviewedBy = command.reviewerId;
     course.rejectReason = null;
 
-    if (course.parentId) {
-      const parent = await this.courseRepository.findById(course.parentId);
-      if (parent) {
-        parent.status = CourseStatus.ARCHIVED;
-        await this.courseRepository.update(parent);
-      }
-    }
+    await this.courseRepository.archiveAncestorChain(course.parentId ?? null);
 
     await this.courseRepository.update(course);
   }

@@ -1,5 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Inject, BadRequestException, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { In, Repository } from 'typeorm';
 
 import { CreateOrderCommand } from '@/modules/orders/application/command/create-order.command';
 import { Order } from '@/modules/orders/domain/entity/order.entity';
@@ -8,6 +10,8 @@ import {
   IOrderRepository,
 } from '@/modules/orders/domain/repository/order.repository';
 import { OrderStatus } from '@/modules/orders/domain/enum/order-status.enum';
+import { CourseOrmEntity } from '@/modules/courses/infrastructure/entity/course.orm-entity';
+import { CourseStatus } from '@/modules/courses/domain/enum/course-status.enum';
 
 import {
   ENROLLMENT_REPOSITORY,
@@ -30,6 +34,9 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
     private readonly enrollmentRepository: IEnrollmentRepository,
 
     private readonly couponRedemption: CouponRedemptionService,
+
+    @InjectRepository(CourseOrmEntity)
+    private readonly courseRepo: Repository<CourseOrmEntity>,
   ) {}
 
   async execute(command: CreateOrderCommand) {
@@ -43,6 +50,19 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
     const uniqueIds = new Set(courseIds);
     if (uniqueIds.size !== courseIds.length) {
       throw new BadRequestException('Duplicate courses in order');
+    }
+
+    // Chỉ bán version đang xuất bản; bản đã lưu trữ hoặc đã xóa không mua mới được
+    const courses = await this.courseRepo.find({
+      where: { id: In(courseIds.map(String)) },
+    });
+    if (
+      courses.length !== courseIds.length ||
+      courses.some((c) => Number(c.status) !== CourseStatus.PUBLISHED)
+    ) {
+      throw new BadRequestException(
+        'Một số khóa học không còn khả dụng để mua.',
+      );
     }
 
     let orderItems = items.map((i) => ({

@@ -5,10 +5,14 @@ import type { CourseProgress } from '../types/learning.type';
 // Cache 5 phút — tránh refetch (ký lại presigned URL video) mỗi lần refocus.
 const STALE_TIME = 5 * 60 * 1000;
 
-export const useLessonBySlug = (lessonSlug: string | undefined) => {
+export const useLessonBySlug = (
+  lessonSlug: string | undefined,
+  courseSlug?: string,
+) => {
   return useQuery({
-    queryKey: ['lesson', lessonSlug],
-    queryFn: () => learningService.getLessonBySlug(lessonSlug!),
+    // Thêm courseSlug vào key tránh cache nhầm khi trùng slug giữa các version
+    queryKey: ['lesson', courseSlug, lessonSlug],
+    queryFn: () => learningService.getLessonBySlug(lessonSlug!, courseSlug),
     enabled: !!lessonSlug,
     staleTime: STALE_TIME,
   });

@@ -9,6 +9,8 @@ export class CourseDetailResponseDto {
   price: number;
   publishedAt: Date | null;
   createdAt: Date | null;
+  status: number;
+  version: number;
 
   instructor: {
     id: number;

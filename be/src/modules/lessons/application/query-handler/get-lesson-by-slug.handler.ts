@@ -57,7 +57,10 @@ export class GetLessonBySlugHandler implements IQueryHandler<GetLessonBySlugQuer
   async execute(query: GetLessonBySlugQuery) {
     this.logger.debug(`getLessonBySlug: slug=${query.slug}, userId=${query.userId}`);
 
-    const lesson = await this.lessonRepository.findGlobalBySlug(query.slug);
+    const lesson = await this.lessonRepository.findGlobalBySlug(
+      query.slug,
+      query.courseSlug,
+    );
 
     if (!lesson) {
       this.logger.debug(`Lesson not found: slug=${query.slug}`);

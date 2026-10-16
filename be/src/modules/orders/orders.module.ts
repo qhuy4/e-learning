@@ -4,6 +4,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 
 import { OrderOrmEntity } from '@/modules/orders/infrastructure/entity/order.orm-entity';
 import { OrderItemOrmEntity } from '@/modules/orders/infrastructure/entity/order-item.orm-entity';
+import { CourseOrmEntity } from '@/modules/courses/infrastructure/entity/course.orm-entity';
 import { OrderRepository } from '@/modules/orders/infrastructure/repository/order.repository';
 import { ORDER_REPOSITORY } from '@/modules/orders/domain/repository/order.repository';
 
@@ -26,7 +27,7 @@ const CommandHandlers = [UpdateOrderStatusHandler, CreateOrderHandler];
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([OrderOrmEntity, OrderItemOrmEntity]),
+    TypeOrmModule.forFeature([OrderOrmEntity, OrderItemOrmEntity, CourseOrmEntity]),
     EnrollmentsModule,
     CouponsModule,
   ],
