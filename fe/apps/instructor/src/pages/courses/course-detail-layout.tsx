@@ -1,15 +1,11 @@
 import { NavLink, Outlet, useParams, useNavigate } from "react-router";
-import { ChevronLeft, Undo2 } from "lucide-react";
+import { ChevronLeft, Eye, Undo2 } from "lucide-react";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useGetCourseDetail, useCancelReview, useUpdateCourse } from "@/features/courses/hook/use-courses";
-import { LEVEL_LABELS, COURSE_STATUS_CONFIG } from "@/features/courses/types/course.constants";
+import { useGetCourseDetail, useCancelReview, useCreatePreviewToken, useUpdateCourse } from "@/features/courses/hook/use-courses";
 import { getErrorMessage } from "@/shared/utils/error";
 import { Button } from "@fe/components/ui/button";
-import { Badge } from "@fe/components/ui/badge";
-import { Card, CardContent } from "@fe/components/ui/card";
-import { Skeleton } from "@fe/components/ui/skeleton";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { cn } from "@fe/lib/utils";
 
@@ -20,20 +16,54 @@ const COURSE_TABS = [
   { label: "Phân tích", to: "/analytics" },
 ];
 
+const CLIENT_URL =
+  import.meta.env.VITE_CLIENT_URL ?? "http://localhost:5173";
+
 export default function CourseDetailLayout() {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { data: courseResponse, isLoading } = useGetCourseDetail(courseId);
+  const { data: courseResponse } = useGetCourseDetail(courseId);
   const course = (courseResponse as any)?.data ?? (courseResponse as any)?.data?.data;
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [confirmSubmit, setConfirmSubmit] = useState(false);
   const { mutateAsync: cancelReview, isPending: isCanceling } = useCancelReview();
   const { mutateAsync: updateCourse, isPending: isSubmitting } = useUpdateCourse();
+  const { mutate: createPreviewToken, isPending: isPreviewing } =
+    useCreatePreviewToken();
 
-  const statusCfg = course ? COURSE_STATUS_CONFIG[course.status] : null;
   const isPendingReview = course?.status === 2;
   const canSubmitForReview = course?.status === 1 || course?.status === 4;
+
+  const handlePreview = () => {
+    if (!courseId) return;
+
+    const tid = toast.loading("Đang mở bản xem trước...");
+    const tab = window.open("about:blank", "_blank");
+    if (tab) {
+      tab.document.title = "Đang mở bản xem trước...";
+      tab.document.body.textContent = "Đang mở bản xem trước...";
+    }
+
+    createPreviewToken(courseId, {
+      onSuccess: (res) => {
+        toast.success("Đang mở bản xem trước...", {
+          id: tid,
+          duration: 2500,
+        });
+        const url = `${CLIENT_URL}/courses/preview/${res.token}`;
+        if (tab) {
+          tab.location.href = url;
+        } else {
+          window.open(url, "_blank", "noopener,noreferrer");
+        }
+      },
+      onError: (err) => {
+        tab?.close();
+        toast.error(getErrorMessage(err), { id: tid });
+      },
+    });
+  };
 
   const handleCancelReview = async () => {
     if (!courseId) return;
@@ -104,7 +134,17 @@ export default function CourseDetailLayout() {
       </div>
 
       {/* Course header card */}
-        <div className="w-fit me-0 ms-auto ">
+        <div className="w-fit me-0 ms-auto flex items-center gap-2">
+        <Button
+            variant="outline"
+            size="sm"
+            className="h-8 text-xs"
+            onClick={handlePreview}
+            disabled={!courseId || isPreviewing}
+        >
+          <Eye className="h-3.5 w-3.5 mr-1" />
+          Xem trước
+        </Button>
         {isPendingReview && (
             <Button
                 variant="outline"

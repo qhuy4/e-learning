@@ -28,7 +28,7 @@ export const dictationService = {
     if (audioFile) {
       formData.append("audio", audioFile);
     }
-    return postFormData('/teacher/dictations', formData);
+    return postFormData('/instructor/dictations', formData);
   },
 
   updateDictation: async (id: number, payload: Partial<Dictation>, audioFile?: File) => {
@@ -44,31 +44,31 @@ export const dictationService = {
     if (audioFile) {
       formData.append("audio", audioFile);
     }
-    return putFormData(`/teacher/dictations/${id}`, formData);
+    return putFormData(`/instructor/dictations/${id}`, formData);
   },
 
   getDictationById: async (id: number) => {
-    const response = await api.get(`/teacher/dictations/${id}`);
+    const response = await api.get(`/instructor/dictations/${id}`);
     return response.data;
   },
 
   getLessonDictations: async (lessonId: number) => {
-    const response = await api.get(`/teacher/dictations/lesson/${lessonId}`);
+    const response = await api.get(`/instructor/dictations/lesson/${lessonId}`);
     return response.data;
   },
 
   attachToLesson: async (dictationId: number, lessonId: number | string) => {
-    const response = await api.post(`/teacher/dictations/${dictationId}/attach`, { lessonId: lessonId.toString() });
+    const response = await api.post(`/instructor/dictations/${dictationId}/attach`, { lessonId: lessonId.toString() });
     return response.data;
   },
 
   detachFromLesson: async (dictationId: number, lessonId: number | string) => {
-    const response = await api.delete(`/teacher/dictations/${dictationId}/detach/${lessonId}`);
+    const response = await api.delete(`/instructor/dictations/${dictationId}/detach/${lessonId}`);
     return response.data;
   },
 
   deleteDictation: async (id: number) => {
-    const response = await api.delete(`/teacher/dictations/${id}`);
+    const response = await api.delete(`/instructor/dictations/${id}`);
     return response.data;
   }
 };

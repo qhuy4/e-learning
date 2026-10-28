@@ -1,5 +1,5 @@
 import { api } from "@fe/lib/axios";
-import { instructorApi } from "@/shared/lib/axios";
+import { instructorApi, instructorRootApi } from "@/shared/lib/axios";
 
 export interface Category {
   id: string;
@@ -91,5 +91,12 @@ export const courseService = {
   async cancelReview(id: string) {
     const response = await instructorApi.post(`/courses/${id}/cancel-review`);
     return response.data;
+  },
+
+  async createPreviewToken(id: string): Promise<{ token: string }> {
+    const response = await instructorRootApi.post<{
+      data: { token: string };
+    }>(`/courses/${id}/preview-token`);
+    return response.data.data;
   },
 };

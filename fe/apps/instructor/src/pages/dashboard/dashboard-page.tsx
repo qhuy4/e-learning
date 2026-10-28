@@ -9,6 +9,7 @@ import {
   BookOpen,
   ArrowRight,
   Wallet,
+  Sparkles,
 } from "lucide-react";
 import {
   BarChart,
@@ -22,6 +23,9 @@ import { useGetProfile } from "@/features/profile/hook/use-profile";
 import { useRevenueSummary, useRevenueByCourse } from "@/features/revenue/hook/use-revenue";
 import { useGetCourses } from "@/features/courses/hook/use-courses";
 import { useStudents } from "@/features/students/hook/use-students";
+import { useTeachingProfile } from "@/features/teaching-profile/hooks/use-teaching-profile";
+import { useSkillProfile } from "@/features/skill-profile/hooks/use-skill-profile";
+import { SkillScoreBar } from "@/features/skill-profile/components/skill-score-bar";
 import { Card, CardContent } from "@fe/components/ui/card";
 import { Badge } from "@fe/components/ui/badge";
 import { Skeleton } from "@fe/components/ui/skeleton";
@@ -61,6 +65,8 @@ function formatCurrency(amount: number) {
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { data: profileData } = useGetProfile();
+  const { data: teachingProfile } = useTeachingProfile();
+  const { data: skills, isLoading: skillsLoading } = useSkillProfile();
   const { data: summaryData, isLoading: summaryLoading } = useRevenueSummary();
   const { data: byCourseData, isLoading: courseLoading } = useRevenueByCourse({ page: 1, limit: 5 });
   const { data: allCourses } = useGetCourses({ page: 1, limit: 999 });
@@ -146,6 +152,27 @@ export default function DashboardPage() {
           <p className="text-muted-foreground mt-1">
             Tổng quan về hoạt động giảng dạy của bạn.
           </p>
+          {teachingProfile && (
+            <button
+              type="button"
+              onClick={() => navigate("/teaching-profile")}
+              className="group mt-2 flex cursor-pointer items-center gap-2"
+              title="Mở Hồ sơ giảng dạy"
+            >
+              <div className="h-1.5 w-40 overflow-hidden rounded-full bg-muted">
+                <div
+                  className="h-full rounded-full bg-emerald-600 transition-all"
+                  style={{ width: `${teachingProfile.completion.percent}%` }}
+                />
+              </div>
+              <span className="text-xs text-muted-foreground transition-colors group-hover:text-foreground">
+                Hồ sơ giảng dạy của bạn đã hoàn thành{" "}
+                <span className="font-semibold text-foreground">
+                  {teachingProfile.completion.percent}%
+                </span>
+              </span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -170,6 +197,61 @@ export default function DashboardPage() {
               </div>
             ))}
       </div>
+
+      {/* AI Skill Profile */}
+      <Card>
+        <CardContent className="p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+              <h3 className="text-sm font-semibold">Hồ sơ kỹ năng AI</h3>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs"
+              onClick={() => navigate("/skill-profile")}
+            >
+              Xem đánh giá chi tiết
+              <ArrowRight className="h-3.5 w-3.5 ml-1" />
+            </Button>
+          </div>
+          {skillsLoading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <Skeleton key={i} className="h-5 w-full" />
+              ))}
+            </div>
+          ) : !skills?.length ? (
+            <p className="text-sm text-muted-foreground">
+              Chưa có dữ liệu kỹ năng.
+            </p>
+          ) : (
+            <>
+              <div className="space-y-1">
+                {skills.map((skill) => (
+                  <SkillScoreBar
+                    key={skill.id}
+                    name={skill.name}
+                    score={skill.score}
+                    confidence={skill.confidence}
+                    onClick={() => navigate("/skill-profile")}
+                  />
+                ))}
+              </div>
+              <p className="border-t pt-3 text-xs text-muted-foreground">
+                <span className="font-medium text-foreground">Score</span> = AI
+                đánh giá ·{" "}
+                <span className="font-medium text-foreground">Confidence</span> =
+                độ chắc chắn ·{" "}
+                <span className="font-medium text-foreground">Evidence</span> =
+                dữ liệu nền — thêm bằng chứng tại trang Bằng chứng để AI tính
+                lại.
+              </p>
+            </>
+          )}
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Course Status Breakdown */}

@@ -17,6 +17,10 @@ const PAGE_TITLES: Record<string, string> = {
   "/achievements": "Thành tựu",
   "/qa": "Câu hỏi & Thảo luận",
   "/profile": "Hồ sơ",
+  "/teaching-profile": "Hồ sơ giảng dạy",
+  "/skill-profile": "Hồ sơ kỹ năng AI",
+  "/evidence": "Bằng chứng",
+  "/recommendations": "Khuyến nghị",
 };
 
 export function SiteHeader() {

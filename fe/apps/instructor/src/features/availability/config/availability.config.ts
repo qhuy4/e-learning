@@ -13,6 +13,8 @@ export const DAY_NAMES = [
   "Thứ 6",
   "Thứ 7",
 ];
+/** Display order for the weekly grid: T2 → CN (day_of_week 0 = Sunday). */
+export const WEEK_ORDER = [1, 2, 3, 4, 5, 6, 0];
 
 export const recurringStatusConfig: Record<
   string,
@@ -43,3 +45,31 @@ export const exceptionTypeConfig: Record<
     variant: "outline",
   },
 };
+
+/** Kind → hiển thị cho exception (off = nghỉ cả ngày, range = nghỉ khung giờ, extra = cộng thêm) */
+export const exceptionKindConfig: Record<
+  string,
+  { label: string; className: string }
+> = {
+  off: {
+    label: "Nghỉ cả ngày",
+    className:
+      "border-destructive/40 bg-destructive/10 text-destructive dark:border-destructive/50",
+  },
+  range: {
+    label: "Nghỉ khung giờ",
+    className:
+      "border-destructive/40 bg-destructive/10 text-destructive dark:border-destructive/50",
+  },
+  extra: {
+    label: "Cộng thêm giờ",
+    className:
+      "border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-700 dark:bg-emerald-950 dark:text-emerald-300",
+  },
+};
+
+/** Hours helper: "HH:mm" → phút */
+export function timeToMinutes(time: string): number {
+  const [h, m] = time.split(":").map(Number);
+  return h * 60 + m;
+}

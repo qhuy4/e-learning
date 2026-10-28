@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { toast } from "sonner";
 import {
@@ -14,7 +14,13 @@ import {
   Edit,
   GripVertical,
 } from "lucide-react";
-import { useGetCourseDetail, useCreateSection, useDeleteSection, useDeleteLesson } from "@/features/courses/hook/use-courses";
+import {
+  useGetCourseDetail,
+  useCreateSection,
+  useUpdateSection,
+  useDeleteSection,
+  useDeleteLesson,
+} from "@/features/courses/hook/use-courses";
 import type { Section, Lesson } from "@/features/courses/types/course.types";
 import { getErrorMessage } from "@/shared/utils/error";
 import { Button } from "@fe/components/ui/button";
@@ -54,6 +60,23 @@ function formatDuration(seconds: number): string {
   return `${m}m`;
 }
 
+function getNextChapterNumber(sections: Section[]): number {
+  const numbers = sections
+    .map((section) => /^Chương\s+(\d+)\b/i.exec(section.title)?.[1])
+    .filter((value): value is string => Boolean(value))
+    .map(Number);
+  return Math.max(sections.length, ...numbers, 0) + 1;
+}
+
+function getNextSectionPosition(sections: Section[]): number {
+  return (
+    Math.max(
+      0,
+      ...sections.map((section, index) => section.position ?? index + 1),
+    ) + 1
+  );
+}
+
 export default function CourseContentTab() {
   const { courseId } = useParams<{ courseId: string }>();
   const { data: courseResponse, isLoading } = useGetCourseDetail(courseId);
@@ -74,6 +97,8 @@ export default function CourseContentTab() {
   const editable = canEditCourse(course.status);
   const sections: Section[] = course.sections ?? [];
   const numCourseId = courseId ? Number(courseId) : undefined;
+  const nextChapterNumber = getNextChapterNumber(sections);
+  const nextSectionPosition = getNextSectionPosition(sections);
 
   return (
     <div className="space-y-4">
@@ -103,20 +128,37 @@ export default function CourseContentTab() {
           ))}
         </div>
       ) : (
-        <EmptyState editable={editable} courseId={numCourseId} />
+        <EmptyState
+          editable={editable}
+          courseId={numCourseId}
+          nextChapterNumber={nextChapterNumber}
+          position={nextSectionPosition}
+        />
       )}
 
       {/* Add section */}
       {editable && sections.length > 0 && (
-        <AddSection courseId={numCourseId} sectionCount={sections.length} />
+        <AddSection
+          courseId={numCourseId}
+          nextChapterNumber={nextChapterNumber}
+          position={nextSectionPosition}
+        />
       )}
     </div>
   );
 }
 
-function EmptyState({ editable, courseId }: { editable: boolean; courseId?: number }) {
-  const navigate = useNavigate();
-
+function EmptyState({
+  editable,
+  courseId,
+  nextChapterNumber,
+  position,
+}: {
+  editable: boolean;
+  courseId?: number;
+  nextChapterNumber: number;
+  position: number;
+}) {
   return (
     <Card>
       <CardContent className="p-10 flex flex-col items-center text-center gap-3">
@@ -125,27 +167,29 @@ function EmptyState({ editable, courseId }: { editable: boolean; courseId?: numb
         </div>
         <p className="text-sm font-medium">Chưa có chương trình học</p>
         {editable && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate(`/courses/${courseId}/edit`)}
-          >
-            <Plus className="h-4 w-4 mr-1.5" />
-            Thêm chương đầu tiên
-          </Button>
+          <AddSection
+            courseId={courseId}
+            nextChapterNumber={nextChapterNumber}
+            position={position}
+          />
         )}
       </CardContent>
     </Card>
   );
 }
 
-function AddSection({ courseId, sectionCount }: { courseId?: number; sectionCount: number }) {
-  const [title, setTitle] = useState("");
+function AddSection({
+  courseId,
+  nextChapterNumber,
+  position,
+}: {
+  courseId?: number;
+  nextChapterNumber: number;
+  position: number;
+}) {
   const { mutateAsync: createSection, isPending } = useCreateSection();
 
   const handleAdd = async () => {
-    const t = title.trim();
-    if (!t) return;
     if (!courseId) {
       toast.error("Không tìm thấy khóa học");
       return;
@@ -153,30 +197,19 @@ function AddSection({ courseId, sectionCount }: { courseId?: number; sectionCoun
     try {
       await createSection({
         courseId,
-        section: { title: t, position: sectionCount + 1 },
+        section: { title: `Chương ${nextChapterNumber}`, position },
       });
-      setTitle("");
-      toast.success("Đã thêm chương!");
+      toast.success(`Đã thêm Chương ${nextChapterNumber}!`);
     } catch (err) {
       toast.error(getErrorMessage(err));
     }
   };
 
   return (
-    <div className="flex gap-2 items-center">
-      <Input
-        placeholder="Nhập tên chương mới..."
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-        disabled={isPending}
-        className="h-9"
-      />
-      <Button onClick={handleAdd} disabled={isPending || !title.trim()} size="sm" className="h-9 shrink-0">
-        <Plus className="h-4 w-4 mr-1.5" />
-        {isPending ? "Đang thêm..." : "Thêm chương"}
-      </Button>
-    </div>
+    <Button onClick={handleAdd} disabled={isPending || !courseId} size="sm" className="h-9">
+      <Plus className="h-4 w-4 mr-1.5" />
+      {isPending ? "Đang thêm..." : "Thêm chương"}
+    </Button>
   );
 }
 
@@ -198,6 +231,7 @@ function SectionItem({
   const [deletingLessonId, setDeletingLessonId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleValue, setTitleValue] = useState(section.title);
+  const cancelTitleEditRef = useRef(false);
 
   const toggleLesson = (lessonId: string | number) => {
     setExpandedLessons(prev => ({ ...prev, [lessonId]: !prev[lessonId] }));
@@ -206,6 +240,43 @@ function SectionItem({
   const lessons: Lesson[] = section.lessons ?? [];
   const { mutateAsync: deleteSectionApi } = useDeleteSection();
   const { mutateAsync: deleteLessonApi } = useDeleteLesson();
+  const { mutateAsync: updateSectionApi, isPending: isSavingTitle } = useUpdateSection();
+
+  const handleSaveTitle = async () => {
+    if (cancelTitleEditRef.current) {
+      cancelTitleEditRef.current = false;
+      setTitleValue(section.title);
+      setEditingTitle(false);
+      return;
+    }
+
+    const nextTitle = titleValue.trim();
+    if (!nextTitle || nextTitle === section.title) {
+      setTitleValue(section.title);
+      setEditingTitle(false);
+      return;
+    }
+
+    if (!courseId) {
+      setTitleValue(section.title);
+      setEditingTitle(false);
+      return;
+    }
+
+    try {
+      await updateSectionApi({
+        courseId,
+        sectionId: Number(section.id),
+        data: { title: nextTitle },
+      });
+      toast.success("Đã đổi tên chương!");
+    } catch (err) {
+      setTitleValue(section.title);
+      toast.error(getErrorMessage(err));
+    } finally {
+      setEditingTitle(false);
+    }
+  };
 
   const handleDeleteSection = async () => {
     const tid = toast.loading("Đang xóa chương...");
@@ -265,13 +336,14 @@ function SectionItem({
               value={titleValue}
               onChange={(e) => setTitleValue(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") setEditingTitle(false);
+                if (e.key === "Enter") e.currentTarget.blur();
                 if (e.key === "Escape") {
-                  setTitleValue(section.title);
-                  setEditingTitle(false);
+                  cancelTitleEditRef.current = true;
+                  e.currentTarget.blur();
                 }
               }}
-              onBlur={() => setEditingTitle(false)}
+              onBlur={() => void handleSaveTitle()}
+              disabled={isSavingTitle}
               autoFocus
               className="h-7 text-sm flex-1"
               onClick={(e) => e.stopPropagation()}

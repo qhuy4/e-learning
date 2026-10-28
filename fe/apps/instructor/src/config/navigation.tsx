@@ -6,13 +6,16 @@ import {
     CreditCard,
     Clock,
     Award,
-    GraduationCap,
     UserCircle,
     LogOut,
     Trophy,
     MessageCircleQuestion,
     CalendarClock,
     CalendarDays,
+    ClipboardList,
+    Sparkles,
+    FileCheck,
+    Lightbulb,
 } from "lucide-react"
 import type { NavGroup, NavItem } from "@/shared/types/navigation"
 
@@ -30,6 +33,31 @@ export const navigation: Navigation = {
                     title: "Dashboard",
                     url: "/",
                     icon: LayoutDashboard,
+                },
+            ],
+        },
+        {
+            label: "Hồ sơ & AI",
+            items: [
+                {
+                    title: "Hồ sơ giảng dạy",
+                    url: "/teaching-profile",
+                    icon: ClipboardList,
+                },
+                {
+                    title: "Hồ sơ kỹ năng AI",
+                    url: "/skill-profile",
+                    icon: Sparkles,
+                },
+                {
+                    title: "Bằng chứng",
+                    url: "/evidence",
+                    icon: FileCheck,
+                },
+                {
+                    title: "Khuyến nghị",
+                    url: "/recommendations",
+                    icon: Lightbulb,
                 },
             ],
         },
@@ -85,11 +113,6 @@ export const navigation: Navigation = {
                     title: "Câu hỏi",
                     url: "/qa",
                     icon: MessageCircleQuestion,
-                },
-                {
-                    title: "Đăng ký giáo viên",
-                    url: "/teacher/register",
-                    icon: GraduationCap,
                 },
             ],
         },

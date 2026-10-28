@@ -1,685 +1,220 @@
-import {useState} from "react";
-import {CalendarOff, Clock, Pencil, Plus, Trash2, X} from "lucide-react";
-import {toast} from "sonner";
-
-import {TimePicker} from "@/components/time-picker";
-import {DayOfWeekPicker} from "@/components/day-of-week-picker";
-import {Toggle} from "@fe/components/ui/toggle";
+import { useState } from "react";
+import { CalendarDays, CalendarOff, ChevronLeft, ChevronRight, Clock, ListChecks } from "lucide-react";
+import { cn } from "@fe/lib/utils";
+import { Button } from "@fe/components/ui/button";
+import { Card, CardContent } from "@fe/components/ui/card";
 
 import {
-  useCreateException,
-  useCreateRecurring,
-  useDeleteException,
-  useDeleteRecurring,
-  useExceptionAvailability,
   useRecurringAvailability,
-  useUpdateException,
-  useUpdateRecurring,
+  useExceptionAvailability,
 } from "@/features/availability/hooks/use-availability";
-import type {ExceptionAvailability, RecurringAvailability,} from "@/features/availability/types/availability.types";
 import {
-  DAY_LABELS,
-  DAY_NAMES,
-  exceptionTypeConfig,
-  recurringStatusConfig,
+  timeToMinutes,
 } from "@/features/availability/config/availability.config";
-import {Button} from "@fe/components/ui/button";
-import {Badge} from "@fe/components/ui/badge";
-import {Input} from "@fe/components/ui/input";
-import {Label} from "@fe/components/ui/label";
-import {Card, CardContent, CardHeader, CardTitle} from "@fe/components/ui/card";
-import {Popover, PopoverContent, PopoverTrigger} from "@fe/components/ui/popover";
-import {Calendar} from "@fe/components/ui/calendar";
-import {ConfirmDialog} from "@/components/confirm-dialog";
-import {getErrorMessage} from "@/shared/utils/error";
+import type { RecurringAvailability } from "@/features/availability/types/availability.types";
+import { WeekAvailabilityGrid } from "@/features/availability/components/week-availability-grid";
+import { WeeklyScheduleCards } from "@/features/availability/components/weekly-schedule-cards";
+import { ExceptionsSection } from "@/features/availability/components/exceptions-section";
+import { RecurringFormDialog } from "@/features/availability/components/recurring-form-dialog";
 
-function parseDate(value: string): Date | undefined {
-  if (!value) return undefined;
-  const [y, m, d] = value.split("-").map(Number);
-  const date = new Date(y, m - 1, d);
-  return Number.isNaN(date.getTime()) ? undefined : date;
+function mondayOf(date: Date): Date {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  const day = d.getDay(); // 0 = Sunday
+  d.setDate(d.getDate() + (day === 0 ? -6 : 1 - day));
+  return d;
 }
 
-function formatDate(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+function addDays(date: Date, n: number): Date {
+  const d = new Date(date);
+  d.setDate(d.getDate() + n);
+  return d;
+}
+
+function fmtShort(date: Date): string {
+  return `${String(date.getDate()).padStart(2, "0")}/${String(
+    date.getMonth() + 1,
+  ).padStart(2, "0")}`;
 }
 
 export default function AvailabilityPage() {
-  const [tab, setTab] = useState<"recurring" | "exceptions">("recurring");
+  const [view, setView] = useState<"weekly" | "calendar">("weekly");
+  const [weekStart, setWeekStart] = useState(() => mondayOf(new Date()));
+
+  const { data: recurring, isLoading } = useRecurringAvailability();
+  const { data: exceptions } = useExceptionAvailability();
+
+  const [dialog, setDialog] = useState<{
+    open: boolean;
+    editing: RecurringAvailability | null;
+    initial?: { day: number; start: string; end: string };
+  }>({ open: false, editing: null });
+
+  const openCreate = (initial?: { day: number; start: string; end: string }) =>
+    setDialog({ open: true, editing: null, initial });
+  const openEdit = (item: RecurringAvailability) =>
+    setDialog({ open: true, editing: item });
+  const closeDialog = () => setDialog({ open: false, editing: null });
+
+  // Stats
+  const activeItems = recurring?.filter((item) => item.is_active) ?? [];
+  const totalMinutes = activeItems.reduce(
+    (sum, item) =>
+      sum + Math.max(0, timeToMinutes(item.end_time) - timeToMinutes(item.start_time)),
+    0,
+  );
+  const hours = totalMinutes / 60;
+  const hoursLabel = Number.isInteger(hours) ? String(hours) : hours.toFixed(1);
+  const exceptionCount = exceptions?.length ?? 0;
+
+  const isCurrentWeek =
+    mondayOf(new Date()).getTime() === weekStart.getTime();
+  const weekLabel = `${fmtShort(weekStart)} – ${fmtShort(
+    addDays(weekStart, 6),
+  )}`;
+
+  const views: { id: "weekly" | "calendar"; label: string; icon: typeof Clock }[] = [
+    { id: "weekly", label: "Lịch tuần", icon: ListChecks },
+    { id: "calendar", label: "Calendar", icon: CalendarDays },
+  ];
 
   return (
     <div className="mx-auto p-6 space-y-6">
+      {/* Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Lịch giảng dạy</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Quản lý lịch availability của bạn
+          Lịch cố định hằng tuần + ngoại lệ từng ngày
         </p>
       </div>
 
-      <div className="flex gap-1 bg-muted p-1 rounded-lg w-fit">
-        <button
-          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-            tab === "recurring"
-              ? "bg-background shadow-sm text-foreground"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-          onClick={() => setTab("recurring")}
-        >
-          <Clock className="w-4 h-4 mr-2 inline" />
-          Lịch cố định
-        </button>
-        <button
-          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-            tab === "exceptions"
-              ? "bg-background shadow-sm text-foreground"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-          onClick={() => setTab("exceptions")}
-        >
-          <CalendarOff className="w-4 h-4 mr-2 inline" />
-          Ngoại lệ
-        </button>
-      </div>
-
-      {tab === "recurring" ? <RecurringTab /> : <ExceptionsTab />}
-    </div>
-  );
-}
-
-function RecurringTab() {
-  const { data: items, isLoading } = useRecurringAvailability();
-  const createMut = useCreateRecurring();
-  const updateMut = useUpdateRecurring();
-  const deleteMut = useDeleteRecurring();
-
-  const [showForm, setShowForm] = useState(false);
-  const [editing, setEditing] = useState<RecurringAvailability | null>(null);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
-
-  const [form, setForm] = useState({
-    day_of_week: "1",
-    start_time: "08:00",
-    end_time: "12:00",
-    effective_from: new Date().toISOString().split("T")[0],
-    effective_until: "",
-    is_active: true,
-  });
-
-  const [fromOpen, setFromOpen] = useState(false);
-  const [untilOpen, setUntilOpen] = useState(false);
-
-  const openCreate = () => {
-    setEditing(null);
-    setForm({
-      day_of_week: "1",
-      start_time: "08:00",
-      end_time: "12:00",
-      effective_from: new Date().toISOString().split("T")[0],
-      effective_until: "",
-      is_active: true,
-    });
-    setShowForm(true);
-  };
-
-  const openEdit = (item: RecurringAvailability) => {
-    setEditing(item);
-    setForm({
-      day_of_week: String(item.day_of_week),
-      start_time: item.start_time,
-      end_time: item.end_time,
-      effective_from: item.effective_from,
-      effective_until: item.effective_until ?? "",
-      is_active: item.is_active,
-    });
-    setShowForm(true);
-  };
-
-  const cancelForm = () => {
-    setShowForm(false);
-    setEditing(null);
-  };
-
-  const handleSubmit = () => {
-    const payload = {
-      day_of_week: Number(form.day_of_week),
-      start_time: form.start_time,
-      end_time: form.end_time,
-      effective_from: form.effective_from,
-      effective_until: form.effective_until || undefined,
-      is_active: form.is_active,
-    };
-
-    const onDone = () => {
-      toast.success(editing ? "Đã cập nhật!" : "Đã tạo!");
-      cancelForm();
-    };
-
-    if (editing) {
-      updateMut.mutate(
-        { id: editing.id, data: payload },
-        { onSuccess: onDone, onError: (err) => toast.error(getErrorMessage(err)) }
-      );
-    } else {
-      createMut.mutate(payload, {
-        onSuccess: onDone,
-        onError: (err) => toast.error(getErrorMessage(err)),
-      });
-    }
-  };
-
-  const handleDelete = () => {
-    if (!deletingId) return;
-    deleteMut.mutate(deletingId, {
-      onSuccess: () => {
-        toast.success("Đã xóa!");
-        setDeletingId(null);
-      },
-      onError: (err) => toast.error(getErrorMessage(err)),
-    });
-  };
-
-  if (isLoading) {
-    return (
-      <div className="space-y-3">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="h-16 bg-muted rounded-lg animate-pulse" />
-        ))}
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      <div className="flex justify-end">
-        {!showForm && (
-          <Button onClick={openCreate}>
-            <Plus className="w-4 h-4 mr-2" />
-            Thêm lịch
-          </Button>
-        )}
-      </div>
-
-      {showForm && (
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-base">
-              {editing ? "Sửa lịch" : "Thêm lịch mới"}
-            </CardTitle>
-            <Button variant="ghost" size="sm" onClick={cancelForm}>
-              <X className="w-4 h-4" />
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Ngày trong tuần</Label>
-              <DayOfWeekPicker
-                value={form.day_of_week}
-                onChange={(v) => setForm({ ...form, day_of_week: v })}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Giờ bắt đầu</Label>
-                <TimePicker
-                  value={form.start_time}
-                  onChange={(v) => setForm({ ...form, start_time: v })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Giờ kết thúc</Label>
-                <TimePicker
-                  value={form.end_time}
-                  onChange={(v) => setForm({ ...form, end_time: v })}
-                />
+      {/* Stats + view toggle */}
+      <Card>
+        <CardContent className="flex flex-col gap-4 py-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/10">
+                <Clock className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              </span>
+              <div>
+                <div className="text-lg font-bold leading-tight">
+                  {isLoading ? "…" : `${hoursLabel} giờ`}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  có sẵn trong tuần
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Hiệu lực từ</Label>
-                <Popover open={fromOpen} onOpenChange={setFromOpen}>
-                  <PopoverTrigger
-                    render={
-                      <Button variant="outline" className="w-full justify-start font-normal">
-                        {parseDate(form.effective_from)
-                          ? parseDate(form.effective_from)!.toLocaleDateString()
-                          : "Chọn ngày"}
-                      </Button>
-                    }
-                  />
-<PopoverContent className="w-auto overflow-hidden p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={parseDate(form.effective_from)}
-                        defaultMonth={parseDate(form.effective_from) ?? new Date()}
-                        captionLayout="dropdown"
-                        disabled={(date) => {
-                          const today = new Date();
-                          today.setHours(0, 0, 0, 0);
-                          return date < today;
-                        }}
-                        onSelect={(date) => {
-                        if (date) {
-                          setForm({ ...form, effective_from: formatDate(date) });
-                          setFromOpen(false);
-                        }
-                      }}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
+            <div className="h-9 w-px bg-border" />
 
-              <div className="space-y-2">
-                <Label>Hiệu lực đến</Label>
-                <Popover open={untilOpen} onOpenChange={setUntilOpen}>
-                  <PopoverTrigger
-                    render={
-                      <Button variant="outline" className="w-full justify-start font-normal">
-                        {form.effective_until
-                          ? parseDate(form.effective_until)?.toLocaleDateString()
-                          : "Vô thời hạn"}
-                      </Button>
-                    }
-                  />
-<PopoverContent className="w-auto overflow-hidden p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={parseDate(form.effective_until)}
-                        defaultMonth={parseDate(form.effective_until) ?? parseDate(form.effective_from) ?? new Date()}
-                        captionLayout="dropdown"
-                        disabled={(date) => {
-                          const minDate = parseDate(form.effective_from);
-                          if (!minDate) return false;
-                          const today = new Date();
-                          today.setHours(0, 0, 0, 0);
-                          const floor = minDate > today ? minDate : today;
-                          floor.setHours(0, 0, 0, 0);
-                          return date < floor;
-                        }}
-                        onSelect={(date) => {
-                        setForm({ ...form, effective_until: date ? formatDate(date) : "" });
-                        setUntilOpen(false);
-                      }}
-                    />
-                    {form.effective_until && (
-                      <div className="p-2 border-t">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="w-full"
-                          onClick={() => {
-                            setForm({ ...form, effective_until: "" });
-                            setUntilOpen(false);
-                          }}
-                        >
-                          Xóa (vô thời hạn)
-                        </Button>
-                      </div>
-                    )}
-                  </PopoverContent>
-                </Popover>
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/10">
+                <CalendarOff className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+              </span>
+              <div>
+                <div className="text-lg font-bold leading-tight">
+                  {exceptionCount} ngoại lệ
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  nghỉ / cộng thêm giờ
+                </div>
               </div>
             </div>
+          </div>
 
-            <div className="flex items-center gap-3">
-              <Label htmlFor="is_active">Hoạt động</Label>
-              <Toggle
-                id="is_active"
+          <div className="flex w-fit gap-1 rounded-lg bg-muted p-1">
+            {views.map((v) => (
+              <button
+                key={v.id}
+                type="button"
+                onClick={() => setView(v.id)}
+                className={cn(
+                  "flex items-center gap-1.5 rounded-md px-3.5 py-2 text-sm font-medium transition-colors cursor-pointer",
+                  view === v.id
+                    ? "bg-background text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                <v.icon className="h-4 w-4" />
+                {v.label}
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Views */}
+      {view === "weekly" ? (
+        isLoading ? (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
+            {Array.from({ length: 7 }).map((_, i) => (
+              <div key={i} className="h-40 rounded-lg bg-muted animate-pulse" />
+            ))}
+          </div>
+        ) : (
+          <WeeklyScheduleCards
+            items={recurring ?? []}
+            onAdd={() => openCreate()}
+          />
+        )
+      ) : (
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Button
                 variant="outline"
                 size="sm"
-                defaultPressed={form.is_active}
-                onPressedChange={(pressed) => setForm({ ...form, is_active: pressed })}
+                onClick={() => setWeekStart(addDays(weekStart, -7))}
               >
-                {form.is_active ? "Bật" : "Tắt"}
-              </Toggle>
-            </div>
-
-            <div className="flex justify-end gap-2 pt-2">
-              <Button variant="outline" onClick={cancelForm}>
-                Hủy
+                <ChevronLeft className="h-4 w-4" />
               </Button>
-              <Button onClick={handleSubmit} disabled={createMut.isPending || updateMut.isPending}>
-                {editing ? "Cập nhật" : "Tạo"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {!items?.length && !showForm ? (
-        <div className="text-center py-12 text-muted-foreground">
-          Chưa có lịch cố định nào
-        </div>
-      ) : (
-        <div className="space-y-2">
-          {items?.map((item) => (
-            <div
-              key={item.id}
-              className="flex items-center justify-between p-4 bg-card rounded-lg border"
-            >
-              <div className="flex items-center gap-4">
-                <Badge variant="outline" className="w-10 justify-center">
-                  {DAY_LABELS[item.day_of_week]}
-                </Badge>
-                <div>
-                  <div className="font-medium">
-                    {DAY_NAMES[item.day_of_week]} • {item.start_time} -{" "}
-                    {item.end_time}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    Từ {item.effective_from}
-                    {item.effective_until
-                      ? ` đến ${item.effective_until}`
-                      : " (vô thời hạn)"}
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge
-                  variant={recurringStatusConfig[item.is_active ? "active" : "inactive"].variant}
-                  className={recurringStatusConfig[item.is_active ? "active" : "inactive"].className}
-                >
-                  {recurringStatusConfig[item.is_active ? "active" : "inactive"].label}
-                </Badge>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => openEdit(item)}
-                >
-                  <Pencil className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setDeletingId(item.id)}
-                >
-                  <Trash2 className="w-4 h-4 text-destructive" />
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      <ConfirmDialog
-        open={deletingId !== null}
-        title="Xóa lịch?"
-        description="Hành động này không thể hoàn tác."
-        onConfirm={handleDelete}
-        onCancel={() => setDeletingId(null)}
-      />
-    </div>
-  );
-}
-
-function ExceptionsTab() {
-  const { data: items, isLoading } = useExceptionAvailability();
-  const createMut = useCreateException();
-  const updateMut = useUpdateException();
-  const deleteMut = useDeleteException();
-
-  const [showForm, setShowForm] = useState(false);
-  const [editing, setEditing] = useState<ExceptionAvailability | null>(null);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
-
-  const [form, setForm] = useState({
-    specific_date: new Date().toISOString().split("T")[0],
-    is_unavailable: true,
-    start_time: "08:00",
-    end_time: "12:00",
-    reason: "",
-  });
-
-  const [dateOpen, setDateOpen] = useState(false);
-
-  const openCreate = () => {
-    setEditing(null);
-    setForm({
-      specific_date: new Date().toISOString().split("T")[0],
-      is_unavailable: true,
-      start_time: "08:00",
-      end_time: "12:00",
-      reason: "",
-    });
-    setShowForm(true);
-  };
-
-  const openEdit = (item: ExceptionAvailability) => {
-    setEditing(item);
-    setForm({
-      specific_date: item.specific_date,
-      is_unavailable: item.is_unavailable,
-      start_time: item.start_time ?? "08:00",
-      end_time: item.end_time ?? "12:00",
-      reason: item.reason ?? "",
-    });
-    setShowForm(true);
-  };
-
-  const cancelForm = () => {
-    setShowForm(false);
-    setEditing(null);
-  };
-
-  const handleSubmit = () => {
-    const payload: any = {
-      specific_date: form.specific_date,
-      is_unavailable: form.is_unavailable,
-      start_time: form.is_unavailable ? null : form.start_time,
-      end_time: form.is_unavailable ? null : form.end_time,
-      reason: form.reason || undefined,
-    };
-
-    if (editing) {
-      updateMut.mutate(
-        { id: editing.id, data: payload },
-        {
-          onSuccess: () => {
-            toast.success("Đã cập nhật!");
-            setShowForm(false);
-            setEditing(null);
-          },
-          onError: (err) => toast.error(getErrorMessage(err)),
-        }
-      );
-    } else {
-      createMut.mutate(payload, {
-        onSuccess: () => {
-          toast.success("Đã tạo!");
-          setShowForm(false);
-        },
-        onError: (err) => toast.error(getErrorMessage(err)),
-      });
-    }
-  };
-
-  const handleDelete = () => {
-    if (!deletingId) return;
-    deleteMut.mutate(deletingId, {
-      onSuccess: () => {
-        toast.success("Đã xóa!");
-        setDeletingId(null);
-      },
-      onError: (err) => toast.error(getErrorMessage(err)),
-    });
-  };
-
-  if (isLoading) {
-    return (
-      <div className="space-y-3">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="h-16 bg-muted rounded-lg animate-pulse" />
-        ))}
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      <div className="flex justify-end">
-        <Button onClick={openCreate}>
-          <Plus className="w-4 h-4 mr-2" />
-          Thêm ngoại lệ
-        </Button>
-      </div>
-
-      {showForm && (
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">
-              {editing ? "Sửa ngoại lệ" : "Thêm ngoại lệ mới"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Ngày</Label>
-              <Popover open={dateOpen} onOpenChange={setDateOpen}>
-                <PopoverTrigger
-                  render={
-                    <Button variant="outline" className="w-full justify-start font-normal">
-                      {parseDate(form.specific_date)
-                        ? parseDate(form.specific_date)!.toLocaleDateString()
-                        : "Chọn ngày"}
-                    </Button>
-                  }
-                />
-                <PopoverContent className="w-auto overflow-hidden p-0" align="start">
-                  <Calendar
-                      mode="single"
-                      selected={parseDate(form.specific_date)}
-                      defaultMonth={parseDate(form.specific_date) ?? new Date()}
-                      captionLayout="dropdown"
-                      disabled={(date) => {
-                        const today = new Date();
-                        today.setHours(0, 0, 0, 0); 
-                        return date < today;
-                      }}
-                      onSelect={(date) => {
-                        if (date) {
-                          setForm({ ...form, specific_date: formatDate(date) });
-                          setDateOpen(false);
-                        }
-                      }}
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Label htmlFor="is_unavailable">Nghỉ cả ngày</Label>
-              <Toggle
-                id="is_unavailable"
+              <span className="min-w-32 text-center text-sm font-semibold tabular-nums">
+                {weekLabel}
+              </span>
+              <Button
                 variant="outline"
                 size="sm"
-                defaultPressed={form.is_unavailable}
-                onPressedChange={(pressed) =>
-                  setForm({ ...form, is_unavailable: pressed })
-                }
+                onClick={() => setWeekStart(addDays(weekStart, 7))}
               >
-                {form.is_unavailable ? "Bật" : "Tắt"}
-              </Toggle>
-            </div>
-
-            {!form.is_unavailable && (
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Giờ bắt đầu</Label>
-                  <TimePicker
-                    value={form.start_time}
-                    onChange={(v) => setForm({ ...form, start_time: v })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Giờ kết thúc</Label>
-                  <TimePicker
-                    value={form.end_time}
-                    onChange={(v) => setForm({ ...form, end_time: v })}
-                  />
-                </div>
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <Label>Lý do (tùy chọn)</Label>
-              <Input
-                value={form.reason}
-                onChange={(e) => setForm({ ...form, reason: e.target.value })}
-                placeholder="Nghỉ phép, sự kiện..."
-              />
-            </div>
-
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={cancelForm}>
-                Hủy
+                <ChevronRight className="h-4 w-4" />
               </Button>
-              <Button onClick={handleSubmit} disabled={createMut.isPending || updateMut.isPending}>
-                {editing ? "Cập nhật" : "Tạo"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {!items?.length ? (
-        <div className="text-center py-12 text-muted-foreground">
-          Chưa có ngoại lệ nào
-        </div>
-      ) : (
-        <div className="space-y-2">
-          {items.map((item) => (
-            <div
-              key={item.id}
-              className="flex items-center justify-between p-4 bg-card rounded-lg border"
-            >
-              <div className="flex items-center gap-4">
-                <Badge
-                  variant={exceptionTypeConfig[item.is_unavailable ? "unavailable" : "custom"].variant}
-                  className="w-10 justify-center"
-                >
-                  {exceptionTypeConfig[item.is_unavailable ? "unavailable" : "custom"].label}
-                </Badge>
-                <div>
-                  <div className="font-medium">{item.specific_date}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {item.is_unavailable
-                      ? "Nghỉ cả ngày"
-                      : `${item.start_time} - ${item.end_time}`}
-                    {item.reason ? ` • ${item.reason}` : ""}
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
+              {!isCurrentWeek && (
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => openEdit(item)}
+                  onClick={() => setWeekStart(mondayOf(new Date()))}
                 >
-                  <Pencil className="w-4 h-4" />
+                  Về tuần này
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setDeletingId(item.id)}
-                >
-                  <Trash2 className="w-4 h-4 text-destructive" />
-                </Button>
-              </div>
+              )}
             </div>
-          ))}
+            <span className="text-xs text-muted-foreground">
+              Kéo chuột để tạo khung giờ • bấm khung để sửa
+            </span>
+          </div>
+
+          <WeekAvailabilityGrid
+            items={recurring ?? []}
+            weekStart={weekStart}
+            exceptions={exceptions ?? []}
+            onCreate={(slot) => openCreate(slot)}
+            onEdit={openEdit}
+          />
         </div>
       )}
 
-      <ConfirmDialog
-        open={deletingId !== null}
-        title="Xóa ngoại lệ?"
-        description="Hành động này không thể hoàn tác."
-        onConfirm={handleDelete}
-        onCancel={() => setDeletingId(null)}
-      />
+      {/* Exceptions — nằm ngay trong Availability */}
+      <ExceptionsSection />
+
+      {dialog.open && (
+        <RecurringFormDialog
+          open
+          editing={dialog.editing}
+          initial={dialog.initial}
+          onClose={closeDialog}
+        />
+      )}
     </div>
   );
 }

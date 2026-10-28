@@ -16,6 +16,8 @@ export interface ExceptionAvailability {
   instructor_id: number;
   specific_date: string;
   is_unavailable: boolean;
+  /** true = cộng thêm giờ (extra availability), false = chặn giờ */
+  is_extra?: boolean;
   start_time: string | null;
   end_time: string | null;
   reason: string | null;
@@ -28,7 +30,7 @@ export interface CreateRecurringRequest {
   start_time: string;
   end_time: string;
   effective_from: string;
-  effective_until?: string;
+  effective_until?: string | null;
   is_active?: boolean;
 }
 
@@ -44,15 +46,31 @@ export interface UpdateRecurringRequest {
 export interface CreateExceptionRequest {
   specific_date: string;
   is_unavailable: boolean;
-  start_time?: string;
-  end_time?: string;
+  is_extra?: boolean;
+  start_time?: string | null;
+  end_time?: string | null;
   reason?: string;
 }
 
 export interface UpdateExceptionRequest {
   specific_date?: string;
   is_unavailable?: boolean;
+  is_extra?: boolean;
   start_time?: string | null;
   end_time?: string | null;
   reason?: string | null;
+}
+
+/** kind của exception suy ra từ is_extra / is_unavailable */
+export type ExceptionKind = "off" | "range" | "extra";
+
+export function exceptionKind(item: {
+  is_unavailable: boolean;
+  is_extra?: boolean;
+  start_time?: string | null;
+  end_time?: string | null;
+}): ExceptionKind {
+  if (item.is_extra) return "extra";
+  if (item.is_unavailable) return "off";
+  return "range";
 }

@@ -158,7 +158,7 @@ export function useUpdateLesson() {
 export function useDeleteLesson() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, courseId }: { id: number; courseId?: number }) =>
+    mutationFn: ({ id }: { id: number; courseId?: number }) =>
       courseService.deleteLesson(id),
     onSuccess: (_data, variables) => {
       if (variables.courseId) {
@@ -166,6 +166,12 @@ export function useDeleteLesson() {
       }
       queryClient.invalidateQueries({ queryKey: ["courses"] });
     },
+  });
+}
+
+export function useCreatePreviewToken() {
+  return useMutation({
+    mutationFn: (id: string) => courseService.createPreviewToken(id),
   });
 }
 

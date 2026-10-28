@@ -149,7 +149,7 @@ export function CourseInfoStep({ data, updateData }: CourseInfoStepProps) {
 
                 <Input
                   id="title"
-                  placeholder="VD: Lập trình ReactJS cơ bản..."
+                  placeholder="VD: Tiếng Anh giao tiếp cho người đi làm..."
                   value={data.title}
                   onChange={(e) =>
                     updateData({

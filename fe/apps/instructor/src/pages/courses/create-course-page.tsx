@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router";
-import { ChevronLeft, Save, SendHorizonal } from "lucide-react";
+import { ChevronLeft, Eye, Save, SendHorizonal } from "lucide-react";
 import { toast } from "sonner";
 
 import type { Course } from "@/features/courses/types/course.types";
@@ -8,6 +8,7 @@ import { CourseInfoStep } from "@/features/courses/components/create-course/cour
 import { CourseContentStep } from "@/features/courses/components/create-course/course-content-step";
 import {
   useCreateCourse,
+  useCreatePreviewToken,
   useGetCourseDetail,
   useUpdateCourse,
 } from "@/features/courses/hook/use-courses";
@@ -23,6 +24,9 @@ function isEditable(status: number) {
   return status === 1 || status === 4;
 }
 
+const CLIENT_URL =
+  import.meta.env.VITE_CLIENT_URL ?? "http://localhost:5173";
+
 export default function CreateCoursePage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,9 +35,11 @@ export default function CreateCoursePage() {
 
   const { mutate: createCourse, isPending: isCreating } = useCreateCourse();
   const { mutate: updateCourse, isPending: isUpdating } = useUpdateCourse();
+  const { mutate: createPreviewToken, isPending: isCreatingPreview } =
+    useCreatePreviewToken();
   const { data: courseResponse, refetch } = useGetCourseDetail(isEditMode ? courseId : undefined);
 
-  const isBusy = isCreating || isUpdating;
+  const isBusy = isCreating || isUpdating || isCreatingPreview;
 
   useEffect(() => {
     if (location.state?.refresh && courseId) {
@@ -63,13 +69,13 @@ export default function CreateCoursePage() {
   const statusCfg = COURSE_STATUS_CONFIG[currentStatus];
   const canEdit = !isEditMode || isEditable(currentStatus);
 
-  const createFormData = (data: Course): FormData => {
+  const createFormData = (data: Course, status?: number): FormData => {
     const formData = new FormData();
     formData.append("title", data.title);
     if (data.description) formData.append("description", data.description);
     if (data.level) formData.append("level", String(data.level));
     if (data.price !== undefined) formData.append("price", String(data.price));
-    if (data.status) formData.append("status", String(data.status));
+    if (status) formData.append("status", String(status));
     if (data.thumbnail instanceof File) {
       formData.append("thumbnail", data.thumbnail);
     }
@@ -119,7 +125,7 @@ export default function CreateCoursePage() {
     }
 
     const tid = toast.loading("Đang gửi yêu cầu duyệt...");
-    const formData = createFormData({ ...courseData, status: 2 });
+    const formData = createFormData(courseData, 2);
     updateCourse({ id: courseId!, data: formData }, {
       onSuccess: () => {
         toast.success("Đã gửi yêu cầu duyệt thành công!", { id: tid });
@@ -129,6 +135,80 @@ export default function CreateCoursePage() {
         toast.error(getErrorMessage(err), { id: tid });
       },
     });
+  };
+
+  const openPreview = (
+    id: string,
+    tid: string | number,
+    tab: Window | null,
+  ) => {
+    createPreviewToken(id, {
+      onSuccess: (res) => {
+        toast.success("Đang mở bản xem trước...", {
+          id: tid,
+          duration: 2500,
+        });
+        const url = `${CLIENT_URL}/courses/preview/${res.token}`;
+        if (tab) {
+          tab.location.href = url;
+        } else {
+          window.open(url, "_blank", "noopener,noreferrer");
+        }
+      },
+      onError: (err) => {
+        tab?.close();
+        toast.error(getErrorMessage(err), { id: tid });
+      },
+    });
+  };
+
+  const handlePreview = () => {
+    if (!isEditMode && !courseData.title.trim()) {
+      toast.error("Vui lòng nhập tên khóa học!");
+      return;
+    }
+
+    const tid = toast.loading(
+      isEditMode && !canEdit
+        ? "Đang mở bản xem trước..."
+        : "Đang lưu để xem trước...",
+    );
+    const tab = window.open("about:blank", "_blank");
+    if (tab) {
+      tab.document.title = "Đang mở bản xem trước...";
+      tab.document.body.textContent = "Đang mở bản xem trước...";
+    }
+
+    if (!isEditMode) {
+      createCourse(createFormData(courseData), {
+        onSuccess: (res) => {
+          const id = String(res.data.id);
+          navigate(`/courses/${id}/edit`, { replace: true });
+          openPreview(id, tid, tab);
+        },
+        onError: (err) => {
+          tab?.close();
+          toast.error(getErrorMessage(err), { id: tid });
+        },
+      });
+      return;
+    }
+
+    if (canEdit) {
+      updateCourse(
+        { id: courseId!, data: createFormData(courseData) },
+        {
+          onSuccess: () => openPreview(courseId!, tid, tab),
+          onError: (err) => {
+            tab?.close();
+            toast.error(getErrorMessage(err), { id: tid });
+          },
+        },
+      );
+      return;
+    }
+
+    openPreview(courseId!, tid, tab);
   };
 
   const renderActions = () => {
@@ -207,6 +287,15 @@ export default function CreateCoursePage() {
         </div>
 
         <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+          <Button
+            variant="outline"
+            onClick={handlePreview}
+            disabled={isBusy}
+            className="px-4"
+          >
+            <Eye className="w-4 h-4 mr-2" />
+            Xem trước
+          </Button>
           {renderActions()}
         </div>
       </div>
