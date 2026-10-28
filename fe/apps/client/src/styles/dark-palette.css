@@ -1,0 +1,89 @@
+/* Client-only dark palette (from dark.html mockup).
+   Imported after @fe/style/global.css so these .dark values win
+   the cascade for the client app only — admin/instructor keep the
+   generic dark tokens from global.css. */
+
+/* Theme switch snap: while ThemeProvider sets this attribute,
+   no element may animate the color change. */
+[data-theme-switch] *,
+[data-theme-switch] *::before,
+[data-theme-switch] *::after {
+  transition: none !important;
+}
+
+.dark {
+    --background: #0B0F19;
+    --foreground: #F8FAFC;
+    --card: #161F30;
+    --card-foreground: #F8FAFC;
+    --popover: #161F30;
+    --popover-foreground: #F8FAFC;
+    --primary: #F38181;
+    --primary-foreground: #1A0A0A;
+    --secondary: #95E1D3;
+    --secondary-foreground: #0A2421;
+    --muted: #111726;
+    --muted-foreground: #94A3B8;
+    --accent: #FCE38A;
+    --accent-foreground: #221900;
+    --border: #1E293B;
+    --input: #334155;
+    --ring: #F38181;
+    --sidebar: #161F30;
+    --sidebar-foreground: #F8FAFC;
+    --sidebar-primary: #F38181;
+    --sidebar-primary-foreground: #1A0A0A;
+    --sidebar-accent: #111726;
+    --sidebar-accent-foreground: #F8FAFC;
+    --sidebar-border: #1E293B;
+    --sidebar-ring: #F38181;
+
+    /* M3 Primary */
+    --m3-primary: #F38181;
+    --m3-primary-container: #F38181;
+    --m3-on-primary: #1A0A0A;
+    --m3-on-primary-container: #1A0A0A;
+    --m3-primary-fixed: #3B1B1D;
+    --m3-primary-fixed-dim: #572528;
+    --m3-on-primary-fixed: #FFDAD8;
+    --m3-on-primary-fixed-variant: #FFB3B1;
+
+    /* M3 Secondary */
+    --m3-secondary: #95E1D3;
+    --m3-secondary-container: #133E38;
+    --m3-on-secondary: #0A2421;
+    --m3-on-secondary-container: #95E1D3;
+    --m3-secondary-fixed: #164E46;
+    --m3-secondary-fixed-dim: #95E1D3;
+    --m3-on-secondary-fixed: #A4F1E3;
+    --m3-on-secondary-fixed-variant: #89D4C7;
+
+    /* M3 Tertiary */
+    --m3-tertiary: #FCE38A;
+    --m3-tertiary-container: #3F3610;
+    --m3-on-tertiary: #221900;
+    --m3-on-tertiary-container: #FCE38A;
+    --m3-tertiary-fixed: #FCE38A;
+    --m3-tertiary-fixed-dim: #D8BD5E;
+    --m3-on-tertiary-fixed: #FAE189;
+    --m3-on-tertiary-fixed-variant: #DDC570;
+
+    /* M3 Surface */
+    --m3-surface: #0D1117;
+    --m3-surface-dim: #080C14;
+    --m3-surface-bright: #161F30;
+    --m3-surface-container-lowest: #080C14;
+    --m3-surface-container-low: #111726;
+    --m3-surface-container: #161F30;
+    --m3-surface-container-high: #1E293B;
+    --m3-surface-container-highest: #28354D;
+    --m3-surface-variant: #1E293B;
+    --m3-on-surface: #F8FAFC;
+    --m3-on-surface-variant: #94A3B8;
+    --m3-on-background: #F8FAFC;
+    --m3-inverse-surface: #E7EEFF;
+    --m3-inverse-on-surface: #273141;
+    --m3-inverse-primary: #9E3F42;
+    --m3-outline: #334155;
+    --m3-outline-variant: #1E293B;
+}
