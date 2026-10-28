@@ -47,53 +47,53 @@
     --color-piemind-mint: #95E1D3;
 
     /* M3 Primary */
-    --color-m3-primary: #9e3f42;
-    --color-m3-primary-container: #f38181;
-    --color-m3-on-primary: #ffffff;
-    --color-m3-on-primary-container: #6c1a20;
-    --color-m3-primary-fixed: #ffdad8;
-    --color-m3-primary-fixed-dim: #ffb3b1;
-    --color-m3-on-primary-fixed: #410007;
-    --color-m3-on-primary-fixed-variant: #7f282c;
+    --color-m3-primary: var(--m3-primary);
+    --color-m3-primary-container: var(--m3-primary-container);
+    --color-m3-on-primary: var(--m3-on-primary);
+    --color-m3-on-primary-container: var(--m3-on-primary-container);
+    --color-m3-primary-fixed: var(--m3-primary-fixed);
+    --color-m3-primary-fixed-dim: var(--m3-primary-fixed-dim);
+    --color-m3-on-primary-fixed: var(--m3-on-primary-fixed);
+    --color-m3-on-primary-fixed-variant: var(--m3-on-primary-fixed-variant);
 
     /* M3 Secondary */
-    --color-m3-secondary: #146a5f;
-    --color-m3-secondary-container: #95E1D3;
-    --color-m3-on-secondary: #ffffff;
-    --color-m3-on-secondary-container: #1e7065;
-    --color-m3-secondary-fixed: #a4f1e3;
-    --color-m3-secondary-fixed-dim: #89d4c7;
-    --color-m3-on-secondary-fixed: #00201c;
-    --color-m3-on-secondary-fixed-variant: #005047;
+    --color-m3-secondary: var(--m3-secondary);
+    --color-m3-secondary-container: var(--m3-secondary-container);
+    --color-m3-on-secondary: var(--m3-on-secondary);
+    --color-m3-on-secondary-container: var(--m3-on-secondary-container);
+    --color-m3-secondary-fixed: var(--m3-secondary-fixed);
+    --color-m3-secondary-fixed-dim: var(--m3-secondary-fixed-dim);
+    --color-m3-on-secondary-fixed: var(--m3-on-secondary-fixed);
+    --color-m3-on-secondary-fixed-variant: var(--m3-on-secondary-fixed-variant);
 
     /* M3 Tertiary */
-    --color-m3-tertiary: #6f5d11;
-    --color-m3-tertiary-container: #FCE38A;
-    --color-m3-on-tertiary: #ffffff;
-    --color-m3-on-tertiary-container: #453800;
-    --color-m3-tertiary-fixed: #fae189;
-    --color-m3-tertiary-fixed-dim: #ddc570;
-    --color-m3-on-tertiary-fixed: #221b00;
-    --color-m3-on-tertiary-fixed-variant: #554600;
+    --color-m3-tertiary: var(--m3-tertiary);
+    --color-m3-tertiary-container: var(--m3-tertiary-container);
+    --color-m3-on-tertiary: var(--m3-on-tertiary);
+    --color-m3-on-tertiary-container: var(--m3-on-tertiary-container);
+    --color-m3-tertiary-fixed: var(--m3-tertiary-fixed);
+    --color-m3-tertiary-fixed-dim: var(--m3-tertiary-fixed-dim);
+    --color-m3-on-tertiary-fixed: var(--m3-on-tertiary-fixed);
+    --color-m3-on-tertiary-fixed-variant: var(--m3-on-tertiary-fixed-variant);
 
     /* M3 Surface */
-    --color-m3-surface: #f9f9ff;
-    --color-m3-surface-dim: #d0daf0;
-    --color-m3-surface-bright: #f9f9ff;
-    --color-m3-surface-container-lowest: #ffffff;
-    --color-m3-surface-container-low: #f0f3ff;
-    --color-m3-surface-container: #e7eeff;
-    --color-m3-surface-container-high: #dee8ff;
-    --color-m3-surface-container-highest: #d9e3f9;
-    --color-m3-surface-variant: #d9e3f9;
-    --color-m3-on-surface: #121c2c;
-    --color-m3-on-surface-variant: #000000;
-    --color-m3-on-background: #121c2c;
-    --color-m3-inverse-surface: #273141;
-    --color-m3-inverse-on-surface: #ebf1ff;
-    --color-m3-inverse-primary: #ffb3b1;
-    --color-m3-outline: #897271;
-    --color-m3-outline-variant: #dcc0bf;
+    --color-m3-surface: var(--m3-surface);
+    --color-m3-surface-dim: var(--m3-surface-dim);
+    --color-m3-surface-bright: var(--m3-surface-bright);
+    --color-m3-surface-container-lowest: var(--m3-surface-container-lowest);
+    --color-m3-surface-container-low: var(--m3-surface-container-low);
+    --color-m3-surface-container: var(--m3-surface-container);
+    --color-m3-surface-container-high: var(--m3-surface-container-high);
+    --color-m3-surface-container-highest: var(--m3-surface-container-highest);
+    --color-m3-surface-variant: var(--m3-surface-variant);
+    --color-m3-on-surface: var(--m3-on-surface);
+    --color-m3-on-surface-variant: var(--m3-on-surface-variant);
+    --color-m3-on-background: var(--m3-on-background);
+    --color-m3-inverse-surface: var(--m3-inverse-surface);
+    --color-m3-inverse-on-surface: var(--m3-inverse-on-surface);
+    --color-m3-inverse-primary: var(--m3-inverse-primary);
+    --color-m3-outline: var(--m3-outline);
+    --color-m3-outline-variant: var(--m3-outline-variant);
 
     --radius-sm: calc(var(--radius) * 0.6);
     --radius-md: calc(var(--radius) * 0.8);
@@ -150,6 +150,55 @@
     --piemind-yellow: #FCE38A;
     --piemind-green: #EAFFD0;
     --piemind-mint: #95E1D3;
+
+    /* M3 Primary */
+    --m3-primary: #9e3f42;
+    --m3-primary-container: #f38181;
+    --m3-on-primary: #ffffff;
+    --m3-on-primary-container: #6c1a20;
+    --m3-primary-fixed: #ffdad8;
+    --m3-primary-fixed-dim: #ffb3b1;
+    --m3-on-primary-fixed: #410007;
+    --m3-on-primary-fixed-variant: #7f282c;
+
+    /* M3 Secondary */
+    --m3-secondary: #146a5f;
+    --m3-secondary-container: #95E1D3;
+    --m3-on-secondary: #ffffff;
+    --m3-on-secondary-container: #1e7065;
+    --m3-secondary-fixed: #a4f1e3;
+    --m3-secondary-fixed-dim: #89d4c7;
+    --m3-on-secondary-fixed: #00201c;
+    --m3-on-secondary-fixed-variant: #005047;
+
+    /* M3 Tertiary */
+    --m3-tertiary: #6f5d11;
+    --m3-tertiary-container: #FCE38A;
+    --m3-on-tertiary: #ffffff;
+    --m3-on-tertiary-container: #453800;
+    --m3-tertiary-fixed: #fae189;
+    --m3-tertiary-fixed-dim: #ddc570;
+    --m3-on-tertiary-fixed: #221b00;
+    --m3-on-tertiary-fixed-variant: #554600;
+
+    /* M3 Surface */
+    --m3-surface: #f9f9ff;
+    --m3-surface-dim: #d0daf0;
+    --m3-surface-bright: #f9f9ff;
+    --m3-surface-container-lowest: #ffffff;
+    --m3-surface-container-low: #f0f3ff;
+    --m3-surface-container: #e7eeff;
+    --m3-surface-container-high: #dee8ff;
+    --m3-surface-container-highest: #d9e3f9;
+    --m3-surface-variant: #d9e3f9;
+    --m3-on-surface: #121c2c;
+    --m3-on-surface-variant: #000000;
+    --m3-on-background: #121c2c;
+    --m3-inverse-surface: #273141;
+    --m3-inverse-on-surface: #ebf1ff;
+    --m3-inverse-primary: #ffb3b1;
+    --m3-outline: #897271;
+    --m3-outline-variant: #dcc0bf;
 }
 
 .dark {
