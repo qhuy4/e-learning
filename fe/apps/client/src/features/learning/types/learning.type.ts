@@ -14,6 +14,8 @@ export interface LessonDetail {
   position: number;
   isPreview: boolean;
   status: number;
+  /** true = bài đang bị khóa do bài đứng trước chưa hoàn thành (>= 90%) */
+  isLocked?: boolean;
 }
 
 // ─── Course Learning (từ GET /courses/id/:id — dùng cho sidebar) ───────────

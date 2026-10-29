@@ -15,7 +15,13 @@ import { useVideoProgress } from '../../features/learning/hooks/use-video-progre
 import { QuizLesson } from '../../features/quizzes/components/QuizLesson';
 import { QuizLauncher } from '../../features/quizzes/components/QuizLauncher';
 import { useLessonQuizzes } from '../../features/quizzes/hooks/use-quiz';
-import { ArrowLeft, ClipboardList, Loader2, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, ClipboardList, Loader2, CheckCircle2, Lock } from 'lucide-react';
+import { toast } from 'sonner';
+import {
+  buildSequentialLocks,
+  getLessonLockMessage,
+  LOCK_MESSAGES,
+} from '../../features/learning/utils/lesson-lock';
 
 export const LearningPage = () => {
   const { courseSlug, lessonSlug } = useParams<{ courseSlug: string; lessonSlug?: string }>();
@@ -88,10 +94,18 @@ export const LearningPage = () => {
     ? lessonProgressMap.get(lessonData.id)
     : undefined;
 
+  // Khóa tuần tự: bài sau mở khi bài đứng trước đã xem >= 90% (đồng bộ backend).
+  const lockOptions = { isEnrolled, isPreviewMode: !!previewToken };
+  const lockedLessonIds = buildSequentialLocks(
+    courseData?.sections ?? [],
+    lessonProgressMap,
+    lockOptions,
+  );
+
   const { handleProgressUpdate, handleVideoEnd } = useVideoProgress({
     courseId: courseData?.id ?? 0,
     lessonId: lessonData?.id ?? 0,
-    enabled: isEnrolled && !!lessonData,
+    enabled: isEnrolled && !!lessonData && !lessonData.isLocked,
   });
 
   const navigate = useNavigate();
@@ -129,6 +143,17 @@ export const LearningPage = () => {
   const navigateToLesson = (slug: string) => {
     const url = `/learning/${courseSlug}/${slug}${previewToken ? `?previewToken=${previewToken}` : ''}`;
     navigate(url);
+  };
+
+  // Điều hướng có kiểm khóa: bấm vào bài bị khóa → hiện lý do thay vì vào bài.
+  const handleGoToLesson = (lesson: { slug: string; id: number; isPreview: boolean } | null) => {
+    if (!lesson) return;
+    const lockMessage = getLessonLockMessage(lesson, lockedLessonIds, lockOptions);
+    if (lockMessage) {
+      toast.warning(lockMessage);
+      return;
+    }
+    navigateToLesson(lesson.slug);
   };
 
   if (courseData && !lessonSlug && defaultLessonSlug) {
@@ -169,8 +194,28 @@ export const LearningPage = () => {
 
       <div className="flex flex-1 flex-col lg:flex-row h-[calc(100vh-64px)]">
         <div className="flex-1 overflow-y-auto min-w-0 custom-scrollbar flex flex-col bg-slate-50">
-          {/* Player / Quiz */}
-          {lessonData.type === 'quiz' ? (
+          {/* Bài đang khóa → màn hình khóa (không tải player/quiz) */}
+          {lessonData.isLocked ? (
+            <div className="w-full p-4 md:p-6">
+              <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-6 text-center shadow-[0_4px_20px_rgba(15,23,42,0.06)] md:rounded-3xl">
+                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100">
+                  <Lock className="h-6 w-6 text-slate-400" />
+                </span>
+                <p className="text-lg font-extrabold text-slate-900">Bài học đang khóa</p>
+                <p className="max-w-md text-sm font-medium text-slate-500">
+                  {LOCK_MESSAGES.previousIncomplete}
+                </p>
+                {prevLesson && (
+                  <button
+                    onClick={() => navigateToLesson(prevLesson.slug)}
+                    className="mt-1 rounded-xl border-2 border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition-all hover:border-slate-300 hover:bg-slate-50"
+                  >
+                    Quay lại bài trước
+                  </button>
+                )}
+              </div>
+            </div>
+          ) : lessonData.type === 'quiz' ? (
             <QuizLauncher
               variant="hero"
               quizzes={lessonQuizzes}
@@ -183,6 +228,7 @@ export const LearningPage = () => {
               posterUrl={lessonData.thumbnail}
               title={lessonData.title}
               initialPosition={currentLessonProgress?.isCompleted ? 0 : currentLessonProgress?.watchSeconds}
+              watchedSeconds={currentLessonProgress?.watchSeconds}
               onProgressUpdate={handleProgressUpdate}
               onVideoEnd={handleVideoEnd}
             />
@@ -255,7 +301,7 @@ export const LearningPage = () => {
                 </button>
                 <button
                   disabled={!nextLesson}
-                  onClick={() => nextLesson && navigateToLesson(nextLesson.slug)}
+                  onClick={() => handleGoToLesson(nextLesson)}
                   className="group flex flex-1 items-center justify-center gap-2 rounded-xl bg-piemind-pink px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-piemind-pink/90 hover:shadow-lg hover:shadow-piemind-pink/25 disabled:cursor-not-allowed disabled:opacity-40 md:flex-none"
                 >
                   Bài tiếp theo
@@ -293,6 +339,8 @@ export const LearningPage = () => {
             courseSlug={courseData.slug}
             isEnrolled={isEnrolled}
             lessonProgressMap={lessonProgressMap}
+            lockedLessonIds={lockedLessonIds}
+            onLessonClickLocked={(message) => toast.warning(message)}
           />
         </div>
       </div>
@@ -336,7 +384,7 @@ export const LearningPage = () => {
                 nextLesson
                   ? () => {
                       setQuizOpen(false);
-                      navigateToLesson(nextLesson.slug);
+                      handleGoToLesson(nextLesson);
                     }
                   : undefined
               }

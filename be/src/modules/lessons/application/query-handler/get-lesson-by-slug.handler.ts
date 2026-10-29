@@ -36,6 +36,7 @@ async function resolveSignedUrl(
 
 import { LessonDtoMapper } from '../../presentation/mappers/lesson-dto.mapper';
 import { SectionOrmEntity } from '@/modules/sections/infrastructure/entity/section.orm-entity';
+import { LessonAccessService } from '@/modules/lessons/application/service/lesson-access.service';
 import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';
 
@@ -52,6 +53,7 @@ export class GetLessonBySlugHandler implements IQueryHandler<GetLessonBySlugQuer
     private readonly enrollmentRepository: IEnrollmentRepository,
     @InjectRepository(SectionOrmEntity)
     private readonly sectionRepository: Repository<SectionOrmEntity>,
+    private readonly lessonAccessService: LessonAccessService,
   ) {}
 
   async execute(query: GetLessonBySlugQuery) {
@@ -96,6 +98,18 @@ export class GetLessonBySlugHandler implements IQueryHandler<GetLessonBySlugQuer
 
     this.logger.debug(`canViewVideo=${canViewVideo}, videoSource=${lesson.videoSource}`);
 
+    // Học tuần tự: đã ghi danh mà bài đứng trước chưa hoàn thành (>= 90%) → khóa bài này,
+    // không cấp video. "Chưa mua khóa" vẫn do nhánh canViewVideo=false ở trên đảm nhiệm.
+    const isLocked =
+      canViewVideo && query.userId
+        ? await this.lessonAccessService.isLocked(lesson, query.userId)
+        : false;
+
+    if (isLocked) {
+      this.logger.debug(`Lesson ${lesson.id} locked: chưa hoàn thành bài đứng trước`);
+      canViewVideo = false;
+    }
+
     const signedUrl = canViewVideo
       ? await resolveSignedUrl(lesson.videoSource, this.storage, this.logger)
       : null;
@@ -105,8 +119,8 @@ export class GetLessonBySlugHandler implements IQueryHandler<GetLessonBySlugQuer
       ? await resolveSignedUrl(lesson.thumbnail, this.storage, this.logger)
       : null;
 
-    this.logger.debug(`Result: signedUrl=${signedUrl ? 'present' : 'null'}`);
+    this.logger.debug(`Result: signedUrl=${signedUrl ? 'present' : 'null'}, isLocked=${isLocked}`);
 
-    return LessonDtoMapper.toDetailDto(lesson, signedUrl, signedThumbnailUrl);
+    return LessonDtoMapper.toDetailDto(lesson, signedUrl, signedThumbnailUrl, { isLocked });
   }
 }

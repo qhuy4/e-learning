@@ -17,6 +17,7 @@ export class LessonDtoMapper {
     lesson: Lesson,
     signedVideoUrl: string | null = null,
     signedThumbnailUrl: string | null = null,
+    access?: { isLocked?: boolean },
   ) {
     return {
       id: lesson.id,
@@ -32,6 +33,8 @@ export class LessonDtoMapper {
       position: lesson.position,
       isPreview: lesson.isPreview,
       status: lesson.status,
+      // true khi học viên chưa hoàn thành bài đứng trước (học tuần tự).
+      isLocked: access?.isLocked ?? false,
     };
   }
 

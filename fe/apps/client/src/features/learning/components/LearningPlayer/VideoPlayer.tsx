@@ -13,6 +13,8 @@ interface VideoPlayerProps {
   posterUrl?: string | null;
   title?: string;
   initialPosition?: number;
+  /** Giây đã xem lưu trên server — giới hạn tua tới đó (bài hoàn thành ≈ tua toàn video). */
+  watchedSeconds?: number;
   onProgressUpdate?: (info: VideoProgressInfo) => void;
   onVideoEnd?: () => void;
 }
@@ -42,6 +44,7 @@ export const VideoPlayer = ({
   posterUrl,
   title,
   initialPosition = 0,
+  watchedSeconds = 0,
   onProgressUpdate,
   onVideoEnd,
 }: VideoPlayerProps) => {
@@ -65,8 +68,28 @@ export const VideoPlayer = ({
 
   const [activeSrc, setActiveSrc] = useState<string | null>(videoSource);
   const seekAppliedRef = useRef(false);
-  // Người dùng tự tua bằng slider/nút → không seek tự động nữa (bấm play bình thường không chặn).
-  const userSeekedRef = useRef(false);
+  // Vị trí xem tới xa nhất — tua tiến không được vượt qua phần này
+  // (lùi thì tự do để xem lại phần đã lướt qua).
+  const maxWatchedRef = useRef(0);
+  // Vị trí xem gần nhất của video HIỆN TẠI — không đá về 0 khi phải đổi src.
+  const lastTimeRef = useRef(0);
+  // Key (origin+pathname) của video hiện tại — phân biệt "đổi chữ ký" vs "đổi bài".
+  const srcKeyRef = useRef<string | null>(null);
+  // Vị trí cần seek khi metadata sẵn sàng / khi đổi src.
+  const restoreSeekRef = useRef(0);
+  // Đọc prop muộn (cache progress về sau) mà không cần đưa vào deps effect reset.
+  const initialPositionRef = useRef(initialPosition);
+  const watchedSecondsRef = useRef(watchedSeconds);
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const sliderInputRef = useRef<HTMLInputElement>(null);
+  // Kéo thanh tua bằng chuột.
+  const [isDragging, setIsDragging] = useState(false);
+  const [hoverPct, setHoverPct] = useState<number | null>(null);
+
+  useEffect(() => {
+    initialPositionRef.current = initialPosition;
+    watchedSecondsRef.current = watchedSeconds;
+  });
 
   useEffect(() => {
     setActiveSrc((prev) => {
@@ -81,35 +104,71 @@ export const VideoPlayer = ({
     setActiveSrc((prev) => (videoSource && prev !== videoSource ? videoSource : prev));
   }, [videoSource]);
 
+  // Đổi src: cùng file (chữ ký presigned hết hạn) → GIỮ vị trí xem và phần đã xem;
+  // đổi bài video khác → bắt đầu lại từ đầu như bình thường.
   useEffect(() => {
+    const newKey = activeSrc ? videoKey(activeSrc) : null;
+    const sameFile = newKey !== null && newKey === srcKeyRef.current;
+    srcKeyRef.current = newKey;
+
     seekAppliedRef.current = false;
-    userSeekedRef.current = false;
+    if (!sameFile) {
+      lastTimeRef.current = 0;
+      maxWatchedRef.current = 0;
+    }
+    const restoreTo =
+      initialPositionRef.current > 0 ? initialPositionRef.current : lastTimeRef.current;
+    restoreSeekRef.current = restoreTo;
+
     setIsPlaying(false);
     setProgress(0);
-    setCurrentTime(0);
+    setCurrentTime(restoreTo);
     setDuration(0);
     setFlash(null);
     setIsBuffering(false);
   }, [activeSrc]);
 
+  // Server lưu đã xem tới đâu (watchSeconds) → giới hạn tua tới đó.
+  // Bài hoàn thành (watchSeconds ≈ duration) ⇒ tua được toàn video ngay khi mở.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !activeSrc || watchedSeconds <= 0) return;
+    const seed = () => {
+      if (!video.duration) return;
+      maxWatchedRef.current = Math.max(
+        maxWatchedRef.current,
+        Math.min(watchedSeconds, video.duration),
+      );
+    };
+    if (video.readyState >= 1) seed();
+    else video.addEventListener('loadedmetadata', seed, { once: true });
+    return () => video.removeEventListener('loadedmetadata', seed);
+  }, [activeSrc, watchedSeconds]);
+
   // Seek vị trí đã học: chạy lại khi initialPosition về muộn, chỉ 1 lần mỗi nguồn.
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !activeSrc || initialPosition <= 0 || seekAppliedRef.current) return;
+    if (!video || !activeSrc || seekAppliedRef.current) return;
+    // initialPosition về muộn (cache course-progress) → cập nhật vị trí cần restore.
+    if (initialPosition > restoreSeekRef.current) restoreSeekRef.current = initialPosition;
 
     const applySeek = () => {
       const v = videoRef.current;
-      if (!v || seekAppliedRef.current || userSeekedRef.current) return;
-      // Đã chạy qua vị trí lưu → không kéo ngược lại.
-      if (v.currentTime > initialPosition) return;
-      const target = v.duration
-        ? Math.min(initialPosition, Math.max(0, v.duration - 0.5))
-        : initialPosition;
-      if (target <= 0) return;
-      v.currentTime = target;
+      if (!v || seekAppliedRef.current) return;
+      const target = restoreSeekRef.current;
+      // Đã chạy qua vị trí lưu hoặc không có vị trí cần restore → không seek.
+      if (target <= 0 || v.currentTime > target) {
+        seekAppliedRef.current = true;
+        return;
+      }
+      const clamped = v.duration ? Math.min(target, Math.max(0, v.duration - 0.5)) : target;
+      v.currentTime = clamped;
       seekAppliedRef.current = true;
-      setCurrentTime(target);
-      setProgress(v.duration ? (target / v.duration) * 100 : 0);
+      // Vị trí resume từ server = nơi học viên đã xem tới → cho phép tua trong khoảng này.
+      maxWatchedRef.current = Math.max(maxWatchedRef.current, clamped);
+      lastTimeRef.current = clamped;
+      setCurrentTime(clamped);
+      setProgress(v.duration ? (clamped / v.duration) * 100 : 0);
     };
 
     if (video.readyState >= 1) applySeek();
@@ -162,8 +221,9 @@ export const VideoPlayer = ({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      const tag = (e.target as HTMLElement)?.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      const el = e.target as HTMLElement;
+      const tag = el?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || el?.isContentEditable) return;
       if (e.code === 'Space') {
         e.preventDefault();
         togglePlay();
@@ -173,16 +233,13 @@ export const VideoPlayer = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [togglePlay]);
 
-  const skip = useCallback((delta: number) => {
-    const video = videoRef.current;
-    if (!video) return;
-    userSeekedRef.current = true;
-    video.currentTime = Math.min(Math.max(0, video.currentTime + delta), video.duration || Infinity);
-  }, []);
-
+  // Chính sách tua: lùi tự do, tiến tối đa tới vị trí đã xem tới xa nhất
+  // (maxWatchedRef) — không bỏ qua được nội dung chưa xem.
   const handleTimeUpdate = () => {
     const video = videoRef.current;
     if (!video) return;
+    if (video.currentTime > maxWatchedRef.current) maxWatchedRef.current = video.currentTime;
+    lastTimeRef.current = video.currentTime;
     const percent = video.duration ? (video.currentTime / video.duration) * 100 : 0;
     setCurrentTime(video.currentTime);
     setProgress(percent);
@@ -197,11 +254,118 @@ export const VideoPlayer = ({
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     const video = videoRef.current;
     if (!video || !video.duration) return;
-    userSeekedRef.current = true;
-    const value = Number(e.target.value);
-    video.currentTime = (value / 100) * video.duration;
-    setProgress(value);
+    // Kéo quá phần đã xem thì neo về vị trí xem xa nhất.
+    const target = Math.min(
+      (Number(e.target.value) / 100) * video.duration,
+      maxWatchedRef.current,
+    );
+    video.currentTime = target;
+    lastTimeRef.current = target;
+    setProgress((target / video.duration) * 100);
   };
+
+  const skip = useCallback((delta: number) => {
+    const video = videoRef.current;
+    if (!video) return;
+    // Tiến 10s chỉ trong phần đã xem; lùi thì không giới hạn.
+    const maxReachable = Math.max(maxWatchedRef.current, video.currentTime);
+    video.currentTime = Math.min(Math.max(0, video.currentTime + delta), maxReachable);
+    lastTimeRef.current = video.currentTime;
+    setCurrentTime(video.currentTime);
+    setProgress(video.duration ? (video.currentTime / video.duration) * 100 : 0);
+  }, []);
+
+  // Seek theo % trên thanh tua — clamp trong khoảng đã xem.
+  const seekToPct = useCallback((pct: number) => {
+    const video = videoRef.current;
+    if (!video || !video.duration) return;
+    const maxPct = Math.min(100, (maxWatchedRef.current / video.duration) * 100);
+    const target = Math.min(Math.max(pct, 0), maxPct);
+    video.currentTime = (target / 100) * video.duration;
+    lastTimeRef.current = video.currentTime;
+    setProgress(target);
+    setCurrentTime(video.currentTime);
+  }, []);
+
+  // Vị trí chuột trên thanh (0-100) — dùng cho hover/drag.
+  const pctFromClientX = useCallback((clientX: number) => {
+    const el = timelineRef.current;
+    if (!el) return 0;
+    const rect = el.getBoundingClientRect();
+    if (rect.width <= 0) return 0;
+    return Math.min(Math.max(((clientX - rect.left) / rect.width) * 100, 0), 100);
+  }, []);
+
+  // Kéo thả: chấm bám đúng vị trí chuột, seek liên tục theo di chuyển.
+  const handleTimelinePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!duration) return;
+      e.currentTarget.setPointerCapture(e.pointerId);
+      setIsDragging(true);
+      seekToPct(pctFromClientX(e.clientX));
+      // Giữ phím mũi tên tua được sau khi bấm chuột.
+      sliderInputRef.current?.focus();
+    },
+    [duration, pctFromClientX, seekToPct],
+  );
+
+  const handleTimelinePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      const pct = pctFromClientX(e.clientX);
+      setHoverPct(pct);
+      if (isDragging) seekToPct(pct);
+    },
+    [isDragging, pctFromClientX, seekToPct],
+  );
+
+  const handleTimelinePointerUp = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      }
+      setIsDragging(false);
+    },
+    [],
+  );
+
+  // Phím mũi tên khi thanh tua đang focus: ±5 giây (Home = về đầu).
+  const handleSliderKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        skip(-5);
+      } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        skip(5);
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        seekToPct(0);
+      }
+    },
+    [skip, seekToPct],
+  );
+
+  // Mũi tên ←/→ tua ±5s ngay khi đang ở trang học (không cần bấm vào thanh tua),
+  // giống thói quen trên YouTube. Bỏ qua khi đang gõ trong ô nhập liệu.
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement;
+      const tag = el?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || el?.isContentEditable) return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        togglePlay();
+      } else if (e.code === 'ArrowLeft') {
+        e.preventDefault();
+        skip(-5);
+      } else if (e.code === 'ArrowRight') {
+        e.preventDefault();
+        skip(5);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [togglePlay, skip]);
 
   const toggleMute = () => {
     const video = videoRef.current;
@@ -229,6 +393,9 @@ export const VideoPlayer = ({
   };
 
   const controlsVisible = !isPlaying || isHovering;
+
+  // Phần trăm xem tới xa nhất — giới hạn trên của thanh tua.
+  const watchedPercent = duration > 0 ? Math.min(100, (maxWatchedRef.current / duration) * 100) : 0;
 
   if (!videoSource) {
     return (
@@ -310,27 +477,47 @@ export const VideoPlayer = ({
             controlsVisible ? 'opacity-100' : 'pointer-events-none opacity-0'
           }`}
         >
-          {/* Timeline */}
-          <div className="group/scrub relative mb-3 flex h-4 items-center">
+          {/* Timeline — kéo chuột bám đúng vị trí con trỏ (clamp trong phần đã xem);
+              phím mũi tên tua ±5s khi thanh được focus */}
+          <div
+            ref={timelineRef}
+            onPointerDown={handleTimelinePointerDown}
+            onPointerMove={handleTimelinePointerMove}
+            onPointerUp={handleTimelinePointerUp}
+            onPointerCancel={handleTimelinePointerUp}
+            onPointerLeave={() => setHoverPct(null)}
+            title="Kéo để tua trong phần đã xem"
+            className="group/scrub relative mb-3 flex h-4 cursor-pointer touch-none items-center"
+          >
             <div className="relative h-1.5 w-full rounded-full bg-white/25">
+              <div
+                className="absolute inset-y-0 left-0 rounded-full bg-white/45"
+                style={{ width: `${watchedPercent}%` }}
+              />
               <div
                 className="absolute inset-y-0 left-0 rounded-full bg-piemind-pink"
                 style={{ width: `${progress}%` }}
               />
-              <div
-                className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-piemind-pink opacity-0 shadow transition-opacity group-hover/scrub:opacity-100"
-                style={{ left: `${progress}%` }}
-              />
+              {/* Chấm theo con trỏ khi hover/drag — neo đúng phần được tua */}
+              {hoverPct !== null && (
+                <div
+                  className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-piemind-pink shadow"
+                  style={{ left: `${Math.min(hoverPct, watchedPercent)}%` }}
+                />
+              )}
             </div>
             <input
+              ref={sliderInputRef}
               type="range"
               min={0}
-              max={100}
+              max={Math.max(watchedPercent, 0.1)}
               step={0.1}
               value={progress}
               onChange={handleSeek}
-              aria-label="Tua video"
-              className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+              onKeyDown={handleSliderKeyDown}
+              aria-label="Tua trong phần đã xem"
+              tabIndex={0}
+              className="pointer-events-none absolute inset-0 h-full w-full opacity-0"
             />
           </div>
 
@@ -350,13 +537,15 @@ export const VideoPlayer = ({
               <button
                 onClick={() => skip(-10)}
                 aria-label="Lùi 10 giây"
+                title="Lùi 10 giây"
                 className="hidden h-9 w-9 items-center justify-center rounded-full text-white/85 transition-colors hover:bg-white/15 hover:text-white sm:flex"
               >
                 <Rewind className="h-4 w-4" />
               </button>
               <button
                 onClick={() => skip(10)}
-                aria-label="Tiến 10 giây"
+                aria-label="Tiến 10 giây (chỉ trong phần đã xem)"
+                title="Chỉ tiến trong phần đã xem"
                 className="hidden h-9 w-9 items-center justify-center rounded-full text-white/85 transition-colors hover:bg-white/15 hover:text-white sm:flex"
               >
                 <FastForward className="h-4 w-4" />

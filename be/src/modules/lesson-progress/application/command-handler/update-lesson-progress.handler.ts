@@ -5,13 +5,16 @@ import {
   LESSON_PROGRESS_REPOSITORY,
 } from '../../domain/repository/lesson-progress.repository';
 import { LessonProgress } from '../../domain/entity/lesson-progress.entity';
-import { Inject, Logger } from '@nestjs/common';
+import { Inject, Logger, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EnrollmentOrmEntity } from '@/modules/enrollments/infrastructure/entity/enrollment.orm-entity';
 import { LessonOrmEntity } from '@/modules/lessons/infrastructure/entity/lesson.orm-entity';
+import { LessonAccessService } from '@/modules/lessons/application/service/lesson-access.service';
 import { LearningEvent } from '@/modules/achievements/application/event/learning.event';
 import { AchievementCriteria } from '@/modules/achievements/domain/enum/achievement-criteria.enum';
+import { AppException } from '@/common/exception/app.exception';
+import { ErrorCode } from '@/common/enum/error-code.enum';
 
 @CommandHandler(UpdateLessonProgressCommand)
 export class UpdateLessonProgressHandler implements ICommandHandler<UpdateLessonProgressCommand> {
@@ -24,10 +27,20 @@ export class UpdateLessonProgressHandler implements ICommandHandler<UpdateLesson
     private readonly enrollmentRepository: Repository<EnrollmentOrmEntity>,
     @InjectRepository(LessonOrmEntity)
     private readonly lessonRepository: Repository<LessonOrmEntity>,
+    private readonly lessonAccessService: LessonAccessService,
     private readonly eventBus: EventBus,
   ) {}
 
   async execute(command: UpdateLessonProgressCommand): Promise<LessonProgress> {
+    // Chặn ghi tiến độ bài đang khóa (học tuần tự) — ví dụ gọi API trực tiếp
+    // để "tự hoàn thành" bài chưa xem và mở khóa bài sau.
+    const lesson = await this.lessonRepository.findOne({
+      where: { id: command.lessonId.toString() },
+    });
+    if (lesson && (await this.lessonAccessService.isLocked(lesson, command.userId))) {
+      throw new AppException(ErrorCode.LESSON_LOCKED, HttpStatus.FORBIDDEN);
+    }
+
     const existing = await this.lessonProgressRepository.findByUserAndLesson(
       command.userId,
       command.lessonId,
