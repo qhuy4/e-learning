@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { learningService } from '../services/learning.service';
-import type { CourseProgress } from '../types/learning.type';
+import type { CourseProgress, LessonNote } from '../types/learning.type';
 
 // Cache 5 phút — tránh refetch (ký lại presigned URL video) mỗi lần refocus.
 const STALE_TIME = 5 * 60 * 1000;
@@ -97,5 +97,63 @@ export const useLessonMaterials = (lessonId: number | undefined, enabled = true)
     queryKey: ['lesson-materials', lessonId],
     queryFn: () => learningService.getLessonMaterials(lessonId!),
     enabled: enabled && !!lessonId,
+  });
+};
+
+// ─── Ghi chú bài học ────────────────────────────────────────────────────────
+export const useLessonNotes = (lessonId: number | undefined, enabled = true) => {
+  return useQuery({
+    queryKey: ['lesson-notes', lessonId],
+    queryFn: () => learningService.getLessonNotes(lessonId!),
+    enabled: enabled && !!lessonId,
+  });
+};
+
+export const useCreateLessonNote = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: learningService.createLessonNote,
+    onSuccess: (created) => {
+      // Ghi chú là dữ liệu nhỏ → append vào cache là đủ, không cần refetch.
+      queryClient.setQueryData<LessonNote[]>(
+        ['lesson-notes', created.lessonId],
+        (old) => {
+          if (!old) return old;
+          return [...old, created].sort(
+            (a, b) =>
+              a.noteTimeSeconds - b.noteTimeSeconds || a.id - b.id,
+          );
+        },
+      );
+    },
+  });
+};
+
+export const useUpdateLessonNote = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, content }: { id: number; content: string }) =>
+      learningService.updateLessonNote(id, content),
+    onSuccess: (updated) => {
+      queryClient.setQueryData<LessonNote[]>(
+        ['lesson-notes', updated.lessonId],
+        (old) =>
+          old?.map((n) => (n.id === updated.id ? updated : n)),
+      );
+    },
+  });
+};
+
+export const useDeleteLessonNote = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id }: { id: number; lessonId: number }) =>
+      learningService.deleteLessonNote(id),
+    onSuccess: (_res, variables) => {
+      queryClient.setQueryData<LessonNote[]>(
+        ['lesson-notes', variables.lessonId],
+        (old) => old?.filter((n) => n.id !== variables.id),
+      );
+    },
   });
 };

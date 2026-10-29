@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   LearningHeader,
@@ -6,6 +6,7 @@ import {
   LearningTabs,
   LearningSidebar,
   formatSectionLabel,
+  type VideoPlayerHandle,
 } from '../../features/learning/components/LearningPlayer';
 import { useLearningCourse, useLessonBySlug, usePreviewLesson, useCourseProgress } from '../../features/learning/hooks/use-learning';
 import { usePreviewCourse } from '../../features/courses/hooks/use-courses';
@@ -107,6 +108,9 @@ export const LearningPage = () => {
     lessonId: lessonData?.id ?? 0,
     enabled: isEnrolled && !!lessonData && !lessonData.isLocked,
   });
+
+  // Ref player → panel Ghi chú tua video về mốc của note và đọc thời điểm hiện tại.
+  const videoRef = useRef<VideoPlayerHandle>(null);
 
   const navigate = useNavigate();
   const currentIndex = allLessons.findIndex((l: any) => l.slug === lessonData?.slug);
@@ -224,6 +228,7 @@ export const LearningPage = () => {
             />
           ) : (
             <VideoPlayer
+              ref={videoRef}
               videoSource={lessonData.videoSource}
               posterUrl={lessonData.thumbnail}
               title={lessonData.title}
@@ -328,7 +333,7 @@ export const LearningPage = () => {
 
           <div className="px-4 py-4 md:px-6">
             <div className="rounded-2xl border border-slate-200 bg-white shadow-[0_4px_20px_rgba(15,23,42,0.06)]">
-              <LearningTabs lesson={lessonData} />
+              <LearningTabs lesson={lessonData} videoRef={videoRef} />
             </div>
           </div>
         </div>

@@ -85,3 +85,14 @@ export interface LessonMaterial {
   downloadUrl: string | null;
   createdAt: string | null;
 }
+
+// ─── Lesson Notes (ghi chú cá nhân gắn với mốc thời gian video) ────────────
+export interface LessonNote {
+  id: number;
+  lessonId: number;
+  /** Giây trong video — bấm vào ghi chú sẽ tua về đây */
+  noteTimeSeconds: number;
+  content: string;
+  createdAt: string | null;
+  updatedAt: string | null;
+}

@@ -1,4 +1,11 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useImperativeHandle,
+  type Ref,
+} from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, Settings, Rewind, FastForward, Loader2 } from 'lucide-react';
 
 interface VideoProgressInfo {
@@ -8,7 +15,19 @@ interface VideoProgressInfo {
   watchSeconds: number;
 }
 
+/**
+ * API imperative của player — LearningPage giữ ref để panel Ghi chú
+ * tua video về mốc thời gian của note và đọc thời điểm hiện tại.
+ */
+export interface VideoPlayerHandle {
+  /** Tua video tới giây chỉ định (clamp trong phần đã xem). */
+  seekTo: (seconds: number) => void;
+  /** Giây hiện tại của video — dùng cho nút "Ghi chú tại mm:ss". */
+  getCurrentTime: () => number;
+}
+
 interface VideoPlayerProps {
+  ref?: Ref<VideoPlayerHandle>;
   videoSource: string | null;
   posterUrl?: string | null;
   title?: string;
@@ -40,6 +59,7 @@ const videoKey = (url: string): string => {
 };
 
 export const VideoPlayer = ({
+  ref,
   videoSource,
   posterUrl,
   title,
@@ -343,6 +363,26 @@ export const VideoPlayer = ({
       }
     },
     [skip, seekToPct],
+  );
+
+  // API imperative cho panel Ghi chú: tua về mốc của note + đọc thời điểm hiện tại.
+  useImperativeHandle(
+    ref,
+    () => ({
+      seekTo: (seconds: number) => {
+        const video = videoRef.current;
+        if (!video || !video.duration) return;
+        // Note nằm ngoài phần đã xem → neo về phần xem xa nhất (giữ chính sách tua).
+        const maxReachable = Math.max(maxWatchedRef.current, video.currentTime);
+        const clamped = Math.min(Math.max(seconds, 0), maxReachable);
+        video.currentTime = clamped;
+        lastTimeRef.current = clamped;
+        setCurrentTime(clamped);
+        setProgress((clamped / video.duration) * 100);
+      },
+      getCurrentTime: () => videoRef.current?.currentTime ?? 0,
+    }),
+    [],
   );
 
   // Mũi tên ←/→ tua ±5s ngay khi đang ở trang học (không cần bấm vào thanh tua),
