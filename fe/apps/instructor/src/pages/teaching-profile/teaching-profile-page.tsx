@@ -9,13 +9,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@fe/components/ui/card
 import { Input } from "@fe/components/ui/input";
 import { Label } from "@fe/components/ui/label";
 import { Skeleton } from "@fe/components/ui/skeleton";
-import { Toggle } from "@fe/components/ui/toggle";
 import { getErrorMessage } from "@/shared/utils/error";
 import {
   useTeachingProfile,
   useUpdateTeachingProfile,
 } from "@/features/teaching-profile/hooks/use-teaching-profile";
-import { TEACHING_LEVELS } from "@/features/teaching-profile/types/teaching-profile.types";
+import { CEFR_LEVEL_OPTIONS } from "@/features/teaching-profile/types/teaching-profile.types";
 
 /** Checklist chưa xong → link tới trang sửa / trang quản lý phù hợp */
 const CHECKLIST_LINKS: Record<string, string> = {
@@ -30,11 +29,8 @@ export default function TeachingProfilePage() {
   const updateMut = useUpdateTeachingProfile();
 
   const [experienceYears, setExperienceYears] = useState("");
-  const [levels, setLevels] = useState<string[]>([]);
-  const [methods, setMethods] = useState<string[]>([]);
-  const [methodInput, setMethodInput] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
-  const [teachingVideoUrl, setTeachingVideoUrl] = useState("");
+  const [teachingLevels, setTeachingLevels] = useState<string[]>([]);
 
   // Nạp profile vào form 1 lần khi data về (render-phase, không clobber khi user đang sửa)
   const [hydrated, setHydrated] = useState(false);
@@ -43,40 +39,23 @@ export default function TeachingProfilePage() {
     setExperienceYears(
       profile.experienceYears != null ? String(profile.experienceYears) : "",
     );
-    setLevels(profile.teachingLevels ?? []);
-    setMethods(profile.teachingMethods ?? []);
     setWebsiteUrl(profile.websiteUrl ?? "");
-    setTeachingVideoUrl(profile.teachingVideoUrl ?? "");
+    setTeachingLevels(profile.teachingLevels ?? []);
   }
 
-  const toggleLevel = (level: string) =>
-    setLevels((prev) =>
-      prev.includes(level) ? prev.filter((l) => l !== level) : [...prev, level],
+  const toggleLevel = (band: string) => {
+    setTeachingLevels((prev) =>
+      prev.includes(band) ? prev.filter((b) => b !== band) : [...prev, band],
     );
-
-  const addMethod = () => {
-    const value = methodInput.trim();
-    if (!value) return;
-    if (methods.length >= 20) {
-      toast.error("Tối đa 20 phương pháp giảng dạy.");
-      return;
-    }
-    if (!methods.includes(value)) setMethods((prev) => [...prev, value]);
-    setMethodInput("");
   };
-
-  const removeMethod = (value: string) =>
-    setMethods((prev) => prev.filter((m) => m !== value));
 
   const handleSave = () => {
     updateMut.mutate(
       {
         experienceYears:
           experienceYears === "" ? null : Number(experienceYears),
-        teachingLevels: levels,
-        teachingMethods: methods,
         websiteUrl: websiteUrl.trim() || null,
-        teachingVideoUrl: teachingVideoUrl.trim() || null,
+        teachingLevels,
       },
       {
         onSuccess: () => toast.success("Đã lưu hồ sơ giảng dạy!"),
@@ -106,8 +85,8 @@ export default function TeachingProfilePage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Hồ sơ giảng dạy</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Tự khai báo kinh nghiệm & chuyên môn — không bắt buộc làm bài test. AI
-          dùng các thông tin này làm bằng chứng cho Skill Profile.
+          Tự khai báo kinh nghiệm — hiển thị trên hồ sơ, không thay thế bằng
+          chứng đã xác minh (chứng chỉ, đánh giá học viên).
         </p>
       </div>
 
@@ -229,8 +208,8 @@ export default function TeachingProfilePage() {
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Tự khai báo</CardTitle>
             <p className="text-xs text-muted-foreground">
-              Các mục tuỳ chọn — điền càng đầy đủ, AI càng có nhiều bằng chứng
-              để chấm điểm skills.
+              Các mục tuỳ chọn. Thông tin tự khai chỉ hiển thị trên hồ sơ, không
+              tham gia tính điểm kỹ năng.
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -251,72 +230,38 @@ export default function TeachingProfilePage() {
               />
             </div>
 
-            {/* Levels A1 → C2 */}
+            {/* Levels — dữ liệu cho filter level khi học viên tìm giảng viên */}
             <div className="space-y-2">
-              <Label>Trình độ giảng dạy</Label>
-              <div className="grid max-w-md grid-cols-6 gap-1.5">
-                {TEACHING_LEVELS.map((level) => (
-                  <Toggle
-                    key={level}
-                    variant="outline"
-                    size="sm"
-                    pressed={levels.includes(level)}
-                    onPressedChange={() => toggleLevel(level)}
-                    className="cursor-pointer"
-                  >
-                    {level}
-                  </Toggle>
-                ))}
+              <Label>Các level bạn giảng dạy</Label>
+              <div className="flex flex-wrap gap-1.5">
+                {CEFR_LEVEL_OPTIONS.map((band) => {
+                  const active = teachingLevels.includes(band);
+                  return (
+                    <button
+                      key={band}
+                      type="button"
+                      onClick={() => toggleLevel(band)}
+                      aria-pressed={active}
+                      className={cn(
+                        "rounded-full border px-3 py-1 text-xs font-semibold transition-colors",
+                        active
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-input text-muted-foreground hover:border-primary/50",
+                      )}
+                    >
+                      {band}
+                    </button>
+                  );
+                })}
               </div>
               <p className="text-xs text-muted-foreground">
-                Chọn các cấp độ bạn giảng dạy (A1 → C2).
+                Dùng để xếp hạng khi học viên tìm giảng viên theo level của họ.
+                Chưa khai báo = luôn hiển thị.
               </p>
             </div>
 
-            {/* Methods */}
-            <div className="space-y-2">
-              <Label htmlFor="methodInput">Phương pháp giảng dạy</Label>
-              <div className="flex max-w-lg gap-2">
-                <Input
-                  id="methodInput"
-                  placeholder="Ví dụ: Communicative Approach — Enter để thêm"
-                  value={methodInput}
-                  onChange={(e) => setMethodInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      addMethod();
-                    }
-                  }}
-                />
-                <Button type="button" variant="outline" onClick={addMethod}>
-                  Thêm
-                </Button>
-              </div>
-              {methods.length > 0 && (
-                <div className="flex flex-wrap gap-1.5">
-                  {methods.map((method) => (
-                    <span
-                      key={method}
-                      className="flex items-center gap-1 rounded-full border bg-muted/50 px-2.5 py-1 text-xs"
-                    >
-                      {method}
-                      <button
-                        type="button"
-                        onClick={() => removeMethod(method)}
-                        className="cursor-pointer text-muted-foreground hover:text-destructive"
-                        title="Xóa"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Website + video */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {/* Methods / Video — cột DB giữ nguyên, chưa ghi/đọc qua API. */}
+            <div className="grid grid-cols-1 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="websiteUrl">Website / portfolio</Label>
                 <Input
@@ -325,16 +270,6 @@ export default function TeachingProfilePage() {
                   placeholder="https://..."
                   value={websiteUrl}
                   onChange={(e) => setWebsiteUrl(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="teachingVideoUrl">Video giảng dạy (tuỳ chọn)</Label>
-                <Input
-                  id="teachingVideoUrl"
-                  type="url"
-                  placeholder="https://youtube.com/..."
-                  value={teachingVideoUrl}
-                  onChange={(e) => setTeachingVideoUrl(e.target.value)}
                 />
               </div>
             </div>

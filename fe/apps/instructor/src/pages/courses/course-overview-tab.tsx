@@ -187,7 +187,7 @@ export default function CourseOverviewTab() {
         {/* Lesson type breakdown */}
         {totalLessons > 0 && (
           <div className="flex flex-wrap gap-3 mt-3">
-            {Object.entries(lessonsByType).map(([type, count]) => {
+            {(Object.entries(lessonsByType) as Array<[string, number]>).map(([type, count]) => {
               const Icon = LESSON_TYPE_ICONS[type] ?? FileText;
               return (
                 <div key={type} className="flex items-center gap-1.5 text-xs text-muted-foreground">

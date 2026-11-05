@@ -122,8 +122,6 @@ export default function CourseContentTab() {
               index={index}
               courseId={numCourseId}
               editable={editable}
-              allSections={sections}
-              courseStatus={course.status}
             />
           ))}
         </div>
@@ -428,16 +426,18 @@ function SectionItem({
                         {editable && (
                           <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
                             <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
+                              <DropdownMenuTrigger
+                                render={
+                                  <Button
                                   variant="ghost"
                                   size="icon"
                                   title="Thêm Bài Tập"
                                   className="h-7 w-7 text-muted-foreground hover:text-primary"
-                                >
-                                  <FileQuestion className="h-3.5 w-3.5" />
-                                </Button>
-                              </DropdownMenuTrigger>
+                                  >
+                                    <FileQuestion className="h-3.5 w-3.5" />
+                                  </Button>
+                                }
+                              />
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem 
                                   onClick={() => navigate(`/quizzes/create?lessonId=${lesson.id}&courseId=${courseId}`)}
@@ -474,8 +474,8 @@ function SectionItem({
                       </div>
                       {expandedLessons[lesson.id] && (
                         <>
-                          <LessonQuizList lessonId={lesson.id as number} courseId={courseId!} editable={editable} />
-                          <LessonDictationList lessonId={lesson.id as number} courseId={courseId!} editable={editable} />
+                          <LessonQuizList lessonId={Number(lesson.id)} courseId={courseId!} editable={editable} />
+                          <LessonDictationList lessonId={Number(lesson.id)} courseId={courseId!} editable={editable} />
                         </>
                       )}
                     </div>

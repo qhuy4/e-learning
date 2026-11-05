@@ -7,16 +7,25 @@ import {
   Lightbulb,
 } from "lucide-react";
 import { Button } from "@fe/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@fe/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@fe/components/ui/card";
 import { Badge } from "@fe/components/ui/badge";
 import { Skeleton } from "@fe/components/ui/skeleton";
 import { ConfidenceBadge } from "@/features/skill-profile/components/confidence-badge";
 import { scorePercent } from "@/features/skill-profile/config/skill.config";
-import { useSkillRecommendations } from "@/features/skill-profile/hooks/use-skill-profile";
+import {
+  useDismissSkillRecommendation,
+  useSkillRecommendations,
+} from "@/features/skill-profile/hooks/use-skill-profile";
 
 export default function RecommendationsPage() {
   const navigate = useNavigate();
   const { data, isLoading } = useSkillRecommendations();
+  const dismiss = useDismissSkillRecommendation();
 
   const strengths = data?.strengths ?? [];
   const limited = data?.limited ?? [];
@@ -149,13 +158,25 @@ export default function RecommendationsPage() {
                           Để cải thiện confidence:
                         </p>
                         {item.actions.map((action) => (
-                          <p
+                          <div
                             key={action.type}
                             className="flex items-start gap-1.5 text-xs text-muted-foreground"
                           >
                             <span className="text-primary">→</span>
-                            {action.label}
-                          </p>
+                            <span className="flex-1">{action.label}</span>
+                            {action.recommendationId &&
+                              action.status === "ACTIVE" && (
+                                <button
+                                  type="button"
+                                  className="text-muted-foreground hover:text-foreground"
+                                  onClick={() =>
+                                    dismiss.mutate(action.recommendationId!)
+                                  }
+                                >
+                                  Bỏ qua
+                                </button>
+                              )}
+                          </div>
                         ))}
                       </div>
                     )}

@@ -224,7 +224,7 @@ export default function CoursesListPage() {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
-        <Select value={level || "all"} onValueChange={(v) => { setLevel(v === "all" ? "" : v); setPage(1); }}>
+        <Select value={level || "all"} onValueChange={(v) => { const next = v ?? "all"; setLevel(next === "all" ? "" : next); setPage(1); }}>
           <SelectTrigger className="h-9 min-w-[160px]">
             {level ? LEVEL_LABELS[Number(level)] : "Tất cả cấp độ"}
           </SelectTrigger>
@@ -236,7 +236,7 @@ export default function CoursesListPage() {
           </SelectContent>
         </Select>
 
-        <Select value={status || "all"} onValueChange={(v) => { setStatus(v === "all" ? "" : v); setPage(1); }}>
+        <Select value={status || "all"} onValueChange={(v) => { const next = v ?? "all"; setStatus(next === "all" ? "" : next); setPage(1); }}>
           <SelectTrigger className="h-9 min-w-[160px]">
             {status ? STATUS_LABELS[Number(status)] : "Tất cả trạng thái"}
           </SelectTrigger>

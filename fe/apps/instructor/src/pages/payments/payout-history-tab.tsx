@@ -8,6 +8,7 @@ import { Card, CardContent } from "@fe/components/ui/card";
 import { Skeleton } from "@fe/components/ui/skeleton";
 import { DataTable } from "@/components/common/data-table/data-table";
 import type { ColumnDef } from "@tanstack/react-table";
+import type { DataTableFeatures } from "@/components/common/data-table/data-table-features";
 import type { Payout } from "@/features/payments/types/payment.types";
 
 function formatCurrency(amount: number) {
@@ -29,7 +30,7 @@ const VARIANT_MAP: Record<string, string> = {
   destructive: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
 };
 
-const payoutColumns: ColumnDef<Payout>[] = [
+const payoutColumns: ColumnDef<DataTableFeatures, Payout>[] = [
   {
     accessorKey: "createdAt",
     header: "Ngày yêu cầu",
@@ -136,15 +137,14 @@ export function PayoutHistoryTab() {
           data={payouts}
           page={page}
           pageSize={pageSize}
-          total={meta?.total ?? 0}
           totalPages={meta?.totalPages ?? 0}
           onPageChange={setPage}
           onPageSizeChange={(size) => {
             setPageSize(size);
             setPage(1);
           }}
-          isLoading={isLoading}
-          texts={{
+          loading={isLoading}
+          text={{
             searchPlaceholder: "Tìm kiếm...",
             noResults: "Chưa có lịch sử thanh toán",
           }}

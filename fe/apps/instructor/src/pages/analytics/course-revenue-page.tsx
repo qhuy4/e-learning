@@ -120,7 +120,9 @@ export default function CourseRevenuePage() {
   const periodRevenue = analytics.revenue?.periodRevenue ?? 0;
   const growthRate = analytics.enrollmentGrowth?.growthRate;
 
-  const revenueData = (analytics.revenue?.trend ?? []).map((r: any) => ({
+  const revenueData: Array<{ date: string; revenue: number }> = (
+    analytics.revenue?.trend ?? []
+  ).map((r: { date: string; revenue?: number }) => ({
     date: r.date,
     revenue: Number(r.revenue),
   }));
@@ -128,8 +130,8 @@ export default function CourseRevenuePage() {
   const dateRangeLabel =
     DATE_RANGE_OPTIONS.find((o) => o.value === dateRange)?.label ?? "";
 
-  const handleDateRangeChange = (value: string) => {
-    const range = value as DateRange;
+  const handleDateRangeChange = (range: DateRange | null) => {
+    if (!range) return;
     setDateRange(range);
     if (range !== "custom") {
       setCustomRange(undefined);
@@ -300,7 +302,7 @@ export default function CourseRevenuePage() {
                   }
                 />
                 <RechartsTooltip
-                  formatter={(value: number) => formatCurrency(value)}
+                  formatter={(value) => formatCurrency(Number(value ?? 0))}
                   contentStyle={{
                     borderRadius: "8px",
                     border: `1px solid ${borderColor}`,

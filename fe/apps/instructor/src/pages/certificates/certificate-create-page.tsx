@@ -107,8 +107,10 @@ export default function CertificateCreatePage() {
                 <PopoverContent className="w-auto p-0">
                   <Calendar
                     mode="single"
-                    selected={form.issuedAt}
-                    onSelect={(date) => setForm({ ...form, issuedAt: date })}
+                    selected={form.issuedAt ?? undefined}
+                    onSelect={(date) =>
+                      setForm({ ...form, issuedAt: date ?? null })
+                    }
                   />
                 </PopoverContent>
               </Popover>
@@ -124,8 +126,10 @@ export default function CertificateCreatePage() {
                 <PopoverContent className="w-auto p-0">
                   <Calendar
                     mode="single"
-                    selected={form.expiresAt}
-                    onSelect={(date) => setForm({ ...form, expiresAt: date })}
+                    selected={form.expiresAt ?? undefined}
+                    onSelect={(date) =>
+                      setForm({ ...form, expiresAt: date ?? null })
+                    }
                   />
                 </PopoverContent>
               </Popover>

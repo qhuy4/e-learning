@@ -9,7 +9,6 @@ import {
   BookOpen,
   ArrowRight,
   Wallet,
-  Sparkles,
 } from "lucide-react";
 import {
   BarChart,
@@ -24,8 +23,6 @@ import { useRevenueSummary, useRevenueByCourse } from "@/features/revenue/hook/u
 import { useGetCourses } from "@/features/courses/hook/use-courses";
 import { useStudents } from "@/features/students/hook/use-students";
 import { useTeachingProfile } from "@/features/teaching-profile/hooks/use-teaching-profile";
-import { useSkillProfile } from "@/features/skill-profile/hooks/use-skill-profile";
-import { SkillScoreBar } from "@/features/skill-profile/components/skill-score-bar";
 import { Card, CardContent } from "@fe/components/ui/card";
 import { Badge } from "@fe/components/ui/badge";
 import { Skeleton } from "@fe/components/ui/skeleton";
@@ -66,7 +63,6 @@ export default function DashboardPage() {
   const navigate = useNavigate();
   const { data: profileData } = useGetProfile();
   const { data: teachingProfile } = useTeachingProfile();
-  const { data: skills, isLoading: skillsLoading } = useSkillProfile();
   const { data: summaryData, isLoading: summaryLoading } = useRevenueSummary();
   const { data: byCourseData, isLoading: courseLoading } = useRevenueByCourse({ page: 1, limit: 5 });
   const { data: allCourses } = useGetCourses({ page: 1, limit: 999 });
@@ -189,69 +185,14 @@ export default function DashboardPage() {
               <div key={stat.title} className="rounded-lg border p-4">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-muted-foreground">{stat.title}</span>
-                  <div className={`rounded-lg p-1.5 ${stat.bgColor}`}>
-                    <stat.icon className={`h-4 w-4 ${stat.color}`} />
+                  <div className="rounded-lg p-1.5 bg-muted">
+                    <stat.icon className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </div>
                 <div className="mt-2 text-xl font-bold">{stat.value}</div>
               </div>
             ))}
       </div>
-
-      {/* AI Skill Profile */}
-      <Card>
-        <CardContent className="p-5 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-              <h3 className="text-sm font-semibold">Hồ sơ kỹ năng AI</h3>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-xs"
-              onClick={() => navigate("/skill-profile")}
-            >
-              Xem đánh giá chi tiết
-              <ArrowRight className="h-3.5 w-3.5 ml-1" />
-            </Button>
-          </div>
-          {skillsLoading ? (
-            <div className="space-y-3">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <Skeleton key={i} className="h-5 w-full" />
-              ))}
-            </div>
-          ) : !skills?.length ? (
-            <p className="text-sm text-muted-foreground">
-              Chưa có dữ liệu kỹ năng.
-            </p>
-          ) : (
-            <>
-              <div className="space-y-1">
-                {skills.map((skill) => (
-                  <SkillScoreBar
-                    key={skill.id}
-                    name={skill.name}
-                    score={skill.score}
-                    confidence={skill.confidence}
-                    onClick={() => navigate("/skill-profile")}
-                  />
-                ))}
-              </div>
-              <p className="border-t pt-3 text-xs text-muted-foreground">
-                <span className="font-medium text-foreground">Score</span> = AI
-                đánh giá ·{" "}
-                <span className="font-medium text-foreground">Confidence</span> =
-                độ chắc chắn ·{" "}
-                <span className="font-medium text-foreground">Evidence</span> =
-                dữ liệu nền — thêm bằng chứng tại trang Bằng chứng để AI tính
-                lại.
-              </p>
-            </>
-          )}
-        </CardContent>
-      </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Course Status Breakdown */}
@@ -317,15 +258,15 @@ export default function DashboardPage() {
                     axisLine={false}
                   />
                   <Tooltip
-                    formatter={(value: number) => formatCurrency(value)}
+                    formatter={(value) => formatCurrency(Number(value))}
                     contentStyle={{ fontSize: 12, borderRadius: 8 }}
                   />
                   <Bar dataKey="revenue" radius={[0, 4, 4, 0]} fill={chartColor} />
                 </BarChart>
               </ResponsiveContainer>
-            )}
-          </CardContent>
-        </Card>
+          )}
+        </CardContent>
+      </Card>
       </div>
 
       {/* Recent Enrollments */}

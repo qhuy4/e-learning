@@ -27,6 +27,7 @@ import { useCourseAnalytics } from "@/features/analytics/hooks/use-analytics";
 import {
   DATE_RANGE_OPTIONS,
   type DateRange,
+  type LessonPerformance,
   type SectionAnalytics,
 } from "@/features/analytics/types/analytics";
 import {
@@ -229,7 +230,7 @@ export default function CourseAnalyticsPage() {
 
   const growthRate = analytics.enrollmentGrowth?.growthRate;
 
-  const allLessons = (analytics.sections ?? []).flatMap(
+  const allLessons: LessonPerformance[] = (analytics.sections ?? []).flatMap(
     (s: SectionAnalytics) => s.lessons,
   );
   const totalLessons = allLessons.length;

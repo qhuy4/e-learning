@@ -35,6 +35,7 @@ declare const BankHub: {
     redirectUri: string;
     iframe: boolean;
     grantToken: string;
+    state?: string;
     onSuccess: (publicToken: string, state: string) => void;
     onExit: () => void;
   }) => { open: () => void; close: () => void };
@@ -152,7 +153,7 @@ export function PayoutAccountsTab() {
       setVerifyingAccountId(accountId);
       try {
         const result = await createGrantToken(accountId);
-        const { grantToken } = result.data ?? result;
+        const { grantToken } = result;
         const state = `accountId=${accountId}`;
 
         if (typeof BankHub !== "undefined" && BankHub.useBankHubLink) {
@@ -166,7 +167,7 @@ export function PayoutAccountsTab() {
               const resolvedAccountId = match ? parseInt(match[1], 10) : accountId;
               try {
                 const verifyResult = await verifyAccount({ accountId: resolvedAccountId, publicToken });
-                const { verified } = verifyResult.data ?? verifyResult;
+                const { verified } = verifyResult;
                 if (verified) {
                   toast.success("Đã xác minh tài khoản thành công!");
                 } else {
@@ -184,7 +185,7 @@ export function PayoutAccountsTab() {
           });
           open();
         } else {
-          const { casLinkUrl } = result.data ?? result;
+          const { casLinkUrl } = result;
           const popup = window.open(
             casLinkUrl,
             "cas-link",
@@ -207,7 +208,7 @@ export function PayoutAccountsTab() {
                 accountId: resolvedAccountId,
                 publicToken,
               });
-              const { verified } = verifyResult.data ?? verifyResult;
+              const { verified } = verifyResult;
               if (verified) {
                 toast.success("Đã xác minh tài khoản thành công!");
               } else {
