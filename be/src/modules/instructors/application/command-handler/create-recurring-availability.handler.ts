@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { HttpStatus } from '@nestjs/common';
 import { CreateRecurringAvailabilityCommand } from '../command/create-recurring-availability.command';
-import { TeacherAvailabilityRecurringRepository } from '@/modules/instructors/infrastructure/repository/teacher-availability-recurring.repository';
+import { InstructorAvailabilityRecurringRepository } from '@/modules/instructors/infrastructure/repository/instructor-availability-recurring.repository';
 import { ErrorCode } from '@/common/enum/error-code.enum';
 import { AppException } from '@/common/exception/app.exception';
 
@@ -9,7 +9,7 @@ import { AppException } from '@/common/exception/app.exception';
 export class CreateRecurringAvailabilityHandler
   implements ICommandHandler<CreateRecurringAvailabilityCommand>
 {
-  constructor(private readonly repo: TeacherAvailabilityRecurringRepository) {}
+  constructor(private readonly repo: InstructorAvailabilityRecurringRepository) {}
 
   async execute(command: CreateRecurringAvailabilityCommand) {
     const existing = await this.repo.findOverlap(

@@ -33,9 +33,11 @@ export class InstructorExceptionAvailabilityController {
   @Post()
   create(
     @CurrentUser('id') userId: number,
-    @Body() body: {
+    @Body()
+    body: {
       specific_date: string;
       is_unavailable: boolean;
+      is_extra?: boolean;
       start_time?: string;
       end_time?: string;
       reason?: string;

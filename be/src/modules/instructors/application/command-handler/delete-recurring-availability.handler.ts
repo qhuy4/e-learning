@@ -3,13 +3,13 @@ import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';
 import { HttpStatus } from '@nestjs/common';
 import { DeleteRecurringAvailabilityCommand } from '../command/delete-recurring-availability.command';
-import { TeacherAvailabilityRecurringRepository } from '@/modules/instructors/infrastructure/repository/teacher-availability-recurring.repository';
+import { InstructorAvailabilityRecurringRepository } from '@/modules/instructors/infrastructure/repository/instructor-availability-recurring.repository';
 
 @CommandHandler(DeleteRecurringAvailabilityCommand)
 export class DeleteRecurringAvailabilityHandler
   implements ICommandHandler<DeleteRecurringAvailabilityCommand>
 {
-  constructor(private readonly repo: TeacherAvailabilityRecurringRepository) {}
+  constructor(private readonly repo: InstructorAvailabilityRecurringRepository) {}
 
   async execute(command: DeleteRecurringAvailabilityCommand) {
     const existing = await this.repo.findById(command.id);

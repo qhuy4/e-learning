@@ -14,12 +14,13 @@ import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { Role } from '@/common/enum/role.enum';
-import { InstructorCertificateEntity } from '@/modules/teacher/infrastructure/entity/instructor-certificate.entity';
+import { InstructorCertificateEntity } from '@/modules/instructors/infrastructure/entity/instructor-certificate.entity';
 import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
-import { CertificateStatus } from '@/modules/teacher/domain/enum/certificate-status.enum';
+import { CertificateStatus } from '@/modules/instructors/domain/enum/certificate-status.enum';
 import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { SkillAssessmentRunService } from '@/modules/skill-profiling/application/skill-assessment-run.service';
 
 @Controller('admin/instructor-certificates')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -30,6 +31,7 @@ export class AdminInstructorCertificatesController {
     private readonly certRepo: Repository<InstructorCertificateEntity>,
     @InjectRepository(UserOrmEntity)
     private readonly userRepo: Repository<UserOrmEntity>,
+    private readonly assessmentRuns: SkillAssessmentRunService,
   ) {}
 
   @Get()
@@ -44,8 +46,7 @@ export class AdminInstructorCertificatesController {
     const p = page ? parseInt(page, 10) : 1;
     const l = limit ? parseInt(limit, 10) : 10;
 
-    const qb = this.certRepo
-      .createQueryBuilder('ic');
+    const qb = this.certRepo.createQueryBuilder('ic');
 
     const whereConditions: string[] = [];
 
@@ -74,7 +75,8 @@ export class AdminInstructorCertificatesController {
     };
 
     const sortKey = sortableColumns[sortBy ?? ''] ?? 'ic.created_at';
-    const sortDir: 'ASC' | 'DESC' = sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+    const sortDir: 'ASC' | 'DESC' =
+      sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
     qb.orderBy(sortKey, sortDir)
       .skip((p - 1) * l)
@@ -84,10 +86,13 @@ export class AdminInstructorCertificatesController {
 
     // Fetch user names in batch
     const userIds = [...new Set(entities.map((e) => e.userId))];
-    const users = userIds.length > 0
-      ? await this.userRepo.find({ where: { id: In(userIds) } })
-      : [];
-    const userMap = new Map<number, UserOrmEntity>(users.map((u) => [Number(u.id), u]));
+    const users =
+      userIds.length > 0
+        ? await this.userRepo.find({ where: { id: In(userIds) } })
+        : [];
+    const userMap = new Map<number, UserOrmEntity>(
+      users.map((u) => [Number(u.id), u]),
+    );
 
     const data = entities.map((e) => ({
       id: Number(e.id),
@@ -124,7 +129,9 @@ export class AdminInstructorCertificatesController {
     const user = await this.userRepo.findOne({ where: { id: entity.userId } });
     let reviewer: UserOrmEntity | null = null;
     if (entity.reviewedBy) {
-      reviewer = await this.userRepo.findOne({ where: { id: entity.reviewedBy } });
+      reviewer = await this.userRepo.findOne({
+        where: { id: entity.reviewedBy },
+      });
     }
 
     return {
@@ -140,8 +147,12 @@ export class AdminInstructorCertificatesController {
       reviewedAt: entity.reviewedAt,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
-      user: user ? { id: Number(user.id), name: user.name, email: user.email } : undefined,
-      reviewer: reviewer ? { id: Number(reviewer.id), name: reviewer.name } : undefined,
+      user: user
+        ? { id: Number(user.id), name: user.name, email: user.email }
+        : undefined,
+      reviewer: reviewer
+        ? { id: Number(reviewer.id), name: reviewer.name }
+        : undefined,
     };
   }
 
@@ -161,7 +172,11 @@ export class AdminInstructorCertificatesController {
     entity.rejectReason = null;
 
     await this.certRepo.save(entity);
-    return { id: Number(entity.id), certificateStatus: entity.certificateStatus };
+    await this.assessmentRuns.onEvidenceChangedForUser(Number(entity.userId));
+    return {
+      id: Number(entity.id),
+      certificateStatus: entity.certificateStatus,
+    };
   }
 
   @Patch(':id/reject')
@@ -181,6 +196,10 @@ export class AdminInstructorCertificatesController {
     entity.rejectReason = rejectReason || null;
 
     await this.certRepo.save(entity);
-    return { id: Number(entity.id), certificateStatus: entity.certificateStatus };
+    await this.assessmentRuns.onEvidenceChangedForUser(Number(entity.userId));
+    return {
+      id: Number(entity.id),
+      certificateStatus: entity.certificateStatus,
+    };
   }
 }

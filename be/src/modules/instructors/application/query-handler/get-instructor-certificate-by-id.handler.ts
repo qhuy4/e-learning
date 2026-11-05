@@ -5,7 +5,7 @@ import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';
 import { HttpStatus } from '@nestjs/common';
 import { GetInstructorCertificateByIdQuery } from '@/modules/instructors/application/query/get-instructor-certificate-by-id.query';
-import { InstructorCertificateEntity } from '@/modules/teacher/infrastructure/entity/instructor-certificate.entity';
+import { InstructorCertificateEntity } from '@/modules/instructors/infrastructure/entity/instructor-certificate.entity';
 
 @QueryHandler(GetInstructorCertificateByIdQuery)
 export class GetInstructorCertificateByIdHandler

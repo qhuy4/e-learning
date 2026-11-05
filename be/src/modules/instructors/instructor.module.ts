@@ -7,16 +7,17 @@ import { InstructorProfileTypeOrmEntity } from '@/modules/instructors/infrastruc
 import { GetInstructorProfileHandler } from '@/modules/instructors/application/query-handler/get-instructor-profile.handler';
 import { UserModule } from '@/modules/users/user.module';
 import { InstructorsController } from '@/modules/instructors/presentation/instructors.controller';
+import { PublicInstructorsController } from '@/modules/instructors/presentation/public-instructors.controller';
 import { InstructorRepository } from '@/modules/instructors/infrastructure/repository/instructor.repository';
 import { GetInstructorsHandler } from '@/modules/instructors/application/query-handler/get-instructors.handler';
 import { GetInstructorByIdHandler } from '@/modules/instructors/application/query-handler/get-instructor-by-id.handler';
 import { UpdateInstructorHandler } from '@/modules/instructors/application/command-handler/update-instructor.handler';
 import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
 
-import { TeacherAvailabilityRecurringOrmEntity } from '@/modules/instructors/infrastructure/entity/teacher-availability-recurring.orm.entity';
-import { TeacherAvailabilityExceptionOrmEntity } from '@/modules/instructors/infrastructure/entity/teacher-availability-exception.orm.entity';
-import { TeacherAvailabilityRecurringRepository } from '@/modules/instructors/infrastructure/repository/teacher-availability-recurring.repository';
-import { TeacherAvailabilityExceptionRepository } from '@/modules/instructors/infrastructure/repository/teacher-availability-exception.repository';
+import { InstructorAvailabilityRecurringOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-availability-recurring.orm.entity';
+import { InstructorAvailabilityExceptionOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-availability-exception.orm.entity';
+import { InstructorAvailabilityRecurringRepository } from '@/modules/instructors/infrastructure/repository/instructor-availability-recurring.repository';
+import { InstructorAvailabilityExceptionRepository } from '@/modules/instructors/infrastructure/repository/instructor-availability-exception.repository';
 import { InstructorRecurringAvailabilityController } from '@/modules/instructors/presentation/instructor-recurring-availability.controller';
 import { InstructorExceptionAvailabilityController } from '@/modules/instructors/presentation/instructor-exception-availability.controller';
 import { GetRecurringAvailabilityHandler } from '@/modules/instructors/application/query-handler/get-recurring-availability.handler';
@@ -32,7 +33,7 @@ import { GetInstructorRevenueSummaryHandler } from '@/modules/instructors/applic
 import { GetInstructorRevenueByCourseHandler } from '@/modules/instructors/application/query-handler/get-instructor-revenue-by-course.handler';
 import { OrderItemOrmEntity } from '@/modules/orders/infrastructure/entity/order-item.orm-entity';
 import { CourseOrmEntity } from '@/modules/courses/infrastructure/entity/course.orm-entity';
-import { InstructorCertificateEntity } from '@/modules/teacher/infrastructure/entity/instructor-certificate.entity';
+import { InstructorCertificateEntity } from '@/modules/instructors/infrastructure/entity/instructor-certificate.entity';
 import { InstructorCertificateController } from '@/modules/instructors/presentation/instructor-certificate.controller';
 import { AdminInstructorCertificatesController } from '@/modules/instructors/presentation/admin-instructor-certificates.controller';
 import { GetInstructorCertificatesHandler } from '@/modules/instructors/application/query-handler/get-instructor-certificates.handler';
@@ -40,6 +41,8 @@ import { GetInstructorCertificateByIdHandler } from '@/modules/instructors/appli
 import { CreateInstructorCertificateHandler } from '@/modules/instructors/application/command-handler/create-instructor-certificate.handler';
 import { DeleteInstructorCertificateHandler } from '@/modules/instructors/application/command-handler/delete-instructor-certificate.handler';
 import { InstructorAnalyticsController } from '@/modules/analytics/presentation/instructor-analytics.controller';
+import { TeachingProfileController } from '@/modules/instructors/presentation/teaching-profile.controller';
+import { TeachingProfileService } from '@/modules/instructors/application/teaching-profile.service';
 import { GetCourseAnalyticsHandler } from '@/modules/analytics/application/query-handler/get-course-analytics.handler';
 import { CourseViewOrmEntity } from '@/modules/analytics/infrastructure/entity/course-view.orm-entity';
 import { EnrollmentOrmEntity } from '@/modules/enrollments/infrastructure/entity/enrollment.orm-entity';
@@ -48,6 +51,7 @@ import { ReviewOrmEntity } from '@/modules/reviews/infrastructure/entity/review.
 import { SectionOrmEntity } from '@/modules/sections/infrastructure/entity/section.orm-entity';
 import { LessonOrmEntity } from '@/modules/lessons/infrastructure/entity/lesson.orm-entity';
 import { OrderOrmEntity } from '@/modules/orders/infrastructure/entity/order.orm-entity';
+import { SkillProfilingModule } from '@/modules/skill-profiling/skill-profiling.module';
 
 const QueryHandlers = [
   GetInstructorProfileHandler,
@@ -77,11 +81,12 @@ const CommandHandlers = [
   imports: [
     CqrsModule,
     UserModule,
+    SkillProfilingModule,
     TypeOrmModule.forFeature([
       InstructorProfileTypeOrmEntity,
       UserOrmEntity,
-      TeacherAvailabilityRecurringOrmEntity,
-      TeacherAvailabilityExceptionOrmEntity,
+      InstructorAvailabilityRecurringOrmEntity,
+      InstructorAvailabilityExceptionOrmEntity,
       OrderItemOrmEntity,
       CourseOrmEntity,
       InstructorCertificateEntity,
@@ -96,18 +101,21 @@ const CommandHandlers = [
   ],
   controllers: [
     InstructorsController,
+    PublicInstructorsController,
     InstructorRecurringAvailabilityController,
     InstructorExceptionAvailabilityController,
     InstructorRevenueController,
     InstructorCertificateController,
     AdminInstructorCertificatesController,
     InstructorAnalyticsController,
+    TeachingProfileController,
   ],
   providers: [
     InstructorProfileRepository,
     InstructorRepository,
-    TeacherAvailabilityRecurringRepository,
-    TeacherAvailabilityExceptionRepository,
+    InstructorAvailabilityRecurringRepository,
+    InstructorAvailabilityExceptionRepository,
+    TeachingProfileService,
     ...QueryHandlers,
     ...CommandHandlers,
   ],

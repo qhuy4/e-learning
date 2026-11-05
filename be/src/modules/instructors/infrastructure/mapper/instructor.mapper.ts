@@ -12,7 +12,7 @@ export class InstructorMapper {
     const user = entity.user;
 
     return Instructor.restore({
-      id: entity.id!,
+      id: entity.id,
       userId: user.id,
 
       // User

@@ -1,8 +1,6 @@
 import { ApprovalStatus } from '@/modules/instructors/domain/enum/instructor-profile.status';
 
-export function mapApprovalStatus(
-  status: ApprovalStatus,
-): string {
+export function mapApprovalStatus(status: ApprovalStatus): string {
   switch (status) {
     case ApprovalStatus.PENDING:
       return 'PENDING';

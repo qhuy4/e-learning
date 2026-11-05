@@ -2,7 +2,7 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GetInstructorCertificatesQuery } from '@/modules/instructors/application/query/get-instructor-certificates.query';
-import { InstructorCertificateEntity } from '@/modules/teacher/infrastructure/entity/instructor-certificate.entity';
+import { InstructorCertificateEntity } from '@/modules/instructors/infrastructure/entity/instructor-certificate.entity';
 
 @QueryHandler(GetInstructorCertificatesQuery)
 export class GetInstructorCertificatesHandler

@@ -5,8 +5,8 @@ import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';
 import { ForbiddenException, HttpStatus } from '@nestjs/common';
 import { DeleteInstructorCertificateCommand } from '@/modules/instructors/application/command/delete-instructor-certificate.command';
-import { InstructorCertificateEntity } from '@/modules/teacher/infrastructure/entity/instructor-certificate.entity';
-import { CertificateStatus } from '@/modules/teacher/domain/enum/certificate-status.enum';
+import { InstructorCertificateEntity } from '@/modules/instructors/infrastructure/entity/instructor-certificate.entity';
+import { CertificateStatus } from '@/modules/instructors/domain/enum/certificate-status.enum';
 
 @CommandHandler(DeleteInstructorCertificateCommand)
 export class DeleteInstructorCertificateHandler

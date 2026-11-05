@@ -2,8 +2,8 @@ import { ICommandHandler, CommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateInstructorCertificateCommand } from '@/modules/instructors/application/command/create-instructor-certificate.command';
-import { InstructorCertificateEntity } from '@/modules/teacher/infrastructure/entity/instructor-certificate.entity';
-import { CertificateStatus } from '@/modules/teacher/domain/enum/certificate-status.enum';
+import { InstructorCertificateEntity } from '@/modules/instructors/infrastructure/entity/instructor-certificate.entity';
+import { CertificateStatus } from '@/modules/instructors/domain/enum/certificate-status.enum';
 
 @CommandHandler(CreateInstructorCertificateCommand)
 export class CreateInstructorCertificateHandler

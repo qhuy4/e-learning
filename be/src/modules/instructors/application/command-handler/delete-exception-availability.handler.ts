@@ -3,13 +3,13 @@ import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';
 import { HttpStatus } from '@nestjs/common';
 import { DeleteExceptionAvailabilityCommand } from '../command/delete-exception-availability.command';
-import { TeacherAvailabilityExceptionRepository } from '@/modules/instructors/infrastructure/repository/teacher-availability-exception.repository';
+import { InstructorAvailabilityExceptionRepository } from '@/modules/instructors/infrastructure/repository/instructor-availability-exception.repository';
 
 @CommandHandler(DeleteExceptionAvailabilityCommand)
 export class DeleteExceptionAvailabilityHandler
   implements ICommandHandler<DeleteExceptionAvailabilityCommand>
 {
-  constructor(private readonly repo: TeacherAvailabilityExceptionRepository) {}
+  constructor(private readonly repo: InstructorAvailabilityExceptionRepository) {}
 
   async execute(command: DeleteExceptionAvailabilityCommand) {
     const existing = await this.repo.findById(command.id);

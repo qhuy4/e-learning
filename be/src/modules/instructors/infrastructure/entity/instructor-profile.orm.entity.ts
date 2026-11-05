@@ -35,6 +35,18 @@ export class InstructorProfileTypeOrmEntity {
   @Column({ name: 'social_links', type: 'json', nullable: true })
   socialLinks: Record<string, any> | null;
 
+  @Column({ name: 'experience_years', type: 'smallint', nullable: true })
+  experienceYears: number | null;
+
+  @Column({ name: 'teaching_levels', type: 'json', nullable: true })
+  teachingLevels: string[] | null;
+
+  @Column({ name: 'teaching_methods', type: 'json', nullable: true })
+  teachingMethods: string[] | null;
+
+  @Column({ name: 'teaching_video_url', type: 'text', nullable: true })
+  teachingVideoUrl: string | null;
+
   @Column({
     name: 'revenue_share_pct',
     type: 'decimal',
@@ -70,6 +82,9 @@ export class InstructorProfileTypeOrmEntity {
     default: ApprovalStatus.PENDING,
   })
   approvalStatus: ApprovalStatus;
+
+  @Column({ name: 'review_reason', type: 'text', nullable: true })
+  reviewReason: string | null;
 
   @Column({ name: 'approved_at', type: 'timestamp', nullable: true })
   approvedAt: Date | null;

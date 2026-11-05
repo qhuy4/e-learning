@@ -3,11 +3,11 @@ import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';
 import { HttpStatus } from '@nestjs/common';
 import { UpdateExceptionAvailabilityCommand } from '../command/update-exception-availability.command';
-import { TeacherAvailabilityExceptionRepository } from '@/modules/instructors/infrastructure/repository/teacher-availability-exception.repository';
+import { InstructorAvailabilityExceptionRepository } from '@/modules/instructors/infrastructure/repository/instructor-availability-exception.repository';
 
 @CommandHandler(UpdateExceptionAvailabilityCommand)
 export class UpdateExceptionAvailabilityHandler implements ICommandHandler<UpdateExceptionAvailabilityCommand> {
-  constructor(private readonly repo: TeacherAvailabilityExceptionRepository) {}
+  constructor(private readonly repo: InstructorAvailabilityExceptionRepository) {}
 
   async execute(command: UpdateExceptionAvailabilityCommand) {
     const existing = await this.repo.findById(command.id);
