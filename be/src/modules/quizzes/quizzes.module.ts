@@ -10,7 +10,7 @@ import { QuizAttemptOrmEntity } from './infrastructure/entity/quiz-attempt.orm-e
 import { QuizAnswerOrmEntity } from './infrastructure/entity/quiz-answer.orm-entity';
 
 import { AdminQuizController } from './presentation/controllers/admin-quiz.controller';
-import { TeacherQuizController } from './presentation/controllers/teacher-quiz.controller';
+import { InstructorQuizController } from './presentation/controllers/instructor-quiz.controller';
 import { StudentQuizController } from './presentation/controllers/student-quiz.controller';
 
 import { CreateQuizHandler } from './application/command-handler/create-quiz.handler';
@@ -78,7 +78,7 @@ const repositories = [
 
 @Module({
   imports: [TypeOrmModule.forFeature(ormEntities), CqrsModule],
-  controllers: [AdminQuizController, TeacherQuizController, StudentQuizController],
+  controllers: [AdminQuizController, InstructorQuizController, StudentQuizController],
   providers: [...commandHandlers, ...queryHandlers, ...repositories],
 })
 export class QuizzesModule {}

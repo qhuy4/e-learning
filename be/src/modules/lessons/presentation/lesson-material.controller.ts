@@ -6,6 +6,7 @@ import {
   NotFoundException,
   Param,
   ParseIntPipe,
+  Query,
   Req,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -24,6 +25,12 @@ import {
   ENROLLMENT_REPOSITORY,
   IEnrollmentRepository,
 } from '@/modules/enrollments/domain/repository/enrollment.repository';
+import { PreviewTokenService } from '@/common/service/preview-token.service';
+import {
+  COURSE_REPOSITORY,
+  ICourseRepository,
+} from '@/modules/courses/domain/repository/course.repository';
+import { UserRole } from '@/modules/users/domain/enum/user.role';
 
 /**
  * Học viên: xem + tải tài liệu của bài học.
@@ -43,6 +50,9 @@ export class LessonMaterialController {
     @Inject(FILE_STORAGE)
     private readonly storage: FileStorage,
     private readonly jwtService: JwtService,
+    private readonly previewTokenService: PreviewTokenService,
+    @Inject(COURSE_REPOSITORY)
+    private readonly courseRepository: ICourseRepository,
   ) {}
 
   private async toDto(material: LessonMaterialOrmEntity) {
@@ -73,6 +83,7 @@ export class LessonMaterialController {
   async getMaterials(
     @Param('id', ParseIntPipe) id: number,
     @Req() req: Request,
+    @Query('token') previewToken?: string,
   ) {
     const lesson = await this.lessonRepo.findOne({
       where: { id: String(id) },
@@ -86,25 +97,49 @@ export class LessonMaterialController {
     try {
       const authHeader = req.headers.authorization;
       if (authHeader?.startsWith('Bearer ')) {
-        const payload = this.jwtService.verify(authHeader.substring(7));
+        const payload = this.jwtService.verify<{ sub?: number; id?: number }>(
+          authHeader.substring(7),
+        );
         userId = Number(payload.sub ?? payload.id);
       }
     } catch {
       userId = undefined;
     }
 
+    const section = lesson.sectionId
+      ? await this.sectionRepo.findOne({
+          where: { id: lesson.sectionId.toString() },
+        })
+      : null;
+
     let canView = !!lesson.isPreview;
 
-    if (!canView && userId && lesson.sectionId) {
-      const section = await this.sectionRepo.findOne({
-        where: { id: lesson.sectionId.toString() },
-      });
-      if (section) {
-        canView = await this.enrollmentRepo.existsActiveByUserAndCourse(
-          userId,
-          Number(section.courseId),
+    // Giảng viên/admin xem trước: token phải đúng khóa học của bài học.
+    if (!canView && previewToken) {
+      const payload =
+        this.previewTokenService.verifyCoursePreviewToken(previewToken);
+
+      if (!section || Number(section.courseId) !== Number(payload.courseId)) {
+        throw new ForbiddenException(
+          'Preview token không thuộc khóa học của bài học này.',
         );
       }
+
+      const role: UserRole = payload.role;
+
+      if (role === UserRole.ADMIN) {
+        canView = true;
+      } else if (role === UserRole.INSTRUCTOR) {
+        const course = await this.courseRepository.findById(payload.courseId);
+        canView = !!course && course.instructorId === payload.userId;
+      }
+    }
+
+    if (!canView && userId && section) {
+      canView = await this.enrollmentRepo.existsActiveByUserAndCourse(
+        userId,
+        Number(section.courseId),
+      );
     }
 
     if (!canView) {

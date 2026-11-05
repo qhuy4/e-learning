@@ -19,8 +19,8 @@ import { DeleteQuizCommand } from '../../application/command/delete-quiz.command
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.INSTRUCTOR)
-@Controller('teacher/quizzes')
-export class TeacherQuizController {
+@Controller('instructor/quizzes')
+export class InstructorQuizController {
   constructor(private readonly commandBus: CommandBus, private readonly queryBus: QueryBus) {}
 
   @Post()

@@ -1,11 +1,16 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Inject, ForbiddenException, BadRequestException } from '@nestjs/common';
+import {
+  Inject,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { CreateReviewCommand } from '@/modules/reviews/application/command/create-review.command';
 import { ReviewRepository } from '@/modules/reviews/infrastructure/repository/review.repository';
 import {
   ENROLLMENT_REPOSITORY,
   IEnrollmentRepository,
 } from '@/modules/enrollments/domain/repository/enrollment.repository';
+import { SkillAssessmentRunService } from '@/modules/skill-profiling/application/skill-assessment-run.service';
 
 @CommandHandler(CreateReviewCommand)
 export class CreateReviewHandler implements ICommandHandler<CreateReviewCommand> {
@@ -13,6 +18,7 @@ export class CreateReviewHandler implements ICommandHandler<CreateReviewCommand>
     private readonly reviewRepository: ReviewRepository,
     @Inject(ENROLLMENT_REPOSITORY)
     private readonly enrollmentRepository: IEnrollmentRepository,
+    private readonly assessmentRuns: SkillAssessmentRunService,
   ) {}
 
   async execute(command: CreateReviewCommand) {
@@ -23,10 +29,11 @@ export class CreateReviewHandler implements ICommandHandler<CreateReviewCommand>
     }
 
     // 1. Enforce requirement: User MUST be enrolled in the course to leave a review
-    const isEnrolled = await this.enrollmentRepository.existsActiveByUserAndCourse(
-      Number(userId),
-      Number(courseId),
-    );
+    const isEnrolled =
+      await this.enrollmentRepository.existsActiveByUserAndCourse(
+        Number(userId),
+        Number(courseId),
+      );
 
     if (!isEnrolled) {
       throw new ForbiddenException(
@@ -35,12 +42,14 @@ export class CreateReviewHandler implements ICommandHandler<CreateReviewCommand>
     }
 
     // 2. Save or update review with review images
-    return this.reviewRepository.createOrUpdateReview({
+    const review = await this.reviewRepository.createOrUpdateReview({
       userId,
       courseId,
       rating,
       comment,
       imageUrls,
     });
+    await this.assessmentRuns.onEvidenceChangedForCourse(review!.courseId);
+    return review;
   }
 }

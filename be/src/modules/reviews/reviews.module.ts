@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CqrsModule } from '@nestjs/cqrs';
 import { StorageModule } from '@/common/storage/storage.module';
 import { EnrollmentsModule } from '@/modules/enrollments/enrollments.module';
+import { SkillProfilingModule } from '@/modules/skill-profiling/skill-profiling.module';
 
 import { ReviewOrmEntity } from '@/modules/reviews/infrastructure/entity/review.orm-entity';
 import { ReviewImageOrmEntity } from '@/modules/reviews/infrastructure/entity/review-image.orm-entity';
@@ -39,6 +40,7 @@ const CommandHandlers = [
     CqrsModule,
     StorageModule,
     EnrollmentsModule,
+    SkillProfilingModule,
     TypeOrmModule.forFeature([ReviewOrmEntity, ReviewImageOrmEntity]),
   ],
   controllers: [
@@ -46,11 +48,7 @@ const CommandHandlers = [
     InstructorReviewsController,
     StudentReviewsController,
   ],
-  providers: [
-    ReviewRepository,
-    ...QueryHandlers,
-    ...CommandHandlers,
-  ],
+  providers: [ReviewRepository, ...QueryHandlers, ...CommandHandlers],
   exports: [ReviewRepository],
 })
 export class ReviewsModule {}
