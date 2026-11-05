@@ -34,6 +34,9 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
 
   [ErrorCode.SECTION_NOT_FOUND]: 'Chương không tồn tại',
   [ErrorCode.LESSON_NOT_FOUND]: 'Bài học không tồn tại',
+  [ErrorCode.LESSON_LOCKED]: 'Vui lòng hoàn thành bài học trước để mở khóa bài này',
+  [ErrorCode.LESSON_NOTE_NOT_FOUND]: 'Ghi chú không tồn tại',
+  [ErrorCode.LESSON_COMMENT_NOT_FOUND]: 'Bình luận không tồn tại',
 
   [ErrorCode.ORDER_NOT_FOUND]: 'Đơn hàng không tồn tại',
   [ErrorCode.ORDER_INVALID_STATUS_TRANSITION]:

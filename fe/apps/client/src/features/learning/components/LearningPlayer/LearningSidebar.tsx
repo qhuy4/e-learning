@@ -8,6 +8,7 @@ import {
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { cn } from '@fe/lib/utils';
 import type { LearningSection, LearningLesson } from '../../types/learning.type';
+import { LOCK_MESSAGES } from '../../utils/lesson-lock';
 
 interface LessonProgressInfo {
   isCompleted: boolean;
@@ -20,6 +21,10 @@ interface LearningSidebarProps {
   courseSlug: string;
   isEnrolled?: boolean;
   lessonProgressMap?: Map<number, LessonProgressInfo>;
+  /** Bài bị khóa theo thứ tự (chưa hoàn thành >= 90% bài đứng trước). */
+  lockedLessonIds?: Set<number>;
+  /** Bấm vào bài đang khóa → hiện cảnh báo thay vì điều hướng. */
+  onLessonClickLocked?: (message: string) => void;
 }
 
 const formatDuration = (duration: number | null) => {
@@ -46,6 +51,8 @@ export const LearningSidebar = ({
   courseSlug,
   isEnrolled,
   lessonProgressMap,
+  lockedLessonIds,
+  onLessonClickLocked,
 }: LearningSidebarProps) => {
   const { lessonSlug } = useParams<{ lessonSlug: string }>();
   const [searchParams] = useSearchParams();
@@ -143,7 +150,16 @@ export const LearningSidebar = ({
                     {section.lessons.map((lesson, lessonIndex) => {
                       const info = lessonProgressMap?.get(Number(lesson.id));
                       const isActive = lesson.slug === lessonSlug;
-                      const isLocked = !lesson.isPreview && !previewToken && !isEnrolled;
+                      // 2 loại khóa: "chưa mua khóa" vs "chưa hoàn thành bài đứng trước".
+                      const purchaseLocked = !lesson.isPreview && !previewToken && !isEnrolled;
+                      const sequenceLocked =
+                        !purchaseLocked && lockedLessonIds?.has(Number(lesson.id)) === true;
+                      const lockMessage = purchaseLocked
+                        ? LOCK_MESSAGES.notEnrolled
+                        : sequenceLocked
+                          ? LOCK_MESSAGES.previousIncomplete
+                          : null;
+                      const isLocked = lockMessage !== null;
                       const Icon = lessonIcon(lesson);
                       const duration = formatDuration(lesson.duration);
 
@@ -159,7 +175,9 @@ export const LearningSidebar = ({
                           }
                           aria-disabled={isLocked}
                           onClick={(e) => {
-                            if (isLocked) e.preventDefault();
+                            if (lockMessage === null) return;
+                            e.preventDefault();
+                            onLessonClickLocked?.(lockMessage);
                           }}
                           className={cn(
                             'flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-all',
@@ -220,7 +238,7 @@ export const LearningSidebar = ({
                             </span>
                           ) : isLocked ? (
                             <span className="shrink-0 text-[10px] font-bold uppercase text-slate-400">
-                              Khóa
+                              {purchaseLocked ? 'Mua khóa' : 'Chưa học xong'}
                             </span>
                           ) : duration ? (
                             <span className="shrink-0 text-[11px] font-semibold tabular-nums text-slate-400">

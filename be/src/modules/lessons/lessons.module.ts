@@ -28,6 +28,8 @@ import { CoursesModule } from '@/modules/courses/courses.module';
 import { EnrollmentsModule } from '@/modules/enrollments/enrollments.module';
 import { LessonPublicController } from '@/modules/lessons/presentation/lesson-public.controller';
 import { SectionOrmEntity } from '@/modules/sections/infrastructure/entity/section.orm-entity';
+import { LessonProgressOrmEntity } from '@/modules/lesson-progress/infrastructure/entity/lesson-progress.orm-entity';
+import { LessonAccessService } from '@/modules/lessons/application/service/lesson-access.service';
 
 const CommandHandlers = [
   CreateLessonHandler,
@@ -48,6 +50,7 @@ const QueryHandlers = [
       LessonOrmEntity,
       LessonMaterialOrmEntity,
       SectionOrmEntity,
+      LessonProgressOrmEntity,
     ]),
     SectionsModule,
     forwardRef(() => CoursesModule),
@@ -74,8 +77,9 @@ const QueryHandlers = [
 
     ...CommandHandlers,
     ...QueryHandlers,
+    LessonAccessService,
   ],
 
-  exports: [LESSON_REPOSITORY],
+  exports: [LESSON_REPOSITORY, LessonAccessService],
 })
 export class LessonsModule {}

@@ -14,6 +14,8 @@ export interface LessonDetail {
   position: number;
   isPreview: boolean;
   status: number;
+  /** true = bài đang bị khóa do bài đứng trước chưa hoàn thành (>= 90%) */
+  isLocked?: boolean;
 }
 
 // ─── Course Learning (từ GET /courses/id/:id — dùng cho sidebar) ───────────
@@ -82,4 +84,29 @@ export interface LessonMaterial {
   mimeType: string | null;
   downloadUrl: string | null;
   createdAt: string | null;
+}
+
+// ─── Lesson Notes (ghi chú cá nhân gắn với mốc thời gian video) ────────────
+export interface LessonNote {
+  id: number;
+  lessonId: number;
+  /** Giây trong video — bấm vào ghi chú sẽ tua về đây */
+  noteTimeSeconds: number;
+  content: string;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+// ─── Lesson Comments (hỏi đáp bình luận nhiều cấp kiểu FB/YouTube) ─────────
+export interface LessonComment {
+  id: number;
+  lessonId: number;
+  /** Bình luận gốc khi null — FE tự dựng cây nhiều cấp theo parentId */
+  parentId: number | null;
+  content: string;
+  createdAt: string | null;
+  updatedAt: string | null;
+  /** Người viết là giảng viên của khóa → hiện badge "Giảng viên" */
+  isInstructor: boolean;
+  user?: { id: number; name: string };
 }

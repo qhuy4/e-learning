@@ -1,9 +1,11 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@fe/components/ui/tabs';
-import { FileText, MessageSquare, Download } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@fe/components/ui/avatar';
+import { FileText, Download } from 'lucide-react';
 import type { LessonDetail } from '../../types/learning.type';
-import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useLessonMaterials } from '../../hooks/use-learning';
+import { LessonNotes } from '../LessonNotes';
+import { LessonComments } from '../LessonComments';
+import type { VideoPlayerHandle } from './VideoPlayer';
+import type { RefObject } from 'react';
 
 const formatFileSize = (bytes?: number | null) => {
   if (!bytes || bytes <= 0) return '';
@@ -20,39 +22,37 @@ const fileExt = (name: string) => {
 interface LearningTabsProps {
   lesson: LessonDetail;
   previewToken?: string;
+  /** Ref player video — panel Ghi chú dùng để tua về mốc note */
+  videoRef?: RefObject<VideoPlayerHandle | null>;
 }
 
-export const LearningTabs = ({ lesson, previewToken }: LearningTabsProps) => {
-  const { user } = useAuth();
+export const LearningTabs = ({
+  lesson,
+  previewToken,
+  videoRef,
+}: LearningTabsProps) => {
   const {
     data: materials,
     isLoading: materialsLoading,
     isError: materialsError,
   } = useLessonMaterials(lesson.id, true, previewToken);
-  const userInitials =
-    (user?.name || user?.email || 'Học viên')
-      .split(/[\s@.]+/)
-      .filter(Boolean)
-      .map((w) => w[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2) || 'HV';
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 max-w-4xl mx-auto lg:mx-0 w-full font-sans">
+    <div className="p-4 md:p-6 lg:p-8 w-full font-sans">
       <Tabs defaultValue="overview" className="w-full">
         {/* Tab strip kiểu chuyên nghiệp: chữ trái + gạch dưới hồng khi chọn */}
         <TabsList
           variant="line"
           className="w-full justify-start gap-5 sm:gap-8 flex-wrap p-0 group-data-horizontal/tabs:h-auto border-b border-slate-200"
         >
+          {/* Bài kiểm tra không có video → ẩn tab Ghi chú */}
           {(
             [
               ['overview', 'Tổng quan'],
-              ['notes', 'Ghi chú'],
+              ...(lesson.type === 'quiz' ? [] : [['notes', 'Ghi chú']]),
               ['qa', 'Hỏi đáp'],
               ['resources', 'Tài liệu'],
-            ] as const
+            ] as Array<[string, string]>
           ).map(([value, label]) => (
             <TabsTrigger
               key={value}
@@ -65,61 +65,25 @@ export const LearningTabs = ({ lesson, previewToken }: LearningTabsProps) => {
         </TabsList>
 
         {/* TAB TỔNG QUAN */}
-        <TabsContent value="overview" className="pt-4 focus-visible:outline-none focus-visible:ring-0 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <TabsContent value="overview" className="pt-4 focus-visible:outline-none focus-visible:ring-0">
           <h2 className="text-lg font-bold text-slate-900 mb-3">Về bài học này</h2>
           <p className="text-slate-600 leading-relaxed text-sm md:text-base">
             {lesson.content ?? 'Chưa có mô tả cho bài học này.'}
           </p>
         </TabsContent>
 
-        {/* TAB GHI CHÚ */}
-        <TabsContent value="notes" className="pt-4 focus-visible:outline-none focus-visible:ring-0 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center mb-8 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-            <input
-              type="text"
-              placeholder={`Thêm ghi chú mới tại ${lesson.duration ? Math.floor(lesson.duration / 60) + ':' + String(lesson.duration % 60).padStart(2, '0') : '00:00'}...`}
-              className="flex-1 w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-piemind-pink focus:ring-1 focus:ring-piemind-pink/40 bg-white"
-            />
-            <button className="bg-piemind-pink hover:bg-piemind-pink/90 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-colors w-full sm:w-auto shrink-0 shadow-[0_4px_16px_rgba(243,129,129,0.3)]">
-              Lưu ghi chú
-            </button>
-          </div>
-
-          <p className="text-sm text-slate-500 text-center py-8">Chưa có ghi chú nào.</p>
+        {/* TAB GHI CHÚ — ghi chú cá nhân theo mốc thời gian, bấm vào để tua lại */}
+        <TabsContent value="notes" className="pt-4 focus-visible:outline-none focus-visible:ring-0">
+          <LessonNotes lessonId={lesson.id} videoRef={videoRef} />
         </TabsContent>
 
-        {/* TAB HỎI ĐÁP */}
-        <TabsContent value="qa" className="pt-4 focus-visible:outline-none focus-visible:ring-0 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-            Bình luận <MessageSquare className="w-4 h-4 text-piemind-pink" />
-          </h3>
-
-          {/* Form bình luận */}
-          <div className="flex gap-4 mb-8">
-            <Avatar className="w-10 h-10 shrink-0 border border-slate-100">
-              <AvatarImage src={user?.avatar ?? undefined} />
-              <AvatarFallback className="bg-piemind-pink/10 text-piemind-pink text-xs font-bold">
-                {userInitials}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 flex flex-col items-end gap-3">
-              <textarea
-                placeholder="Bạn có thắc mắc gì về bài học này?"
-                className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-piemind-pink focus:ring-1 focus:ring-piemind-pink/40 min-h-[90px] resize-y bg-slate-50/50 focus:bg-white transition-colors"
-              />
-              <button className="bg-piemind-pink hover:bg-piemind-pink/90 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-[0_4px_16px_rgba(243,129,129,0.3)]">
-                Gửi câu hỏi
-              </button>
-            </div>
-          </div>
-
-          <div className="space-y-8">
-            <p className="text-sm text-slate-500 text-center py-8">Chưa có câu hỏi nào.</p>
-          </div>
+        {/* TAB HỎI ĐÁP — bình luận nhiều cấp, giảng viên trả lời trực tiếp */}
+        <TabsContent value="qa" className="pt-4 focus-visible:outline-none focus-visible:ring-0">
+          <LessonComments lessonId={lesson.id} />
         </TabsContent>
 
         {/* TAB TÀI LIỆU */}
-        <TabsContent value="resources" className="pt-4 focus-visible:outline-none focus-visible:ring-0 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <TabsContent value="resources" className="pt-4 focus-visible:outline-none focus-visible:ring-0">
           {materialsLoading ? (
             <p className="text-sm text-slate-500 text-center py-8">Đang tải tài liệu...</p>
           ) : materialsError ? (

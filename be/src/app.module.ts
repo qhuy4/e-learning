@@ -17,6 +17,8 @@ import { StorageModule } from '@/common/storage/storage.module';
 import { InstructorModule } from '@/modules/instructors/instructor.module';
 import { LocationModule } from '@/modules/locations/location.module';
 import { LessonProgressModule } from './modules/lesson-progress/lesson-progress.module';
+import { LessonNotesModule } from './modules/lesson-notes/lesson-notes.module';
+import { LessonCommentsModule } from './modules/lesson-comments/lesson-comments.module';
 import { ReviewsModule } from '@/modules/reviews/reviews.module';
 import { OrdersModule } from '@/modules/orders/orders.module';
 import { EnrollmentsModule } from '@/modules/enrollments/enrollments.module';
@@ -77,6 +79,8 @@ import { InstructorApplicationsModule } from '@/modules/instructor-applications/
     LessonsModule,
     StorageModule,
     LessonProgressModule,
+    LessonNotesModule,
+    LessonCommentsModule,
     PaymentsModule,
     HomeModule,
     QuizzesModule,

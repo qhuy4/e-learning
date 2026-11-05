@@ -30,6 +30,8 @@ import InstructorApplyPage from "@/pages/instructor/instructor-apply-page"
 import InstructorActivatePage from "@/pages/instructor/instructor-activate-page"
 import QuestionsPage from "@/pages/qa/questions-page"
 import QuestionDetailPage from "@/pages/qa/question-detail-page"
+import LessonCommentsPage from "@/pages/lesson-comments/lesson-comments-page"
+import LessonCommentDetailPage from "@/pages/lesson-comments/lesson-comment-detail-page"
 import LoginPage from "@/pages/authen/login-page"
 import TeachingProfilePage from "@/pages/teaching-profile/teaching-profile-page"
 import SkillProfilePage from "@/pages/skill-profile/skill-profile-page"
@@ -86,6 +88,8 @@ export const router = createBrowserRouter([
                     { path: "achievements", element: <AchievementsPage /> },
                     { path: "qa", element: <QuestionsPage /> },
                     { path: "qa/:id", element: <QuestionDetailPage /> },
+                    { path: "lesson-comments", element: <LessonCommentsPage /> },
+                    { path: "lesson-comments/:id", element: <LessonCommentDetailPage /> },
                     { path: "profile", element: <ProfilePage /> },
                     { path: "teaching-profile", element: <TeachingProfilePage /> },
                     { path: "skill-profile", element: <SkillProfilePage /> },

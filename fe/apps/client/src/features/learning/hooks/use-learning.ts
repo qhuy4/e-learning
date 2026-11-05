@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { learningService } from '../services/learning.service';
-import type { CourseProgress } from '../types/learning.type';
+import type { CourseProgress, LessonNote } from '../types/learning.type';
 
 // Cache 5 phút — tránh refetch (ký lại presigned URL video) mỗi lần refocus.
 const STALE_TIME = 5 * 60 * 1000;
@@ -101,5 +101,123 @@ export const useLessonMaterials = (
     queryKey: ['lesson-materials', lessonId, previewToken ?? ''],
     queryFn: () => learningService.getLessonMaterials(lessonId!, previewToken),
     enabled: enabled && !!lessonId,
+  });
+};
+
+// ─── Ghi chú bài học ────────────────────────────────────────────────────────
+export const useLessonNotes = (lessonId: number | undefined, enabled = true) => {
+  return useQuery({
+    queryKey: ['lesson-notes', lessonId],
+    queryFn: () => learningService.getLessonNotes(lessonId!),
+    enabled: enabled && !!lessonId,
+  });
+};
+
+export const useCreateLessonNote = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: learningService.createLessonNote,
+    onSuccess: (created) => {
+      // Ghi chú là dữ liệu nhỏ → append vào cache là đủ, không cần refetch.
+      queryClient.setQueryData<LessonNote[]>(
+        ['lesson-notes', created.lessonId],
+        (old) => {
+          if (!old) return old;
+          return [...old, created].sort(
+            (a, b) =>
+              a.noteTimeSeconds - b.noteTimeSeconds || a.id - b.id,
+          );
+        },
+      );
+    },
+  });
+};
+
+export const useUpdateLessonNote = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, content }: { id: number; content: string }) =>
+      learningService.updateLessonNote(id, content),
+    onSuccess: (updated) => {
+      queryClient.setQueryData<LessonNote[]>(
+        ['lesson-notes', updated.lessonId],
+        (old) =>
+          old?.map((n) => (n.id === updated.id ? updated : n)),
+      );
+    },
+  });
+};
+
+export const useDeleteLessonNote = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id }: { id: number; lessonId: number }) =>
+      learningService.deleteLessonNote(id),
+    onSuccess: (_res, variables) => {
+      queryClient.setQueryData<LessonNote[]>(
+        ['lesson-notes', variables.lessonId],
+        (old) => old?.filter((n) => n.id !== variables.id),
+      );
+    },
+  });
+};
+
+// ─── Bình luận hỏi đáp ──────────────────────────────────────────────────────
+export const useLessonComments = (
+  lessonId: number | undefined,
+  enabled = true,
+) => {
+  return useQuery({
+    queryKey: ['lesson-comments', lessonId],
+    queryFn: () => learningService.getLessonComments(lessonId!),
+    enabled: enabled && !!lessonId,
+  });
+};
+
+export const useCreateLessonComment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: learningService.createLessonComment,
+    onSuccess: (created) => {
+      // Invalidate để refetch — comment có thể là con của comment mới thêm.
+      queryClient.invalidateQueries({
+        queryKey: ['lesson-comments', created.lessonId],
+      });
+    },
+  });
+};
+
+export const useUpdateLessonComment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      id,
+      content,
+    }: {
+      id: number;
+      content: string;
+      lessonId: number;
+    }) => learningService.updateLessonComment(id, content),
+    onSuccess: (_updated, variables) => {
+      // Refetch thay vì thay cache cục bộ: response PATCH thiếu user/createdAt
+      // → thay cache làm mất tên/mốc thời gian và ẩn luôn nút Sửa/Xóa.
+      queryClient.invalidateQueries({
+        queryKey: ['lesson-comments', variables.lessonId],
+      });
+    },
+  });
+};
+
+export const useDeleteLessonComment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id }: { id: number; lessonId: number }) =>
+      learningService.deleteLessonComment(id),
+    onSuccess: (_res, variables) => {
+      // Xóa cascade cả nhánh con → refetch để tree nhất quán.
+      queryClient.invalidateQueries({
+        queryKey: ['lesson-comments', variables.lessonId],
+      });
+    },
   });
 };
