@@ -9,7 +9,7 @@ import { parseScopeParam, scopeSearch } from "../scope";
 import { formatClock, recordedSpeakingParts } from "../utils";
 import { CueCard } from "../components/speaking/CueCard";
 import { SpeakingRecorder } from "../components/speaking/SpeakingRecorder";
-import { TeacherGradeButton } from "../../exams/components/TeacherGradeButton";
+import { InstructorGradeButton } from "../../exams/components/InstructorGradeButton";
 import { PartTabs } from "../components/common/PartTabs";
 import { ProgressBar } from "../components/common/ProgressBar";
 import { SectionBadge } from "../components/common/SectionBadge";
@@ -309,7 +309,7 @@ export function IeltsSpeakingPage() {
               Speaking không chấm điểm tự động — sau khi nộp, gửi bài cho giáo viên chấm tay và
               nhận phản hồi.
             </p>
-            <TeacherGradeButton skillLabel="Speaking" fullWidth />
+            <InstructorGradeButton skillLabel="Speaking" fullWidth />
           </section>
 
           <section className="rounded-xl border border-border bg-muted/30 p-5">

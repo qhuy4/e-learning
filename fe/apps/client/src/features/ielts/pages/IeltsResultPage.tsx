@@ -21,7 +21,7 @@ import { BandScoreCard } from "../components/result/BandScoreCard";
 import { CriteriaCard, criteriaFromBand } from "../components/result/CriteriaCard";
 import { PremiumLockCard } from "../components/result/PremiumLockCard";
 import { PremiumUpgradeModal } from "../components/result/PremiumUpgradeModal";
-import { TeacherGradeButton } from "../../exams/components/TeacherGradeButton";
+import { InstructorGradeButton } from "../../exams/components/InstructorGradeButton";
 import { QuestionReviewList } from "../components/result/QuestionReviewList";
 import type { QuestionReviewEntry } from "../components/result/QuestionReviewList";
 import type { ReviewState } from "../components/result/QuestionReviewItem";
@@ -500,7 +500,7 @@ export function IeltsResultPage() {
                 chi tiết.
               </p>
               <div className="mt-3">
-                <TeacherGradeButton skillLabel="Speaking" size="sm" fullWidth />
+                <InstructorGradeButton skillLabel="Speaking" size="sm" fullWidth />
               </div>
             </div>
           )}
@@ -685,7 +685,7 @@ export function IeltsResultPage() {
           {showSkill("writing") && (
           <PremiumLockCard
             title="Phản hồi Writing"
-            description="Nhận xét theo 4 tiêu chí + gợi ý nâng band từ AI mentor."
+            description="Nhận xét theo 4 tiêu chí + gợi ý nâng band từ AI giảng viên."
             sample={[
               "Task Response: position is clear but supporting ideas need…",
               "Coherence: paragraphing is logical; linking words are overused…",
