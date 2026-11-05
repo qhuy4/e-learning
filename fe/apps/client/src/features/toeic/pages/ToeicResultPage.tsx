@@ -26,7 +26,7 @@ import { TaskReviewSection } from "../components/result/TaskReviewSection";
 import type { ToeicMode } from "../types";
 import { TaskScoreCard } from "../components/result/TaskScoreCard";
 import { SectionBadge } from "../components/common/SectionBadge";
-import { TeacherGradeButton } from "../../exams/components/TeacherGradeButton";
+import { InstructorGradeButton } from "../../exams/components/InstructorGradeButton";
 import {
   DEFAULT_TOEIC_CONFIG,
   QUESTION_TOTAL,
@@ -470,7 +470,7 @@ export function ToeicResultPage() {
                   Bài nói của bạn đã ghi âm — gửi cho giáo viên chấm tay để nhận điểm và phản hồi.
                 </p>
                 <div className="mt-4">
-                  <TeacherGradeButton skillLabel="Speaking" size="sm" fullWidth />
+                  <InstructorGradeButton skillLabel="Speaking" size="sm" fullWidth />
                 </div>
               </div>
             ) : (
@@ -734,7 +734,7 @@ export function ToeicResultPage() {
               </ul>
               {/* Speaking không chấm tự động — nhờ giáo viên chấm. */}
               <div className="mt-4 border-t border-border pt-4">
-                <TeacherGradeButton skillLabel="Speaking" size="sm" fullWidth />
+                <InstructorGradeButton skillLabel="Speaking" size="sm" fullWidth />
               </div>
             </AnalyticsCard>
 

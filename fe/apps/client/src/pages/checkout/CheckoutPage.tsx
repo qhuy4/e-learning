@@ -110,7 +110,7 @@ export const CheckoutPage = () => {
   if (!course) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center">
-        <p className="text-slate-500">Khóa học không tồn tại.</p>
+        <p className="text-muted-foreground">Khóa học không tồn tại.</p>
       </div>
     );
   }
@@ -125,23 +125,23 @@ export const CheckoutPage = () => {
     : null;
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 pt-5 pb-10 lg:pt-6 lg:pb-14">
+    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 dark:bg-background pt-5 pb-10 lg:pt-6 lg:pb-14">
       <div className="mx-auto w-full max-w-6xl px-4">
         {/* Header 1 dòng: Quay lại | Tiêu đề ......... trạng thái bảo mật */}
         <div className="mb-5 flex items-center gap-3 lg:mb-6">
           <button
             onClick={() => navigate(-1)}
-            className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors hover:text-slate-700"
+            className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="w-4 h-4" />
             Quay lại
           </button>
-          <span aria-hidden className="h-5 w-px shrink-0 bg-slate-300" />
-          <h1 className="min-w-0 truncate text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl lg:text-3xl">
+          <span aria-hidden className="h-5 w-px shrink-0 bg-border" />
+          <h1 className="min-w-0 truncate text-xl font-extrabold tracking-tight text-foreground sm:text-2xl lg:text-3xl">
             {isFree ? "Đăng ký khóa học" : "Thanh toán"}
           </h1>
           {!isFree && (
-            <span className="ml-auto hidden shrink-0 items-center gap-1.5 text-xs font-semibold text-slate-500 sm:inline-flex">
+            <span className="ml-auto hidden shrink-0 items-center gap-1.5 text-xs font-semibold text-muted-foreground sm:inline-flex">
               <Lock className="w-3.5 h-3.5" />
               Thanh toán bảo mật
             </span>
@@ -150,12 +150,12 @@ export const CheckoutPage = () => {
 
         <div className="grid gap-6 lg:grid-cols-5 lg:gap-8 items-start">
           {/* LEFT — một khối thống nhất, chia section bằng đường kẻ mảnh */}
-          <div className="lg:col-span-3 bg-white border border-slate-200 rounded-2xl divide-y divide-slate-100 overflow-hidden">
+          <div className="lg:col-span-3 bg-card border border-border rounded-2xl divide-y divide-border overflow-hidden">
             {/* Khóa học */}
             <div className="p-5 sm:p-6">
               <div className="flex gap-4 sm:gap-5">
-                <div className="relative w-36 h-24 rounded-xl overflow-hidden bg-slate-100 shrink-0 hidden sm:flex items-center justify-center">
-                  <span className="text-xs text-slate-400">Không có ảnh</span>
+                <div className="relative w-36 h-24 rounded-xl overflow-hidden bg-muted shrink-0 hidden sm:flex items-center justify-center">
+                  <span className="text-xs text-muted-foreground">Không có ảnh</span>
                   {course.thumbnail && (
                     <img
                       src={course.thumbnail}
@@ -171,15 +171,15 @@ export const CheckoutPage = () => {
                   <span className="inline-block text-[11px] font-bold uppercase tracking-wider text-piemind-pink bg-piemind-pink/10 border border-piemind-pink/20 rounded-full px-2.5 py-0.5 mb-2">
                     {levelLabels[course.level ?? 0] || "Khóa học"}
                   </span>
-                  <h2 className="font-bold text-slate-900 text-base sm:text-lg leading-snug line-clamp-2">
+                  <h2 className="font-bold text-foreground text-base sm:text-lg leading-snug line-clamp-2">
                     {course.title}
                   </h2>
                   {course.instructor?.headline && (
-                    <p className="text-sm text-slate-500 mt-1 line-clamp-1">
+                    <p className="text-sm text-muted-foreground mt-1 line-clamp-1">
                       {course.instructor.headline}
                     </p>
                   )}
-                  <div className="flex flex-wrap items-center gap-4 mt-3 text-xs text-slate-500">
+                  <div className="flex flex-wrap items-center gap-4 mt-3 text-xs text-muted-foreground">
                     {typeof course.instructor?.name === "string" &&
                       course.instructor.name && (
                         <span className="font-medium">
@@ -203,7 +203,7 @@ export const CheckoutPage = () => {
                   </div>
                 </div>
                 <div className="text-right shrink-0">
-                  <span className="text-lg font-extrabold text-slate-900">
+                  <span className="text-lg font-extrabold text-foreground">
                     {isFree ? "Miễn phí" : formatCurrency(price)}
                   </span>
                 </div>
@@ -241,7 +241,7 @@ export const CheckoutPage = () => {
                 couponCode={appliedCoupon?.code}
               >
                 {errorMessage && (
-                  <div className="p-3.5 bg-rose-50 text-rose-600 text-sm font-medium rounded-xl border border-rose-200">
+                  <div className="p-3.5 bg-destructive/10 text-destructive text-sm font-medium rounded-xl border border-destructive/20">
                     {errorMessage}
                   </div>
                 )}
@@ -283,7 +283,7 @@ export const CheckoutPage = () => {
                   </Button>
                 )}
 
-                <p className="text-center text-xs text-slate-400">
+                <p className="text-center text-xs text-muted-foreground">
                   Bằng việc thanh toán, bạn đồng ý với điều khoản sử dụng của
                   E-Learning
                 </p>

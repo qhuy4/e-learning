@@ -30,8 +30,8 @@ export const ReviewList: React.FC<ReviewListProps> = ({
 
   if (!reviews || reviews.length === 0) {
     return (
-      <div className="text-center py-10 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-        <p className="text-slate-500 font-medium text-sm">
+      <div className="text-center py-10 bg-muted rounded-2xl border border-dashed border-border">
+        <p className="text-muted-foreground font-medium text-sm">
           Chưa có đánh giá nào cho khóa học này.
         </p>
       </div>
@@ -65,12 +65,12 @@ export const ReviewList: React.FC<ReviewListProps> = ({
         return (
           <div
             key={review.id}
-            className="bg-white rounded-2xl p-4 md:p-5 border border-slate-200 shadow-[0_4px_20px_rgba(15,23,42,0.06)] hover:shadow-[0_6px_24px_rgba(15,23,42,0.09)] transition-shadow space-y-3"
+            className="bg-card rounded-2xl p-4 md:p-5 border border-border shadow-[0_4px_20px_rgba(15,23,42,0.06)] hover:shadow-[0_6px_24px_rgba(15,23,42,0.09)] transition-shadow space-y-3"
           >
             {/* Header: User Avatar, Name, Rating Stars, Date, Delete button */}
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-100 border border-slate-200 shrink-0 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full overflow-hidden bg-muted border border-border shrink-0 flex items-center justify-center">
                   {avatar ? (
                     <img
                       src={avatar}
@@ -81,11 +81,11 @@ export const ReviewList: React.FC<ReviewListProps> = ({
                       }}
                     />
                   ) : (
-                    <User className="w-5 h-5 text-slate-400" />
+                    <User className="w-5 h-5 text-muted-foreground" />
                   )}
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900">{name}</h4>
+                  <h4 className="text-sm font-bold text-foreground">{name}</h4>
                   <div className="flex items-center gap-2 mt-0.5">
                     <div className="flex items-center text-amber-400 gap-0.5">
                       {[1, 2, 3, 4, 5].map((star) => (
@@ -94,12 +94,12 @@ export const ReviewList: React.FC<ReviewListProps> = ({
                           className={`w-3.5 h-3.5 ${
                             star <= review.rating
                               ? "fill-amber-400 text-amber-400"
-                              : "text-slate-300"
+                              : "text-muted-foreground/40"
                           }`}
                         />
                       ))}
                     </div>
-                    <span className="text-xs text-slate-400">{dateFormatted}</span>
+                    <span className="text-xs text-muted-foreground">{dateFormatted}</span>
                   </div>
                 </div>
               </div>
@@ -108,7 +108,7 @@ export const ReviewList: React.FC<ReviewListProps> = ({
                 <button
                   onClick={() => setDeletingReviewId(review.id)}
                   disabled={deleteMutation.isPending}
-                  className="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer"
+                  className="text-muted-foreground hover:text-destructive p-1.5 rounded-lg hover:bg-destructive/10 transition-colors cursor-pointer"
                   title="Xóa đánh giá"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -118,7 +118,7 @@ export const ReviewList: React.FC<ReviewListProps> = ({
 
             {/* Comment Content */}
             {review.comment && (
-              <p className="text-sm text-slate-600 leading-relaxed font-normal whitespace-pre-line">
+              <p className="text-sm text-muted-foreground leading-relaxed font-normal whitespace-pre-line">
                 {review.comment}
               </p>
             )}
@@ -131,7 +131,7 @@ export const ReviewList: React.FC<ReviewListProps> = ({
                     key={img.id}
                     type="button"
                     onClick={() => setSelectedImage(img.imageUrl)}
-                    className="w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border border-slate-200 hover:opacity-95 hover:ring-2 hover:ring-piemind-pink transition-all group shrink-0 cursor-pointer"
+                    className="w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border border-border hover:opacity-95 hover:ring-2 hover:ring-piemind-pink transition-all group shrink-0 cursor-pointer"
                   >
                     <img
                       src={img.imageUrl}
@@ -151,12 +151,12 @@ export const ReviewList: React.FC<ReviewListProps> = ({
         <AlertDialogPopup>
           <AlertDialogHeader>
             <div className="flex items-start gap-3">
-              <div className="shrink-0 p-2.5 rounded-full bg-rose-100 text-rose-600">
+              <div className="shrink-0 p-2.5 rounded-full bg-destructive/10 text-destructive">
                 <TriangleAlert className="h-5 w-5" />
               </div>
               <div>
-                <AlertDialogTitle className="text-base font-bold text-slate-900">Xóa đánh giá</AlertDialogTitle>
-                <AlertDialogDescription className="text-sm text-slate-600 mt-1">
+                <AlertDialogTitle className="text-base font-bold text-foreground">Xóa đánh giá</AlertDialogTitle>
+                <AlertDialogDescription className="text-sm text-muted-foreground mt-1">
                   Bạn có chắc chắn muốn xóa đánh giá này không? Thao tác này không thể hoàn tác.
                 </AlertDialogDescription>
               </div>
@@ -174,7 +174,7 @@ export const ReviewList: React.FC<ReviewListProps> = ({
             <Button
               onClick={confirmDelete}
               disabled={deleteMutation.isPending}
-              className="bg-rose-600 hover:bg-rose-700 text-white font-semibold cursor-pointer border-0"
+              className="bg-destructive hover:bg-destructive/90 text-white font-semibold cursor-pointer border-0"
             >
               {deleteMutation.isPending ? "Đang xóa..." : "Xóa đánh giá"}
             </Button>

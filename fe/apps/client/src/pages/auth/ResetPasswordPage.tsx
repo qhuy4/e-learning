@@ -60,7 +60,7 @@ export const ResetPasswordPage = () => {
               </div>
               <label className="block text-sm font-bold" htmlFor="confirmPassword">Confirm new password</label>
               <input id="confirmPassword" required minLength={8} value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} type={showPassword ? "text" : "password"} className="h-12 w-full rounded-xl bg-m3-surface-container-low px-4 outline-none focus:ring-2 focus:ring-[#F38181]/30" />
-              {error && <p className="flex gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-600"><XCircle className="size-5 shrink-0" />{error}</p>}
+              {error && <p className="flex gap-2 rounded-xl border border-destructive/20 bg-destructive/10 p-3 text-sm font-semibold text-destructive"><XCircle className="size-5 shrink-0" />{error}</p>}
               <button disabled={submitting} className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#F38181] font-bold text-white disabled:opacity-60">
                 {submitting && <Loader2 className="size-5 animate-spin" />} Reset password
               </button>

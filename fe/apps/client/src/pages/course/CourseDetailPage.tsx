@@ -28,14 +28,14 @@ export const CourseDetailPage = () => {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-6 flex flex-col gap-6">
         <div className="animate-pulse flex flex-col gap-4">
-          <div className="h-4 bg-slate-200 rounded w-1/4" />
-          <div className="h-48 bg-slate-200 rounded-xl" />
+          <div className="h-4 bg-muted rounded w-1/4" />
+          <div className="h-48 bg-muted rounded-xl" />
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-8 space-y-4">
-              <div className="h-64 bg-slate-200 rounded-xl" />
+              <div className="h-64 bg-muted rounded-xl" />
             </div>
             <div className="lg:col-span-4">
-              <div className="h-48 bg-slate-200 rounded-xl" />
+              <div className="h-48 bg-muted rounded-xl" />
             </div>
           </div>
         </div>
@@ -46,8 +46,8 @@ export const CourseDetailPage = () => {
   if (isError || !courseData) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-6">
-        <div className="bg-white rounded-xl border border-primary/30 shadow-sm p-12 text-center">
-          <p className="text-slate-500 text-lg">Không tìm thấy khóa học</p>
+        <div className="bg-card rounded-xl border border-primary/30 shadow-sm p-12 text-center">
+          <p className="text-muted-foreground text-lg">Không tìm thấy khóa học</p>
           <Link to="/courses" className="text-piemind-pink font-bold text-sm mt-2 inline-block hover:underline">
             Khám phá khóa học
           </Link>
@@ -59,13 +59,13 @@ export const CourseDetailPage = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-6 flex flex-col gap-6">
       {/* Breadcrumbs */}
-      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-slate-500">
+      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-muted-foreground">
         <Link to="/courses" className="hover:text-piemind-pink transition-colors flex items-center gap-1">
           <School className="size-4" />
           <span>Khóa học</span>
         </Link>
-        <ChevronRight className="size-4 text-slate-300" />
-        <span className="text-slate-900 font-bold">{courseData.title}</span>
+        <ChevronRight className="size-4 text-muted-foreground/40" />
+        <span className="text-foreground font-bold">{courseData.title}</span>
       </nav>
 
       {/* Course Header Hero */}

@@ -21,10 +21,10 @@ export const ReviewStatsSummary: React.FC<ReviewStatsSummaryProps> = ({
   const stars = [5, 4, 3, 2, 1];
 
   return (
-    <div className="bg-white rounded-2xl p-4 md:p-5 border border-slate-200 shadow-[0_4px_20px_rgba(15,23,42,0.06)] mb-5 flex flex-col md:flex-row items-center gap-5 md:gap-6">
+    <div className="bg-card rounded-2xl p-4 md:p-5 border border-border shadow-[0_4px_20px_rgba(15,23,42,0.06)] mb-5 flex flex-col md:flex-row items-center gap-5 md:gap-6">
       {/* Average Rating Score */}
-      <div className="flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-slate-200 pb-4 md:pb-0 md:pr-6 shrink-0 min-w-[130px]">
-        <span className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-none">
+      <div className="flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-border pb-4 md:pb-0 md:pr-6 shrink-0 min-w-[130px]">
+        <span className="text-3xl md:text-4xl font-extrabold text-foreground tracking-tight leading-none">
           {numAverageRating > 0 ? numAverageRating.toFixed(1) : "0.0"}
         </span>
         <div className="flex items-center my-1.5 gap-0.5 text-amber-400">
@@ -34,12 +34,12 @@ export const ReviewStatsSummary: React.FC<ReviewStatsSummaryProps> = ({
               className={`w-4 h-4 ${
                 star <= Math.round(numAverageRating)
                   ? "fill-amber-400 text-amber-400"
-                  : "text-slate-300"
+                  : "text-muted-foreground/40"
               }`}
             />
           ))}
         </div>
-        <span className="text-xs font-medium text-slate-500">
+        <span className="text-xs font-medium text-muted-foreground">
           {numTotalReviews} đánh giá
         </span>
       </div>
@@ -47,7 +47,7 @@ export const ReviewStatsSummary: React.FC<ReviewStatsSummaryProps> = ({
       {/* Star Breakdown Progress Bars */}
       <div className="flex-1 w-full space-y-0.5">
         <div className="flex justify-between items-center mb-1.5">
-          <span className="text-xs font-semibold text-slate-700">Lọc theo số sao:</span>
+          <span className="text-xs font-semibold text-foreground">Lọc theo số sao:</span>
           {selectedRating && (
             <button
               onClick={() => onSelectRating(undefined)}
@@ -69,23 +69,23 @@ export const ReviewStatsSummary: React.FC<ReviewStatsSummaryProps> = ({
               key={star}
               onClick={() => onSelectRating(isSelected ? undefined : star)}
               className={`w-full flex items-center gap-2.5 group transition-colors rounded-lg px-1.5 py-1 cursor-pointer ${
-                isSelected ? "bg-piemind-pink/10 ring-1 ring-piemind-pink/40" : "hover:bg-slate-50"
+                isSelected ? "bg-piemind-pink/10 ring-1 ring-piemind-pink/40" : "hover:bg-muted"
               }`}
             >
-              <div className="flex items-center gap-1 w-8 shrink-0 text-xs font-medium text-slate-700">
+              <div className="flex items-center gap-1 w-8 shrink-0 text-xs font-medium text-foreground">
                 <span>{star}</span>
                 <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
               </div>
 
               {/* Progress Bar */}
-              <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                 <div
                   className="h-full bg-amber-400 rounded-full transition-all duration-300 group-hover:bg-amber-500"
                   style={{ width: `${percentage}%` }}
                 />
               </div>
 
-              <div className="w-14 text-right text-[11px] font-medium text-slate-500 shrink-0">
+              <div className="w-14 text-right text-[11px] font-medium text-muted-foreground shrink-0">
                 {count} ({percentage}%)
               </div>
             </button>

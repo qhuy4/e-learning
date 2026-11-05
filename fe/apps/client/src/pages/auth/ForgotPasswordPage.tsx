@@ -41,14 +41,9 @@ export const ForgotPasswordPage = () => {
     <div className="w-full flex flex-col bg-m3-surface relative">
       <div className="flex flex-col w-full pt-8 md:pt-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="relative w-full">
-          <div className="absolute -top-12 left-1/4 w-72 h-72 bg-[#a4f1e3]/40 rounded-full blur-3xl pointer-events-none -z-10" />
-          <div className="absolute -bottom-10 right-1/4 w-80 h-80 bg-[#f38181]/20 rounded-full blur-3xl pointer-events-none -z-10" />
-
-          <div className="w-full bg-white rounded-xl  overflow-hidden grid grid-cols-1 lg:grid-cols-12 ">
+          <div className="w-full bg-card rounded-xl  overflow-hidden grid grid-cols-1 lg:grid-cols-12 ">
             {/* LEFT: Mascot Panel - fixed height, no layout shift */}
             <section className="lg:col-span-5 bg-gradient-to-br from-m3-surface-container-low via-m3-surface-container to-[#a4f1e3]/20 p-6 lg:p-8 flex flex-col justify-between relative overflow-hidden h-full ">
-              <div className="absolute top-0 right-0 w-44 h-44 bg-[#a4f1e3]/30 rounded-full -mr-16 -mt-16 blur-xl pointer-events-none" />
-              <div className="absolute bottom-16 -left-10 w-36 h-36 bg-[#fae189]/30 rounded-full blur-lg pointer-events-none" />
 
 
 
@@ -58,7 +53,7 @@ export const ForgotPasswordPage = () => {
                   <ShieldCheck className="size-4" />
                   <span className="font-bold tracking-wide text-xs">Level: B1 Intermediate</span>
                 </div>
-                <div className="relative w-56 h-56 sm:w-64 sm:h-64 rounded-lg overflow-hidden bg-white shadow-md flex items-center justify-center p-2">
+                <div className="relative w-56 h-56 sm:w-64 sm:h-64 rounded-lg overflow-hidden bg-card shadow-md flex items-center justify-center p-2">
                   <img
                     alt="Pie the Red Panda Tutor"
                     className="w-full h-full object-cover rounded transform hover:scale-105 transition-transform duration-500 ease-out"
@@ -66,7 +61,7 @@ export const ForgotPasswordPage = () => {
                   />
                 </div>
                 {/* Thought Card */}
-                <div className="mt-6 w-full bg-white/90 backdrop-blur-md p-4 rounded-lg shadow-sm">
+                <div className="mt-6 w-full bg-card/90 backdrop-blur-md p-4 rounded-lg shadow-sm">
                   <div className="flex items-start gap-2">
                     <Heart className="size-5 text-[#F38181] flex-shrink-0 mt-0.5" />
                     <p className="text-m3-on-surface-variant italic leading-relaxed text-sm">
@@ -85,7 +80,7 @@ export const ForgotPasswordPage = () => {
             </section>
 
             {/* RIGHT: Form Panel */}
-            <section className="lg:col-span-7 lg:px-8  flex flex-col justify-between bg-white">
+            <section className="lg:col-span-7 lg:px-8  flex flex-col justify-between bg-card">
               <div>
                 {/* Header Controls */}
                 <div className="flex items-center justify-between mb-6">
@@ -120,7 +115,7 @@ export const ForgotPasswordPage = () => {
                         className={`w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-full text-xs font-bold transition-all ${
                           method === "magic"
                             ? "bg-[#95E1D3] text-[#146a5f] shadow-sm"
-                            : "text-m3-on-surface-variant hover:text-m3-on-surface hover:bg-white/50"
+                            : "text-m3-on-surface-variant hover:text-m3-on-surface hover:bg-muted"
                         }`}
                         type="button"
                       >
@@ -150,7 +145,7 @@ export const ForgotPasswordPage = () => {
                         <Mail className="size-5 text-m3-on-surface-variant group-focus-within:text-[#146a5f] transition-colors" />
                       </div>
                       <input
-                        className="w-full pl-11 pr-11 py-3 bg-m3-surface-container-low text-m3-on-surface rounded-full font-body-md text-sm transition-all outline-none focus:bg-white focus:shadow-md ring-0"
+                        className="w-full pl-11 pr-11 py-3 bg-m3-surface-container-low text-m3-on-surface rounded-full font-body-md text-sm transition-all outline-none focus:bg-card focus:shadow-md ring-0"
                         id="recovery-email"
                         placeholder="name@domain.com"
                         required
@@ -174,7 +169,7 @@ export const ForgotPasswordPage = () => {
                         <Smartphone className="size-5 text-m3-on-surface-variant" />
                       </div>
                       <input
-                        className="w-full pl-11 pr-4 py-3 bg-m3-surface-container-low text-m3-on-surface rounded-full font-body-md text-sm transition-all outline-none focus:bg-white focus:shadow-md"
+                        className="w-full pl-11 pr-4 py-3 bg-m3-surface-container-low text-m3-on-surface rounded-full font-body-md text-sm transition-all outline-none focus:bg-card focus:shadow-md"
                         id="recovery-phone"
                         placeholder="+84 (555) 019-2834"
                         type="tel"
@@ -204,7 +199,7 @@ export const ForgotPasswordPage = () => {
                       </div>
                     </div>
                   )}
-                  {error && <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-600">{error}</p>}
+                  {error && <p className="rounded-xl border border-destructive/20 bg-destructive/10 p-3 text-sm font-semibold text-destructive">{error}</p>}
                 </form>
 
                 {/* Alternative Actions */}

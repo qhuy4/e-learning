@@ -38,15 +38,9 @@ export const StudentLoginPage = () => {
     <div className="w-full flex flex-col bg-m3-surface relative">
       <div className="flex flex-col w-full py-8 md:py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="relative w-full">
-          <div className="absolute -top-16 -left-12 w-72 h-72 rounded-full bg-m3-primary-container/10 blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-16 -right-12 w-80 h-80 rounded-full bg-m3-secondary-fixed/30 blur-3xl pointer-events-none" />
-
           <div className="relative w-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
             {/* LEFT COLUMN: Brand Welcome & Mascot Showcase */}
             <div className="lg:col-span-5 flex flex-col justify-between p-8 sm:p-10 rounded-2xl bg-m3-surface-container-low relative overflow-hidden shadow-[0_4px_24px_rgba(45,55,72,0.04)] group/card transition-all duration-300 hover:shadow-[0_8px_30px_rgba(45,55,72,0.08)]">
-              <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-m3-tertiary-fixed/30 blur-xl pointer-events-none transition-transform duration-700 group-hover/card:scale-110" />
-              <div className="absolute bottom-10 -left-10 w-36 h-36 rounded-full bg-m3-secondary-fixed/40 blur-lg pointer-events-none transition-transform duration-700 group-hover/card:scale-110" />
-
               <div className="relative z-10 flex flex-col gap-5">
                 {/* Top Badge */}
                 <div className="inline-flex items-center gap-2 self-start bg-[#FCE38A] text-[#453800] px-3.5 py-1.5 rounded-full shadow-sm select-none cursor-default">
@@ -88,21 +82,21 @@ export const StudentLoginPage = () => {
               </div>
 
               {/* Quick Stat / Live Learner Metric Card */}
-              <div className="relative z-10 mt-6 bg-[#EAFFD0]/70 border border-[#95E1D3]/60 p-4 rounded-xl shadow-sm flex items-center justify-between transition-all duration-200 hover:bg-[#EAFFD0]/90 hover:shadow-md hover:-translate-y-0.5 cursor-default">
+              <div className="relative z-10 mt-6 bg-[#EAFFD0]/70 dark:bg-[#95E1D3]/10 border border-[#95E1D3]/60 p-4 rounded-xl shadow-sm flex items-center justify-between transition-all duration-200 hover:bg-[#EAFFD0]/90 hover:shadow-md hover:-translate-y-0.5 cursor-default">
                 <div className="flex items-center gap-3">
                   <div className="w-11 h-11 rounded-full bg-[#95E1D3] flex items-center justify-center text-[#146a5f] shadow-sm transition-transform duration-200 group-hover:rotate-6">
                     <TrendingUp className="size-5 font-bold" />
                   </div>
                   <div>
-                    <p className="font-label-sm text-slate-600 font-semibold">Your Active Level</p>
-                    <p className="font-headline-sm text-slate-900 font-bold">B1 &bull; Intermediate</p>
+                    <p className="font-label-sm text-muted-foreground font-semibold">Your Active Level</p>
+                    <p className="font-headline-sm text-foreground font-bold">B1 &bull; Intermediate</p>
                   </div>
                 </div>
                 <div className="text-right">
                   <span className="inline-flex items-center gap-1 font-label-md text-[#453800] font-bold bg-[#FCE38A] px-2.5 py-1 rounded-full shadow-sm">
                     <Zap className="size-3.5 text-[#453800] fill-current" /> 14 Days
                   </span>
-                  <p className="font-label-sm text-slate-600 font-medium mt-1">Study Streak</p>
+                  <p className="font-label-sm text-muted-foreground font-medium mt-1">Study Streak</p>
                 </div>
               </div>
             </div>
@@ -119,7 +113,7 @@ export const StudentLoginPage = () => {
                 {/* Social Login Hub */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <button
-                    className="flex items-center justify-center gap-3 px-4 py-3 rounded-full bg-m3-surface-container-low border border-slate-200/80 hover:bg-slate-50 hover:border-slate-300 active:scale-[0.99] transition-all duration-200 text-m3-on-surface font-label-lg"
+                    className="flex items-center justify-center gap-3 px-4 py-3 rounded-full bg-m3-surface-container-low border border-border hover:bg-muted hover:border-input active:scale-[0.99] transition-all duration-200 text-m3-on-surface font-label-lg"
                     type="button"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -131,7 +125,7 @@ export const StudentLoginPage = () => {
                     <span>Continue with Google</span>
                   </button>
                   <button
-                    className="flex items-center justify-center gap-3 px-4 py-3 rounded-full bg-m3-surface-container-low border border-slate-200/80 hover:bg-slate-50 hover:border-slate-300 active:scale-[0.99] transition-all duration-200 text-m3-on-surface font-label-lg"
+                    className="flex items-center justify-center gap-3 px-4 py-3 rounded-full bg-m3-surface-container-low border border-border hover:bg-muted hover:border-input active:scale-[0.99] transition-all duration-200 text-m3-on-surface font-label-lg"
                     type="button"
                   >
                     <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -151,8 +145,8 @@ export const StudentLoginPage = () => {
 
                 {/* Error Banner */}
                 {loginMutation.isError && (
-                  <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 flex items-center gap-2 font-body-sm font-semibold">
-                    <CheckCircle className="size-5 text-red-500" />
+                  <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive flex items-center gap-2 font-body-sm font-semibold">
+                    <CheckCircle className="size-5 text-destructive" />
                     <div>
                       <p>{loginErrorMessage}</p>
                       {loginErrorCode === "EMAIL_VERIFICATION_REQUIRED" && (
@@ -177,7 +171,7 @@ export const StudentLoginPage = () => {
                     <label className="block font-label-md text-m3-on-surface font-semibold" htmlFor="emailInput">
                       Email Address
                     </label>
-                    <div className="relative flex items-center group/field border border-transparent rounded-xl hover:border-slate-300 focus-within:border-[#f38181] focus-within:ring-2 focus-within:ring-[#f38181]/20 transition-all duration-200">
+                    <div className="relative flex items-center group/field border border-transparent rounded-xl hover:border-input focus-within:border-[#f38181] focus-within:ring-2 focus-within:ring-[#f38181]/20 transition-all duration-200">
                       <Mail className="size-5 absolute left-4 text-m3-on-surface-variant group-focus-within/field:text-[#F38181] transition-colors duration-200 pointer-events-none" />
                       <input
                         className="w-full h-[52px] pl-12 pr-4 bg-m3-surface-container-low rounded-xl text-m3-on-surface font-body-md focus:bg-m3-surface-container-lowest focus:outline-none border-none ring-0 focus:ring-0 shadow-sm transition-all placeholder:text-m3-on-surface-variant/50"
@@ -201,7 +195,7 @@ export const StudentLoginPage = () => {
                         Forgot password?
                       </Link>
                     </div>
-                    <div className="relative flex items-center group/field border border-transparent rounded-xl hover:border-slate-300 focus-within:border-[#f38181] focus-within:ring-2 focus-within:ring-[#f38181]/20 transition-all duration-200">
+                    <div className="relative flex items-center group/field border border-transparent rounded-xl hover:border-input focus-within:border-[#f38181] focus-within:ring-2 focus-within:ring-[#f38181]/20 transition-all duration-200">
                       <Lock className="size-5 absolute left-4 text-m3-on-surface-variant group-focus-within/field:text-[#F38181] transition-colors duration-200 pointer-events-none" />
                       <input
                         className="w-full h-[52px] pl-12 pr-12 bg-m3-surface-container-low rounded-xl text-m3-on-surface font-body-md focus:bg-m3-surface-container-lowest focus:outline-none border-none ring-0 focus:ring-0 shadow-sm transition-all placeholder:text-m3-on-surface-variant/50"

@@ -177,16 +177,16 @@ export const ReviewFormModal: React.FC<ReviewFormModalProps> = ({
       <div className="fixed inset-0" onClick={onClose} />
 
       <div
-        className="relative bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-200 z-10 my-auto max-h-[90vh] flex flex-col transform transition-all animate-in zoom-in-95 duration-200"
+        className="relative bg-card rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-border z-10 my-auto max-h-[90vh] flex flex-col transform transition-all animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Clean Light Header Bar */}
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
+        <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-card shrink-0">
           <div>
-            <h3 className="text-base font-extrabold text-slate-900 tracking-tight">
+            <h3 className="text-base font-extrabold text-foreground tracking-tight">
               {existingReview ? "Chỉnh sửa đánh giá của bạn" : "Viết đánh giá khóa học"}
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-muted-foreground mt-0.5">
               Chia sẻ trải nghiệm học tập thực tế để giúp giảng viên và cộng đồng học viên.
             </p>
           </div>
@@ -194,7 +194,7 @@ export const ReviewFormModal: React.FC<ReviewFormModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-700 p-2 rounded-full hover:bg-slate-100 transition-colors cursor-pointer"
+            className="text-muted-foreground hover:text-foreground p-2 rounded-full hover:bg-muted transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -203,15 +203,15 @@ export const ReviewFormModal: React.FC<ReviewFormModalProps> = ({
         {/* Scrollable Form Content */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto max-h-[calc(90vh-84px)]">
           {errorMessage && (
-            <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-xl flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+            <div className="p-3.5 bg-destructive/10 border border-destructive/20 text-destructive text-xs font-semibold rounded-xl flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-destructive shrink-0" />
               <span>{errorMessage}</span>
             </div>
           )}
 
           {/* Interactive Star Rating Selector */}
           <div className="flex flex-col items-center justify-center p-5 bg-piemind-pink/5 rounded-2xl border border-piemind-pink/15 space-y-2.5">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
+            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               Đánh giá chung của bạn về khóa học
             </span>
 
@@ -231,7 +231,7 @@ export const ReviewFormModal: React.FC<ReviewFormModalProps> = ({
                       className={`w-8 h-8 transition-colors duration-150 ${
                         active
                           ? "fill-amber-400 text-amber-400 drop-shadow-sm"
-                          : "text-slate-300 hover:text-amber-200"
+                          : "text-muted-foreground/40 hover:text-amber-300"
                       }`}
                     />
                   </button>
@@ -249,10 +249,10 @@ export const ReviewFormModal: React.FC<ReviewFormModalProps> = ({
           {/* Comment Textarea */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
+              <label className="text-xs font-bold uppercase tracking-wider text-foreground">
                 Nội dung đánh giá chi tiết
               </label>
-              <span className="text-[11px] text-slate-400 font-medium">
+              <span className="text-[11px] text-muted-foreground font-medium">
                 {comment.length} / 1000 ký tự
               </span>
             </div>
@@ -261,24 +261,24 @@ export const ReviewFormModal: React.FC<ReviewFormModalProps> = ({
               onChange={(e) => setComment(e.target.value.slice(0, 1000))}
               placeholder="Nhập cảm nhận của bạn về nội dung bài giảng, cách truyền đạt của giảng viên hoặc kiến thức thực tế thu nhận được..."
               rows={5}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-piemind-pink/40 focus:border-piemind-pink text-sm text-slate-800 placeholder:text-slate-400 bg-white transition-all"
+              className="w-full px-4 py-3 rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-piemind-pink/40 focus:border-piemind-pink text-sm text-foreground placeholder:text-muted-foreground bg-card transition-all"
             />
           </div>
 
           {/* Review Image Attachments */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
+              <label className="text-xs font-bold uppercase tracking-wider text-foreground">
                 Hình ảnh đính kèm ({images.length}/5)
               </label>
-              <span className="text-[11px] text-slate-400 font-medium">Gửi kèm cùng bài đánh giá</span>
+              <span className="text-[11px] text-muted-foreground font-medium">Gửi kèm cùng bài đánh giá</span>
             </div>
 
             <div className="grid grid-cols-5 gap-3">
               {images.map((img, idx) => (
                 <div
                   key={idx}
-                  className="relative aspect-square rounded-xl overflow-hidden border border-slate-200 shadow-2xs group bg-slate-100"
+                  className="relative aspect-square rounded-xl overflow-hidden border border-border shadow-2xs group bg-muted"
                 >
                   <img src={img.url} alt={`Preview ${idx}`} className="w-full h-full object-cover" />
                   <button
@@ -297,7 +297,7 @@ export const ReviewFormModal: React.FC<ReviewFormModalProps> = ({
               ))}
 
               {images.length < 5 && (
-                <label className="aspect-square border-2 border-dashed border-slate-200 hover:border-piemind-pink rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all hover:bg-piemind-pink/5 text-slate-400 hover:text-piemind-pink group">
+                <label className="aspect-square border-2 border-dashed border-border hover:border-piemind-pink rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all hover:bg-piemind-pink/5 text-muted-foreground hover:text-piemind-pink group">
                   <ImagePlus className="w-5 h-5 mb-1 group-hover:scale-110 transition-transform" />
                   <span className="text-[11px] font-bold">Thêm ảnh</span>
                   <input
@@ -314,12 +314,12 @@ export const ReviewFormModal: React.FC<ReviewFormModalProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
             <button
               type="button"
               onClick={onClose}
               disabled={createOrUpdateMutation.isPending}
-              className="px-5 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+              className="px-5 py-2.5 text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors cursor-pointer"
             >
               Hủy
             </button>

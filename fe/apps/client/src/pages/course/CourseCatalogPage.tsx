@@ -106,11 +106,6 @@ export const CourseCatalogPage = () => {
 
   return (
     <div className="relative w-full max-w-7xl mx-auto px-4 lg:px-8 py-8 overflow-hidden">
-      {/* Ambient Glow Orbs */}
-      <div className="absolute -top-32 right-12 w-96 h-96 rounded-full bg-m3-secondary-fixed/40 blur-3xl -z-10 pointer-events-none" />
-      <div className="absolute top-72 -left-20 w-80 h-80 rounded-full bg-m3-primary-fixed/30 blur-3xl -z-10 pointer-events-none" />
-      <div className="absolute top-1/2 right-1/4 w-72 h-72 rounded-full bg-m3-tertiary-fixed/30 blur-3xl -z-10 pointer-events-none" />
-
       {/* 1. BREADCRUMBS & HERO */}
       <section className="mb-12">
         <nav aria-label="Đường dẫn" className="flex items-center gap-2 font-label-lg text-sm text-m3-on-surface-variant mb-6">
@@ -181,7 +176,6 @@ export const CourseCatalogPage = () => {
 
           {/* Right Mascot Teaser Card */}
           <div className="lg:col-span-5 relative bg-gradient-to-br from-m3-surface-container-lowest to-m3-surface-container-low rounded-xl p-6 flex flex-col justify-between overflow-hidden border border-m3-outline-variant/30">
-            <div className="absolute -right-12 -top-12 w-48 h-48 rounded-full bg-m3-primary-container/20 blur-2xl pointer-events-none" />
             <div className="relative z-10 flex items-start justify-between gap-4">
               <div className="bg-m3-surface-container-lowest rounded-2xl px-4 py-2.5 text-xs text-m3-on-surface-variant font-medium max-w-[210px] relative border border-m3-outline-variant/30">
                 <p className="text-m3-on-surface font-semibold mb-0.5">
@@ -389,18 +383,16 @@ export const CourseCatalogPage = () => {
 
       {/* 6. BOTTOM CTA */}
       <section className="mb-12">
-        <div className="relative bg-gradient-to-br from-m3-on-background via-m3-inverse-surface to-m3-on-background text-m3-inverse-on-surface rounded-xl p-8 lg:p-12 overflow-hidden">
-          <div className="absolute -right-24 -bottom-24 w-96 h-96 rounded-full bg-m3-primary-container/15 blur-3xl pointer-events-none" />
-          <div className="absolute -left-20 -top-20 w-80 h-80 rounded-full bg-m3-secondary/20 blur-3xl pointer-events-none" />
+        <div className="relative bg-gradient-to-br from-m3-on-background via-m3-inverse-surface to-m3-on-background text-m3-inverse-on-surface dark:from-m3-surface-container-high dark:via-m3-surface-container dark:to-m3-surface-container-high dark:text-m3-on-surface rounded-xl p-8 lg:p-12 overflow-hidden">
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-8 space-y-3">
-              <span className="inline-block px-3.5 py-1 rounded-full bg-white/10 text-m3-primary-fixed text-xs font-bold backdrop-blur-sm">
+              <span className="inline-block px-3.5 py-1 rounded-full bg-white/10 text-m3-primary-fixed dark:text-m3-on-primary-fixed text-xs font-bold backdrop-blur-sm">
                 Truy cập ngay · Không cần thẻ tín dụng
               </span>
               <h2 className="text-2xl lg:text-3xl font-extrabold text-white leading-snug">
                 Sẵn sàng nói tiếng Anh tự nhiên, không vấp giữa câu?
               </h2>
-              <p className="text-sm text-m3-surface-variant max-w-2xl leading-relaxed">
+              <p className="text-sm text-m3-surface-variant dark:text-m3-on-surface-variant max-w-2xl leading-relaxed">
                 Tạo tài khoản khách miễn phí trong 30 giây để mở khóa bài học đầu tiên của cả 36
                 khóa học và nhận báo cáo chẩn đoán giọng nói chi tiết từ Pie.
               </p>
@@ -408,7 +400,7 @@ export const CourseCatalogPage = () => {
             <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3">
               <Link
                 to="/student/register"
-                className="w-full bg-m3-primary-container hover:opacity-95 text-white font-extrabold py-3.5 px-6 rounded-full text-center transition-all flex items-center justify-center gap-2 text-sm cursor-pointer"
+                className="w-full bg-m3-primary-container hover:opacity-95 text-white dark:text-m3-on-primary font-extrabold py-3.5 px-6 rounded-full text-center transition-all flex items-center justify-center gap-2 text-sm cursor-pointer"
               >
                 <Sparkles size={18} />
                 Tạo tài khoản miễn phí

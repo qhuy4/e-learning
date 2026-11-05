@@ -54,15 +54,15 @@ export const CourseReviewsSection: React.FC<CourseReviewsSectionProps> = ({
   const userReview = eligibility?.userReview;
 
   return (
-    <div className="mt-12 pt-8 border-t border-slate-200">
+    <div className="mt-12 pt-8 border-t border-border">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
-          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+          <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
             <MessageSquare className="w-5 h-5 text-piemind-pink" />
             Đánh giá từ học viên
           </h2>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Ý kiến đánh giá trung thực từ các học viên đã tham gia khóa học.
           </p>
         </div>
@@ -78,8 +78,8 @@ export const CourseReviewsSection: React.FC<CourseReviewsSectionProps> = ({
               {userReview ? "Chỉnh sửa đánh giá của bạn" : "Viết đánh giá"}
             </button>
           ) : (
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-piemind-yellow/25 border border-piemind-yellow/60 text-slate-700 text-sm font-medium rounded-xl">
-              <Lock className="w-4 h-4 text-slate-500 shrink-0" />
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-piemind-yellow/25 border border-piemind-yellow/60 text-foreground text-sm font-medium rounded-xl">
+              <Lock className="w-4 h-4 text-muted-foreground shrink-0" />
               <span>Cần mua/đăng ký khóa học để viết đánh giá</span>
             </div>
           )}
@@ -97,9 +97,9 @@ export const CourseReviewsSection: React.FC<CourseReviewsSectionProps> = ({
       />
 
       {/* Filter Controls Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-5 p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-sm font-medium text-slate-700">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-5 p-3.5 bg-muted rounded-xl border border-border text-sm font-medium text-foreground">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="font-bold text-slate-900 mr-1">Bộ lọc:</span>
+          <span className="font-bold text-foreground mr-1">Bộ lọc:</span>
 
           {/* Filter by image option */}
           <button
@@ -110,7 +110,7 @@ export const CourseReviewsSection: React.FC<CourseReviewsSectionProps> = ({
             className={`px-3.5 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 cursor-pointer ${
               hasImage
                 ? "bg-piemind-pink text-white border-piemind-pink font-bold shadow-xs"
-                : "bg-white text-slate-700 border-slate-300 hover:bg-slate-100"
+                : "bg-card text-foreground border-input hover:bg-muted"
             }`}
           >
             <span>Có hình ảnh</span>
@@ -123,7 +123,7 @@ export const CourseReviewsSection: React.FC<CourseReviewsSectionProps> = ({
                 setHasImage(false);
                 setPage(1);
               }}
-              className="px-3 py-1.5 text-slate-500 hover:text-piemind-pink underline font-semibold cursor-pointer"
+              className="px-3 py-1.5 text-muted-foreground hover:text-piemind-pink underline font-semibold cursor-pointer"
             >
               Xóa bộ lọc
             </button>
@@ -132,14 +132,14 @@ export const CourseReviewsSection: React.FC<CourseReviewsSectionProps> = ({
 
         {/* Sort Order Selector */}
         <div className="flex items-center gap-2">
-          <span className="text-slate-500 font-medium">Sắp xếp:</span>
+          <span className="text-muted-foreground font-medium">Sắp xếp:</span>
           <select
             value={sortOrder}
             onChange={(e) => {
               setSortOrder(e.target.value as "desc" | "asc");
               setPage(1);
             }}
-            className="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-piemind-pink/40 cursor-pointer"
+            className="px-3 py-1.5 bg-card border border-input rounded-lg text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-piemind-pink/40 cursor-pointer"
           >
             <option value="desc">Mới nhất</option>
             <option value="asc">Cũ nhất</option>
@@ -149,7 +149,7 @@ export const CourseReviewsSection: React.FC<CourseReviewsSectionProps> = ({
 
       {/* Reviews List */}
       {isLoading ? (
-        <div className="text-center py-10 text-slate-400 font-medium text-sm">
+        <div className="text-center py-10 text-muted-foreground font-medium text-sm">
           Đang tải đánh giá...
         </div>
       ) : (
@@ -166,17 +166,17 @@ export const CourseReviewsSection: React.FC<CourseReviewsSectionProps> = ({
           <button
             onClick={() => setPage((p) => Math.max(p - 1, 1))}
             disabled={page === 1}
-            className="px-4 py-2 text-sm font-medium rounded-lg border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 cursor-pointer"
+            className="px-4 py-2 text-sm font-medium rounded-lg border border-input disabled:opacity-40 disabled:cursor-not-allowed hover:bg-muted cursor-pointer"
           >
             Trang trước
           </button>
-          <span className="text-sm font-semibold text-slate-700 px-2">
+          <span className="text-sm font-semibold text-foreground px-2">
             Trang {page} / {totalPages}
           </span>
           <button
             onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
             disabled={page === totalPages}
-            className="px-4 py-2 text-sm font-medium rounded-lg border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 cursor-pointer"
+            className="px-4 py-2 text-sm font-medium rounded-lg border border-input disabled:opacity-40 disabled:cursor-not-allowed hover:bg-muted cursor-pointer"
           >
             Trang sau
           </button>

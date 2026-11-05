@@ -77,9 +77,6 @@ export const StudentRegisterPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
             {/* LEFT COLUMN: Inspiring Journey Showcase */}
             <div className="lg:col-span-5 flex flex-col justify-between rounded-2xl bg-m3-surface-container-low p-8 lg:p-10 shadow-sm relative overflow-hidden transition-all duration-300 hover:shadow-md  group">
-              <div className="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-m3-secondary-container/40 blur-3xl pointer-events-none transition-transform duration-500 group-hover:scale-110" />
-              <div className="absolute -left-12 bottom-12 w-48 h-48 rounded-full bg-m3-primary-container/20 blur-2xl pointer-events-none transition-transform duration-500 group-hover:scale-110" />
-
               <div className="relative z-10">
                 {/* Top Badge */}
                 <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FCE38A] text-[#453800] font-bold mb-6 shadow-sm">
@@ -98,7 +95,7 @@ export const StudentRegisterPage = () => {
 
                 {/* Feature Cards */}
                 <div className="space-y-4 mb-8">
-                  <div className="flex items-start gap-3 bg-[#EAFFD0]/70 border border-[#95E1D3] p-3.5 rounded-xl shadow-sm transition-all duration-200 hover:bg-[#EAFFD0]/90 hover:shadow-md hover:-translate-y-0.5 cursor-default">
+                  <div className="flex items-start gap-3 bg-[#EAFFD0]/70 dark:bg-[#95E1D3]/10 border border-[#95E1D3] p-3.5 rounded-xl shadow-sm transition-all duration-200 hover:bg-[#EAFFD0]/90 hover:shadow-md hover:-translate-y-0.5 cursor-default">
                     <div className="w-7 h-7 rounded-full bg-[#95E1D3] flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
                       <CheckCircle className="size-4 text-[#146a5f]" />
                     </div>
@@ -112,7 +109,7 @@ export const StudentRegisterPage = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3 bg-[#EAFFD0]/70 border border-[#95E1D3] p-3.5 rounded-xl shadow-sm transition-all duration-200 hover:bg-[#EAFFD0]/90 hover:shadow-md hover:-translate-y-0.5 cursor-default">
+                  <div className="flex items-start gap-3 bg-[#EAFFD0]/70 dark:bg-[#95E1D3]/10 border border-[#95E1D3] p-3.5 rounded-xl shadow-sm transition-all duration-200 hover:bg-[#EAFFD0]/90 hover:shadow-md hover:-translate-y-0.5 cursor-default">
                     <div className="w-7 h-7 rounded-full bg-[#95E1D3] flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
                       <BarChart3 className="size-4 text-[#146a5f]" />
                     </div>
@@ -126,7 +123,7 @@ export const StudentRegisterPage = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3 bg-[#EAFFD0]/70 border border-[#95E1D3] p-3.5 rounded-xl shadow-sm transition-all duration-200 hover:bg-[#EAFFD0]/90 hover:shadow-md hover:-translate-y-0.5 cursor-default">
+                  <div className="flex items-start gap-3 bg-[#EAFFD0]/70 dark:bg-[#95E1D3]/10 border border-[#95E1D3] p-3.5 rounded-xl shadow-sm transition-all duration-200 hover:bg-[#EAFFD0]/90 hover:shadow-md hover:-translate-y-0.5 cursor-default">
                     <div className="w-7 h-7 rounded-full bg-[#95E1D3] flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
                       <Target className="size-4 text-[#146a5f]" />
                     </div>
@@ -182,7 +179,7 @@ export const StudentRegisterPage = () => {
                 {/* Social Signup Buttons */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
                   <button
-                    className="w-full flex items-center justify-center gap-2.5 py-3 px-4 rounded-full bg-m3-surface-container-low border border-transparent hover:bg-slate-50 hover:border-slate-300 hover:shadow-sm active:scale-[0.99] text-m3-on-surface font-label-lg transition-all duration-200 cursor-pointer"
+                    className="w-full flex items-center justify-center gap-2.5 py-3 px-4 rounded-full bg-m3-surface-container-low border border-transparent hover:bg-muted hover:border-input hover:shadow-sm active:scale-[0.99] text-m3-on-surface font-label-lg transition-all duration-200 cursor-pointer"
                     type="button"
                   >
                     <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
@@ -194,7 +191,7 @@ export const StudentRegisterPage = () => {
                     <span>Sign up with Google</span>
                   </button>
                   <button
-                    className="w-full flex items-center justify-center gap-2.5 py-3 px-4 rounded-full bg-m3-surface-container-low border border-transparent hover:bg-slate-50 hover:border-slate-300 hover:shadow-sm active:scale-[0.99] text-m3-on-surface font-label-lg transition-all duration-200 cursor-pointer"
+                    className="w-full flex items-center justify-center gap-2.5 py-3 px-4 rounded-full bg-m3-surface-container-low border border-transparent hover:bg-muted hover:border-input hover:shadow-sm active:scale-[0.99] text-m3-on-surface font-label-lg transition-all duration-200 cursor-pointer"
                     type="button"
                   >
                     <svg className="w-5 h-5 shrink-0 fill-current text-m3-on-surface" viewBox="0 0 24 24">
@@ -219,7 +216,7 @@ export const StudentRegisterPage = () => {
                     <label className="block font-label-md text-m3-on-surface mb-1.5" htmlFor="fullName">
                       Full Name
                     </label>
-                    <div className="relative flex items-center rounded-xl border border-transparent hover:border-slate-300 focus-within:border-[#f38181] focus-within:ring-2 focus-within:ring-[#f38181]/20 transition-all duration-200">
+                    <div className="relative flex items-center rounded-xl border border-transparent hover:border-input focus-within:border-[#f38181] focus-within:ring-2 focus-within:ring-[#f38181]/20 transition-all duration-200">
                       <User className="size-5 absolute left-4 text-m3-on-surface-variant pointer-events-none" />
                       <input
                         className="w-full h-[52px] pl-12 pr-4 rounded-xl bg-m3-surface-container-low text-m3-on-surface placeholder:text-m3-on-surface-variant focus:outline-none focus:bg-m3-surface-container-lowest border-0 font-body-md transition-all duration-200"
@@ -238,7 +235,7 @@ export const StudentRegisterPage = () => {
                     <label className="block font-label-md text-m3-on-surface mb-1.5" htmlFor="emailInput">
                       Email Address
                     </label>
-                    <div className="relative flex items-center rounded-xl border border-transparent hover:border-slate-300 focus-within:border-[#f38181] focus-within:ring-2 focus-within:ring-[#f38181]/20 transition-all duration-200">
+                    <div className="relative flex items-center rounded-xl border border-transparent hover:border-input focus-within:border-[#f38181] focus-within:ring-2 focus-within:ring-[#f38181]/20 transition-all duration-200">
                       <Mail className="size-5 absolute left-4 text-m3-on-surface-variant pointer-events-none" />
                       <input
                         className="w-full h-[52px] pl-12 pr-4 rounded-xl bg-m3-surface-container-low text-m3-on-surface placeholder:text-m3-on-surface-variant focus:outline-none focus:bg-m3-surface-container-lowest border-0 font-body-md transition-all duration-200"
@@ -262,7 +259,7 @@ export const StudentRegisterPage = () => {
                         At least 8 chars & 1 number
                       </span>
                     </div>
-                    <div className="relative flex items-center rounded-xl border border-transparent hover:border-slate-300 focus-within:border-[#f38181] focus-within:ring-2 focus-within:ring-[#f38181]/20 transition-all duration-200">
+                    <div className="relative flex items-center rounded-xl border border-transparent hover:border-input focus-within:border-[#f38181] focus-within:ring-2 focus-within:ring-[#f38181]/20 transition-all duration-200">
                       <Lock className="size-5 absolute left-4 text-m3-on-surface-variant pointer-events-none" />
                       <input
                         className="w-full h-[52px] pl-12 pr-12 rounded-xl bg-m3-surface-container-low text-m3-on-surface placeholder:text-m3-on-surface-variant focus:outline-none focus:bg-m3-surface-container-lowest border-0 font-body-md transition-all duration-200"
@@ -275,7 +272,7 @@ export const StudentRegisterPage = () => {
                       />
                       <button
                         aria-label="Toggle password visibility"
-                        className="absolute right-4 text-m3-on-surface-variant hover:text-m3-on-surface transition-colors flex items-center cursor-pointer p-1 rounded-full hover:bg-slate-200/50"
+                        className="absolute right-4 text-m3-on-surface-variant hover:text-m3-on-surface transition-colors flex items-center cursor-pointer p-1 rounded-full hover:bg-muted"
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
                       >
@@ -314,7 +311,7 @@ export const StudentRegisterPage = () => {
                     <label className="block font-label-md text-m3-on-surface mb-1.5" htmlFor="confirmPasswordInput">
                       Confirm Password
                     </label>
-                    <div className="relative flex items-center rounded-xl border border-transparent hover:border-slate-300 focus-within:border-[#f38181] focus-within:ring-2 focus-within:ring-[#f38181]/20">
+                    <div className="relative flex items-center rounded-xl border border-transparent hover:border-input focus-within:border-[#f38181] focus-within:ring-2 focus-within:ring-[#f38181]/20">
                       <Lock className="size-5 absolute left-4 text-m3-on-surface-variant pointer-events-none" />
                       <input
                         className="w-full h-[52px] pl-12 pr-4 rounded-xl bg-m3-surface-container-low focus:outline-none"
@@ -327,7 +324,7 @@ export const StudentRegisterPage = () => {
                     </div>
                   </div>
 
-                  {error && <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-600">{error}</p>}
+                  {error && <p className="rounded-xl border border-destructive/20 bg-destructive/10 p-3 text-sm font-semibold text-destructive">{error}</p>}
 
                   {/* Terms Checkbox */}
                   <div className="pt-1">
