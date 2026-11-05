@@ -49,8 +49,13 @@ export const learningService = {
     return res.data;
   },
 
-  getLessonMaterials: async (lessonId: number): Promise<LessonMaterial[]> => {
-    const { data: res } = await api.get(`/lessons/${lessonId}/materials`);
+  getLessonMaterials: async (
+    lessonId: number,
+    previewToken?: string,
+  ): Promise<LessonMaterial[]> => {
+    const { data: res } = await api.get(`/lessons/${lessonId}/materials`, {
+      params: previewToken ? { token: previewToken } : undefined,
+    });
     return res.data;
   },
 };

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, CheckCircle2, Clock3, Flame, Star, X } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Clock3, Eye, Flame, Pencil, Star, X } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@fe/components/ui/avatar';
 import { useNavigate } from 'react-router';
 import { ReviewFormModal, useReviewEligibility } from '../../../reviews';
@@ -18,6 +18,9 @@ interface LearningHeaderProps {
   totalLessons?: number;
   /** Tổng thời gian của các bài còn lại (phút) */
   remainingMinutes?: number;
+  previewMode?: boolean;
+  previewToken?: string;
+  editUrl?: string;
 }
 
 export const LearningHeader = ({
@@ -29,12 +32,18 @@ export const LearningHeader = ({
   completedLessons,
   totalLessons,
   remainingMinutes,
+  previewMode,
+  previewToken,
+  editUrl,
 }: LearningHeaderProps) => {
   const navigate = useNavigate();
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const { user } = useAuth();
 
-  const { data: eligibility } = useReviewEligibility(courseId || '', !!courseId);
+  const { data: eligibility } = useReviewEligibility(
+    courseId || '',
+    !!courseId && !previewMode,
+  );
   const userReview = eligibility?.userReview;
 
   const hasProgress = typeof totalLessons === 'number' && totalLessons > 0;
@@ -52,13 +61,23 @@ export const LearningHeader = ({
   const chipBase =
     'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold whitespace-nowrap';
 
+  const handleBack = () => {
+    if (previewMode && previewToken) {
+      navigate(`/courses/preview/${previewToken}`);
+    } else if (courseSlug) {
+      navigate(`/courses/${courseSlug}`);
+    } else {
+      navigate(-1);
+    }
+  };
+
   return (
     <header className="h-16 border-b border-slate-200 bg-white flex items-center justify-between gap-3 px-4 md:px-6 sticky top-0 z-50">
       {/* Trái: quay lại + breadcrumb khóa học › phần */}
       <div className="flex items-center gap-3 min-w-0">
         <button
-          onClick={() => (courseSlug ? navigate(`/courses/${courseSlug}`) : navigate(-1))}
-          aria-label="Quay lại trang khóa học"
+          onClick={handleBack}
+          aria-label={previewMode ? 'Quay lại bản xem trước' : 'Quay lại trang khóa học'}
           className="shrink-0 w-9 h-9 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-900"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -128,23 +147,48 @@ export const LearningHeader = ({
           </span>
         )}
 
-        <button
-          onClick={() => setIsReviewModalOpen(true)}
-          className="hidden sm:inline-flex h-9 items-center gap-1.5 rounded-full border border-slate-200 px-3 text-xs font-bold text-slate-600 transition-colors hover:border-piemind-pink hover:text-piemind-pink"
-        >
-          <Star className="w-3.5 h-3.5" />
-          Đánh giá
-        </button>
+        {previewMode ? (
+          <>
+            <span
+              className={cn(
+                chipBase,
+                'border-amber-200 bg-amber-50 text-amber-700',
+              )}
+            >
+              <Eye className="w-3.5 h-3.5" />
+              Xem trước
+            </span>
+            {editUrl && (
+              <a
+                href={editUrl}
+                className="hidden sm:inline-flex h-9 items-center gap-1.5 rounded-full border border-amber-200 bg-white px-3 text-xs font-bold text-amber-700 transition-colors hover:bg-amber-50"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+                Quay lại chỉnh sửa
+              </a>
+            )}
+          </>
+        ) : (
+          <>
+            <button
+              onClick={() => setIsReviewModalOpen(true)}
+              className="hidden sm:inline-flex h-9 items-center gap-1.5 rounded-full border border-slate-200 px-3 text-xs font-bold text-slate-600 transition-colors hover:border-piemind-pink hover:text-piemind-pink"
+            >
+              <Star className="w-3.5 h-3.5" />
+              Đánh giá
+            </button>
 
-        <Avatar className="hidden sm:flex h-9 w-9 ring-2 ring-white">
-          <AvatarImage src={user?.avatar ?? undefined} alt={user?.name || 'Người dùng'} />
-          <AvatarFallback className="bg-piemind-pink/10 text-piemind-pink text-xs font-bold">
-            {userInitials}
-          </AvatarFallback>
-        </Avatar>
+            <Avatar className="hidden sm:flex h-9 w-9 ring-2 ring-white">
+              <AvatarImage src={user?.avatar ?? undefined} alt={user?.name || 'Người dùng'} />
+              <AvatarFallback className="bg-piemind-pink/10 text-piemind-pink text-xs font-bold">
+                {userInitials}
+              </AvatarFallback>
+            </Avatar>
+          </>
+        )}
 
         <button
-          onClick={() => (courseSlug ? navigate(`/courses/${courseSlug}`) : navigate(-1))}
+          onClick={handleBack}
           aria-label="Đóng bài học"
           className="w-9 h-9 rounded-full flex items-center justify-center text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
         >
@@ -152,7 +196,7 @@ export const LearningHeader = ({
         </button>
       </div>
 
-      {courseId && (
+      {courseId && !previewMode && (
         <ReviewFormModal
           isOpen={isReviewModalOpen}
           onClose={() => setIsReviewModalOpen(false)}

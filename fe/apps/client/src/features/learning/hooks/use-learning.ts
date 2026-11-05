@@ -92,10 +92,14 @@ export const useCourseProgress = (courseId: number | undefined, enabled = true) 
   });
 };
 
-export const useLessonMaterials = (lessonId: number | undefined, enabled = true) => {
+export const useLessonMaterials = (
+  lessonId: number | undefined,
+  enabled = true,
+  previewToken?: string,
+) => {
   return useQuery({
-    queryKey: ['lesson-materials', lessonId],
-    queryFn: () => learningService.getLessonMaterials(lessonId!),
+    queryKey: ['lesson-materials', lessonId, previewToken ?? ''],
+    queryFn: () => learningService.getLessonMaterials(lessonId!, previewToken),
     enabled: enabled && !!lessonId,
   });
 };

@@ -19,15 +19,16 @@ const fileExt = (name: string) => {
 
 interface LearningTabsProps {
   lesson: LessonDetail;
+  previewToken?: string;
 }
 
-export const LearningTabs = ({ lesson }: LearningTabsProps) => {
+export const LearningTabs = ({ lesson, previewToken }: LearningTabsProps) => {
   const { user } = useAuth();
   const {
     data: materials,
     isLoading: materialsLoading,
     isError: materialsError,
-  } = useLessonMaterials(lesson.id);
+  } = useLessonMaterials(lesson.id, true, previewToken);
   const userInitials =
     (user?.name || user?.email || 'Học viên')
       .split(/[\s@.]+/)
@@ -123,7 +124,9 @@ export const LearningTabs = ({ lesson }: LearningTabsProps) => {
             <p className="text-sm text-slate-500 text-center py-8">Đang tải tài liệu...</p>
           ) : materialsError ? (
             <p className="text-sm text-slate-500 text-center py-8">
-              Không thể tải tài liệu. Vui lòng đăng nhập và ghi danh khóa học.
+              {previewToken
+                ? 'Không thể tải tài liệu trong chế độ xem trước.'
+                : 'Không thể tải tài liệu. Vui lòng đăng nhập và ghi danh khóa học.'}
             </p>
           ) : !materials || materials.length === 0 ? (
             <p className="text-sm text-slate-500 text-center py-8">Chưa có tài liệu đính kèm.</p>
