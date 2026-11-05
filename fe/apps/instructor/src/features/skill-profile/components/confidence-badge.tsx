@@ -11,11 +11,14 @@ interface ConfidenceBadgeProps {
   className?: string;
 }
 
-/** Confidence của AI — "Cao · 82%" */
+/** Hiển thị mức dữ liệu hỗ trợ, không dùng màu lỗi hoặc thuật ngữ kỹ thuật. */
 export function ConfidenceBadge({ value, className }: ConfidenceBadgeProps) {
   if (value == null) {
     return (
-      <Badge variant="outline" className={cn("text-muted-foreground", className)}>
+      <Badge
+        variant="outline"
+        className={cn("text-muted-foreground", className)}
+      >
         Chưa đủ dữ liệu
       </Badge>
     );
@@ -25,7 +28,7 @@ export function ConfidenceBadge({ value, className }: ConfidenceBadgeProps) {
       variant="outline"
       className={cn(LEVEL_BADGE[confidenceLevel(value)], className)}
     >
-      {confidenceLabel(value)} · {Math.round(value * 100)}%
+      Mức hỗ trợ: {confidenceLabel(value)}
     </Badge>
   );
 }

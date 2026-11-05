@@ -1,14 +1,11 @@
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { skillProfileService } from "../services/skill-profile.service";
 import type { EvidenceListParams } from "../types/skill.types";
 
 const SKILL_KEYS = {
   profile: ["skill-profile"],
   detail: (id: number) => ["skill-detail", id],
+  history: (id: number) => ["skill-history", id],
   recommendations: ["skill-recommendations"],
   evidence: (params: EvidenceListParams) => ["skill-evidence", params],
 } as const;
@@ -39,10 +36,26 @@ export function useSkillDetail(skillId: number | null) {
   });
 }
 
+export function useSkillHistory(skillId: number | null) {
+  return useQuery({
+    queryKey: SKILL_KEYS.history(skillId ?? 0),
+    queryFn: () => skillProfileService.history(skillId as number),
+    enabled: skillId != null,
+  });
+}
+
 export function useSkillRecommendations() {
   return useQuery({
     queryKey: SKILL_KEYS.recommendations,
     queryFn: skillProfileService.recommendations,
+  });
+}
+
+export function useDismissSkillRecommendation() {
+  const invalidate = useInvalidateSkillData();
+  return useMutation({
+    mutationFn: skillProfileService.dismissRecommendation,
+    onSuccess: invalidate,
   });
 }
 

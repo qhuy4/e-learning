@@ -146,7 +146,10 @@ function SectionItem({
     const tid = toast.loading("Đang xóa bài học...");
     try {
       if (!String(deletingLessonId).startsWith("new_")) {
-        await deleteLessonApi(Number(deletingLessonId));
+        await deleteLessonApi({
+          id: Number(deletingLessonId),
+          courseId,
+        });
       }
       updateSectionLessons(lessons.filter((l) => l.id !== deletingLessonId));
       toast.success("Đã xóa bài học!", { id: tid });

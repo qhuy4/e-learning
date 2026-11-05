@@ -1,4 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
+import type { DataTableFeatures } from "@/components/common/data-table/data-table-features";
 import type { RevenueByCourse } from "../types/revenue";
 
 function formatCurrency(amount: number) {
@@ -8,7 +9,10 @@ function formatCurrency(amount: number) {
   }).format(amount);
 }
 
-export const revenueByCourseColumns: ColumnDef<RevenueByCourse>[] = [
+export const revenueByCourseColumns: ColumnDef<
+  DataTableFeatures,
+  RevenueByCourse
+>[] = [
   {
     accessorKey: "courseTitle",
     header: "Khóa học",

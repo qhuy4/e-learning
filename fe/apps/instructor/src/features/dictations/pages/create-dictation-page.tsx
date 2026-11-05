@@ -19,7 +19,7 @@ export default function CreateDictationPage() {
   const editId = searchParams.get("editId");
   const navigate = useNavigate();
 
-  const { data: courseData } = useGetCourseDetail(courseId);
+  const { data: courseData } = useGetCourseDetail(courseId ?? undefined);
   const { data: dictationResponse, isLoading: isLoadingDictation } = useGetDictationById(editId ? Number(editId) : undefined);
   const { mutateAsync: createDictation, isPending: isCreating } = useCreateDictation();
   const { mutateAsync: updateDictation, isPending: isUpdating } = useUpdateDictation();

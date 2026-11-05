@@ -1,4 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
+import type { DataTableFeatures } from "@/components/common/data-table/data-table-features";
 import type { Achievement } from "../types/achievement";
 import { achievementCriteriaLabel } from "../types/achievement";
 
@@ -7,7 +8,10 @@ function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("vi-VN");
 }
 
-export function createAchievementColumns(): ColumnDef<Achievement>[] {
+export function createAchievementColumns(): ColumnDef<
+  DataTableFeatures,
+  Achievement
+>[] {
   return [
     {
       accessorKey: "icon",

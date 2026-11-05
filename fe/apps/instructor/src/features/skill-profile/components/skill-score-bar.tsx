@@ -14,10 +14,14 @@ interface SkillScoreBarProps {
 }
 
 /**
- * Dòng skill dạng: Tên ────── bar ────── 90%  Cao
- * score = AI nghĩ bạn mạnh tới đâu; nhãn màu = confidence (AI chắc chắn tới đâu).
+ * Dòng skill dạng: Tên ────── bar ────── 90%  Mức hỗ trợ
  */
-export function SkillScoreBar({ name, score, confidence, onClick }: SkillScoreBarProps) {
+export function SkillScoreBar({
+  name,
+  score,
+  confidence,
+  onClick,
+}: SkillScoreBarProps) {
   const pct = scorePercent(score);
   const hasScore = pct != null;
 
@@ -42,13 +46,11 @@ export function SkillScoreBar({ name, score, confidence, onClick }: SkillScoreBa
           "w-20 shrink-0 text-right text-xs font-medium",
           hasScore ? confidenceTextClass(confidence) : "text-muted-foreground",
         )}
-        title={`Confidence: ${
-          confidence != null ? `${Math.round(confidence * 100)}%` : "chưa đủ dữ liệu"
-        }`}
+        title="Mức dữ liệu hỗ trợ kết quả"
       >
         {hasScore
           ? confidenceLevel(confidence) === "low"
-            ? "Cần thêm bằng chứng"
+            ? "Cần thêm dữ liệu"
             : confidenceLabel(confidence)
           : "Chưa có dữ liệu"}
       </span>

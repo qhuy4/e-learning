@@ -37,7 +37,7 @@ export function SkillRadarChart({ skills, height = 300 }: SkillRadarChartProps) 
       <div className="flex h-[300px] flex-col items-center justify-center gap-2 text-center">
         <p className="text-sm font-medium">Chưa đủ dữ liệu cho radar</p>
         <p className="max-w-64 text-xs text-muted-foreground">
-          Radar cần ít nhất 3 kỹ năng có điểm. Thêm bằng chứng để AI tính điểm.
+          Radar cần ít nhất 3 kỹ năng có điểm. Thêm dữ liệu để AI tính điểm.
         </p>
       </div>
     );

@@ -10,7 +10,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 
-import {features, type DataTableFeatures} from "@/components/common/data-table/data-table-features"
+import {features, type DataTableFeatures, type DataTableMeta} from "@/components/common/data-table/data-table-features"
 import {Button} from '@fe/components/ui/button';
 import {Skeleton} from "@fe/components/ui/skeleton";
 import {Input} from "@fe/components/ui/input";
@@ -33,7 +33,7 @@ interface DataTableText {
 }
 
 interface DataTableProps<TData extends RowData> {
-    columns: ColumnDef<DataTableFeatures, TData>[]
+    columns: ColumnDef<DataTableFeatures, TData, any>[]
     data: TData[]
     onRowClick?: (row: TData) => void
     page: number
@@ -54,7 +54,7 @@ interface DataTableProps<TData extends RowData> {
     sortOrder?: "asc" | "desc"
     onSortChange?: (sortBy: string, sortOrder: "asc" | "desc") => void
 
-    tableMeta?: Record<string, unknown>
+    tableMeta?: Partial<DataTableMeta>
 
     text?: DataTableText
 }

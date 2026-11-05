@@ -71,17 +71,17 @@ export function createCertificateColumns(
               <Button
                 variant="ghost"
                 size="icon"
-                asChild
+                render={
+                  <a
+                    href={cert.filePath}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  />
+                }
                 className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg"
                 title="Xem file"
               >
-                <a
-                  href={cert.filePath}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                </a>
+                <ExternalLink className="h-4 w-4" />
               </Button>
             )}
             {cert.certificateStatus === 1 && (

@@ -1,4 +1,7 @@
-export type SkillCategory = "SUBJECT" | "PEDAGOGY";
+export type SkillCategory = "LANGUAGE" | "EXAM" | "PEDAGOGY" | "SUBJECT";
+
+export type SkillAssessmentStatus =
+  "NO_EVIDENCE" | "INSUFFICIENT_EVIDENCE" | "PROVISIONAL" | "ASSESSED";
 
 export type SkillSourceType =
   | "SELF_ASSESSMENT"
@@ -18,7 +21,10 @@ export interface SkillSummary {
   displayOrder: number;
   score: number | null;
   confidence: number | null;
+  assessmentStatus: SkillAssessmentStatus;
   evidenceCount: number;
+  independentEvidenceCount: number;
+  verifiedRatio: number;
   computedAt: string | null;
 }
 
@@ -64,10 +70,40 @@ export interface SkillDetail {
   };
   score: number | null;
   confidence: number | null;
+  assessmentStatus: SkillAssessmentStatus;
   evidenceCount: number;
+  independentEvidenceCount: number;
+  verifiedRatio: number;
+  currentRunId: number | null;
   computedAt: string | null;
   reasons: string[];
   evidence: SkillEvidenceItem[];
+  assessmentEvidence: Array<{
+    evidenceId: number | null;
+    sourceType: SkillSourceType;
+    sourceId: string | null;
+    independenceKey: string;
+    eligible: boolean;
+    exclusionReason: string | null;
+    normalizedScore: number | null;
+    effectiveWeight: number | null;
+  }>;
+}
+
+export interface SkillAssessmentHistoryItem {
+  runId: number;
+  triggerType: string;
+  processingStatus: string;
+  algorithmVersion: string;
+  inputHash: string | null;
+  startedAt: string;
+  completedAt: string | null;
+  error: string | null;
+  score: number | null;
+  confidence: number | null;
+  assessmentStatus: SkillAssessmentStatus | null;
+  evidenceCount: number | null;
+  independentEvidenceCount: number | null;
 }
 
 export interface RecommendedSkill {
@@ -79,12 +115,18 @@ export interface RecommendedSkill {
   };
   score: number | null;
   confidence: number | null;
+  assessmentStatus: SkillAssessmentStatus;
   evidenceCount: number;
 }
 
 export interface LimitedSkill extends RecommendedSkill {
   reason: string;
-  actions: { type: SkillSourceType | string; label: string }[];
+  actions: {
+    type: SkillSourceType | string;
+    label: string;
+    recommendationId?: number | null;
+    status?: "ACTIVE" | "COMPLETED" | "DISMISSED";
+  }[];
 }
 
 export interface SkillRecommendations {
@@ -102,6 +144,8 @@ export interface CreateSkillEvidenceRequest {
 }
 
 export interface RefreshResult {
+  runId: number;
+  status: "SUCCEEDED" | "FAILED" | "SUPERSEDED";
   extracted: { created: number; superseded: number; kept: number };
   skills: SkillSummary[];
 }

@@ -14,9 +14,11 @@ import { DictationExcelImport } from "./dictation-excel-import";
 function FieldHint({ text }: { text: string }) {
   return (
     <Tooltip>
-      <TooltipTrigger asChild>
-        <HelpCircle className="h-3 w-3 text-muted-foreground cursor-help" />
-      </TooltipTrigger>
+      <TooltipTrigger
+        render={
+          <HelpCircle className="h-3 w-3 text-muted-foreground cursor-help" />
+        }
+      />
       <TooltipContent>
         <p>{text}</p>
       </TooltipContent>

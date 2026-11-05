@@ -4,6 +4,7 @@ import type {
   EvidenceListParams,
   RefreshResult,
   SkillDetail,
+  SkillAssessmentHistoryItem,
   SkillEvidenceList,
   SkillRecommendations,
   SkillSummary,
@@ -20,8 +21,20 @@ export const skillProfileService = {
     return res.data.data;
   },
 
+  async history(skillId: number): Promise<SkillAssessmentHistoryItem[]> {
+    const res = await instructorApi.get(`/skill-profile/${skillId}/history`);
+    return res.data.data;
+  },
+
   async recommendations(): Promise<SkillRecommendations> {
     const res = await instructorApi.get("/skill-profile/recommendations");
+    return res.data.data;
+  },
+
+  async dismissRecommendation(id: number): Promise<{ dismissed: true }> {
+    const res = await instructorApi.patch(
+      `/skill-profile/recommendations/${id}/dismiss`,
+    );
     return res.data.data;
   },
 

@@ -1,6 +1,3 @@
-export const TEACHING_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
-export type TeachingLevel = (typeof TEACHING_LEVELS)[number];
-
 export interface TeachingProfileStats {
   courseCount: number;
   publishedCourseCount: number;
@@ -21,9 +18,8 @@ export interface TeachingProfile {
   bio: string | null;
   websiteUrl: string | null;
   experienceYears: number | null;
-  teachingLevels: string[];
-  teachingMethods: string[];
-  teachingVideoUrl: string | null;
+  /** Các band CEFR giảng dạy — null = chưa khai báo. */
+  teachingLevels: string[] | null;
   stats: TeachingProfileStats;
   subjects: string[];
   completion: {
@@ -35,8 +31,9 @@ export interface TeachingProfile {
 /** undefined = không đổi, null = xóa */
 export interface UpdateTeachingProfileRequest {
   experienceYears?: number | null;
-  teachingLevels?: string[] | null;
-  teachingMethods?: string[] | null;
-  teachingVideoUrl?: string | null;
   websiteUrl?: string | null;
+  teachingLevels?: string[] | null;
 }
+
+/** Thang CEFR cho chip chọn level giảng dạy. */
+export const CEFR_LEVEL_OPTIONS = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
