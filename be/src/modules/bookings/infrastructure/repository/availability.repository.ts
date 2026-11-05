@@ -4,8 +4,8 @@ import { Repository } from 'typeorm';
 
 import { BookingOrmEntity } from '@/modules/bookings/infrastructure/entity/booking.orm-entity';
 import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
-import { TeacherAvailabilityRecurringOrmEntity } from '@/modules/instructors/infrastructure/entity/teacher-availability-recurring.orm.entity';
-import { TeacherAvailabilityExceptionOrmEntity } from '@/modules/instructors/infrastructure/entity/teacher-availability-exception.orm.entity';
+import { InstructorAvailabilityRecurringOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-availability-recurring.orm.entity';
+import { InstructorAvailabilityExceptionOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-availability-exception.orm.entity';
 import {
   formatNextAvailableDisplay,
   getVNDateTimeParts,
@@ -71,23 +71,50 @@ export class AvailabilityRepository {
 
     const baseQuery = this.userRepository
       .createQueryBuilder('teacher')
-      .innerJoin(
-        TeacherAvailabilityRecurringOrmEntity,
-        'availability',
-        hasTimeFilter
-          ? `availability.instructor_id = teacher.id AND availability.day_of_week = :dayOfWeek
-           AND availability.start_time <= :searchStartTime AND availability.end_time >= :searchEndTime`
-          : `availability.instructor_id = teacher.id AND availability.day_of_week = :dayOfWeek
-           AND availability.end_time >= :searchStartTime`,
-      )
       .where((qb) => {
-        const subQuery = qb
+        // Đủ availability nếu có recurring khớp ngày/giờ HOẶC có exception "extra" (cộng thêm giờ).
+        const recurringSub = qb
           .subQuery()
           .select('1')
-          .from(TeacherAvailabilityExceptionOrmEntity, 'exception')
+          .from(InstructorAvailabilityRecurringOrmEntity, 'availability')
+          .where('availability.instructor_id = teacher.id')
+          .andWhere('availability.day_of_week = :dayOfWeek')
+          .andWhere('availability.deleted_at IS NULL')
+          .andWhere('availability.is_active = true')
+          .andWhere(
+            hasTimeFilter
+              ? `availability.start_time <= :searchStartTime AND availability.end_time >= :searchEndTime`
+              : `availability.end_time >= :searchStartTime`,
+          )
+          .getQuery();
+        const extraSub = qb
+          .subQuery()
+          .select('1')
+          .from(InstructorAvailabilityExceptionOrmEntity, 'exception')
           .where('exception.instructor_id = teacher.id')
           .andWhere('exception.specific_date = :bookingDate')
           .andWhere('exception.deleted_at IS NULL')
+          .andWhere('exception.is_extra = true')
+          .andWhere(
+            'exception.start_time IS NOT NULL AND exception.end_time IS NOT NULL',
+          )
+          .andWhere(
+            hasTimeFilter
+              ? `exception.start_time <= :searchStartTime AND exception.end_time >= :searchEndTime`
+              : `exception.end_time >= :searchStartTime`,
+          )
+          .getQuery();
+        return `EXISTS ${recurringSub} OR EXISTS ${extraSub}`;
+      })
+      .andWhere((qb) => {
+        const subQuery = qb
+          .subQuery()
+          .select('1')
+          .from(InstructorAvailabilityExceptionOrmEntity, 'exception')
+          .where('exception.instructor_id = teacher.id')
+          .andWhere('exception.specific_date = :bookingDate')
+          .andWhere('exception.deleted_at IS NULL')
+          .andWhere('exception.is_extra = false')
           .andWhere(
             `(
               exception.is_unavailable = true
@@ -197,14 +224,14 @@ export class AvailabilityRepository {
     const nowMinutes = toMinutes(currentTimeStr);
 
     const [recurring, exceptions, bookings] = await Promise.all([
-      this.userRepository.manager.find(TeacherAvailabilityRecurringOrmEntity, {
+      this.userRepository.manager.find(InstructorAvailabilityRecurringOrmEntity, {
         where: {
           instructor_id: instructorId,
           day_of_week: dayOfWeek,
           is_active: true,
         },
       }),
-      this.userRepository.manager.find(TeacherAvailabilityExceptionOrmEntity, {
+      this.userRepository.manager.find(InstructorAvailabilityExceptionOrmEntity, {
         where: { instructor_id: instructorId, specific_date: bookingDate },
       }),
       this.bookingRepository.find({
@@ -220,6 +247,10 @@ export class AvailabilityRepository {
       (r) => !r.deleted_at && r.is_active,
     );
     const activeExceptions = exceptions.filter((e) => !e.deleted_at);
+    const extraExceptions = activeExceptions.filter(
+      (e) => e.is_extra && e.start_time && e.end_time,
+    );
+    const blockingExceptions = activeExceptions.filter((e) => !e.is_extra);
     const activeBookings = bookings.filter((b) => Number(b.status) !== 2);
 
     const result: Record<string, boolean> = {};
@@ -238,12 +269,17 @@ export class AvailabilityRepository {
           toMinutes(r.start_time) <= startMin &&
           toMinutes(r.end_time) >= endMin,
       );
-      if (!inRecurring) {
+      const inExtra = extraExceptions.some(
+        (e) =>
+          toMinutes(e.start_time!) <= startMin &&
+          toMinutes(e.end_time!) >= endMin,
+      );
+      if (!inRecurring && !inExtra) {
         result[slot] = false;
         continue;
       }
 
-      const blockedByException = activeExceptions.some((e) => {
+      const blockedByException = blockingExceptions.some((e) => {
         if (e.is_unavailable) return true;
         if (!e.start_time || !e.end_time) return false;
         return (
@@ -291,14 +327,14 @@ export class AvailabilityRepository {
     const today = getVNDateTimeParts().dateStr;
 
     const [recurring, exceptions, bookings] = await Promise.all([
-      this.userRepository.manager.find(TeacherAvailabilityRecurringOrmEntity, {
+      this.userRepository.manager.find(InstructorAvailabilityRecurringOrmEntity, {
         where: {
           instructor_id: instructorId,
           day_of_week: dayOfWeek,
           is_active: true,
         },
       }),
-      this.userRepository.manager.find(TeacherAvailabilityExceptionOrmEntity, {
+      this.userRepository.manager.find(InstructorAvailabilityExceptionOrmEntity, {
         where: { instructor_id: instructorId, specific_date: date },
       }),
       this.bookingRepository.find({
@@ -314,20 +350,33 @@ export class AvailabilityRepository {
     });
 
     const activeExceptions = exceptions.filter((e) => !e.deleted_at);
-    const fullDayOff = activeExceptions.some((e) => e.is_unavailable);
+    // Exception chặn giờ (is_extra = false) — "extra" là exception cộng thêm giờ.
+    const blockingExceptions = activeExceptions.filter((e) => !e.is_extra);
+    const extraExceptions = activeExceptions.filter(
+      (e) => e.is_extra && e.start_time && e.end_time,
+    );
+    const fullDayOff = blockingExceptions.some((e) => e.is_unavailable);
 
-    if (fullDayOff || activeRecurring.length === 0) {
+    // Window = span của recurring ∪ extra exceptions trong ngày.
+    const starts = [
+      ...activeRecurring.map((r) => toMinutes(r.start_time)),
+      ...extraExceptions.map((e) => toMinutes(e.start_time!)),
+    ];
+    const ends = [
+      ...activeRecurring.map((r) => toMinutes(r.end_time)),
+      ...extraExceptions.map((e) => toMinutes(e.end_time!)),
+    ];
+
+    if (fullDayOff || starts.length === 0) {
       return { available: false, start: null, end: null, busy: [] };
     }
 
-    const starts = activeRecurring.map((r) => toMinutes(r.start_time));
-    const ends = activeRecurring.map((r) => toMinutes(r.end_time));
     let windowStart = Math.min(...starts);
     let windowEnd = Math.max(...ends);
 
     const busy: { start: string; end: string }[] = [];
 
-    for (const e of activeExceptions) {
+    for (const e of blockingExceptions) {
       if (!e.is_unavailable && e.start_time && e.end_time) {
         busy.push({ start: e.start_time, end: e.end_time });
       }

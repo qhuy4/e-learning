@@ -20,11 +20,11 @@ import { AvailabilityRepository } from '@/modules/bookings/infrastructure/reposi
 import { MeetingRoomRepositoryImpl } from '@/modules/meeting-room/infrastructure/repository/meeting-room.repository';
 import { AvailabilityController } from '@/modules/bookings/presentation/availability.controller';
 import {
-  TeacherAvailabilityRecurringOrmEntity,
-} from '@/modules/instructors/infrastructure/entity/teacher-availability-recurring.orm.entity';
+  InstructorAvailabilityRecurringOrmEntity,
+} from '@/modules/instructors/infrastructure/entity/instructor-availability-recurring.orm.entity';
 import {
-  TeacherAvailabilityExceptionOrmEntity,
-} from '@/modules/instructors/infrastructure/entity/teacher-availability-exception.orm.entity';
+  InstructorAvailabilityExceptionOrmEntity,
+} from '@/modules/instructors/infrastructure/entity/instructor-availability-exception.orm.entity';
 
 const QueryHandlers = [
   GetBookingsHandler,
@@ -45,8 +45,8 @@ const CommandHandlers = [
       BookingOrmEntity,
       MeetingRoomOrmEntity,
       UserOrmEntity,
-      TeacherAvailabilityRecurringOrmEntity,
-      TeacherAvailabilityExceptionOrmEntity,
+      InstructorAvailabilityRecurringOrmEntity,
+      InstructorAvailabilityExceptionOrmEntity,
     ]),
     CqrsModule,
   ],

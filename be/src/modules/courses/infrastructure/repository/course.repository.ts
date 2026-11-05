@@ -101,7 +101,7 @@ export class CourseRepository implements ICourseRepository {
         where: { userId: entity.instructorUser.id },
       });
       if (profile) {
-        (entity as any).instructorProfile = profile;
+        Object.assign(entity, { instructorProfile: profile });
       }
     }
 
@@ -126,6 +126,39 @@ export class CourseRepository implements ICourseRepository {
     }
 
     return CourseMapper.toDomain(entity);
+  }
+
+  async findOrmEntityForPreview(id: number): Promise<CourseOrmEntity | null> {
+    const entity = await this.repository
+      .createQueryBuilder('course')
+      .leftJoinAndSelect(
+        'course.sections',
+        'section',
+        'section.deletedAt IS NULL AND section.isActive = true',
+      )
+      .leftJoinAndSelect(
+        'section.lessons',
+        'lesson',
+        'lesson.deletedAt IS NULL',
+      )
+      .leftJoinAndSelect('course.instructorUser', 'instructorUser')
+      .leftJoinAndSelect('instructorUser.profile', 'userProfile')
+      .where('course.id = :id', { id })
+      .andWhere('course.deletedAt IS NULL')
+      .orderBy('section.position', 'ASC')
+      .addOrderBy('lesson.position', 'ASC')
+      .getOne();
+
+    if (entity?.instructorUser) {
+      const profile = await this.instructorRepository.findOne({
+        where: { userId: entity.instructorUser.id },
+      });
+      if (profile) {
+        Object.assign(entity, { instructorProfile: profile });
+      }
+    }
+
+    return entity;
   }
 
   private async findOrmEntityById(id: number): Promise<CourseOrmEntity | null> {
@@ -335,7 +368,9 @@ export class CourseRepository implements ICourseRepository {
    * Dành cho trang duyệt khóa học của admin.
    * Hiện TẤT CẢ version, không filter NOT EXISTS child.
    */
-  async findAllCoursesForAdmin(options: FindCoursesOptions & { status?: number }) {
+  async findAllCoursesForAdmin(
+    options: FindCoursesOptions & { status?: number },
+  ) {
     const { page, limit, level, keyword, status, instructorId } = options;
 
     const query = this.repository

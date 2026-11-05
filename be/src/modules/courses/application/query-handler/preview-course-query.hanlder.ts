@@ -3,10 +3,7 @@ import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { PreviewCourseQuery } from '../query/preview-course.query';
-import {
-  COURSE_REPOSITORY,
-  ICourseRepository,
-} from '../../domain/repository/course.repository';
+import { CourseRepository } from '@/modules/courses/infrastructure/repository/course.repository';
 import { UserRole } from '@/modules/users/domain/enum/user.role';
 import { CourseDtoMapper } from '../../presentation/mappers/course-dto.mapper';
 import { PreviewTokenService } from '@/common/service/preview-token.service';
@@ -18,8 +15,7 @@ import {
 @QueryHandler(PreviewCourseQuery)
 export class PreviewCourseQueryHandler implements IQueryHandler<PreviewCourseQuery> {
   constructor(
-    @Inject(COURSE_REPOSITORY)
-    private readonly courseRepository: ICourseRepository,
+    private readonly courseRepository: CourseRepository,
     private readonly previewTokenService: PreviewTokenService,
     @Inject(FILE_STORAGE)
     private readonly storage: FileStorage,
@@ -29,17 +25,21 @@ export class PreviewCourseQueryHandler implements IQueryHandler<PreviewCourseQue
     const { token } = query;
     const payload = this.previewTokenService.verifyCoursePreviewToken(token);
 
-    const course = await this.courseRepository.findById(payload.courseId);
+    const course = await this.courseRepository.findOrmEntityForPreview(
+      payload.courseId,
+    );
     if (!course) {
       throw new AppException(ErrorCode.COURSE_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
-    if (payload.role === UserRole.ADMIN) {
+    const role: UserRole = payload.role;
+
+    if (role === UserRole.ADMIN) {
       return CourseDtoMapper.toDetailDto(course, this.storage);
     }
 
-    if (payload.role === UserRole.INSTRUCTOR) {
-      if (course.instructorId !== payload.userId) {
+    if (role === UserRole.INSTRUCTOR) {
+      if (Number(course.instructorId) !== payload.userId) {
         throw new ForbiddenException('Bạn không có quyền preview course này');
       }
       return CourseDtoMapper.toDetailDto(course, this.storage);

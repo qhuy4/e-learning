@@ -7,7 +7,7 @@ import { DictationSentenceOrmEntity } from './infrastructure/entity/dictation-se
 import { DictationAttemptOrmEntity } from './infrastructure/entity/dictation-attempt.orm-entity';
 import { DictationAnswerOrmEntity } from './infrastructure/entity/dictation-answer.orm-entity';
 
-import { TeacherDictationController } from './presentation/controllers/teacher-dictation.controller';
+import { InstructorDictationController } from './presentation/controllers/instructor-dictation.controller';
 import { StudentDictationController } from './presentation/controllers/student-dictation.controller';
 import { AdminDictationController } from './presentation/controllers/admin-dictation.controller';
 
@@ -51,7 +51,7 @@ import { StorageModule } from '@/common/storage/storage.module';
     ])
   ],
   controllers: [
-    TeacherDictationController,
+    InstructorDictationController,
     StudentDictationController,
     AdminDictationController
   ],
