@@ -29,6 +29,8 @@ import CasCallbackPage from "@/pages/payments/cas-callback-page"
 import TeacherRegisterPage from "@/pages/teacher/teacher-register-page"
 import QuestionsPage from "@/pages/qa/questions-page"
 import QuestionDetailPage from "@/pages/qa/question-detail-page"
+import LessonCommentsPage from "@/pages/lesson-comments/lesson-comments-page"
+import LessonCommentDetailPage from "@/pages/lesson-comments/lesson-comment-detail-page"
 import LoginPage from "@/pages/authen/login-page"
 import {CreateLessonPage} from "@/features/lessons/pages/create-lesson-page"
 import CreateQuizPage from "@/features/quizzes/pages/create-quiz-page"
@@ -80,6 +82,8 @@ export const router = createBrowserRouter([
                     { path: "achievements", element: <AchievementsPage /> },
                     { path: "qa", element: <QuestionsPage /> },
                     { path: "qa/:id", element: <QuestionDetailPage /> },
+                    { path: "lesson-comments", element: <LessonCommentsPage /> },
+                    { path: "lesson-comments/:id", element: <LessonCommentDetailPage /> },
                     { path: "profile", element: <ProfilePage /> },
                     { path: "lessons/create", element: <CreateLessonPage /> },
                     { path: "lessons/:id/edit", element: <CreateLessonPage /> },

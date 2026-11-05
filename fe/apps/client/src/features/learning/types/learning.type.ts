@@ -96,3 +96,17 @@ export interface LessonNote {
   createdAt: string | null;
   updatedAt: string | null;
 }
+
+// ─── Lesson Comments (hỏi đáp bình luận nhiều cấp kiểu FB/YouTube) ─────────
+export interface LessonComment {
+  id: number;
+  lessonId: number;
+  /** Bình luận gốc khi null — FE tự dựng cây nhiều cấp theo parentId */
+  parentId: number | null;
+  content: string;
+  createdAt: string | null;
+  updatedAt: string | null;
+  /** Người viết là giảng viên của khóa → hiện badge "Giảng viên" */
+  isInstructor: boolean;
+  user?: { id: number; name: string };
+}

@@ -157,3 +157,63 @@ export const useDeleteLessonNote = () => {
     },
   });
 };
+
+// ─── Bình luận hỏi đáp ──────────────────────────────────────────────────────
+export const useLessonComments = (
+  lessonId: number | undefined,
+  enabled = true,
+) => {
+  return useQuery({
+    queryKey: ['lesson-comments', lessonId],
+    queryFn: () => learningService.getLessonComments(lessonId!),
+    enabled: enabled && !!lessonId,
+  });
+};
+
+export const useCreateLessonComment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: learningService.createLessonComment,
+    onSuccess: (created) => {
+      // Invalidate để refetch — comment có thể là con của comment mới thêm.
+      queryClient.invalidateQueries({
+        queryKey: ['lesson-comments', created.lessonId],
+      });
+    },
+  });
+};
+
+export const useUpdateLessonComment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      id,
+      content,
+    }: {
+      id: number;
+      content: string;
+      lessonId: number;
+    }) => learningService.updateLessonComment(id, content),
+    onSuccess: (_updated, variables) => {
+      // Refetch thay vì thay cache cục bộ: response PATCH thiếu user/createdAt
+      // → thay cache làm mất tên/mốc thời gian và ẩn luôn nút Sửa/Xóa.
+      queryClient.invalidateQueries({
+        queryKey: ['lesson-comments', variables.lessonId],
+      });
+    },
+  });
+};
+
+export const useDeleteLessonComment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id }: { id: number; lessonId: number }) =>
+      learningService.deleteLessonComment(id),
+    onSuccess: (_res, variables) => {
+      // Xóa cascade cả nhánh con → refetch để tree nhất quán.
+      queryClient.invalidateQueries({
+        queryKey: ['lesson-comments', variables.lessonId],
+      });
+    },
+  });
+};

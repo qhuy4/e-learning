@@ -6,6 +6,7 @@ import type {
   CourseProgress,
   LessonMaterial,
   LessonNote,
+  LessonComment,
 } from '../types/learning.type';
 
 // bigint trong DB (user_id, lesson_id) pg trả về string trong JSON → chuẩn hóa
@@ -14,6 +15,14 @@ const toLessonNote = (raw: LessonNote): LessonNote => ({
   ...raw,
   id: Number(raw.id),
   lessonId: Number(raw.lessonId),
+});
+
+const toLessonComment = (raw: LessonComment): LessonComment => ({
+  ...raw,
+  id: Number(raw.id),
+  lessonId: Number(raw.lessonId),
+  parentId: raw.parentId !== null ? Number(raw.parentId) : null,
+  user: raw.user ? { ...raw.user, id: Number(raw.user.id) } : undefined,
 });
 
 export const learningService = {
@@ -91,5 +100,34 @@ export const learningService = {
 
   deleteLessonNote: async (id: number): Promise<void> => {
     await api.delete(`/lesson-notes/${id}`);
+  },
+
+  // ─── Bình luận hỏi đáp bài học ───────────────────────────────────────
+  getLessonComments: async (lessonId: number): Promise<LessonComment[]> => {
+    const { data: res } = await api.get(`/lesson-comments/lesson/${lessonId}`);
+    return (res.data as LessonComment[]).map(toLessonComment);
+  },
+
+  createLessonComment: async (payload: {
+    lessonId: number;
+    content: string;
+    parentId?: number | null;
+  }): Promise<LessonComment> => {
+    const { data: res } = await api.post('/lesson-comments', payload);
+    return toLessonComment(res.data);
+  },
+
+  updateLessonComment: async (
+    id: number,
+    content: string,
+  ): Promise<LessonComment> => {
+    const { data: res } = await api.patch(`/lesson-comments/${id}`, {
+      content,
+    });
+    return toLessonComment(res.data);
+  },
+
+  deleteLessonComment: async (id: number): Promise<void> => {
+    await api.delete(`/lesson-comments/${id}`);
   },
 };

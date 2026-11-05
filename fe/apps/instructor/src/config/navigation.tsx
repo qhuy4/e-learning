@@ -11,6 +11,7 @@ import {
     LogOut,
     Trophy,
     MessageCircleQuestion,
+    MessagesSquare,
     CalendarClock,
     CalendarDays,
 } from "lucide-react"
@@ -85,6 +86,11 @@ export const navigation: Navigation = {
                     title: "Câu hỏi",
                     url: "/qa",
                     icon: MessageCircleQuestion,
+                },
+                {
+                    title: "Bình luận bài học",
+                    url: "/lesson-comments",
+                    icon: MessagesSquare,
                 },
                 {
                     title: "Đăng ký giáo viên",
