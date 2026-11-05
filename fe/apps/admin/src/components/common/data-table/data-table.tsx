@@ -12,7 +12,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 
-import {features, type DataTableFeatures} from "@/components/common/data-table/data-table-features.ts"
+import {features, type DataTableFeatures, type DataTableMeta} from "@/components/common/data-table/data-table-features.ts"
 import {Button} from '@fe/components/ui/button.tsx';
 import {Skeleton} from "@fe/components/ui/skeleton.tsx";
 import {Input} from "@fe/components/ui/input.tsx";
@@ -35,7 +35,7 @@ interface DataTableText {
 }
 
 interface DataTableProps<TData extends RowData> {
-    columns: ColumnDef<DataTableFeatures, TData>[]
+    columns: ColumnDef<DataTableFeatures, TData, any>[]
     data: TData[]
     onRowClick?: (row: TData) => void
     page: number
@@ -61,7 +61,7 @@ interface DataTableProps<TData extends RowData> {
     onSortChange?: (sortBy: string, sortOrder: "asc" | "desc") => void
 
     // Additional meta to forward to the table instance (e.g. onEdit, onDelete)
-    tableMeta?: Record<string, unknown>
+    tableMeta?: Partial<DataTableMeta>
 
     // Localized text
     text?: DataTableText
@@ -102,10 +102,6 @@ export function DataTable<TData extends RowData>({
         features,
         data,
         columns,
-        // Trang hiển thị do CHA slice (server trả đúng trang hiện tại, hoặc các
-        // trang client tự cắt) — table không tự cắt theo pageIndex nữa, nếu
-        // không danh sách >10 dòng sẽ "đóng băng" ở 10 dòng đầu dù bấm trang.
-        manualPagination: true,
         meta: {
             sortBy,
             sortOrder,

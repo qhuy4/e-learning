@@ -131,7 +131,7 @@ export function CourseInfoStep({ data, updateData, readOnly = false }: CourseInf
 
                 <Input
                   id="title"
-                  placeholder="VD: Lập trình ReactJS cơ bản..."
+                  placeholder="VD: Tiếng Anh giao tiếp cho người đi làm..."
                   value={data.title}
                   disabled={readOnly}
                   onChange={(e) =>

@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const lessonSchema = z.object({
   title: z
-    .string({ required_error: "Vui lòng nhập tên bài học." })
+    .string({ error: "Vui lòng nhập tên bài học." })
     .trim()
     .min(1, "Vui lòng nhập tên bài học.")
     .max(255, "Tên bài học không được vượt quá 255 ký tự."),

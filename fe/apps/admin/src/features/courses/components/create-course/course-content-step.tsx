@@ -28,7 +28,7 @@ import {
 
 import { SortableSection } from "./sortable-section"; 
 
-import { useCreateSection, useUpdateSection } from "../../hook/use-courses";
+import { useCreateSection, useUpdateSection } from "../../hooks/use-courses";
 import { validateSection } from "../../schemas/section.schema";
 
 interface CourseContentStepProps {

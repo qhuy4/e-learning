@@ -1,5 +1,6 @@
 import type {RowAction} from "@/shared/types/row-action.ts";
-import type {ColumnDef} from "@tanstack/react-table";
+import type {ColumnDef, RowData} from "@tanstack/react-table";
+import type {DataTableFeatures} from "@/components/common/data-table/data-table-features.ts";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -9,9 +10,9 @@ import {
 import {Button} from "@fe/components/ui/button.tsx";
 import {MoreHorizontal} from "lucide-react";
 
-export function createActionsColumn<T>(
+export function createActionsColumn<T extends RowData>(
     getActions: (item: T) => RowAction<T>[]
-): ColumnDef<T> {
+): ColumnDef<DataTableFeatures, T> {
     return {
         id: "actions",
 

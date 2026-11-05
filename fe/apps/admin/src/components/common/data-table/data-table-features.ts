@@ -11,6 +11,13 @@ import {
     tableFeatures,
 } from "@tanstack/react-table"
 
+export interface DataTableMeta {
+    sortBy?: string
+    sortOrder?: "asc" | "desc"
+    onSortChange?: (sortBy: string, sortOrder: "asc" | "desc") => void
+    [key: string]: unknown
+}
+
 export const features = tableFeatures({
     columnFilteringFeature,
     columnVisibilityFeature,
@@ -20,5 +27,6 @@ export const features = tableFeatures({
     sortedRowModel: createSortedRowModel(),
     filterFns: { includesString: filterFn_includesString },
     sortFns: { alphanumeric: sortFn_alphanumeric, text: sortFn_text },
+    tableMeta: {} as DataTableMeta,
 })
 export type DataTableFeatures = typeof features

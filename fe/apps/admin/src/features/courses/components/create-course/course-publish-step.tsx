@@ -5,7 +5,8 @@ interface CoursePublishStepProps {
 }
 
 export function CoursePublishStep({ data }: CoursePublishStepProps) {
-    const totalLessons = data.chapters.reduce((acc, chapter) => acc + chapter.lessons.length, 0);
+    const sections = data.sections ?? [];
+    const totalLessons = sections.reduce((acc, section) => acc + (section.lessons?.length ?? 0), 0);
 
     return (
         <div className="space-y-6 max-w-2xl">
@@ -23,7 +24,7 @@ export function CoursePublishStep({ data }: CoursePublishStepProps) {
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                     <div>
                         <p className="text-sm text-muted-foreground">Category</p>
-                        <p className="font-medium">{data.category || "Uncategorized"}</p>
+                        <p className="font-medium">{data.categoryId ? `#${data.categoryId}` : "Uncategorized"}</p>
                     </div>
                     <div>
                         <p className="text-sm text-muted-foreground">Price</p>
@@ -35,8 +36,8 @@ export function CoursePublishStep({ data }: CoursePublishStepProps) {
                     <p className="text-sm text-muted-foreground mb-2">Content Summary</p>
                     <div className="flex gap-4">
                         <div className="bg-muted px-3 py-2 rounded-md">
-                            <span className="text-xl font-bold">{data.chapters.length}</span>
-                            <span className="text-sm text-muted-foreground ml-2">Chapters</span>
+                            <span className="text-xl font-bold">{sections.length}</span>
+                            <span className="text-sm text-muted-foreground ml-2">Sections</span>
                         </div>
                         <div className="bg-muted px-3 py-2 rounded-md">
                             <span className="text-xl font-bold">{totalLessons}</span>

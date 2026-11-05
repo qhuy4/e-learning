@@ -28,7 +28,7 @@ import { VideoUploader } from "./video-uploader";
 import { ThumbnailUploader } from "./thumbnail-uploader";
 import { validateLesson } from "../schemas/lesson.schema";
 
-interface LessonFormData {
+export interface LessonFormData {
   title: string;
   slug?: string;
   type: "video";

@@ -1,4 +1,5 @@
 import { createColumnHelper } from "@tanstack/react-table";
+import type { DataTableFeatures } from "@/components/common/data-table/data-table-features";
 import { Badge } from "@fe/components/ui/badge";
 import type { InstructorCertificate } from "../types/instructor-certificate";
 import {
@@ -6,7 +7,7 @@ import {
   instructorCertificateStatusClassName,
 } from "../types/instructor-certificate";
 
-const column = createColumnHelper<InstructorCertificate>();
+const column = createColumnHelper<DataTableFeatures, InstructorCertificate>();
 
 export const instructorCertificateColumns = [
   column.accessor("certificateName", {

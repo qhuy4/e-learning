@@ -1,10 +1,10 @@
-import { Separator } from "@fe/components/ui/separator";
-import { SidebarTrigger } from "@fe/components/ui/sidebar";
-import { useTheme } from "@/components/theme-provider.tsx";
-import { Button } from "@fe/components/ui/button.tsx";
-import { Moon, Sun, Bell } from "lucide-react";
-import { useLocation, useNavigate } from "react-router";
-import { useUnreadCount } from "@/features/notifications/hooks/use-notifications";
+import {Separator} from "@fe/components/ui/separator";
+import {SidebarTrigger} from "@fe/components/ui/sidebar";
+import {useTheme} from "@/components/theme-provider.tsx";
+import {Button} from "@fe/components/ui/button.tsx";
+import {Bell, Moon, Sun} from "lucide-react";
+import {useLocation, useNavigate} from "react-router";
+import {useUnreadCount} from "@/features/notifications/hooks/use-notifications";
 
 const PAGE_TITLES: Record<string, string> = {
   "/": "Dashboard",
@@ -13,7 +13,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/students": "Học viên",
   "/students/create": "Tạo học viên",
   "/instructors": "Giảng viên",
-  "/instructors/approvals": "Duyệt Giảng Viên",
+  "/instructors/applications": "Đơn đăng ký giảng viên",
   "/earnings": "Doanh thu",
   "/payments": "Thanh toán",
   "/payout-requests": "Yêu cầu rút tiền",
@@ -54,6 +54,9 @@ export function SiteHeader() {
     if (location.pathname.startsWith("/students/")) {
       if (location.pathname.endsWith("/edit")) return "Chỉnh sửa học viên";
       return "Chi tiết học viên";
+    }
+    if (location.pathname.startsWith("/instructors/applications/")) {
+      return "Chi tiết đơn đăng ký giảng viên";
     }
     if (location.pathname.startsWith("/instructors/")) {
       if (location.pathname.endsWith("/edit")) return "Chỉnh sửa giảng viên";

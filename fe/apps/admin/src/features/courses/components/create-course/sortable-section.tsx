@@ -19,7 +19,7 @@ import type { DragEndEvent } from "@dnd-kit/core";
 
 import { SortableLesson } from "./sortable-lesson";
 import { useUpdateLesson, useDeleteLesson } from "@/features/lessons/hook/use-lessons";
-import { useDeleteSection, useUpdateSection } from "../../hook/use-courses";
+import { useDeleteSection, useUpdateSection } from "../../hooks/use-courses";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 
 interface SortableSectionProps {

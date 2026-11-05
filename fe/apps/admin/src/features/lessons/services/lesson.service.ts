@@ -9,11 +9,11 @@ export const lessonService = {
 
     formData.append("type", "video");
 
-    if (payload.videoSource) {
+    if (payload.videoSource instanceof File) {
       formData.append("video", payload.videoSource);
     }
 
-    if (payload.thumbnail) {
+    if (payload.thumbnail instanceof File) {
       formData.append("thumbnail", payload.thumbnail);
     }
 

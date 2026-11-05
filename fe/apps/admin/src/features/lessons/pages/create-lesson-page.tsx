@@ -1,8 +1,7 @@
 import { Button } from "@fe/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 import { useNavigate, useSearchParams, useParams } from "react-router";
-import { LessonForm } from "@/features/lessons/components/lesson-form";
-import type { Lesson } from "../types/lesson.types";
+import { LessonForm, type LessonFormData } from "@/features/lessons/components/lesson-form";
 import { useCreateLesson, useGetLesson, useUpdateLesson } from "../hook/use-lessons";
 import { toast } from "sonner";
 
@@ -19,7 +18,7 @@ export function CreateLessonPage() {
   const { mutate: createLesson, isPending: isCreating } = useCreateLesson();
   const { mutate: updateLesson, isPending: isUpdating } = useUpdateLesson();
 
-  const handleSave = (data: Lesson) => {
+  const handleSave = (data: LessonFormData) => {
     if (isEditing) {
       const tid = toast.loading("Đang cập nhật bài học...");
       updateLesson(

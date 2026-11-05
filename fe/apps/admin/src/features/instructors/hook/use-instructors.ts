@@ -44,9 +44,9 @@ export function useUpdateInstructor() {
                 name?: string;
                 email?: string;
                 status?: string;
-                headline?: string;
-                bio?: string;
-                websiteUrl?: string;
+                headline?: string | null;
+                bio?: string | null;
+                websiteUrl?: string | null;
                 socialLinks?: Record<string, string> | null;
             }
         }) => adminInstructorService.updateInstructor(id, data),
@@ -63,73 +63,3 @@ export function useUpdateInstructor() {
     })
 }
 
-export function useCreateUser() {
-    const queryClient = useQueryClient()
-
-    return useMutation({
-        mutationFn: (data: UserWriteInput) => userService.createUser(data),
-        onSuccess: () => {
-            void queryClient.invalidateQueries({queryKey: instructorKeys.lists()})
-        },
-    })
-}
-
-export function useUpdateUser() {
-    const queryClient = useQueryClient()
-
-    return useMutation({
-        mutationFn: ({
-            id,
-            data,
-        }: {
-            id: number
-            data: UserWriteInput
-        }) => userService.updateUser(id, data),
-
-        onSuccess: (_result, variables) => {
-            void queryClient.invalidateQueries({
-                queryKey: instructorKeys.lists(),
-            })
-
-            void queryClient.invalidateQueries({
-                queryKey: instructorKeys.detail(variables.id),
-            })
-        },
-    })
-}
-
-export function useDeleteUser() {
-    const queryClient = useQueryClient()
-
-    return useMutation({
-        mutationFn: (id: number) => userService.deleteUser(id),
-        onSuccess: () => {
-            void queryClient.invalidateQueries({queryKey: instructorKeys.all})
-        },
-    })
-}
-
-export function useBlockUser() {
-    const queryClient = useQueryClient()
-
-    return useMutation({
-        mutationFn: ({id, reason}: { id: number; reason: string }) =>
-            userService.blockUser(id, reason),
-        onSuccess: (_result, variables) => {
-            void queryClient.invalidateQueries({queryKey: instructorKeys.lists()})
-            void queryClient.invalidateQueries({queryKey: instructorKeys.detail(variables.id)})
-        },
-    })
-}
-
-export function useUnblockUser() {
-    const queryClient = useQueryClient()
-
-    return useMutation({
-        mutationFn: (id: number) => userService.unblockUser(id),
-        onSuccess: (_result, variables) => {
-            void queryClient.invalidateQueries({queryKey: instructorKeys.lists()})
-            void queryClient.invalidateQueries({queryKey: instructorKeys.detail(variables)})
-        },
-    })
-}

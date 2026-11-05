@@ -11,33 +11,41 @@ const columnHelper = createColumnHelper<DataTableFeatures, PendingInstructorProf
 
 interface ApprovalTableMeta {
   onView?: (profile: PendingInstructorProfile) => void
-  onApprove?: (profileId: number) => void
-  reviewing?: boolean
+}
+
+const STATUS_LABELS: Record<
+  string,
+  { label: string; variant: "outline" | "secondary" | "default" | "destructive" }
+> = {
+  PENDING_SUBMISSION: { label: "Chờ bổ sung", variant: "secondary" },
+  PENDING_INFORMATION: { label: "Cần bổ sung", variant: "secondary" },
+  PENDING_REVIEW: { label: "Chờ duyệt", variant: "outline" },
+  APPROVED: { label: "Đã duyệt", variant: "default" },
+  REJECTED: { label: "Đã từ chối", variant: "destructive" },
 }
 
 function approvalStatus(profile: PendingInstructorProfile) {
-  const statuses: Record<number, {label: string; className: string}> = {
-    1: {label: "Chờ duyệt (PENDING)", className: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"},
-    2: {label: "Đã duyệt (APPROVED)", className: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"},
-    3: {label: "Đã từ chối (REJECTED)", className: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"},
-  }
-  const status = statuses[profile.approvalStatus]
-  return status ? <Badge className={status.className}>{status.label}</Badge> : "—"
+  const status = STATUS_LABELS[profile.status]
+  return status ? (
+    <Badge variant={status.variant}>{status.label}</Badge>
+  ) : (
+    "-"
+  )
 }
 
 export function createInstructorApprovalColumns() {
   return columnHelper.columns([
-    columnHelper.accessor("user.name", {
+    columnHelper.accessor("fullName", {
       id: "instructor",
       header: "Giảng viên",
       cell: (info) => {
         const profile = info.row.original
         return (
           <div className="min-w-44">
-            <div className="font-semibold">{profile.user?.name || `User #${profile.userId}`}</div>
-            <div className="text-xs text-muted-foreground">{profile.user?.email}</div>
+            <div className="font-semibold">{profile.fullName || profile.email}</div>
+            <div className="text-xs text-muted-foreground">{profile.email}</div>
             <div className="mt-0.5 text-xs text-muted-foreground">
-              Ngày nộp: {new Date(profile.createdAt).toLocaleDateString("vi-VN")}
+              Ngày nộp: {new Date(profile.submittedAt || profile.createdAt).toLocaleDateString("vi-VN")}
             </div>
           </div>
         )
@@ -55,20 +63,11 @@ export function createInstructorApprovalColumns() {
         )
       },
     }),
-    columnHelper.display({
-      id: "emailVerification",
-      header: "Xác thực email",
-      cell: () => (
-        <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
-          ✓ Đã xác thực
-        </Badge>
-      ),
-    }),
-    columnHelper.accessor("certificates", {
+    columnHelper.accessor("certificateCount", {
       header: "Bằng cấp",
-      cell: (info) => <Badge variant="secondary">🎓 {info.getValue().length} chứng chỉ</Badge>,
+      cell: (info) => <Badge variant="secondary">{info.getValue()} chứng chỉ</Badge>,
     }),
-    columnHelper.accessor("approvalStatus", {
+    columnHelper.accessor("status", {
       header: "Trạng thái",
       cell: (info) => approvalStatus(info.row.original),
     }),
@@ -79,15 +78,17 @@ export function createInstructorApprovalColumns() {
         const profile = info.row.original
         const meta = info.table.options.meta as ApprovalTableMeta | undefined
         return (
-          <div className="flex min-w-48 justify-end gap-2" onClick={(event) => event.stopPropagation()}>
-            <Button variant="secondary" size="sm" onClick={() => meta?.onView?.(profile)}>
-              Chi tiết & Đối soát
+          <div
+            className="flex justify-end whitespace-nowrap"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => meta?.onView?.(profile)}
+            >
+              Xem & xử lý
             </Button>
-            {profile.approvalStatus === 1 && (
-              <Button size="sm" disabled={meta?.reviewing} onClick={() => meta?.onApprove?.(profile.profileId)}>
-                Duyệt
-              </Button>
-            )}
           </div>
         )
       },

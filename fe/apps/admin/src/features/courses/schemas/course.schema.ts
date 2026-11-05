@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const createCourseSchema = z.object({
   title: z
-    .string({ required_error: "Vui lòng nhập tên khóa học." })
+    .string({ error: "Vui lòng nhập tên khóa học." })
     .trim()
     .min(1, "Vui lòng nhập tên khóa học.")
     .max(255, "Tên khóa học không được vượt quá 255 ký tự."),
@@ -22,7 +22,7 @@ export const createCourseSchema = z.object({
 
 export const editCourseSchema = z.object({
   title: z
-    .string({ required_error: "Vui lòng nhập tên khóa học." })
+    .string({ error: "Vui lòng nhập tên khóa học." })
     .trim()
     .min(1, "Vui lòng nhập tên khóa học.")
     .max(255, "Tên khóa học không được vượt quá 255 ký tự."),
@@ -35,9 +35,8 @@ export const editCourseSchema = z.object({
   categoryId: z.coerce.number().optional().default(1),
 });
 
-const getFirstIssue = (
-  result: ReturnType<typeof createCourseSchema.safeParse>,
-) => (!result.success ? result.error.issues[0].message : null);
+const getFirstIssue = (result: z.ZodSafeParseResult<unknown>) =>
+  !result.success ? result.error.issues[0].message : null;
 
 export const validateCourse = (data: any) =>
   getFirstIssue(createCourseSchema.safeParse(data));

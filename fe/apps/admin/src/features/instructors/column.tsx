@@ -139,7 +139,7 @@ export function createInstructorColumns() {
                 const approvedAt = info.getValue()
                 return (
                     <span className="text-sm text-muted-foreground">
-                        {formatDate(approvedAt)}
+                        {formatDate(approvedAt ?? null)}
                     </span>
                 )
             },

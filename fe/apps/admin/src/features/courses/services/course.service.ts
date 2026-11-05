@@ -69,7 +69,7 @@ export const courseService = {
     return response.data;
   },
 
-  createSection: async (payload: { courseId: number; section: Section }) => {
+  createSection: async (payload: { courseId: number; section: Omit<Section, "id"> }) => {
     const response = await api.post(
       `/courses/${payload.courseId}/sections`,
       payload.section,
