@@ -30,6 +30,12 @@ export class StorageController {
     if (!key) {
       throw new NotFoundException('File key is required');
     }
+    if (
+      key.startsWith('mentor-certificates/') ||
+      key.startsWith('instructor-certificates/')
+    ) {
+      throw new NotFoundException('File not found');
+    }
 
     try {
       const downloadUrl = await this.storage.createDownloadUrl({

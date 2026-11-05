@@ -4,7 +4,6 @@ import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 // import { User } from '@/modules/users/entities/user.entity';
-import { InstructorInviteEntity } from '@/modules/auth/entities/instructor-invite.entity';
 import { AuthService } from '@/modules/auth/auth.service';
 import { AuthController } from '@/modules/auth/auth.controller';
 import { MailService } from '@/modules/auth/services/mail.service';
@@ -31,12 +30,7 @@ import { AuthSecurityController } from '@/modules/auth/presentation/controllers/
 
 @Module({
   imports: [
-    // TypeOrmModule.forFeature([User, InstructorInviteEntity]),
-    TypeOrmModule.forFeature([
-      UserOrmEntity,
-      InstructorInviteEntity,
-      RefreshSession,
-    ]),
+    TypeOrmModule.forFeature([UserOrmEntity, RefreshSession]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     UserModule,
     CqrsModule,
@@ -75,6 +69,6 @@ import { AuthSecurityController } from '@/modules/auth/presentation/controllers/
     RefreshTokenHandler,
     LogoutHandler,
   ],
-  exports: [AuthService, JwtModule, PassportModule],
+  exports: [AuthService, MailService, JwtModule, PassportModule],
 })
 export class AuthModule {}

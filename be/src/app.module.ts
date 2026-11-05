@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from '@/app.controller';
 import { AppService } from '@/app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -7,7 +8,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { UserModule } from '@/modules/users/user.module';
 import { CoursesModule } from '@/modules/courses/courses.module';
-import { TeacherModule } from '@/modules/teacher/teacher.module';
 import { QuizzesModule } from './modules/quizzes/quizzes.module';
 import { DictationsModule } from './modules/dictations/dictations.module';
 import { AuthModule } from '@/modules/auth/auth.module';
@@ -36,6 +36,9 @@ import { ExamsModule } from '@/modules/exams/exams.module';
 import { ExamsImportModule } from '@/modules/exams/import/exams-import.module';
 import { BookingsModule } from '@/modules/bookings/bookings.module';
 import { MeetingRoomModule } from '@/modules/meeting-room/meeting-room.module';
+import { SkillProfilingModule } from '@/modules/skill-profiling/skill-profiling.module';
+import { StudentAssessmentModule } from '@/modules/student-assessment/student-assessment.module';
+import { InstructorApplicationsModule } from '@/modules/instructor-applications/instructor-applications.module';
 
 @Module({
   imports: [
@@ -50,6 +53,7 @@ import { MeetingRoomModule } from '@/modules/meeting-room/meeting-room.module';
       },
     }),
     CqrsModule.forRoot(),
+    ScheduleModule.forRoot(),
     LocationModule,
     ReviewsModule,
     OrdersModule,
@@ -69,7 +73,6 @@ import { MeetingRoomModule } from '@/modules/meeting-room/meeting-room.module';
     AuthModule,
     InstructorModule,
     CoursesModule,
-    TeacherModule,
     SectionsModule,
     LessonsModule,
     StorageModule,
@@ -81,6 +84,9 @@ import { MeetingRoomModule } from '@/modules/meeting-room/meeting-room.module';
     ExamsModule,
     ExamsImportModule,
     MeetingRoomModule,
+    SkillProfilingModule,
+    StudentAssessmentModule,
+    InstructorApplicationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -65,6 +65,20 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   [ErrorCode.INSTRUCTOR_PROFILE_NOT_FOUND]: 'Không tìm thấy hồ sơ giảng viên',
   [ErrorCode.TEACHER_REGISTRATION_NOT_FOUND]:
     'Không tìm thấy đăng ký giảng viên',
+  [ErrorCode.INSTRUCTOR_APPLICATION_TOKEN_INVALID]:
+    'Liên kết không hợp lệ, đã hết hạn hoặc đã được sử dụng',
+  [ErrorCode.INSTRUCTOR_APPLICATION_NOT_FOUND]:
+    'Không tìm thấy đơn đăng ký giảng viên',
+  [ErrorCode.INSTRUCTOR_APPLICATION_ALREADY_EXISTS]:
+    'Email này đã có đơn đăng ký giảng viên',
+  [ErrorCode.INSTRUCTOR_APPLICATION_REAPPLY_TOO_SOON]:
+    'Hồ sơ giảng viên đã bị từ chối. Vui lòng đăng ký lại sau 24 giờ',
+  [ErrorCode.INSTRUCTOR_APPLICATION_NOT_EDITABLE]:
+    'Đơn đăng ký không thể chỉnh sửa ở trạng thái hiện tại',
+  [ErrorCode.INSTRUCTOR_CERTIFICATE_REQUIRED]:
+    'Vui lòng tải lên ít nhất một chứng chỉ',
+  [ErrorCode.INSTRUCTOR_CERTIFICATE_FILE_INVALID]:
+    'Tệp chứng chỉ không hợp lệ',
 
   [ErrorCode.PAYOUT_NOT_FOUND]: 'Không tìm thấy yêu cầu rút tiền',
   [ErrorCode.PAYOUT_ALREADY_PROCESSED]: 'Yêu cầu rút tiền đã được xử lý',
@@ -104,6 +118,16 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   [ErrorCode.BOOKING_TIME_CONFLICT]: 'Khung giờ đặt lịch bị trùng',
   [ErrorCode.BOOKING_INVALID_STATUS_TRANSITION]:
     'Không thể chuyển trạng thái buổi đặt lịch',
+
+  [ErrorCode.SKILL_NOT_FOUND]: 'Không tìm thấy kỹ năng',
+  [ErrorCode.SKILL_EVIDENCE_SOURCE_NOT_FOUND]:
+    'Không tìm thấy nguồn dữ liệu chứng minh kỹ năng',
+  [ErrorCode.SKILL_EVIDENCE_NOT_FOUND]: 'Không tìm thấy bằng chứng kỹ năng',
+
+  [ErrorCode.ASSESSMENT_NOT_FOUND]: 'Không tìm thấy bài đánh giá',
+  [ErrorCode.MODEL_SERVICE_UNAVAILABLE]:
+    'Dịch vụ đánh giá đang tạm thời không khả dụng',
+  [ErrorCode.MODEL_SERVICE_ERROR]: 'Không thể phân tích bài viết',
 
   [ErrorCode.UNAUTHORIZED]: 'KHÔNG ĐƯỢC PHÉP',
 };
