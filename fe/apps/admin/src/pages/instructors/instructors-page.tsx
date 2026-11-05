@@ -1,12 +1,10 @@
 import {DataTable} from "@/components/common/data-table/data-table.tsx";
 import {Button} from "@fe/components/ui/button.tsx";
 import {Plus} from "lucide-react";
-import {DeleteConfirmDialog} from "@/features/users/components/delete-confirm-diialog.tsx";
 import {useNavigate} from "react-router";
 import type {Instructor} from "@/features/instructors/type/instructor.ts";
 import {createInstructorColumns} from "@/features/instructors/column.tsx";
 import {useListPage} from "@/components/common/page/use-list-page.ts";
-import {useDeleteDialog} from "@/features/users/hook/user-dialog.ts";
 import {useInstructors} from "@/features/instructors/hook/use-instructors.ts";
 
 const columns = createInstructorColumns()
@@ -26,13 +24,6 @@ export default function InstructorsPage() {
     } = useListPage()
 
     const navigate = useNavigate()
-
-    const {
-        open: deleteOpen,
-        item: deletingInstructor,
-        setOpen: setDeleteOpen,
-        handleDelete,
-    } = useDeleteDialog<Instructor>()
 
     const {data: result, isLoading: loading, refetch, isFetching} = useInstructors(
         page,
@@ -58,10 +49,15 @@ export default function InstructorsPage() {
         <div className="p-6">
             <div className="mb-4 flex items-center justify-between">
                 <h1 className="text-2xl font-bold">Giảng viên</h1>
-                <Button onClick={handleCreate}>
-                    <Plus className="size-4"/>
-                    Tạo giảng viên
-                </Button>
+                <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => navigate("/instructors/applications")}>
+                        Đơn đăng ký
+                    </Button>
+                    <Button onClick={handleCreate}>
+                        <Plus className="size-4"/>
+                        Tạo giảng viên
+                    </Button>
+                </div>
             </div>
 
             <DataTable
@@ -84,7 +80,7 @@ export default function InstructorsPage() {
                 sortBy={sortBy}
                 sortOrder={sortOrder}
                 onSortChange={handleSortChange}
-                tableMeta={{onEdit: handleEdit, onDelete: handleDelete}}
+                tableMeta={{onEdit: handleEdit}}
                 text={{
                     searchPlaceholder: "Tìm kiếm...",
                     reload: "Tải lại",
@@ -96,14 +92,6 @@ export default function InstructorsPage() {
                 }}
             />
 
-            <DeleteConfirmDialog
-                open={deleteOpen}
-                onOpenChange={setDeleteOpen}
-                user={deletingInstructor}
-                onSuccess={() => {
-                    setDeleteOpen(false)
-                }}
-            />
         </div>
     )
 }

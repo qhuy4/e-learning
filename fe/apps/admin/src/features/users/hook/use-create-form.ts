@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useNavigate } from "react-router"
 import { toast } from "sonner"
 
-interface UseCreateFormOptions<TForm extends Record<string, unknown>, TOutput> {
+interface UseCreateFormOptions<TForm extends object, TOutput> {
     emptyForm: TForm
     validate: (form: TForm) => Record<string, string | undefined>
     buildOutput: (form: TForm) => TOutput
@@ -11,7 +11,7 @@ interface UseCreateFormOptions<TForm extends Record<string, unknown>, TOutput> {
     redirectTo: string
 }
 
-interface UseCreateFormReturn<TForm extends Record<string, unknown>> {
+interface UseCreateFormReturn<TForm extends object> {
     form: TForm
     errors: Record<string, string | undefined>
     submitting: boolean
@@ -19,7 +19,7 @@ interface UseCreateFormReturn<TForm extends Record<string, unknown>> {
     handleSubmit: (e: React.FormEvent) => Promise<void>
 }
 
-export function  useCreateForm<TForm extends Record<string, unknown>, TOutput>({
+export function useCreateForm<TForm extends object, TOutput>({
     emptyForm,
     validate,
     buildOutput,
@@ -30,6 +30,7 @@ export function  useCreateForm<TForm extends Record<string, unknown>, TOutput>({
     const navigate = useNavigate()
     const [form, setForm] = useState<TForm>(emptyForm)
     const [errors, setErrors] = useState<Record<string, string | undefined>>({})
+    const [submitting, setSubmitting] = useState(false)
 
     function setField<K extends keyof TForm>(key: K, value: TForm[K]) {
         setForm((prev) => ({ ...prev, [key]: value }))
@@ -48,6 +49,7 @@ export function  useCreateForm<TForm extends Record<string, unknown>, TOutput>({
         }
 
         setErrors({})
+        setSubmitting(true)
 
         try {
             const output = buildOutput(form)
@@ -58,8 +60,10 @@ export function  useCreateForm<TForm extends Record<string, unknown>, TOutput>({
             setErrors({
                 submit: err instanceof Error ? err.message : "An unexpected error occurred",
             })
+        } finally {
+            setSubmitting(false)
         }
     }
 
-    return { form, errors, setField, handleSubmit }
+    return { form, errors, submitting, setField, handleSubmit }
 }

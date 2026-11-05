@@ -38,7 +38,7 @@ import {userStatusLabel} from "@/features/users/constants/users.constants.ts";
 import {DeleteConfirmDialog} from "@/features/users/components/delete-confirm-diialog.tsx";
 import type {Instructor} from "@/features/instructors/type/instructor.ts";
 import {usePayoutAccounts, useDeletePayoutAccount} from "@/features/instructors/hooks/use-payout-accounts.ts";
-import {accountTypeLabel, accountTypeClassName, type PayoutAccount} from "@/features/instructors/types/payout-account.ts";
+import {accountTypeLabel, accountTypeClassName, type AccountType, type PayoutAccount} from "@/features/instructors/types/payout-account.ts";
 import {toast} from "sonner";
 
 function statusVariant(status: UserStatus) {
@@ -323,8 +323,8 @@ function PayoutAccountsSection({instructorProfileId}: {instructorProfileId: stri
                                 <div className="min-w-0">
                                     <div className="flex items-center gap-2 flex-wrap">
                                         <span className="text-sm font-medium">{account.accountHolderName}</span>
-                                        <Badge className={accountTypeClassName[account.accountType] ?? ""}>
-                                            {accountTypeLabel[account.accountType] ?? account.accountType}
+                                        <Badge className={accountTypeClassName[account.accountType as AccountType] ?? ""}>
+                                            {accountTypeLabel[account.accountType as AccountType] ?? account.accountType}
                                         </Badge>
                                         {account.isPrimary && (
                                             <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">

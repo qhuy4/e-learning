@@ -42,14 +42,11 @@ export default function CouponsPage() {
           <h1 className="text-2xl font-bold">Mã giảm giá</h1>
           <p className="text-sm text-muted-foreground mt-1">Quản lý mã giảm giá cho hệ thống</p>
         </div>
-        <Button asChild>
-          <Link to="/coupons/create" className="flex items-center">
-            <Plus className="mr-2 h-4 w-4" />
-            <span>
-            Tạo mã giảm giá
-
-            </span>
-          </Link>
+        <Button
+          render={<Link to="/coupons/create" className="flex items-center" />}
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          <span>Tạo mã giảm giá</span>
         </Button>
       </div>
 

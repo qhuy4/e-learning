@@ -4,7 +4,9 @@ import {createColumnHelper} from "@tanstack/react-table"
 import type {
     HeaderContext,
     ColumnDef,
+    RowData,
 } from "@tanstack/react-table"
+import type {DataTableFeatures} from "@/components/common/data-table/data-table-features.ts"
 import {
     ArrowUp,
     ArrowDown,
@@ -39,7 +41,7 @@ import {
 import type {RowAction} from "@/shared/types/row-action.ts"
 import {initials} from "@/features/users/utils/ultis.ts"
 
-const columnHelper = createColumnHelper<User>()
+const columnHelper = createColumnHelper<DataTableFeatures, User>()
 
 function SortHeader<TValue>({
     label,
@@ -48,7 +50,7 @@ function SortHeader<TValue>({
 }: {
     label: string
     columnId: string
-    info: HeaderContext<User, TValue>
+    info: HeaderContext<DataTableFeatures, User, TValue>
 }) {
     const meta = info.table.options.meta
 
@@ -101,9 +103,9 @@ function SortHeader<TValue>({
     )
 }
 
-function createActionsColumn<T>(
+function createActionsColumn<T extends RowData>(
     getActions: (item: T) => RowAction<T>[]
-): ColumnDef<T> {
+): ColumnDef<DataTableFeatures, T> {
     return {
         id: "actions",
 

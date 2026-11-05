@@ -1,191 +1,167 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import {
-  adminInstructorService,
-} from "@/features/instructors/service";
-import type { PendingInstructorProfile } from "@/features/instructors/type/pending-instructor.ts";
-import { ConfirmDialog } from "@/components/confirm-dialog";
-import { useConfirmDialog } from "@/hooks/use-confirm-dialog";
+import { adminInstructorService } from "@/features/instructors/service";
+import type {
+  InstructorApplicationStatus,
+  PendingInstructorProfile,
+} from "@/features/instructors/type/pending-instructor.ts";
 import { DataTable } from "@/components/common/data-table/data-table.tsx";
 import { createInstructorApprovalColumns } from "@/features/instructors/approval-columns.tsx";
+import { Tabs, TabsList, TabsTrigger } from "@fe/components/ui/tabs";
 
-const getMediaUrl = (pathStr: string | null | undefined) => {
-  if (!pathStr) return "";
-  if (pathStr.startsWith("http")) return pathStr;
-  const cleanPath = pathStr.replace(/\\/g, "/").replace(/^\/?/, "");
-  const origin = import.meta.env.VITE_API_URL || `${window.location.protocol}//${window.location.hostname}:3001`;
-  return `${origin.replace(/\/$/, "")}/${cleanPath}`;
-};
+const STATUS_TABS: {
+  label: string;
+  value: InstructorApplicationStatus | undefined;
+}[] = [
+  { label: "Chờ duyệt", value: "PENDING_REVIEW" },
+  { label: "Chờ bổ sung", value: "PENDING_SUBMISSION" },
+  { label: "Cần bổ sung", value: "PENDING_INFORMATION" },
+  { label: "Đã duyệt", value: "APPROVED" },
+  { label: "Đã từ chối", value: "REJECTED" },
+  { label: "Tất cả hồ sơ", value: undefined },
+];
+
+function normalizeApplications(list: PendingInstructorProfile[]) {
+  return list.map((application) => ({
+    ...application,
+    profileId: application.id,
+    certificateCount:
+      application.certificateCount ?? application.certificates?.length ?? 0,
+  }));
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+  const err = error as {
+    response?: { data?: { error?: { message?: string }; message?: string } };
+    message?: string;
+  };
+  return (
+    err.response?.data?.error?.message ||
+    err.response?.data?.message ||
+    err.message ||
+    fallback
+  );
+}
 
 export const InstructorApprovalsPage: React.FC = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [profiles, setProfiles] = useState<PendingInstructorProfile[]>([]);
-  const [statusFilter, setStatusFilter] = useState<number | undefined>(1); // 1 = PENDING default
+  const [applications, setApplications] = useState<PendingInstructorProfile[]>([]);
+  const [statusFilter, setStatusFilter] =
+    useState<InstructorApplicationStatus | undefined>(undefined);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState("");
-  const [selectedProfile, setSelectedProfile] =
-    useState<PendingInstructorProfile | null>(null);
 
-  // Review Modal State
-  const [reviewing, setReviewing] = useState(false);
-  const [rejectModalOpen, setRejectModalOpen] = useState(false);
-  const [rejectReason, setRejectReason] = useState("");
-
-  const { confirm, confirmState, handleConfirm, handleCancel } =
-    useConfirmDialog();
-
-  const fetchProfiles = async (status?: number) => {
-    setLoading(true);
+  const fetchApplications = async (status?: InstructorApplicationStatus) => {
     try {
-      const res = await adminInstructorService.getPendingProfiles(status);
-      const list = Array.isArray(res) ? res : (res as any)?.data || [];
-      setProfiles(list);
-    } catch (err: any) {
-      const msg =
-        err.response?.data?.error?.message ||
-        err.response?.data?.message ||
-        err.message ||
-        "Không thể tải danh sách hồ sơ giảng viên.";
-      toast.error(msg);
+      const list = await adminInstructorService.getPendingProfiles(status);
+      setApplications(normalizeApplications(list));
+    } catch (err: unknown) {
+      toast.error(
+        getErrorMessage(err, "Không thể tải danh sách đơn đăng ký giảng viên."),
+      );
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchProfiles(statusFilter);
+    let cancelled = false;
+
+    adminInstructorService
+      .getPendingProfiles(statusFilter)
+      .then((list) => {
+        if (!cancelled) setApplications(normalizeApplications(list));
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) {
+          toast.error(
+            getErrorMessage(err, "Không thể tải danh sách đơn đăng ký giảng viên."),
+          );
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [statusFilter]);
 
-  const filteredProfiles = useMemo(() => {
+  const filteredApplications = useMemo(() => {
     const keyword = search.trim().toLocaleLowerCase("vi");
-    if (!keyword) return profiles;
+    if (!keyword) return applications;
 
-    return profiles.filter((profile) =>
-      [profile.user?.name, profile.user?.email, profile.headline, profile.bio]
-        .some((value) => value?.toLocaleLowerCase("vi").includes(keyword)),
+    return applications.filter((application) =>
+      [
+        application.fullName,
+        application.email,
+        application.headline,
+        application.bio,
+      ].some((value) => value?.toLocaleLowerCase("vi").includes(keyword)),
     );
-  }, [profiles, search]);
+  }, [applications, search]);
 
-  const totalPages = Math.ceil(filteredProfiles.length / pageSize);
-  const visibleProfiles = useMemo(
-    () => filteredProfiles.slice((page - 1) * pageSize, page * pageSize),
-    [filteredProfiles, page, pageSize],
+  const totalPages = Math.max(1, Math.ceil(filteredApplications.length / pageSize));
+  const visibleApplications = useMemo(
+    () =>
+      filteredApplications.slice((page - 1) * pageSize, page * pageSize),
+    [filteredApplications, page, pageSize],
   );
   const columns = useMemo(() => createInstructorApprovalColumns(), []);
 
-  const handleApprove = async (profileId: number) => {
-    const ok = await confirm({
-      title: "Phê duyệt hồ sơ giảng viên",
-      description:
-        "Bạn có chắc chắn muốn PHÊ DUYỆT hồ sơ giảng viên này? Sau khi duyệt, giảng viên sẽ được kích hoạt toàn quyền xuất bản khóa học và tạo doanh thu.",
-      confirmLabel: "Phê duyệt ngay",
-      cancelLabel: "Hủy bỏ",
-      variant: "default",
-    });
-
-    if (!ok) return;
-
-    const tid = toast.loading("Đang phê duyệt hồ sơ...");
-    setReviewing(true);
-    try {
-      await adminInstructorService.reviewProfile(profileId, 2); // 2 = APPROVED
-      toast.success("Đã phê duyệt hồ sơ giảng viên thành công!", { id: tid });
-      setSelectedProfile(null);
-      fetchProfiles(statusFilter);
-    } catch (err: any) {
-      const msg =
-        err.response?.data?.error?.message ||
-        err.response?.data?.message ||
-        err.message ||
-        "Lỗi khi phê duyệt hồ sơ.";
-      toast.error(msg, { id: tid });
-    } finally {
-      setReviewing(false);
-    }
-  };
-
-  const handleReject = async () => {
-    if (!selectedProfile) return;
-
-    if (!rejectReason.trim()) {
-      toast.error("Vui lòng nhập lý do từ chối hồ sơ.");
-      return;
-    }
-
-    const tid = toast.loading("Đang xử lý từ chối hồ sơ...");
-    setReviewing(true);
-    try {
-      await adminInstructorService.reviewProfile(
-        selectedProfile.profileId,
-        3,
-        rejectReason,
-      ); // 3 = REJECTED
-      toast.success("Đã từ chối hồ sơ giảng viên thành công.", { id: tid });
-      setRejectModalOpen(false);
-      setSelectedProfile(null);
-      setRejectReason("");
-      fetchProfiles(statusFilter);
-    } catch (err: any) {
-      const msg =
-        err.response?.data?.error?.message ||
-        err.response?.data?.message ||
-        err.message ||
-        "Lỗi khi từ chối hồ sơ.";
-      toast.error(msg, { id: tid });
-    } finally {
-      setReviewing(false);
-    }
+  const openDetail = (application: PendingInstructorProfile) => {
+    navigate(`/instructors/applications/${application.id}`);
   };
 
   return (
-    <div className="p-6  mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-            Quản Lý & Duyệt Giảng Viên
-          </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Xem xét thông tin chuyên môn và bằng cấp của tài khoản đã xác thực email
-          </p>
-        </div>
+    <div className="p-6">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold">Đơn đăng ký giảng viên</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Xét duyệt hồ sơ, chứng chỉ và gửi liên kết kích hoạt tài khoản giảng viên.
+        </p>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 pb-3">
-        {[
-          { label: "Chờ duyệt (Pending)", val: 1 },
-          { label: "Đã phê duyệt (Approved)", val: 2 },
-          { label: "Đã từ chối (Rejected)", val: 3 },
-          { label: "Tất cả hồ sơ", val: undefined },
-        ].map((tab) => (
-          <button
-            key={String(tab.val)}
-            onClick={() => {
-              setStatusFilter(tab.val);
-              setPage(1);
-            }}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-              statusFilter === tab.val
-                ? "bg-indigo-600 text-white shadow-sm"
-                : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div className="mb-4 overflow-x-auto">
+        <Tabs
+          value={statusFilter ?? "ALL"}
+          onValueChange={(value) => {
+            setLoading(true);
+            setStatusFilter(
+              value === "ALL"
+                ? undefined
+                : (value as InstructorApplicationStatus),
+            );
+            setPage(1);
+          }}
+        >
+          <TabsList variant="line">
+            {STATUS_TABS.map((tab) => (
+              <TabsTrigger
+                key={tab.value ?? "ALL"}
+                value={tab.value ?? "ALL"}
+                className="flex-none px-3"
+              >
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
       </div>
 
       <DataTable
         columns={columns}
-        data={visibleProfiles}
+        data={visibleApplications}
         page={page}
         pageSize={pageSize}
         totalPages={totalPages}
         onPageChange={setPage}
         loading={loading}
-        refetch={() => fetchProfiles(statusFilter)}
+        refetch={() => fetchApplications(statusFilter)}
         search={search}
         onSearchChange={(value) => {
           setSearch(value);
@@ -195,186 +171,18 @@ export const InstructorApprovalsPage: React.FC = () => {
           setPageSize(value);
           setPage(1);
         }}
-        onRowClick={setSelectedProfile}
-        tableMeta={{onView: setSelectedProfile, onApprove: handleApprove, reviewing}}
+        onRowClick={openDetail}
+        tableMeta={{ onView: openDetail }}
         text={{
           searchPlaceholder: "Tìm tên, email hoặc chuyên môn...",
           reload: "Làm mới",
           rowsPerPage: "Dòng trên trang",
-          noResults: "Không có hồ sơ nào trong mục này.",
+          noResults: "Không có đơn đăng ký nào trong mục này.",
           pageOf: (current, total) => `Trang ${current} / ${total || 1}`,
           previous: "Trước",
           next: "Sau",
         }}
       />
-
-      {/* Review Detail Modal */}
-      {selectedProfile && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200 dark:border-gray-800 p-6 my-8">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                  Hồ Sơ Đăng Ký Giảng Viên
-                </h3>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  Mã hồ sơ: #{selectedProfile.profileId} | User:{" "}
-                  {selectedProfile.user?.name} ({selectedProfile.user?.email})
-                </p>
-              </div>
-              <button
-                onClick={() => setSelectedProfile(null)}
-                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center font-bold"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Profile Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
-              <div>
-                <p className="text-xs text-gray-500">Tiêu đề chuyên môn:</p>
-                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                  {selectedProfile.headline || "Không có"}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500">Website / Portfolio:</p>
-                <p className="text-sm font-semibold text-indigo-600 truncate">
-                  {selectedProfile.websiteUrl || "Không có"}
-                </p>
-              </div>
-              <div className="md:col-span-2">
-                <p className="text-xs text-gray-500">Tiểu sử (Bio):</p>
-                <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
-                  {selectedProfile.bio || "Không có"}
-                </p>
-              </div>
-            </div>
-
-            {/* Certificates List */}
-            <div className="mb-8">
-              <h4 className="text-base font-bold text-gray-900 dark:text-gray-100 mb-3">
-                Chứng Chỉ & Bằng Cấp ({selectedProfile.certificates.length})
-              </h4>
-              {selectedProfile.certificates.length === 0 ? (
-                <p className="text-xs text-gray-500 italic">
-                  Không nộp chứng chỉ kèm theo.
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {selectedProfile.certificates.map((cert: any) => (
-                    <div
-                      key={cert.id}
-                      className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg flex items-center justify-between text-xs"
-                    >
-                      <div>
-                        <strong className="text-gray-900 dark:text-gray-100 text-sm block">
-                          {cert.certificateName}
-                        </strong>
-                        <span className="text-gray-500">
-                          Đơn vị cấp: {cert.issuer || "Không ghi"} | Ngày cấp:{" "}
-                          {cert.issuedAt || "—"}
-                        </span>
-                      </div>
-                      <a
-                        href={getMediaUrl(cert.filePath)}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="px-3 py-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded text-indigo-600 dark:text-indigo-300 hover:underline"
-                      >
-                        Xem file tệp
-                      </a>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Modal Actions */}
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">
-              <button
-                type="button"
-                onClick={() => setSelectedProfile(null)}
-                className="px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold rounded-lg"
-              >
-                Đóng
-              </button>
-              {selectedProfile.approvalStatus === 1 && (
-                <>
-                  <button
-                    type="button"
-                    disabled={reviewing}
-                    onClick={() => setRejectModalOpen(true)}
-                    className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 text-sm font-semibold rounded-lg transition-colors disabled:opacity-50"
-                  >
-                    Từ chối (Reject)
-                  </button>
-                  <button
-                    type="button"
-                    disabled={reviewing}
-                    onClick={() => handleApprove(selectedProfile.profileId)}
-                    className="px-5 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-50 shadow-sm"
-                  >
-                    Phê duyệt hồ sơ
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Reject Reason Prompt Modal */}
-      {rejectModalOpen && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl max-w-md w-full shadow-2xl p-6 border border-gray-200 dark:border-gray-800">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">
-              Từ Chối Hồ Sơ Giảng Viên
-            </h3>
-            <p className="text-xs text-gray-500 mb-4">
-              Vui lòng nhập lý do từ chối để gửi thông báo giải thích cho giảng
-              viên biết cần bổ sung thông tin gì.
-            </p>
-
-            <textarea
-              required
-              rows={4}
-              value={rejectReason}
-              onChange={(e) => setRejectReason(e.target.value)}
-              placeholder="Ví dụ: Hồ sơ chuyên môn chưa đầy đủ hoặc chứng chỉ không hợp lệ..."
-              className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none dark:bg-gray-800 dark:text-gray-100 mb-4"
-            />
-
-            <div className="flex items-center justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setRejectModalOpen(false)}
-                className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-semibold rounded-lg"
-              >
-                Hủy
-              </button>
-              <button
-                type="button"
-                disabled={reviewing || !rejectReason.trim()}
-                onClick={handleReject}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg disabled:opacity-50"
-              >
-                Xác nhận Từ chối
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Global Confirm Dialog */}
-      <ConfirmDialog
-        {...confirmState}
-        onConfirm={handleConfirm}
-        onCancel={handleCancel}
-      />
     </div>
   );
 };
-

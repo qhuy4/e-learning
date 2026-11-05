@@ -34,7 +34,7 @@ interface FormState {
     block_reason: string
     firstName: string
     lastName: string
-    gender: Gender
+    gender: Gender | ""
     phone: string
     dateOfBirth: string
     occupation: string
@@ -56,7 +56,7 @@ function userToForm(user: User): FormState {
         block_reason: user.blockReason ?? "",
         firstName: p?.firstName ?? "",
         lastName: p?.lastName ?? "",
-        gender: p?.gender != null ? String(p.gender) : "",
+        gender: p?.gender ?? "",
         phone: p?.phone ?? "",
         dateOfBirth: formatDate(p?.dateOfBirth),
         occupation: p?.occupation ?? "",
@@ -303,7 +303,7 @@ export function StudentEditPage() {
                                         onValueChange={(val) => setField("status", val as UserStatus)}
                                     >
                                         <SelectTrigger className="w-full">
-                                            <SelectValue disabled/>
+                                            <SelectValue/>
                                         </SelectTrigger>
                                         <SelectContent>
                                             {Object.values(UserStatus).map((s) => (
@@ -433,7 +433,7 @@ export function StudentEditPage() {
                                                     onSelect={(date) => {
                                                         setField(
                                                             "dateOfBirth",
-                                                            date ? date.toISOString().split("T")[0] : null
+                                                            date ? date.toISOString().split("T")[0] : ""
                                                         )
                                                         setOpen(false)
                                                     }}
@@ -547,7 +547,9 @@ export function StudentEditPage() {
                                     </label>
                                     <AvatarUpload
                                         value={form.avatarUrl}
-                                        onChange={(file) => setField("avatarFile", file)}
+                                        onChange={(value) => typeof value === "string"
+                                            ? setField("avatarUrl", value)
+                                            : setField("avatarFile", value)}
                                         disabled={submitting}
                                     />
                                 </div>

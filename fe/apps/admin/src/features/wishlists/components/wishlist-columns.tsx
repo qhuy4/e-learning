@@ -1,7 +1,8 @@
 import { createColumnHelper } from "@tanstack/react-table";
+import type { DataTableFeatures } from "@/components/common/data-table/data-table-features";
 import type { Wishlist } from "../types/wishlist";
 
-const column = createColumnHelper<Wishlist>();
+const column = createColumnHelper<DataTableFeatures, Wishlist>();
 
 export const wishlistColumns = [
   column.accessor("user", {

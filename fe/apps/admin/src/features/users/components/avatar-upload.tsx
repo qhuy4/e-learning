@@ -8,7 +8,7 @@ import {getAvatarUrl} from "@/features/users/utils/ultis.ts";
 
 interface AvatarUploadProps {
     value: string
-    onChange: (file: File) => void
+    onChange: (value: File | string) => void
     className?: string
     disabled?: boolean
 }

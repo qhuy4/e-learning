@@ -30,20 +30,35 @@ function generateCode(): string {
   return result;
 }
 
-function emptyForm() {
+interface CouponFormState {
+  code: string;
+  discountType: CouponType;
+  discountValue: number;
+  minOrderAmount: number;
+  maxDiscountAmount: number | null;
+  usageLimit: number | null;
+  usageLimitPerUser: number;
+  scope: CouponScope;
+  validFrom: string;
+  validUntil: string | null;
+  description: string;
+  courseIds: string[];
+}
+
+function emptyForm(): CouponFormState {
   return {
     code: generateCode(),
     discountType: CouponType.FIXED,
     discountValue: 0,
     minOrderAmount: 0,
-    maxDiscountAmount: null as number | null,
-    usageLimit: null as number | null,
+    maxDiscountAmount: null,
+    usageLimit: null,
     usageLimitPerUser: 1,
     scope: CouponScope.ALL,
     validFrom: new Date().toISOString().split("T")[0],
-    validUntil: null as string | null,
+    validUntil: null,
     description: "",
-    courseIds: [] as string[],
+    courseIds: [],
   };
 }
 

@@ -58,7 +58,7 @@ function SortHeader<TValue>({
     )
 }
 
-function formatDate(date: string | null) {
+function formatDate(date: Date | string | null) {
     if (!date) return "—"
     return new Date(date).toLocaleDateString("vi-VN", {
         day: "2-digit",
@@ -108,7 +108,7 @@ export function createStudentColumns() {
                 const createdAt = info.getValue()
                 return (
                     <span className="text-sm text-muted-foreground">
-                        {formatDate(createdAt as string)}
+                        {formatDate(createdAt)}
                     </span>
                 )
             },

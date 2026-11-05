@@ -1,9 +1,10 @@
 import { createColumnHelper } from "@tanstack/react-table";
+import type { DataTableFeatures } from "@/components/common/data-table/data-table-features";
 import { Badge } from "@fe/components/ui/badge";
 import type { PremiumSubscription } from "../types/premium-subscription";
 import { subscriptionStatusLabel, subscriptionStatusClassName } from "../types/premium-subscription";
 
-const column = createColumnHelper<PremiumSubscription>();
+const column = createColumnHelper<DataTableFeatures, PremiumSubscription>();
 
 export const premiumSubscriptionColumns = [
   column.accessor("user", {

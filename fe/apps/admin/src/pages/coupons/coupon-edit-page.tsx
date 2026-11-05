@@ -31,6 +31,21 @@ function formatDateDisplay(dateStr: string | null) {
   });
 }
 
+interface CouponFormState {
+  code: string;
+  discountType: CouponType;
+  discountValue: number;
+  minOrderAmount: number;
+  maxDiscountAmount: number | null;
+  usageLimit: number | null;
+  usageLimitPerUser: number;
+  scope: CouponScope;
+  validFrom: string;
+  validUntil: string | null;
+  description: string;
+  courseIds: string[];
+}
+
 function PageSkeleton() {
   return (
     <div className="p-6 mx-auto space-y-6">
@@ -58,19 +73,19 @@ export default function CouponEditPage() {
   const { data: coupon, isLoading } = useCoupon(id!);
   const updateCoupon = useUpdateCoupon();
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<CouponFormState>({
     code: "",
     discountType: CouponType.FIXED,
     discountValue: 0,
     minOrderAmount: 0,
-    maxDiscountAmount: null as number | null,
-    usageLimit: null as number | null,
+    maxDiscountAmount: null,
+    usageLimit: null,
     usageLimitPerUser: 1,
     scope: CouponScope.ALL,
     validFrom: "",
-    validUntil: null as string | null,
+    validUntil: null,
     description: "",
-    courseIds: [] as string[],
+    courseIds: [],
   });
 
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
@@ -81,13 +96,13 @@ export default function CouponEditPage() {
     if (coupon) {
       setForm({
         code: coupon.code,
-        discountType: coupon.discountType,
+        discountType: coupon.discountType as CouponType,
         discountValue: coupon.discountValue,
         minOrderAmount: coupon.minOrderAmount,
         maxDiscountAmount: coupon.maxDiscountAmount,
         usageLimit: coupon.usageLimit,
         usageLimitPerUser: coupon.usageLimitPerUser,
-        scope: coupon.scope,
+        scope: coupon.scope as CouponScope,
         validFrom: coupon.validFrom ? new Date(coupon.validFrom).toISOString().split("T")[0] : "",
         validUntil: coupon.validUntil ? new Date(coupon.validUntil).toISOString().split("T")[0] : null,
         description: coupon.description ?? "",

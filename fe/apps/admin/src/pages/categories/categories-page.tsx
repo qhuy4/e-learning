@@ -40,11 +40,9 @@ export default function CategoriesPage() {
           <h1 className="text-2xl font-bold">Danh mục</h1>
           <p className="text-sm text-muted-foreground mt-1">Quản lý danh mục khóa học</p>
         </div>
-        <Button asChild>
-          <Link to="/categories/create">
-            <Plus className="mr-2 h-4 w-4" />
-            Tạo danh mục
-          </Link>
+        <Button render={<Link to="/categories/create" />}>
+          <Plus className="mr-2 h-4 w-4" />
+          Tạo danh mục
         </Button>
       </div>
 

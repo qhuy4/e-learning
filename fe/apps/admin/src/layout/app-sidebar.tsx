@@ -16,12 +16,6 @@ import {
 import { GraduationCap } from "lucide-react"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-    const user = {
-        name: "Nguyễn Văn A",
-        email: "Giảng viên",
-        avatar: "https://i.pravatar.cc/150?img=11",
-    }
-
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader className="border-b border-sidebar-border">
@@ -47,7 +41,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavSecondary items={navigation.secondary} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={user} />
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   )

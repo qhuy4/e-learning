@@ -112,7 +112,7 @@ export default function CategoryCreatePage() {
               id="cat-name"
               value={form.name}
               onChange={(e) => handleNameChange(e.target.value)}
-              placeholder="VD: Lập trình web"
+              placeholder="VD: Tiếng Anh giao tiếp"
               aria-invalid={!!errors.name}
             />
             {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}

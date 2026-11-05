@@ -1,8 +1,9 @@
 import { createColumnHelper } from "@tanstack/react-table";
+import type { DataTableFeatures } from "@/components/common/data-table/data-table-features";
 import { Badge } from "@fe/components/ui/badge";
 import type { Notification } from "../types/notification";
 
-const column = createColumnHelper<Notification>();
+const column = createColumnHelper<DataTableFeatures, Notification>();
 
 const typeLabels: Record<string, string> = {
   "course.approved": "Khóa học được duyệt",
@@ -37,7 +38,6 @@ export const notificationColumns = [
       const v = info.getValue();
       return v ? null : <span className="inline-block h-2 w-2 rounded-full bg-blue-500" />;
     },
-    size: 30,
   }),
   column.accessor("type", {
     header: "Loại",

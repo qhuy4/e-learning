@@ -1,7 +1,7 @@
 export interface CourseQuestion {
   id: string;
   content: string;
-  status: number;
+  status: QuestionStatus;
   lastActivityAt: Date | null;
   createdAt: Date | null;
   updatedAt: Date | null;
@@ -16,7 +16,7 @@ export interface CourseQuestionAnswer {
   questionId: string;
   userId: string;
   content: string;
-  status: number;
+  status: QuestionStatus;
   createdAt: Date | null;
   user?: { id: string; name: string };
 }

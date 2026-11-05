@@ -1,30 +1,31 @@
 import App from "@/App";
 import DashboardPage from "@/pages/dashboard/dashboard-page";
-import { createBrowserRouter } from "react-router";
+import {createBrowserRouter} from "react-router";
 
-import { InstructorApprovalsPage } from "@/pages/instructors/instructor-approvals-page";
+import {InstructorApprovalsPage} from "@/pages/instructors/instructor-approvals-page";
+import {InstructorApplicationDetailPage} from "@/pages/instructors/instructor-application-detail-page";
 import UsersPage from "@/pages/users/users-page";
-import { UserDetailPage } from "@/pages/users/user-detail-page";
-import { UserEditPage } from "@/pages/users/user-edit-page.tsx";
-import { UserCreatePage } from "@/pages/users/user-create-page.tsx";
+import {UserDetailPage} from "@/pages/users/user-detail-page";
+import {UserEditPage} from "@/pages/users/user-edit-page.tsx";
+import {UserCreatePage} from "@/pages/users/user-create-page.tsx";
 import LoginPage from "@/pages/authen/login-page.tsx";
 import LogoutPage from "@/pages/authen/logout-page.tsx";
 import SettingsPage from "@/pages/settings/settings-page.tsx";
-import { ProtectedRoute } from "@/router/protectedRoute.tsx";
-import { PublishRoute } from "@/router/publishRoute.tsx";
+import {ProtectedRoute} from "@/router/protectedRoute.tsx";
+import {PublishRoute} from "@/router/publishRoute.tsx";
 
-import { CreateLessonPage } from "@/features/lessons/pages/create-lesson-page";
+import {CreateLessonPage} from "@/features/lessons/pages/create-lesson-page";
 import InstructorsPage from "@/pages/instructors/instructors-page.tsx";
-import { InstructorDetailPage } from "@/pages/instructors/instructor-detail-page.tsx";
-import { InstructorEditPage } from "@/pages/instructors/instructor-edit-page.tsx";
+import {InstructorDetailPage} from "@/pages/instructors/instructor-detail-page.tsx";
+import {InstructorEditPage} from "@/pages/instructors/instructor-edit-page.tsx";
 import StudentsPage from "@/pages/students/students-page.tsx";
-import { StudentDetailPage } from "@/pages/students/student-detail-page.tsx";
-import { StudentCreatePage } from "@/pages/students/student-create-page.tsx";
-import { StudentEditPage } from "@/pages/students/student-edit-page.tsx";
+import {StudentDetailPage} from "@/pages/students/student-detail-page.tsx";
+import {StudentCreatePage} from "@/pages/students/student-create-page.tsx";
+import {StudentEditPage} from "@/pages/students/student-edit-page.tsx";
 import ReviewsPage from "@/pages/reviews/reviews-page.tsx";
 import ReviewDetailPage from "@/pages/reviews/review-detail-page.tsx";
 import CourseListPage from "@/pages/courses/courses-page";
-import { CourseDetailPage } from "@/pages/courses/course-detail-page";
+import {CourseDetailPage} from "@/pages/courses/course-detail-page";
 import OrdersPage from "@/pages/orders/orders-page";
 import OrderDetailPage from "@/pages/orders/order-detail-page";
 import EnrollmentsPage from "@/pages/enrollments/enrollments-page";
@@ -46,14 +47,14 @@ import ReviewReportsPage from "@/pages/review-reports/review-reports-page";
 import ReviewReportDetailPage from "@/pages/review-reports/report-detail-page";
 import AchievementsPage from "@/pages/achievements/achievements-page";
 import AchievementDetailPage from "@/pages/achievements/achievement-detail-page";
-import { InstructorCertificatesPage } from "@/pages/instructor-certificates/instructor-certificates-page";
-import { InstructorCertificateDetailPage } from "@/pages/instructor-certificates/instructor-certificate-detail-page";
-import { NotificationsPage } from "@/pages/notifications/notifications-page";
-import { NotificationDetailPage } from "@/pages/notifications/notification-detail-page";
-import { PremiumSubscriptionsPage } from "@/pages/premium-subscriptions/premium-subscriptions-page";
-import { PremiumSubscriptionDetailPage } from "@/pages/premium-subscriptions/premium-subscription-detail-page";
-import { WishlistsPage } from "@/pages/wishlists/wishlists-page";
-import { WishlistDetailPage } from "@/pages/wishlists/wishlist-detail-page";
+import {InstructorCertificatesPage} from "@/pages/instructor-certificates/instructor-certificates-page";
+import {InstructorCertificateDetailPage} from "@/pages/instructor-certificates/instructor-certificate-detail-page";
+import {NotificationsPage} from "@/pages/notifications/notifications-page";
+import {NotificationDetailPage} from "@/pages/notifications/notification-detail-page";
+import {PremiumSubscriptionsPage} from "@/pages/premium-subscriptions/premium-subscriptions-page";
+import {PremiumSubscriptionDetailPage} from "@/pages/premium-subscriptions/premium-subscription-detail-page";
+import {WishlistsPage} from "@/pages/wishlists/wishlists-page";
+import {WishlistDetailPage} from "@/pages/wishlists/wishlist-detail-page";
 import PaymentsPage from "@/pages/payments/payments-page";
 import PaymentDetailPage from "@/pages/payments/payment-detail-page";
 import PayoutRequestsPage from "@/pages/payout-requests/payout-requests-page";
@@ -172,12 +173,16 @@ export const router = createBrowserRouter([
                                 index: true,
                                 element: <InstructorsPage />,
                             },
-                            {
-                                path: "approvals",
-                                element: <InstructorApprovalsPage />,
-                            },
-                            {
-                                path: "create",
+                              {
+                                  path: "applications",
+                                  element: <InstructorApprovalsPage />,
+                              },
+                              {
+                                  path: "applications/:id",
+                                  element: <InstructorApplicationDetailPage />,
+                              },
+                              {
+                                  path: "create",
                                 element: <UserCreatePage />,
                             },
                             {

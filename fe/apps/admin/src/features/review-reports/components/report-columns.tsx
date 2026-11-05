@@ -1,4 +1,5 @@
 import { createColumnHelper } from "@tanstack/react-table";
+import type { DataTableFeatures } from "@/components/common/data-table/data-table-features";
 import { Badge } from "@fe/components/ui/badge";
 import type { ReviewReport } from "../types/review-report";
 import {
@@ -6,7 +7,7 @@ import {
   reviewReportStatusClassName,
 } from "../types/review-report";
 
-const column = createColumnHelper<ReviewReport>();
+const column = createColumnHelper<DataTableFeatures, ReviewReport>();
 
 export const reviewReportColumns = [
   column.accessor("review.course", {

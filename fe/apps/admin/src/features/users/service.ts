@@ -26,7 +26,7 @@ export const userService = {
     async getUser(id: number): Promise<User> {
         const response = await adminApi.get<User>(`/users/${id}`);
 
-        return response.data.data;
+        return response.data;
     },
 
     async createUser(data: {
@@ -80,5 +80,8 @@ export const userService = {
         )
 
         return response.data
+    },
+    async deleteUser(id: number): Promise<void> {
+        await adminApi.delete(`/users/${id}`)
     },
 };

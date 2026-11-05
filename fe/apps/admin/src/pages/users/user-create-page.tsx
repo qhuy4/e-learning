@@ -11,7 +11,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@fe/components/ui/select"
-import {genderLabel, UserRole, UserStatus} from "@/features/users/constants/users.constants.ts";
+import {type Gender, genderLabel, type UserRole, UserRole as UserRoles, type UserStatus, UserStatus as UserStatuses} from "@/features/users/constants/users.constants.ts";
 import {createUserSchema} from "@/features/users/schema/user.schema.ts";
 import {useCreateUser} from "@/features/users/hook/use-user.ts";
 import {useCreateForm} from "@/features/users/hook/use-create-form.ts";
@@ -19,13 +19,20 @@ import {useEffect, useState} from "react";
 import {locationService} from "@/shared/service/location.service.ts";
 import type {City, Country} from "@fe/api/location";
 
-function emptyForm() {
+interface UserCreateFormState {
+    name: string; email: string; password: string; status: UserStatus; role: UserRole;
+    block_reason: string; firstName: string; lastName: string; gender: Gender | "";
+    phone: string; dateOfBirth: string; occupation: string; bio: string; address: string;
+    city: string; country: string; avatarUrl: string;
+}
+
+function emptyForm(): UserCreateFormState {
     return {
         name: "",
         email: "",
         password: "",
-        status: UserStatus.PENDING,
-        role: UserRole.STUDENT,
+        status: UserStatuses.PENDING,
+        role: UserRoles.STUDENT,
         block_reason: "",
         firstName: "",
         lastName: "",
@@ -59,7 +66,7 @@ function buildWriteInput(form: ReturnType<typeof emptyForm>) {
         password: form.password.trim() || undefined,
         status: form.status,
         role: form.role,
-        block_reason: form.status === UserStatus.BLOCKED ? form.block_reason.trim() : "",
+        block_reason: form.status === UserStatuses.BLOCKED ? form.block_reason.trim() : "",
         profile: {
             avatarUrl: form?.avatarUrl.trim() || null,
             gender: form.gender !== "" ? form.gender : null,
@@ -195,7 +202,7 @@ export function UserCreatePage() {
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                {Object.values(UserStatus).map((s) => (
+                                                {Object.values(UserStatuses).map((s) => (
                                                     <SelectItem key={s} value={s}>
                                                         {s}
                                                     </SelectItem>
@@ -214,7 +221,7 @@ export function UserCreatePage() {
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                {Object.values(UserRole).map((r) => (
+                                                {Object.values(UserRoles).map((r) => (
                                                     <SelectItem key={r} value={r}>
                                                         {r}
                                                     </SelectItem>
@@ -224,7 +231,7 @@ export function UserCreatePage() {
                                     </div>
                                 </div>
 
-                                {form.status === UserStatus.BLOCKED && (
+                                {form.status === UserStatuses.BLOCKED && (
                                     <div className="space-y-1.5">
                                         <label className="text-sm font-medium" htmlFor="user-block-reason">
                                             Lý do chặn <span className="text-destructive">*</span>
