@@ -29,15 +29,15 @@ export const OrderSummary = ({
   const total = subtotal - safeDiscount;
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_4px_20px_rgba(15,23,42,0.06)] sm:p-6">
-      <h3 className="mb-4 text-base font-bold text-slate-900">
+    <div className="rounded-2xl border border-border bg-card p-5 shadow-[0_4px_20px_rgba(15,23,42,0.06)] sm:p-6">
+      <h3 className="mb-4 text-base font-bold text-foreground">
         Đơn hàng của bạn
       </h3>
 
       {/* Khóa học */}
       <div className="mb-5 flex gap-3">
-        <div className="relative flex h-16 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-slate-100">
-          <span className="text-[10px] text-slate-400">Không có ảnh</span>
+        <div className="relative flex h-16 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted">
+          <span className="text-[10px] text-muted-foreground">Không có ảnh</span>
           {course.thumbnail && (
             <img
               src={course.thumbnail}
@@ -50,15 +50,15 @@ export const OrderSummary = ({
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="mb-0.5 line-clamp-2 text-sm font-bold text-slate-900">
+          <p className="mb-0.5 line-clamp-2 text-sm font-bold text-foreground">
             {course.title}
           </p>
           {course.instructor?.name && (
-            <p className="line-clamp-1 text-xs text-slate-500">
+            <p className="line-clamp-1 text-xs text-muted-foreground">
               {course.instructor.name}
             </p>
           )}
-          <div className="mt-1 flex items-center gap-3 text-xs text-slate-400">
+          <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
             {course.statistics?.studentCount != null && (
               <span>{course.statistics.studentCount} học viên</span>
             )}
@@ -70,17 +70,17 @@ export const OrderSummary = ({
       </div>
 
       {/* Chi tiết giá */}
-      <div className="space-y-3 border-t border-slate-200 pt-4">
+      <div className="space-y-3 border-t border-border pt-4">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-slate-500">Giá gốc</span>
-          <span className="font-semibold text-slate-900">
+          <span className="text-muted-foreground">Giá gốc</span>
+          <span className="font-semibold text-foreground">
             {formatCurrency(subtotal)}
           </span>
         </div>
 
         {safeDiscount > 0 && (
           <div className="flex items-center justify-between text-sm">
-            <span className="flex items-center gap-1.5 text-slate-500">
+            <span className="flex items-center gap-1.5 text-muted-foreground">
               Giảm giá
               {couponCode && (
                 <span className="rounded-md border border-piemind-pink/25 bg-piemind-pink/10 px-1.5 py-0.5 font-mono text-[11px] font-bold text-piemind-pink">
@@ -96,8 +96,8 @@ export const OrderSummary = ({
       </div>
 
       {/* Tổng cộng */}
-      <div className="mt-4 flex items-center justify-between border-t border-slate-200 pt-4">
-        <span className="text-base font-bold text-slate-900">Tổng cộng</span>
+      <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
+        <span className="text-base font-bold text-foreground">Tổng cộng</span>
         <span className="text-2xl font-extrabold tracking-tight text-piemind-pink sm:text-3xl">
           {total > 0 ? formatCurrency(total) : "Miễn phí"}
         </span>
@@ -106,7 +106,7 @@ export const OrderSummary = ({
       {/* CTA + ghi chú */}
       {children && <div className="mt-5 space-y-3">{children}</div>}
 
-      <div className="mt-4 flex items-center justify-center gap-1.5 text-xs text-slate-400">
+      <div className="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
         <ShieldCheck className="h-3.5 w-3.5" />
         Giao dịch được xử lý an toàn qua cổng thanh toán
       </div>

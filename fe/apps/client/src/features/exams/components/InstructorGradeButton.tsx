@@ -17,8 +17,8 @@ function readRequested(key: string): boolean {
   }
 }
 
-interface TeacherGradeButtonProps {
-  /** Kỹ năng cần giáo viên chấm (mặc định Speaking). */
+interface InstructorGradeButtonProps {
+  /** Kỹ năng cần giảng viên chấm (mặc định Speaking). */
   skillLabel?: string;
   size?: "sm" | "default" | "lg";
   /** Nút chiếm hết chiều rộng khối cha. */
@@ -26,18 +26,18 @@ interface TeacherGradeButtonProps {
 }
 
 /**
- * Nút "Nhờ giáo viên chấm điểm" — Speaking (và Writing) KHÔNG chấm tự động,
- * học viên gửi bài cho giáo viên chấm tay.
+ * Nút "Nhờ giảng viên chấm điểm" — Speaking (và Writing) KHÔNG chấm tự động,
+ * học viên gửi bài cho giảng viên chấm tay.
  *
  * Trạng thái được ghi nhận vào sessionStorage (trong phiên) + bắn sự kiện để
- * mọi nút cùng trang đồng bộ. Nối backend (lưu yêu cầu + giáo viên nhận bài)
+ * mọi nút cùng trang đồng bộ. Nối backend (lưu yêu cầu + giảng viên nhận bài)
  * sẽ nối vào sau.
  */
-export function TeacherGradeButton({
+export function InstructorGradeButton({
   skillLabel = "Speaking",
   size = "default",
   fullWidth = false,
-}: TeacherGradeButtonProps) {
+}: InstructorGradeButtonProps) {
   const key = storageKeyOf(skillLabel);
   const [requested, setRequested] = useState(() => readRequested(key));
 
@@ -76,7 +76,7 @@ export function TeacherGradeButton({
           Đã ghi nhận yêu cầu chấm {skillLabel}
         </span>
         <p className="text-center text-[11px] leading-relaxed text-muted-foreground">
-          Giáo viên sẽ chấm bài và phản hồi cho bạn.
+          Giảng viên sẽ chấm bài và phản hồi cho bạn.
         </p>
       </div>
     );
@@ -91,10 +91,10 @@ export function TeacherGradeButton({
         data-testid="teacher-grade-button"
       >
         <GraduationCap className="size-4" />
-        Nhờ giáo viên chấm {skillLabel}
+        Nhờ giảng viên chấm {skillLabel}
       </Button>
       <p className="text-center text-[11px] leading-relaxed text-muted-foreground">
-        {skillLabel} không chấm tự động — bài sẽ được giáo viên chấm tay.
+        {skillLabel} không chấm tự động — bài sẽ được giảng viên chấm tay.
       </p>
     </div>
   );

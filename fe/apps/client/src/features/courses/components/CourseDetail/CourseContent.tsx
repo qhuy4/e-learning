@@ -6,6 +6,8 @@ import type { CourseDetail } from "@/features/courses/types/course.type";
 interface CourseContentProps {
   course?: CourseDetail;
   isEnrolled?: boolean;
+  previewMode?: boolean;
+  previewToken?: string;
 }
 
 /** `duration` từ BE tính bằng giây → hiển thị "X phút" / "Xh Y phút". */
@@ -36,13 +38,18 @@ const lessonTypeIcon = (type: string) => {
   }
 };
 
-export const CourseContent = ({ course, isEnrolled }: CourseContentProps) => {
+export const CourseContent = ({
+  course,
+  isEnrolled,
+  previewMode,
+  previewToken,
+}: CourseContentProps) => {
   const sections = course?.sections || [];
 
   if (sections.length === 0) {
     return (
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-[0_4px_20px_rgba(15,23,42,0.06)] p-8 text-center">
-        <p className="text-slate-500">Chưa có nội dung nào.</p>
+      <div className="bg-card rounded-2xl border border-border shadow-[0_4px_20px_rgba(15,23,42,0.06)] p-8 text-center">
+        <p className="text-muted-foreground">Chưa có nội dung nào.</p>
       </div>
     );
   }
@@ -56,33 +63,33 @@ export const CourseContent = ({ course, isEnrolled }: CourseContentProps) => {
         <AccordionItem
           key={section.id}
           value={String(section.id)}
-          className="bg-white rounded-2xl border border-slate-200 shadow-[0_4px_20px_rgba(15,23,42,0.06)] overflow-hidden"
+          className="bg-card rounded-2xl border border-border shadow-[0_4px_20px_rgba(15,23,42,0.06)] overflow-hidden"
         >
-          <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-slate-50/50">
+          <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50">
             <div className="flex items-center gap-3 flex-1">
               <span className="w-8 h-8 rounded-full bg-piemind-pink flex items-center justify-center text-white text-sm font-bold shrink-0">
                 {sIdx + 1}
               </span>
               <div className="flex-1 min-w-0 text-left">
-                <h3 className="text-base font-bold text-slate-900">{section.title}</h3>
+                <h3 className="text-base font-bold text-foreground">{section.title}</h3>
                 {section.description && (
-                  <p className="text-xs text-slate-500 mt-0.5">{section.description}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{section.description}</p>
                 )}
               </div>
-              <span className="text-xs text-slate-400 font-medium shrink-0">
+              <span className="text-xs text-muted-foreground font-medium shrink-0">
                 {section.lessons?.length || 0} bài học
               </span>
             </div>
           </AccordionTrigger>
 
           <AccordionContent className="[&_a]:no-underline [&_a]:hover:no-underline">
-            <div className="divide-y divide-slate-50 border-t border-slate-100">
+            <div className="divide-y divide-border/50 border-t border-border">
               {section.lessons?.map((lesson, lIdx) => {
-                const locked = !isEnrolled && !lesson.isPreview;
+                const locked = !previewMode && !isEnrolled && !lesson.isPreview;
 
                 const rowContent = (
                   <>
-                    <span className="w-7 h-7 rounded-full bg-m3-surface-container-high flex items-center justify-center text-slate-500 shrink-0">
+                    <span className="w-7 h-7 rounded-full bg-m3-surface-container-high flex items-center justify-center text-muted-foreground shrink-0">
                       {locked ? (
                         <Lock className="size-3.5" />
                       ) : lesson.isPreview ? (
@@ -93,16 +100,16 @@ export const CourseContent = ({ course, isEnrolled }: CourseContentProps) => {
                     </span>
 
                     <div className="flex-1 min-w-0">
-                      <span className={`text-sm font-medium ${locked ? "text-slate-400" : "text-slate-800"}`}>
+                      <span className={`text-sm font-medium ${locked ? "text-muted-foreground" : "text-foreground"}`}>
                         {lesson.title}
                       </span>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-xs text-slate-400 flex items-center gap-1">
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
                           {lessonTypeIcon(lesson.type)}
                           {LESSON_TYPE_LABELS[lesson.type] ?? lesson.type}
                         </span>
                         {lesson.duration != null && lesson.duration > 0 && (
-                          <span className="text-xs text-slate-400 flex items-center gap-1">
+                          <span className="text-xs text-muted-foreground flex items-center gap-1">
                             <Clock className="size-3" />
                             {formatDuration(lesson.duration)}
                           </span>
@@ -124,7 +131,7 @@ export const CourseContent = ({ course, isEnrolled }: CourseContentProps) => {
                 );
 
                 const rowClass = `px-6 py-3.5 flex items-center gap-4 transition-colors ${
-                  locked ? "opacity-60" : "hover:bg-slate-50 cursor-pointer"
+                  locked ? "opacity-60" : "hover:bg-muted cursor-pointer"
                 }`;
 
                 // Bài đã mở (đã đăng ký hoặc cho xem thử) → vào trang xem video.
@@ -135,7 +142,11 @@ export const CourseContent = ({ course, isEnrolled }: CourseContentProps) => {
                 ) : (
                   <Link
                     key={lesson.id}
-                    to={`/learning/${course?.slug}/${lesson.slug}`}
+                    to={`/learning/${course?.slug}/${lesson.slug}${
+                      previewMode && previewToken
+                        ? `?previewToken=${encodeURIComponent(previewToken)}`
+                        : ""
+                    }`}
                     className={rowClass}
                   >
                     {rowContent}

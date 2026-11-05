@@ -14,7 +14,7 @@ export const PaymentMethodSelect = ({
 }: PaymentMethodSelectProps) => {
   return (
     <div>
-      <h3 className="mb-3 text-base font-bold text-slate-900">
+      <h3 className="mb-3 text-base font-bold text-foreground">
         Phương thức thanh toán
       </h3>
 
@@ -28,7 +28,7 @@ export const PaymentMethodSelect = ({
               className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-all ${
                 active
                   ? "border-piemind-pink bg-piemind-pink/[0.04] ring-1 ring-piemind-pink"
-                  : "border-slate-200 bg-white hover:border-slate-300"
+                  : "border-border bg-card hover:border-input"
               }`}
             >
               <input
@@ -42,7 +42,7 @@ export const PaymentMethodSelect = ({
               {/* Radio indicator */}
               <span
                 className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-                  active ? "border-piemind-pink" : "border-slate-300"
+                  active ? "border-piemind-pink" : "border-input"
                 }`}
               >
                 {active && (
@@ -52,12 +52,12 @@ export const PaymentMethodSelect = ({
               <span className="min-w-0">
                 <span
                   className={`block text-sm font-semibold ${
-                    active ? "text-slate-900" : "text-slate-700"
+                    active ? "text-foreground" : "text-foreground/75"
                   }`}
                 >
                   {method.label}
                 </span>
-                <span className="mt-0.5 block text-xs text-slate-500">
+                <span className="mt-0.5 block text-xs text-muted-foreground">
                   {method.desc}
                 </span>
               </span>
