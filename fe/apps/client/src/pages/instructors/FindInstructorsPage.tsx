@@ -11,17 +11,33 @@ import {
 } from "lucide-react";
 import { Input } from "@fe/components/ui/input";
 import { Pagination } from "@fe/components/common/Pagination";
-import { useAvailableTeachers, useMentors } from "@/features/mentor/hooks/use-mentors";
-import { toDateString } from "@/features/mentor/config/slots";
-import type { MentorListItem } from "@/features/mentor/types/mentor.type";
+import { useAvailableInstructors, useInstructors } from "@/features/instructors/hooks/use-instructors";
+import { toDateString } from "@/features/instructors/config/slots";
+import type { InstructorListItem } from "@/features/instructors/types/instructor.type";
 
-const getAvatarSrc = (mentor: MentorListItem): string => {
-    if (mentor.avatarUrl) return mentor.avatarUrl;
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(mentor.name)}&background=F38181&color=fff&bold=true`;
+const getAvatarSrc = (instructor: InstructorListItem): string => {
+    if (instructor.avatarUrl) return instructor.avatarUrl;
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(instructor.name)}&background=F38181&color=fff&bold=true`;
 };
 
-export const FindMentorPage = () => {
+const CERTIFICATE_TAGS = [
+    "IELTS",
+    "TOEIC",
+    "TOEFL",
+    "TESOL",
+    "CELTA",
+    "DELTA",
+    "BUSINESS_ENGLISH",
+    "GENERAL_ENGLISH",
+    "KIDS",
+    "PRONUNCIATION",
+    "WRITING",
+    "SPEAKING",
+];
+
+export const FindInstructorsPage = () => {
     const [search, setSearch] = useState("");
+    const [tag, setTag] = useState("");
     const [sortBy, setSortBy] = useState("recommended");
     const [currentPage, setCurrentPage] = useState(1);
     const [limit, setLimit] = useState(6);
@@ -29,12 +45,13 @@ export const FindMentorPage = () => {
     const today = toDateString(new Date());
 
     const { data: availableRes, isLoading: availableLoading } =
-        useAvailableTeachers(today);
+        useAvailableInstructors(today);
 
-    const { data, isLoading, isError } = useMentors({
+    const { data, isLoading, isError } = useInstructors({
         page: 1,
         limit: 100,
         keyword: search || undefined,
+        tag: tag || undefined,
     });
 
     const availableIds = useMemo(
@@ -43,7 +60,7 @@ export const FindMentorPage = () => {
     );
     const availableTotal = availableRes?.meta?.total ?? 0;
 
-    const filteredMentors = useMemo(() => {
+    const filteredInstructors = useMemo(() => {
         let list = (data?.data ?? []).filter((m) => availableIds.has(m.id));
         if (sortBy === "rating") {
             list = [...list].sort((a, b) => Number(b.avgRating) - Number(a.avgRating));
@@ -51,10 +68,10 @@ export const FindMentorPage = () => {
         return list;
     }, [data, availableIds, sortBy]);
 
-    const totalItems = filteredMentors.length;
+    const totalItems = filteredInstructors.length;
     const totalPages = Math.max(1, Math.ceil(totalItems / limit));
     const safePage = Math.min(currentPage, totalPages);
-    const paginatedMentors = filteredMentors.slice(
+    const paginatedInstructors = filteredInstructors.slice(
         (safePage - 1) * limit,
         safePage * limit,
     );
@@ -68,37 +85,37 @@ export const FindMentorPage = () => {
                 <div>
                     <div className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-piemind-pink text-white text-xs font-bold tracking-wide mb-2 border border-piemind-pink">
                         <Headphones size={14} />
-                        Mentor CEFR được chứng nhận
+                        Giảng viên CEFR được chứng nhận
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
-                        Tìm & đặt lịch cùng huấn luyện viên CEFR của bạn
+                    <h1 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">
+                        Tìm & đặt lịch cùng giảng viên CEFR của bạn
                     </h1>
-                    <p className="text-slate-600 text-base mt-1 font-normal">
-                        Mentor trình độ bản xứ chuyên về nhịp hội thoại và
+                    <p className="text-muted-foreground text-base mt-1 font-normal">
+                        Giảng viên trình độ bản xứ chuyên về nhịp hội thoại và
                         khắc phục các khoảng ngừng khi nói.
                     </p>
                 </div>
-                <div className="flex items-center gap-2 text-xs font-semibold text-slate-600 bg-white px-3.5 py-2 rounded-xl border border-slate-200 shadow-sm self-start md:self-auto">
+                <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground bg-card px-3.5 py-2 rounded-xl border border-border shadow-sm self-start md:self-auto">
                     <span className="w-2 h-2 rounded-full bg-emerald-500" />
                     <span>
                         {availableLoading
-                            ? "Đang tải huấn luyện viên..."
-                            : `${availableTotal} huấn luyện viên sẵn sàng`}
+                            ? "Đang tải giảng viên..."
+                            : `${availableTotal} giảng viên sẵn sàng`}
                     </span>
                 </div>
             </div>
 
             {/* Search & Sort */}
-            <section className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-4">
+            <section className="bg-card p-5 rounded-2xl border border-border shadow-sm flex flex-col gap-4">
                 <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
                     <div className="relative flex-1 min-w-[280px]">
                         <Search
-                            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                            className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
                             size={20}
                         />
                         <Input
-                            className="pl-11 bg-slate-50 rounded-xl border-slate-200 focus:border-piemind-pink focus:bg-white text-sm font-medium placeholder:text-slate-400"
-                            placeholder="Tìm mentor theo tên..."
+                            className="pl-11 bg-muted rounded-xl border-input focus:border-piemind-pink focus:bg-background text-sm font-medium placeholder:text-muted-foreground"
+                            placeholder="Tìm giảng viên theo tên..."
                             value={search}
                             onChange={(e) => {
                                 setSearch(e.target.value);
@@ -107,14 +124,29 @@ export const FindMentorPage = () => {
                         />
                     </div>
                     <div className="flex items-center gap-3 ml-auto">
-                        <div className="flex items-center gap-1 text-xs text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 font-medium">
+                        <select
+                            className="bg-card border border-border rounded-lg text-xs font-bold text-foreground py-1.5 pl-2.5 pr-6 cursor-pointer outline-none"
+                            value={tag}
+                            onChange={(e) => {
+                                setTag(e.target.value);
+                                setCurrentPage(1);
+                            }}
+                        >
+                            <option value="">Mọi chứng chỉ</option>
+                            {CERTIFICATE_TAGS.map((item) => (
+                                <option key={item} value={item}>
+                                    {item.replaceAll("_", " ")}
+                                </option>
+                            ))}
+                        </select>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-lg border border-border font-medium">
                             <CheckCircle size={14} className="text-piemind-pink" />
                             <span>Đã bao gồm gói PiEMind</span>
                         </div>
-                        <div className="flex items-center gap-1 text-xs text-slate-500">
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
                             <span className="font-medium">Sắp xếp:</span>
                             <select
-                                className="bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 py-1.5 pl-2.5 pr-6 cursor-pointer outline-none"
+                                className="bg-card border border-border rounded-lg text-xs font-bold text-foreground py-1.5 pl-2.5 pr-6 cursor-pointer outline-none"
                                 value={sortBy}
                                 onChange={(e) => setSortBy(e.target.value)}
                             >
@@ -139,25 +171,25 @@ export const FindMentorPage = () => {
             )}
             {isError && (
                 <div className="rounded-xl border border-border bg-card p-6 text-center text-muted-foreground">
-                    Không thể tải danh sách mentor. Vui lòng thử lại.
+                    Không thể tải danh sách giảng viên. Vui lòng thử lại.
                 </div>
             )}
 
             {/* Active Count */}
             {!showLoading && !isError && (
-                <div className="flex items-center justify-between text-xs text-slate-500 font-medium px-1">
+                <div className="flex items-center justify-between text-xs text-muted-foreground font-medium px-1">
                     <span>
                         Hiển thị{" "}
-                        <strong className="text-slate-800 font-bold">
+                        <strong className="text-foreground font-bold">
                             {totalItems === 0
                                 ? 0
                                 : `${(safePage - 1) * limit + 1}–${Math.min(safePage * limit, totalItems)}`}
                         </strong>{" "}
                         trong{" "}
-                        <strong className="text-slate-800 font-bold">
+                        <strong className="text-foreground font-bold">
                             {totalItems}
                         </strong>{" "}
-                        huấn luyện viên sẵn sàng
+                        giảng viên sẵn sàng
                     </span>
                     <span className="text-piemind-pink font-bold flex items-center gap-1">
                         <Zap size={14} />
@@ -166,19 +198,19 @@ export const FindMentorPage = () => {
                 </div>
             )}
 
-            {/* Mentor Cards Grid */}
-            {!showLoading && !isError && paginatedMentors.length === 0 && (
-                <div className="rounded-2xl border border-slate-200 bg-white p-12 flex flex-col items-center text-center">
-                    <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-                        <Users className="size-8 text-slate-400" />
+            {/* Instructor Cards Grid */}
+            {!showLoading && !isError && paginatedInstructors.length === 0 && (
+                <div className="rounded-2xl border border-border bg-card p-12 flex flex-col items-center text-center">
+                    <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                        <Users className="size-8 text-muted-foreground" />
                     </div>
-                    <h2 className="text-lg font-bold text-slate-900 mb-1">
-                        {search ? "Không có mentor nào khớp tìm kiếm" : "Hiện chưa có huấn luyện viên nào sẵn sàng"}
+                    <h2 className="text-lg font-bold text-foreground mb-1">
+                        {search ? "Không có giảng viên nào khớp tìm kiếm" : "Hiện chưa có giảng viên nào sẵn sàng"}
                     </h2>
-                    <p className="text-sm text-slate-500 max-w-sm">
+                    <p className="text-sm text-muted-foreground max-w-sm">
                         {search
                             ? "Thử tìm theo tên khác hoặc xóa từ khóa."
-                            : "Hãy quay lại sau — các huấn luyện viên cập nhật lịch thường xuyên."}
+                            : "Hãy quay lại sau — các giảng viên cập nhật lịch thường xuyên."}
                     </p>
                     {search && (
                         <button
@@ -192,40 +224,40 @@ export const FindMentorPage = () => {
                 </div>
             )}
 
-            {!showLoading && !isError && paginatedMentors.length > 0 && (
+            {!showLoading && !isError && paginatedInstructors.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {paginatedMentors.map((mentor) => (
+                    {paginatedInstructors.map((instructor) => (
                         <article
-                            key={mentor.id}
-                            className="bg-white rounded-2xl p-6 border border-piemind-pink/30 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group"
+                            key={instructor.id}
+                            className="bg-card rounded-2xl p-6 border border-piemind-pink/30 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group"
                         >
                             <div className="flex flex-col gap-4">
                                 <div className="flex items-start justify-between">
                                     <div className="flex items-center gap-3.5">
-                                        <div className="relative w-16 h-16 rounded-2xl overflow-hidden border border-slate-200 flex-shrink-0 bg-slate-100">
+                                        <div className="relative w-16 h-16 rounded-2xl overflow-hidden border border-border flex-shrink-0 bg-muted">
                                             <img
-                                                alt={mentor.name}
+                                                alt={instructor.name}
                                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                                src={getAvatarSrc(mentor)}
+                                                src={getAvatarSrc(instructor)}
                                             />
                                         </div>
                                         <div>
-                                            <h3 className="text-base font-bold text-slate-900 leading-snug">
-                                                {mentor.name}
+                                            <h3 className="text-base font-bold text-foreground leading-snug">
+                                                {instructor.name}
                                             </h3>
-                                            <p className="text-xs text-slate-500 font-medium line-clamp-1">
-                                                {mentor.headline || "Huấn luyện viên CEFR"}
+                                            <p className="text-xs text-muted-foreground font-medium line-clamp-1">
+                                                {instructor.headline || "Giảng viên CEFR"}
                                             </p>
                                             <div className="flex items-center gap-1 mt-1">
                                                 <Star
                                                     size={14}
                                                     className="text-amber-500 fill-current"
                                                 />
-                                                <span className="text-xs font-extrabold text-slate-800">
-                                                    {Number(mentor.avgRating || 0).toFixed(1)}
+                                                <span className="text-xs font-extrabold text-foreground">
+                                                    {Number(instructor.avgRating || 0).toFixed(1)}
                                                 </span>
-                                                <span className="text-[11px] text-slate-400">
-                                                    ({mentor.totalStudents} học viên)
+                                                <span className="text-[11px] text-muted-foreground">
+                                                    ({instructor.totalStudents} học viên)
                                                 </span>
                                             </div>
                                         </div>
@@ -235,15 +267,28 @@ export const FindMentorPage = () => {
                                     </span>
                                 </div>
 
-                                {mentor.bio && (
-                                    <p className="text-xs text-slate-600 leading-relaxed font-normal line-clamp-3">
-                                        &quot;{mentor.bio}&quot;
+                                {instructor.certificateTags.length > 0 && (
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {instructor.certificateTags.slice(0, 4).map((item) => (
+                                            <span
+                                                key={item}
+                                                className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-muted text-muted-foreground border border-border"
+                                            >
+                                                {item.replaceAll("_", " ")}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {instructor.bio && (
+                                    <p className="text-xs text-muted-foreground leading-relaxed font-normal line-clamp-3">
+                                        &quot;{instructor.bio}&quot;
                                     </p>
                                 )}
 
-                                <div className="bg-slate-50 rounded-xl px-3.5 py-2.5 border border-slate-100 flex items-center justify-between text-xs">
-                                    <div className="flex items-center gap-1.5 text-slate-600">
-                                        <Clock size={14} className="text-slate-400" />
+                                <div className="bg-muted rounded-xl px-3.5 py-2.5 border border-border flex items-center justify-between text-xs">
+                                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                                        <Clock size={14} className="text-muted-foreground" />
                                         <span>Sẵn sàng hôm nay</span>
                                     </div>
                                     <span className="font-bold text-piemind-pink">
@@ -252,15 +297,15 @@ export const FindMentorPage = () => {
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-2 pt-4 mt-4 border-t border-slate-100">
+                            <div className="flex items-center gap-2 pt-4 mt-4 border-t border-border">
                                 <Link
-                                    to={`/mentors/${mentor.id}/book`}
+                                    to={`/instructors/${instructor.id}/book`}
                                     className="flex-1 py-2.5 px-3 rounded-xl bg-piemind-pink hover:bg-piemind-pink/90 text-white text-xs font-bold transition-all text-center cursor-pointer"
                                 >
                                     Đặt buổi tư vấn
                                 </Link>
                                 <Link
-                                    to={`/mentors/${mentor.id}/book`}
+                                    to={`/instructors/${instructor.id}/book`}
                                     className="px-3.5 py-2.5 rounded-xl border border-border hover:bg-muted text-foreground text-xs font-bold transition-colors whitespace-nowrap cursor-pointer"
                                 >
                                     Xem hồ sơ
@@ -278,7 +323,7 @@ export const FindMentorPage = () => {
                     onPageChange={setCurrentPage}
                     totalPages={totalPages}
                     totalItems={totalItems}
-                    itemLabel="mentor"
+                    itemLabel="giảng viên"
                     limit={limit}
                     onLimitChange={(next) => {
                         setLimit(next);

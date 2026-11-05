@@ -17,6 +17,9 @@ import { QuizLauncher } from '../../features/quizzes/components/QuizLauncher';
 import { useLessonQuizzes } from '../../features/quizzes/hooks/use-quiz';
 import { ArrowLeft, ClipboardList, Loader2, CheckCircle2 } from 'lucide-react';
 
+const INSTRUCTOR_URL =
+  import.meta.env.VITE_INSTRUCTOR_URL ?? 'http://localhost:5175';
+
 export const LearningPage = () => {
   const { courseSlug, lessonSlug } = useParams<{ courseSlug: string; lessonSlug?: string }>();
   const [searchParams] = useSearchParams();
@@ -68,7 +71,10 @@ export const LearningPage = () => {
     isEnrolled,
   );
 
-  const { data: lessonQuizzes } = useLessonQuizzes(lessonData?.id, isAuthenticated);
+  const { data: lessonQuizzes } = useLessonQuizzes(
+    lessonData?.id,
+    isAuthenticated && !previewToken,
+  );
 
   // Sang bài khác → đóng giao diện quiz toàn màn hình.
   useEffect(() => {
@@ -165,18 +171,31 @@ export const LearningPage = () => {
         completedLessons={isEnrolled ? completedLessons : undefined}
         totalLessons={isEnrolled ? totalLessons : undefined}
         remainingMinutes={isEnrolled ? remainingMinutes : undefined}
+        previewMode={!!previewToken}
+        previewToken={previewToken ?? undefined}
+        editUrl={
+          previewToken
+            ? `${INSTRUCTOR_URL}/courses/${courseData.id}/edit`
+            : undefined
+        }
       />
 
       <div className="flex flex-1 flex-col lg:flex-row h-[calc(100vh-64px)]">
         <div className="flex-1 overflow-y-auto min-w-0 custom-scrollbar flex flex-col bg-slate-50">
           {/* Player / Quiz */}
           {lessonData.type === 'quiz' ? (
-            <QuizLauncher
-              variant="hero"
-              quizzes={lessonQuizzes}
-              isLoading={lessonQuizzes === undefined}
-              onStart={() => setQuizOpen(true)}
-            />
+            previewToken ? (
+              <div className="m-4 rounded-2xl border border-amber-200 bg-amber-50 p-6 text-center text-sm font-medium text-amber-700 md:m-6">
+                Bài kiểm tra không khả dụng trong chế độ xem trước.
+              </div>
+            ) : (
+              <QuizLauncher
+                variant="hero"
+                quizzes={lessonQuizzes}
+                isLoading={lessonQuizzes === undefined}
+                onStart={() => setQuizOpen(true)}
+              />
+            )
           ) : (
             <VideoPlayer
               videoSource={lessonData.videoSource}
@@ -272,7 +291,7 @@ export const LearningPage = () => {
             </div>
           </div>
 
-          {lessonData.type !== 'quiz' && (lessonQuizzes?.length ?? 0) > 0 && (
+          {!previewToken && lessonData.type !== 'quiz' && (lessonQuizzes?.length ?? 0) > 0 && (
             <QuizLauncher
               variant="banner"
               quizzes={lessonQuizzes}
@@ -282,7 +301,10 @@ export const LearningPage = () => {
 
           <div className="px-4 py-4 md:px-6">
             <div className="rounded-2xl border border-slate-200 bg-white shadow-[0_4px_20px_rgba(15,23,42,0.06)]">
-              <LearningTabs lesson={lessonData} />
+              <LearningTabs
+                lesson={lessonData}
+                previewToken={previewToken ?? undefined}
+              />
             </div>
           </div>
         </div>

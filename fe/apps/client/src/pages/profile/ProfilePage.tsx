@@ -752,7 +752,7 @@ export const ProfilePage = () => {
                                         <p className="text-sm text-muted-foreground">
                                             Không có buổi học nào sắp tới.{" "}
                                             <Link
-                                                to="/mentors"
+                                                to="/instructors"
                                                 className="text-[#9e3f42] font-semibold hover:underline"
                                             >
                                                 Đặt lịch ngay

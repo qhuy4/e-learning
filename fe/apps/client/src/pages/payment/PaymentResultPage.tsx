@@ -44,10 +44,10 @@ export const PaymentResultPage = () => {
   const courseSlug = lastCheckout?.slug || null;
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-slate-50 px-4 py-12">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-slate-50 dark:bg-background px-4 py-12">
       <div className="w-full max-w-lg animate-in fade-in-0 slide-in-from-bottom-2 duration-500">
         {/* Card trung tâm */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-7 text-center shadow-[0_4px_20px_rgba(15,23,42,0.06)] sm:p-10">
+        <div className="rounded-2xl border border-border bg-card p-7 text-center shadow-[0_4px_20px_rgba(15,23,42,0.06)] sm:p-10">
           {/* Icon trạng thái */}
           <div
             className={`mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full animate-in fade-in-0 zoom-in-95 duration-500 ${
@@ -64,10 +64,10 @@ export const PaymentResultPage = () => {
           </div>
 
           {/* Tiêu đề + thông báo */}
-          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+          <h1 className="text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl">
             {isSuccess ? "Thanh toán thành công!" : "Thanh toán thất bại"}
           </h1>
-          <p className="mx-auto mt-2.5 max-w-sm text-sm leading-relaxed text-slate-500 sm:text-base">
+          <p className="mx-auto mt-2.5 max-w-sm text-sm leading-relaxed text-muted-foreground sm:text-base">
             {isSuccess
               ? "Khóa học đã được thêm vào tài khoản của bạn. Bắt đầu học nào!"
               : "Giao dịch chưa hoàn tất. Bạn có thể thử lại hoặc chọn phương thức thanh toán khác."}
@@ -75,27 +75,27 @@ export const PaymentResultPage = () => {
 
           {/* Thông tin đơn hàng */}
           {(displayOrderId || displayAmount || (isSuccess && lastCheckout?.title)) && (
-            <div className="mt-6 divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 text-left">
+            <div className="mt-6 divide-y divide-border overflow-hidden rounded-xl border border-border bg-muted text-left">
               {displayOrderId && (
                 <div className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
-                  <span className="text-slate-500">Mã đơn hàng</span>
-                  <span className="font-mono font-bold text-slate-900">
+                  <span className="text-muted-foreground">Mã đơn hàng</span>
+                  <span className="font-mono font-bold text-foreground">
                     #{displayOrderId}
                   </span>
                 </div>
               )}
               {displayAmount && (
                 <div className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
-                  <span className="text-slate-500">Số tiền</span>
-                  <span className="font-bold text-slate-900">
+                  <span className="text-muted-foreground">Số tiền</span>
+                  <span className="font-bold text-foreground">
                     {formatCurrency(displayAmount)}
                   </span>
                 </div>
               )}
               {isSuccess && lastCheckout?.title && (
                 <div className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
-                  <span className="shrink-0 text-slate-500">Khóa học</span>
-                  <span className="line-clamp-1 font-semibold text-slate-900">
+                  <span className="shrink-0 text-muted-foreground">Khóa học</span>
+                  <span className="line-clamp-1 font-semibold text-foreground">
                     {lastCheckout.title}
                   </span>
                 </div>
@@ -105,7 +105,7 @@ export const PaymentResultPage = () => {
 
           {/* Mã giao dịch gateway (khi thất bại) */}
           {!isSuccess && vnpResponseCode && vnpResponseCode !== "00" && (
-            <p className="mt-3 font-mono text-xs text-slate-400">
+            <p className="mt-3 font-mono text-xs text-muted-foreground">
               Mã giao dịch: {vnpResponseCode}
             </p>
           )}
@@ -165,7 +165,7 @@ export const PaymentResultPage = () => {
             <div className="mt-5">
               <Link
                 to="/"
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-400 transition-colors hover:text-piemind-pink"
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:text-piemind-pink"
               >
                 <Home className="w-3.5 h-3.5" />
                 Về trang chủ

@@ -158,13 +158,13 @@ export const BookingHistoryTab = () => {
                         Lịch sử đặt lịch
                     </h1>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                        Theo dõi các buổi học 1:1 với mentor, xem lại những
+                        Theo dõi các buổi học 1:1 với giảng viên, xem lại những
                         buổi đã học và đặt lịch mới.
                     </p>
                 </div>
                 <Button
                     className="rounded-full bg-[#F38181] text-white hover:bg-[#e56d6d] shrink-0"
-                    onClick={() => navigate("/mentors")}
+                    onClick={() => navigate("/instructors")}
                 >
                     <CalendarDays className="h-4 w-4 mr-1.5" />
                     Đặt lịch mới
@@ -220,7 +220,7 @@ export const BookingHistoryTab = () => {
                             setKeyword(e.target.value);
                             setPage(1);
                         }}
-                        placeholder="Tìm theo mentor, ghi chú, ngày..."
+                        placeholder="Tìm theo giảng viên, ghi chú, ngày..."
                         className="rounded-full pl-9"
                     />
                 </div>
@@ -235,13 +235,13 @@ export const BookingHistoryTab = () => {
             ) : bookings.length === 0 ? (
                 <Card>
                     <CardContent className="p-10 text-center text-muted-foreground">
-                        Bạn chưa có buổi học nào. Tìm mentor để bắt đầu.
+                        Bạn chưa có buổi học nào. Tìm giảng viên để bắt đầu.
                         <div className="mt-4">
                             <Button
                                 className="rounded-full"
-                                onClick={() => navigate("/mentors")}
+                                onClick={() => navigate("/instructors")}
                             >
-                                Tìm mentor
+                                Tìm giảng viên
                             </Button>
                         </div>
                     </CardContent>
@@ -346,7 +346,7 @@ export const BookingHistoryTab = () => {
                                                 variant="outline"
                                                 className="rounded-full"
                                                 onClick={() =>
-                                                    navigate("/mentors")
+                                                    navigate("/instructors")
                                                 }
                                             >
                                                 <RefreshCw className="h-4 w-4 mr-1.5" />

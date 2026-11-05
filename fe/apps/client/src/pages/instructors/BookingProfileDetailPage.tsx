@@ -12,29 +12,29 @@ import {
     DateSlotPicker,
     DiagnosticShareCard,
     FocusSelectionCard,
-    MentorSummaryCard,
+    InstructorSummaryCard,
     QuickNotesCard,
-} from "@/features/mentor/components/booking";
-import { FOCUS_OPTIONS } from "@/features/mentor/config/focus";
+} from "@/features/instructors/components/booking";
+import { FOCUS_OPTIONS } from "@/features/instructors/config/focus";
 import {
     formatSummaryDate,
     getUpcomingDays,
-} from "@/features/mentor/utils/days";
+} from "@/features/instructors/utils/days";
 import {
     useAvailabilityWindow,
     useDayWindows,
-    useMentorDetail,
-} from "@/features/mentor/hooks/use-mentors";
+    useInstructorDetail,
+} from "@/features/instructors/hooks/use-instructors";
 import {
     addMinutesToTime,
     type DurationMinutes,
     DURATIONS,
     formatSlotLabel,
     generateStartTimes,
-} from "@/features/mentor/config/slots";
+} from "@/features/instructors/config/slots";
 
 export const BookingProfileDetailPage = () => {
-    const { mentorId } = useParams<{ mentorId: string }>();
+    const { instructorId } = useParams<{ instructorId: string }>();
     const { user, isAuthenticated } = useAuth();
     const navigate = useNavigate();
 
@@ -57,18 +57,18 @@ export const BookingProfileDetailPage = () => {
         return () => window.clearInterval(id);
     }, []);
 
-    const id = Number(mentorId);
+    const id = Number(instructorId);
 
-    const { data: mentor, isLoading, isError } = useMentorDetail(id);
+    const { data: instructor, isLoading, isError } = useInstructorDetail(id);
 
     const dayDates = useMemo(() => daysList.map((d) => d.dateStr), [daysList]);
     const { data: dayWindows, isLoading: daysLoading } = useDayWindows(
         dayDates,
-        mentor?.id,
+        instructor?.id,
     );
 
     const { data: availability, isLoading: slotsLoading } =
-        useAvailabilityWindow(selectedDate, mentor?.id);
+        useAvailabilityWindow(selectedDate, instructor?.id);
 
     const startTimes = useMemo(
         () =>
@@ -108,7 +108,7 @@ export const BookingProfileDetailPage = () => {
 
             return api.post("/admin/bookings", {
                 studentId: user!.id,
-                instructorId: mentor!.id,
+                instructorId: instructor!.id,
                 bookingDate: selectedDate,
                 startTime: `${activeTime}:00`,
                 endTime: `${endTime}:00`,
@@ -123,21 +123,18 @@ export const BookingProfileDetailPage = () => {
                         .join(" — ") || undefined,
             });
         },
-        onSuccess: () => navigate("/mentors"),
+        onSuccess: () => navigate("/instructors"),
     });
 
     if (!isAuthenticated) return <Navigate to="/student/login" replace />;
     if (isLoading) return <BookingLoading />;
-    if (isError || !mentor) return <BookingNotFound />;
+    if (isError || !instructor) return <BookingNotFound />;
 
     return (
         <main className="w-full bg-background text-foreground min-h-screen pb-20 pt-8">
             <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6">
-                <div className="absolute -top-16 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none -z-10" />
-                <div className="absolute top-80 left-12 w-80 h-80 bg-secondary/20 rounded-full blur-3xl pointer-events-none -z-10" />
-
-                <BookingBreadcrumbs mentorName={mentor.name} />
-                <BookingHero mentorName={mentor.name} />
+                <BookingBreadcrumbs instructorName={instructor.name} />
+                <BookingHero instructorName={instructor.name} />
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     <div className="lg:col-span-8 flex flex-col gap-6">
@@ -172,20 +169,20 @@ export const BookingProfileDetailPage = () => {
                         />
 
                         <FocusSelectionCard
-                            mentorName={mentor.name}
+                            instructorName={instructor.name}
                             selectedFocus={selectedFocus}
                             onFocusChange={setSelectedFocus}
                         />
 
                         <DiagnosticShareCard
-                            mentorName={mentor.name}
+                            instructorName={instructor.name}
                             studentName={user?.name || ""}
                             shareReport={shareReport}
                             onShareReportChange={setShareReport}
                         />
 
                         <QuickNotesCard
-                            mentorName={mentor.name}
+                            instructorName={instructor.name}
                             notes={notes}
                             onNotesChange={setNotes}
                         />
@@ -200,8 +197,8 @@ export const BookingProfileDetailPage = () => {
                     </div>
 
                     <aside className="lg:col-span-4 flex flex-col gap-4 sticky top-6">
-                        <MentorSummaryCard
-                            mentor={mentor}
+                        <InstructorSummaryCard
+                            instructor={instructor}
                             summaryDate={summaryDate}
                             selectedTimeLabel={selectedTimeLabel}
                             durationMinutes={duration}

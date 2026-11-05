@@ -51,7 +51,7 @@ export const MyBookingsPage = () => {
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Lịch đặt của tôi</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Các buổi học 1:1 sắp tới và đã qua với huấn luyện viên của bạn
+              Các buổi học 1:1 sắp tới và đã qua với giảng viên của bạn
             </p>
           </div>
           <Button
@@ -72,9 +72,9 @@ export const MyBookingsPage = () => {
         ) : bookings.length === 0 ? (
           <Card>
             <CardContent className="p-8 text-center text-muted-foreground">
-              Chưa có lịch đặt nào. Hãy tìm mentor để bắt đầu.
+              Chưa có lịch đặt nào. Hãy tìm giảng viên để bắt đầu.
               <div className="mt-4">
-                <Button onClick={() => navigate("/mentors")}>Tìm mentor</Button>
+                <Button onClick={() => navigate("/instructors")}>Tìm giảng viên</Button>
               </div>
             </CardContent>
           </Card>
