@@ -1,6 +1,17 @@
+import { useState } from "react";
 import { Play, Lock, Clock, FileText, Mic, Video } from "lucide-react";
 import { Link } from "react-router";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@fe/components/ui/accordion";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@fe/components/ui/dialog";
+import { Button } from "@fe/components/ui/button";
 import type { CourseDetail } from "@/features/courses/types/course.type";
 
 interface CourseContentProps {
@@ -45,6 +56,7 @@ export const CourseContent = ({
   previewToken,
 }: CourseContentProps) => {
   const sections = course?.sections || [];
+  const [lockedLessonTitle, setLockedLessonTitle] = useState<string | null>(null);
 
   if (sections.length === 0) {
     return (
@@ -85,11 +97,16 @@ export const CourseContent = ({
           <AccordionContent className="[&_a]:no-underline [&_a]:hover:no-underline">
             <div className="divide-y divide-border/50 border-t border-border">
               {section.lessons?.map((lesson, lIdx) => {
-                const locked = !previewMode && !isEnrolled && !lesson.isPreview;
+                // Quiz chỉ dành cho học viên đã ghi danh, kể cả khi bài được đánh dấu xem thử.
+                const locked = !previewMode && !isEnrolled && (!lesson.isPreview || lesson.type === "quiz");
 
                 const rowContent = (
                   <>
-                    <span className="w-7 h-7 rounded-full bg-m3-surface-container-high flex items-center justify-center text-muted-foreground shrink-0">
+                    <span className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${
+                      locked
+                        ? "bg-slate-100 text-slate-400"
+                        : "bg-m3-surface-container-high text-muted-foreground"
+                    }`}>
                       {locked ? (
                         <Lock className="size-3.5" />
                       ) : lesson.isPreview ? (
@@ -122,7 +139,11 @@ export const CourseContent = ({
                       </div>
                     </div>
 
-                    {!locked && (
+                    {locked ? (
+                      <span className="hidden sm:inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2 py-1 text-[10px] font-bold text-slate-500">
+                        <Lock className="size-3" /> Mở khóa
+                      </span>
+                    ) : (
                       <span className="w-8 h-8 rounded-full bg-piemind-pink/10 flex items-center justify-center text-piemind-pink hover:bg-piemind-pink hover:text-white transition-colors shrink-0">
                         <Play className="size-3.5" />
                       </span>
@@ -131,14 +152,21 @@ export const CourseContent = ({
                 );
 
                 const rowClass = `px-6 py-3.5 flex items-center gap-4 transition-colors ${
-                  locked ? "opacity-60" : "hover:bg-muted cursor-pointer"
+                  locked
+                    ? "cursor-pointer bg-slate-50/50 hover:bg-piemind-pink/[0.04] hover:opacity-100"
+                    : "hover:bg-muted cursor-pointer"
                 }`;
 
                 // Bài đã mở (đã đăng ký hoặc cho xem thử) → vào trang xem video.
                 return locked ? (
-                  <div key={lesson.id} className={rowClass}>
+                  <button
+                    key={lesson.id}
+                    type="button"
+                    onClick={() => setLockedLessonTitle(lesson.title)}
+                    className={`${rowClass} w-full text-left opacity-75`}
+                  >
                     {rowContent}
-                  </div>
+                  </button>
                 ) : (
                   <Link
                     key={lesson.id}
@@ -157,6 +185,40 @@ export const CourseContent = ({
           </AccordionContent>
         </AccordionItem>
       ))}
+
+      <Dialog open={lockedLessonTitle !== null} onOpenChange={(open) => !open && setLockedLessonTitle(null)}>
+        <DialogContent className="gap-0 overflow-hidden rounded-3xl border border-slate-200 p-0 shadow-2xl sm:max-w-md" showCloseButton={false}>
+          <div className="bg-gradient-to-br from-rose-50 via-white to-slate-50 px-7 pb-7 pt-8 text-center">
+            <span className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-piemind-pink/12 text-piemind-pink ring-1 ring-piemind-pink/15">
+              <Lock className="size-6" />
+            </span>
+            <DialogHeader className="mt-5 gap-2">
+              <DialogTitle className="text-xl font-extrabold text-slate-900">Bài học đang được khóa</DialogTitle>
+              <DialogDescription className="mx-auto max-w-xs text-sm leading-relaxed text-slate-500">
+                “{lockedLessonTitle}” thuộc nội dung dành cho học viên đã đăng ký khóa học.
+              </DialogDescription>
+            </DialogHeader>
+          </div>
+          <div className="bg-white px-7 py-5">
+            <div className="flex items-start gap-3 rounded-2xl bg-piemind-pink/8 p-3.5 text-left">
+              <p className="text-xs font-medium leading-relaxed text-slate-600">
+                Bạn vẫn có thể học những bài có nhãn <strong className="text-piemind-pink">Xem thử</strong> miễn phí trước khi đăng ký.
+              </p>
+            </div>
+          </div>
+          <DialogFooter className="border-slate-100 bg-slate-50 px-7 py-5 sm:justify-between">
+            <DialogClose render={<Button variant="ghost" className="font-semibold" />}>
+              Để sau
+            </DialogClose>
+            <Link
+              to={`/checkout/${course?.slug}`}
+              className="mb-1 inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-piemind-pink px-4 text-sm font-bold text-white shadow-[0_4px_14px_rgba(243,129,129,0.3)] transition hover:bg-piemind-pink/90"
+            >
+              <Lock className="size-3.5" /> {Number(course?.price) === 0 ? "Đăng ký miễn phí" : "Mở khóa khóa học"}
+            </Link>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Accordion>
   );
 };

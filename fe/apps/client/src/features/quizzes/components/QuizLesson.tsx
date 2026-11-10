@@ -20,7 +20,7 @@ import { Button } from '@fe/components/ui/button';
 import { cn } from '@fe/lib/utils';
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useUpdateLessonProgress } from '@/features/learning/hooks/use-learning';
-import { useLessonQuizzes, useStartQuiz, useSubmitQuiz } from '../hooks/use-quiz';
+import { useLessonQuizzes, useQuizAttemptHistory, useQuizAttemptReview, useStartQuiz, useSubmitQuiz } from '../hooks/use-quiz';
 import { getErrorMessage, getErrorStatus } from '../services/quiz.service';
 import type { LessonQuiz, QuizAttemptResult, QuizQuestion } from '../types/quiz.type';
 
@@ -56,6 +56,8 @@ const isAnsweredQuestion = (q: QuizQuestion, sel: Record<string, string>, txt: R
 
 interface QuizLessonProps {
   lessonId: number;
+  /** Quiz được chọn từ sidebar; mở thẳng trang giới thiệu của quiz đó. */
+  initialQuizId?: number;
   /** Dùng để đánh dấu hoàn thành bài học khi đạt (PATCH /lesson-progress). */
   courseId?: number;
   /** Điều hướng sang bài tiếp theo (nếu có). */
@@ -65,7 +67,7 @@ interface QuizLessonProps {
 
 type View = 'list' | 'intro' | 'taking' | 'result';
 
-export const QuizLesson = ({ lessonId, courseId, onNextLesson, className }: QuizLessonProps) => {
+export const QuizLesson = ({ lessonId, initialQuizId, courseId, onNextLesson, className }: QuizLessonProps) => {
   const { isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
 
@@ -90,6 +92,13 @@ export const QuizLesson = ({ lessonId, courseId, onNextLesson, className }: Quiz
   const startMutation = useStartQuiz();
   const submitMutation = useSubmitQuiz();
   const updateProgress = useUpdateLessonProgress();
+  const [reviewAttemptId, setReviewAttemptId] = useState<string | number | undefined>();
+  const historyQuizId = selectedQuizId ?? (quizzes?.length === 1 ? quizzes[0].id : undefined);
+  const { data: attemptHistory = [] } = useQuizAttemptHistory(historyQuizId, isAuthenticated);
+  const { data: attemptReview, isLoading: isReviewLoading } = useQuizAttemptReview(
+    reviewAttemptId,
+    isAuthenticated,
+  );
 
   // Quiz hiện tại — ưu tiên bản mới nhất từ server (attemptsUsed đã được refetch).
   const freshQuiz = useMemo(
@@ -112,7 +121,14 @@ export const QuizLesson = ({ lessonId, courseId, onNextLesson, className }: Quiz
     setResult(null);
     setFormError(null);
     setAttemptId(null);
-  }, [lessonId]);
+  }, [lessonId, initialQuizId]);
+
+  useEffect(() => {
+    if (initialQuizId) {
+      setSelectedQuizId(initialQuizId);
+      setView('intro');
+    }
+  }, [initialQuizId]);
 
   const answeredCount = useMemo(
     () => questions.filter((q) => isAnsweredQuestion(q, sel, txt)).length,
@@ -180,6 +196,7 @@ export const QuizLesson = ({ lessonId, courseId, onNextLesson, className }: Quiz
           setResult(attempt);
           setView('result');
           queryClient.invalidateQueries({ queryKey: ['lesson-quizzes', lessonId] });
+          queryClient.invalidateQueries({ queryKey: ['quiz-attempt-history'] });
           // Đạt điểm đạt → đánh dấu bài học hoàn thành (API progress có sẵn).
           const passed = Number(attempt.score ?? 0) >= (activeQuiz?.passingScore ?? 0);
           if (passed && courseId) {
@@ -315,7 +332,7 @@ export const QuizLesson = ({ lessonId, courseId, onNextLesson, className }: Quiz
       freshQuiz.attemptsUsed,
       (activeQuiz?.attemptsUsed ?? 0) + 1,
     );
-    const attemptsLeft = freshQuiz.maxAttempts - attemptsUsedNow > 0;
+    const attemptsLeft = true;
 
     return (
       <div className={shell}>
@@ -389,7 +406,7 @@ export const QuizLesson = ({ lessonId, courseId, onNextLesson, className }: Quiz
                 </span>
               )}
               <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-600">
-                Lần làm bài {attemptsUsedNow}/{freshQuiz.maxAttempts}
+                Lần làm bài {attemptsUsedNow}
               </span>
               {updateProgress.isSuccess && passed && (
                 <span className="rounded-full border border-piemind-mint/40 bg-piemind-mint/10 px-3 py-1 text-xs font-bold text-emerald-600">
@@ -397,6 +414,36 @@ export const QuizLesson = ({ lessonId, courseId, onNextLesson, className }: Quiz
                 </span>
               )}
             </div>
+
+            {freshQuiz.showAnswerAfterSubmit && (
+              <div className="mt-5 w-full max-w-lg text-left">
+                <Button
+                  variant="outline"
+                  className="h-10 rounded-xl border-2 border-slate-200 font-bold text-slate-700"
+                  onClick={() => setReviewAttemptId(result.id)}
+                >
+                  <ListChecks /> Xem đáp án đúng / sai
+                </Button>
+                {reviewAttemptId === result.id && (
+                  <div className="mt-3 space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    {isReviewLoading ? (
+                      <p className="text-center text-sm text-slate-500">Đang tải đáp án...</p>
+                    ) : (
+                      attemptReview?.questions.map((question, questionIndex) => (
+                        <div key={question.id} className={cn('rounded-xl border bg-white p-3', question.isCorrect ? 'border-emerald-200' : 'border-rose-200')}>
+                          <p className="text-sm font-bold text-slate-800">Câu {questionIndex + 1}: {question.question}</p>
+                          <p className="mt-1 text-xs text-slate-600">Bạn chọn: <strong>{question.selectedAnswer ?? 'Chưa trả lời'}</strong></p>
+                          {!question.isCorrect && <p className="mt-1 text-xs text-emerald-700">Đáp án đúng: <strong>{question.correctAnswer ?? '—'}</strong></p>}
+                          <p className={cn('mt-1 text-xs font-bold', question.isCorrect ? 'text-emerald-700' : 'text-rose-700')}>
+                            {question.isCorrect ? 'Đúng' : 'Sai'} · {question.earnedPoints} điểm
+                          </p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
               {isMultiQuiz && (
@@ -438,11 +485,6 @@ export const QuizLesson = ({ lessonId, courseId, onNextLesson, className }: Quiz
               )}
             </div>
 
-            {!attemptsLeft && (
-              <p className="mt-4 text-sm font-semibold text-amber-600">
-                Bạn đã hết lượt làm bài ({freshQuiz.maxAttempts} lần).
-              </p>
-            )}
           </div>
         </div>
       </div>
@@ -669,7 +711,7 @@ export const QuizLesson = ({ lessonId, courseId, onNextLesson, className }: Quiz
 
           <div className="divide-y divide-slate-100">
             {quizzes.map((quiz, index) => {
-              const exhausted = quiz.maxAttempts > 0 && quiz.attemptsUsed >= quiz.maxAttempts;
+              const exhausted = false;
               const noQuestions = quiz.questions.length === 0;
               const disabled = exhausted || noQuestions;
 
@@ -704,7 +746,7 @@ export const QuizLesson = ({ lessonId, courseId, onNextLesson, className }: Quiz
                       )}
                       {!exhausted && quiz.attemptsUsed > 0 && (
                         <span className="shrink-0 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600">
-                          Đã làm {quiz.attemptsUsed}/{quiz.maxAttempts}
+                          Đã làm {quiz.attemptsUsed} lần
                         </span>
                       )}
                     </span>
@@ -778,7 +820,8 @@ export const QuizLesson = ({ lessonId, courseId, onNextLesson, className }: Quiz
   }
 
   {
-    const exhausted = quiz.maxAttempts > 0 && quiz.attemptsUsed >= quiz.maxAttempts;
+    // Học viên có thể làm lại để luyện tập; lịch sử lưu riêng từng lần nộp.
+    const exhausted = false;
     const noQuestions = quiz.questions.length === 0;
     const totalPoints = quiz.questions.reduce((sum, q) => sum + q.points, 0);
     const stats = [
@@ -792,7 +835,7 @@ export const QuizLesson = ({ lessonId, courseId, onNextLesson, className }: Quiz
       {
         icon: Award,
         label: 'Lượt làm bài',
-        value: `${quiz.attemptsUsed}/${quiz.maxAttempts}`,
+        value: `${quiz.attemptsUsed} lần`,
       },
     ];
 
@@ -856,7 +899,7 @@ export const QuizLesson = ({ lessonId, courseId, onNextLesson, className }: Quiz
                   )}
                   {quiz.attemptsUsed > 0 && (
                     <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-600">
-                      Đã làm {quiz.attemptsUsed}/{quiz.maxAttempts} lần
+                      Đã làm {quiz.attemptsUsed} lần
                     </span>
                   )}
                 </div>
@@ -872,18 +915,60 @@ export const QuizLesson = ({ lessonId, courseId, onNextLesson, className }: Quiz
                     ) : (
                       <PencilLine />
                     )}
-                    {quiz.attemptsUsed > 0 && !exhausted ? 'Làm lại' : 'Bắt đầu làm bài'}
+                    {quiz.attemptsUsed > 0 ? 'Làm lại' : 'Bắt đầu làm bài'}
                   </Button>
                 </div>
+
+                {attemptHistory.length > 0 && (
+                  <div className="mt-7 w-full border-t border-slate-100 pt-5 text-left">
+                    <h3 className="text-sm font-extrabold text-slate-800">Lịch sử làm bài</h3>
+                    <div className="mt-3 space-y-2">
+                      {attemptHistory.map((attempt, index) => (
+                        <div key={attempt.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs">
+                          <span className="font-bold text-slate-700">Lần {attemptHistory.length - index}</span>
+                          <span className="font-semibold text-slate-500">{attempt.correctCount}/{attempt.totalQuestions} câu · {attempt.score} điểm</span>
+                          <span className={cn('rounded-full px-2 py-0.5 font-bold', attempt.passed ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700')}>
+                            {attempt.passed ? 'Đạt' : 'Chưa đạt'}
+                          </span>
+                          {quiz.showAnswerAfterSubmit && (
+                            <button
+                              type="button"
+                              onClick={() => setReviewAttemptId(attempt.id)}
+                              className="font-bold text-piemind-pink hover:underline"
+                            >
+                              Xem đáp án
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    {reviewAttemptId && (
+                      <div className="mt-4 rounded-xl border border-slate-200 bg-white p-4">
+                        <p className="mb-3 text-sm font-extrabold text-slate-800">Xem lại câu trả lời</p>
+                        {isReviewLoading ? (
+                          <p className="text-xs text-slate-500">Đang tải đáp án...</p>
+                        ) : (
+                          <div className="space-y-3">
+                            {attemptReview?.questions.map((question, questionIndex) => (
+                              <div key={question.id} className={cn('rounded-xl border p-3', question.isCorrect ? 'border-emerald-200 bg-emerald-50/50' : 'border-rose-200 bg-rose-50/50')}>
+                                <p className="text-xs font-bold text-slate-800">Câu {questionIndex + 1}: {question.question}</p>
+                                <p className="mt-1 text-xs text-slate-600">Bạn chọn: <strong>{question.selectedAnswer ?? 'Chưa trả lời'}</strong></p>
+                                {!question.isCorrect && <p className="mt-1 text-xs text-emerald-700">Đáp án đúng: <strong>{question.correctAnswer ?? '—'}</strong></p>}
+                                <p className={cn('mt-1 text-xs font-bold', question.isCorrect ? 'text-emerald-700' : 'text-rose-700')}>
+                                  {question.isCorrect ? 'Đúng' : 'Sai'} · {question.earnedPoints} điểm
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {noQuestions && (
                   <p className="mt-3 text-sm font-medium text-amber-600">
                     Bài kiểm tra chưa có câu hỏi.
-                  </p>
-                )}
-                {exhausted && (
-                  <p className="mt-3 text-sm font-semibold text-amber-600">
-                    Bạn đã hết lượt làm bài ({quiz.maxAttempts} lần).
                   </p>
                 )}
               </div>

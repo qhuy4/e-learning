@@ -69,7 +69,7 @@ export const CourseDetailPage = () => {
       </nav>
 
       {/* Course Header Hero */}
-      <CourseHeader course={courseData} />
+      <CourseHeader course={courseData} isEnrolled={isEnrolled} />
 
       {/* Learning Outcomes */}
       <CourseLearningOutcomes course={courseData} />
@@ -88,7 +88,7 @@ export const CourseDetailPage = () => {
       </div>
 
       {/* Đánh giá từ học viên */}
-      <CourseReviewsSection courseId={courseData.id} />
+      {isEnrolled && <CourseReviewsSection courseId={courseData.id} isEnrolled />}
 
       {/* Related Courses */}
       {slug && <RelatedCourses courseSlug={slug} />}

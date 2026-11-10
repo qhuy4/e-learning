@@ -1,4 +1,5 @@
-import { PlayCircle, CheckCircle2, Lock, Circle, ClipboardList, BookOpen } from 'lucide-react';
+import { Fragment } from 'react';
+import { PlayCircle, CheckCircle2, Lock, Circle, ClipboardList, BookOpen, ChevronRight } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
@@ -9,6 +10,7 @@ import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { cn } from '@fe/lib/utils';
 import type { LearningSection, LearningLesson } from '../../types/learning.type';
 import { LOCK_MESSAGES } from '../../utils/lesson-lock';
+import type { LessonQuiz } from '@/features/quizzes/types/quiz.type';
 
 interface LessonProgressInfo {
   isCompleted: boolean;
@@ -25,6 +27,8 @@ interface LearningSidebarProps {
   lockedLessonIds?: Set<number>;
   /** Bấm vào bài đang khóa → hiện cảnh báo thay vì điều hướng. */
   onLessonClickLocked?: (message: string) => void;
+  /** Quiz và kết quả lần làm gần nhất, chỉ nạp cho học viên đã ghi danh. */
+  lessonQuizzesByLesson?: Map<number, LessonQuiz[]>;
 }
 
 const formatDuration = (duration: number | null) => {
@@ -53,6 +57,7 @@ export const LearningSidebar = ({
   lessonProgressMap,
   lockedLessonIds,
   onLessonClickLocked,
+  lessonQuizzesByLesson,
 }: LearningSidebarProps) => {
   const { lessonSlug } = useParams<{ lessonSlug: string }>();
   const [searchParams] = useSearchParams();
@@ -162,10 +167,11 @@ export const LearningSidebar = ({
                       const isLocked = lockMessage !== null;
                       const Icon = lessonIcon(lesson);
                       const duration = formatDuration(lesson.duration);
+                      const quizzes = lessonQuizzesByLesson?.get(Number(lesson.id)) ?? [];
 
                       return (
-                        <Link
-                          key={lesson.id}
+                        <Fragment key={lesson.id}>
+                          <Link
                           to={
                             isLocked
                               ? '#'
@@ -249,7 +255,45 @@ export const LearningSidebar = ({
                               Quiz
                             </span>
                           ) : null}
-                        </Link>
+                          </Link>
+                          {isEnrolled && quizzes.map((quiz) => {
+                            const result = quiz.latestAttempt;
+                            const quizLocked = isLocked;
+                            return (
+                              <Link
+                                key={quiz.id}
+                                to={
+                                  quizLocked
+                                    ? '#'
+                                    : `/learning/${courseSlug}/${lesson.slug}?quiz=${quiz.id}`
+                                }
+                                aria-disabled={quizLocked}
+                                onClick={(event) => {
+                                  if (!quizLocked) return;
+                                  event.preventDefault();
+                                  onLessonClickLocked?.(lockMessage ?? LOCK_MESSAGES.previousIncomplete);
+                                }}
+                                className={cn(
+                                  'ml-9 flex items-center gap-2 rounded-xl border border-dashed px-3 py-2 text-xs transition-all',
+                                  quizLocked
+                                    ? 'cursor-not-allowed border-slate-200 bg-slate-50 text-slate-400 opacity-70'
+                                    : 'border-violet-200 bg-violet-50/50 text-slate-700 hover:border-violet-400 hover:bg-violet-50',
+                                )}
+                              >
+                                {quizLocked ? <Lock className="h-3.5 w-3.5" /> : <ClipboardList className="h-3.5 w-3.5 text-violet-600" />}
+                                <span className="min-w-0 flex-1 truncate font-bold">Quiz: {quiz.title}</span>
+                                {result ? (
+                                  <span className={cn('shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-extrabold', result.passed ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700')}>
+                                    {result.score} điểm · {result.passed ? 'Đạt' : 'Chưa đạt'}
+                                  </span>
+                                ) : (
+                                  <span className="shrink-0 text-[10px] font-bold text-violet-600">Chưa làm</span>
+                                )}
+                                {!quizLocked && <ChevronRight className="h-3.5 w-3.5 text-violet-400" />}
+                              </Link>
+                            );
+                          })}
+                        </Fragment>
                       );
                     })}
                   </div>

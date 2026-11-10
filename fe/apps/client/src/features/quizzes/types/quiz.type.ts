@@ -33,10 +33,18 @@ export interface LessonQuiz {
   /** Điểm đạt (điểm thô), 0 = không yêu cầu */
   passingScore: number;
   maxAttempts: number;
+  showAnswerAfterSubmit: boolean;
   shuffleQuestions: boolean;
   shuffleOptions: boolean;
   /** Số lần học viên đã NỘP bài */
   attemptsUsed: number;
+  /** Kết quả lần nộp gần nhất, chỉ trả cho học viên đã ghi danh. */
+  latestAttempt?: {
+    score: number;
+    correctCount: number;
+    totalQuestions: number;
+    passed: boolean;
+  } | null;
   questions: QuizQuestion[];
 }
 
@@ -51,6 +59,27 @@ export interface QuizAttemptResult {
   status: string;
   startedAt?: string | null;
   submittedAt?: string | null;
+}
+
+export interface QuizAttemptHistoryItem {
+  id: string | number;
+  score: number;
+  correctCount: number;
+  totalQuestions: number;
+  submittedAt: string | null;
+  passed: boolean;
+}
+
+export interface QuizAttemptReview {
+  attemptId: string | number;
+  questions: Array<{
+    id: number;
+    question: string;
+    isCorrect: boolean;
+    earnedPoints: number;
+    selectedAnswer: string | null;
+    correctAnswer: string | null;
+  }>;
 }
 
 export interface SubmitQuizAnswer {

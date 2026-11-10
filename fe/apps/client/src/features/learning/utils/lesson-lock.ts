@@ -33,9 +33,8 @@ export const buildSequentialLocks = (
   for (const section of sections) {
     for (const lesson of section.lessons) {
       const lessonId = Number(lesson.id);
-      // Bài xem thử không bị khóa (đồng bộ backend) nhưng vẫn tính độ hoàn thành
-      // để mở bài đứng sau nó.
-      if (!previousCompleted && !lesson.isPreview) lockedLessonIds.add(lessonId);
+      // Khi đã ghi danh, mọi bài đều tuân theo lộ trình tuần tự, kể cả bài preview.
+      if (!previousCompleted) lockedLessonIds.add(lessonId);
 
       const info = progressMap.get(lessonId);
       previousCompleted = info

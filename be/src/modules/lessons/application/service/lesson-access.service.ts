@@ -40,8 +40,9 @@ export class LessonAccessService {
     lesson: { id: number | string | null; sectionId: number | string | null; isPreview?: boolean },
     userId?: number,
   ): Promise<boolean> {
-    // Khách vãng lai / bài xem thử / bài không thuộc chương nào → không áp khóa tuần tự.
-    if (!userId || lesson.isPreview || !lesson.sectionId || lesson.id == null) return false;
+    // Khách vãng lai / bài không thuộc chương nào → không áp khóa tuần tự.
+    // Bài preview chỉ mở miễn phí cho khách; khi đã ghi danh vẫn phải theo thứ tự học.
+    if (!userId || !lesson.sectionId || lesson.id == null) return false;
 
     const section = await this.sectionRepository.findOne({
       where: { id: lesson.sectionId.toString() },

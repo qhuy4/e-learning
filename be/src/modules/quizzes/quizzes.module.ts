@@ -8,6 +8,9 @@ import { QuizQuestionOrmEntity } from './infrastructure/entity/quiz-question.orm
 import { QuizOptionOrmEntity } from './infrastructure/entity/quiz-option.orm-entity';
 import { QuizAttemptOrmEntity } from './infrastructure/entity/quiz-attempt.orm-entity';
 import { QuizAnswerOrmEntity } from './infrastructure/entity/quiz-answer.orm-entity';
+import { LessonOrmEntity } from '@/modules/lessons/infrastructure/entity/lesson.orm-entity';
+import { SectionOrmEntity } from '@/modules/sections/infrastructure/entity/section.orm-entity';
+import { EnrollmentsModule } from '@/modules/enrollments/enrollments.module';
 
 import { AdminQuizController } from './presentation/controllers/admin-quiz.controller';
 import { InstructorQuizController } from './presentation/controllers/instructor-quiz.controller';
@@ -26,6 +29,8 @@ import { GetQuizListHandler } from './application/query-handler/get-quiz-list.ha
 import { GetMyQuizzesHandler } from './application/query-handler/get-my-quizzes.handler';
 import { GetLessonQuizzesHandler } from './application/query-handler/get-lesson-quizzes.handler';
 import { GetStudentLessonQuizzesHandler } from './application/query-handler/get-student-lesson-quizzes.handler';
+import { GetQuizAttemptHistoryHandler } from './application/query-handler/get-quiz-attempt-history.handler';
+import { GetQuizAttemptReviewHandler } from './application/query-handler/get-quiz-attempt-review.handler';
 
 import { QuizRepository } from './infrastructure/repository/quiz.repository';
 import { QUIZ_REPOSITORY } from './domain/repository/quiz.repository';
@@ -47,6 +52,8 @@ const ormEntities = [
   QuizOptionOrmEntity,
   QuizAttemptOrmEntity,
   QuizAnswerOrmEntity,
+  LessonOrmEntity,
+  SectionOrmEntity,
 ];
 
 const commandHandlers = [
@@ -65,6 +72,8 @@ const queryHandlers = [
   GetMyQuizzesHandler,
   GetLessonQuizzesHandler,
   GetStudentLessonQuizzesHandler,
+  GetQuizAttemptHistoryHandler,
+  GetQuizAttemptReviewHandler,
 ];
 
 const repositories = [
@@ -77,7 +86,7 @@ const repositories = [
 ];
 
 @Module({
-  imports: [TypeOrmModule.forFeature(ormEntities), CqrsModule],
+  imports: [TypeOrmModule.forFeature(ormEntities), CqrsModule, EnrollmentsModule],
   controllers: [AdminQuizController, InstructorQuizController, StudentQuizController],
   providers: [...commandHandlers, ...queryHandlers, ...repositories],
 })

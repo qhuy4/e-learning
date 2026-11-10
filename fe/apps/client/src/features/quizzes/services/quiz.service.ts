@@ -1,5 +1,5 @@
 import { api } from '@/shared/lib/axios';
-import type { LessonQuiz, QuizAttemptResult, SubmitQuizAnswer } from '../types/quiz.type';
+import type { LessonQuiz, QuizAttemptHistoryItem, QuizAttemptResult, QuizAttemptReview, SubmitQuizAnswer } from '../types/quiz.type';
 
 export const quizService = {
   /** Danh sách quiz của 1 lesson (kèm câu hỏi — không có đáp án đúng). */
@@ -22,6 +22,16 @@ export const quizService = {
     const { data: res } = await api.post(`/student/quizzes/attempts/${attemptId}/submit`, {
       answers,
     });
+    return res.data;
+  },
+
+  getAttemptHistory: async (quizId: number): Promise<QuizAttemptHistoryItem[]> => {
+    const { data: res } = await api.get(`/student/quizzes/${quizId}/history`);
+    return res.data ?? [];
+  },
+
+  getAttemptReview: async (attemptId: string | number): Promise<QuizAttemptReview> => {
+    const { data: res } = await api.get(`/student/quizzes/attempts/${attemptId}/review`);
     return res.data;
   },
 };

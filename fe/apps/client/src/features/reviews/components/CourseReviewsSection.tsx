@@ -8,10 +8,12 @@ import { ReviewFormModal } from "./ReviewFormModal";
 
 interface CourseReviewsSectionProps {
   courseId: string | number;
+  isEnrolled?: boolean;
 }
 
 export const CourseReviewsSection: React.FC<CourseReviewsSectionProps> = ({
   courseId,
+  isEnrolled = false,
 }) => {
   const { isAuthenticated, user } = useAuth();
   const [selectedRating, setSelectedRating] = useState<number | undefined>(undefined);
@@ -30,7 +32,7 @@ export const CourseReviewsSection: React.FC<CourseReviewsSectionProps> = ({
   });
 
   // Check enrollment eligibility
-  const { data: eligibilityData } = useReviewEligibility(courseId, isAuthenticated);
+  const { data: eligibilityData } = useReviewEligibility(courseId, isAuthenticated && isEnrolled);
   const eligibility = (eligibilityData as any)?.data ?? eligibilityData;
 
   const resObject = (data as any)?.stats ? data : ((data as any)?.data ?? data);
@@ -50,7 +52,7 @@ export const CourseReviewsSection: React.FC<CourseReviewsSectionProps> = ({
   const meta = (resObject as any)?.meta ?? (data as any)?.meta;
   const totalPages = meta?.totalPages || 1;
 
-  const canReview = isAuthenticated && eligibility?.canReview === true;
+  const canReview = isEnrolled && isAuthenticated && eligibility?.canReview === true;
   const userReview = eligibility?.userReview;
 
   return (
@@ -77,12 +79,12 @@ export const CourseReviewsSection: React.FC<CourseReviewsSectionProps> = ({
               <Edit3 className="w-4 h-4" />
               {userReview ? "Chỉnh sửa đánh giá của bạn" : "Viết đánh giá"}
             </button>
-          ) : (
+          ) : isEnrolled ? (
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-piemind-yellow/25 border border-piemind-yellow/60 text-foreground text-sm font-medium rounded-xl">
               <Lock className="w-4 h-4 text-muted-foreground shrink-0" />
               <span>Cần mua/đăng ký khóa học để viết đánh giá</span>
             </div>
-          )}
+          ) : null}
         </div>
       </div>
 

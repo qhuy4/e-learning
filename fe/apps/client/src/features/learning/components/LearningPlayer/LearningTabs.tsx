@@ -1,5 +1,6 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@fe/components/ui/tabs';
-import { FileText, Download } from 'lucide-react';
+import { FileText, Download, Lock } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import type { LessonDetail } from '../../types/learning.type';
 import { useLessonMaterials } from '../../hooks/use-learning';
 import { LessonNotes } from '../LessonNotes';
@@ -22,6 +23,8 @@ const fileExt = (name: string) => {
 interface LearningTabsProps {
   lesson: LessonDetail;
   previewToken?: string;
+  isEnrolled?: boolean;
+  courseSlug?: string;
   /** Ref player video — panel Ghi chú dùng để tua về mốc note */
   videoRef?: RefObject<VideoPlayerHandle | null>;
 }
@@ -29,13 +32,37 @@ interface LearningTabsProps {
 export const LearningTabs = ({
   lesson,
   previewToken,
+  isEnrolled,
+  courseSlug,
   videoRef,
 }: LearningTabsProps) => {
   const {
     data: materials,
     isLoading: materialsLoading,
     isError: materialsError,
-  } = useLessonMaterials(lesson.id, true, previewToken);
+  } = useLessonMaterials(lesson.id, isEnrolled === true, previewToken);
+
+  if (!isEnrolled) {
+    return (
+      <div className="p-4 md:p-6 lg:p-8">
+        <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 via-white to-piemind-pink/[0.06] px-6 py-10 text-center">
+          <span className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-lg shadow-slate-900/15">
+            <Lock className="size-6" />
+          </span>
+          <h2 className="mt-4 text-lg font-extrabold text-slate-900">Nội dung dành cho học viên</h2>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-500">
+            Mở khóa khóa học để dùng ghi chú cá nhân, hỏi đáp cùng giảng viên và tải tài liệu đi kèm.
+          </p>
+          <Link
+            to={`/checkout/${courseSlug}`}
+            className="mt-5 inline-flex items-center gap-2 rounded-xl bg-piemind-pink px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(243,129,129,0.28)] transition hover:bg-piemind-pink/90"
+          >
+            Mở khóa nội dung
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 md:p-6 lg:p-8 w-full font-sans">

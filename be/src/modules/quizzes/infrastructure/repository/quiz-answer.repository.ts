@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { QuizAnswerOrmEntity } from '../entity/quiz-answer.orm-entity';
 import { QuizAnswer } from '../../domain/entity/quiz-answer.entity';
 import { IQuizAnswerRepository } from '../../domain/repository/quiz-answer.repository';
+import { QuizAnswerMapper } from '../mapper/quiz-answer.mapper';
 
 @Injectable()
 export class QuizAnswerRepository implements IQuizAnswerRepository {
@@ -18,5 +19,12 @@ export class QuizAnswerRepository implements IQuizAnswerRepository {
       earnedPoints: a.earnedPoints,
     }));
     await this.repository.save(entities);
+  }
+
+  async findByAttemptId(attemptId: number): Promise<QuizAnswer[]> {
+    const entities = await this.repository.find({
+      where: { attemptId: attemptId.toString() },
+    });
+    return entities.map(QuizAnswerMapper.toDomain);
   }
 }

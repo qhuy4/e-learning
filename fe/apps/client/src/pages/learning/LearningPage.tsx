@@ -15,7 +15,7 @@ import { useAuth } from '../../features/auth/hooks/use-auth';
 import { useVideoProgress } from '../../features/learning/hooks/use-video-progress';
 import { QuizLesson } from '../../features/quizzes/components/QuizLesson';
 import { QuizLauncher } from '../../features/quizzes/components/QuizLauncher';
-import { useLessonQuizzes } from '../../features/quizzes/hooks/use-quiz';
+import { useCourseLessonQuizzes, useLessonQuizzes } from '../../features/quizzes/hooks/use-quiz';
 import { ArrowLeft, ClipboardList, Loader2, CheckCircle2, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -31,6 +31,7 @@ export const LearningPage = () => {
   const { courseSlug, lessonSlug } = useParams<{ courseSlug: string; lessonSlug?: string }>();
   const [searchParams] = useSearchParams();
   const previewToken = searchParams.get('previewToken');
+  const requestedQuizId = Number(searchParams.get('quiz')) || undefined;
 
   // Quiz mở ở giao diện RIÊNG toàn màn hình (không nhúng inline).
   const [quizOpen, setQuizOpen] = useState(false);
@@ -49,7 +50,7 @@ export const LearningPage = () => {
   const targetLessonSlug = lessonSlug || defaultLessonSlug;
 
   const { isAuthenticated } = useAuth();
-  const { data: enrollmentCheck } = useEnrollmentCheck(
+  const { data: enrollmentCheck, isLoading: isEnrollmentCheckLoading } = useEnrollmentCheck(
     courseData?.slug,
     isAuthenticated && !previewToken,
   );
@@ -57,6 +58,11 @@ export const LearningPage = () => {
 
   const allLessons = courseData?.sections?.flatMap((s: any) => s.lessons || []) || [];
   const currentLessonObj = allLessons.find((l: any) => l.slug === targetLessonSlug);
+  const purchaseLocked =
+    !previewToken &&
+    !isEnrollmentCheckLoading &&
+    !isEnrolled &&
+    (currentLessonObj?.isPreview !== true || currentLessonObj?.type === 'quiz');
 
   const regularLessonQuery = useLessonBySlug(targetLessonSlug, courseSlug);
   const previewLessonQuery = usePreviewLesson(
@@ -80,13 +86,23 @@ export const LearningPage = () => {
 
   const { data: lessonQuizzes } = useLessonQuizzes(
     lessonData?.id,
-    isAuthenticated && !previewToken,
+    isEnrolled && !previewToken,
+  );
+  const lessonQuizzesByLesson = useCourseLessonQuizzes(
+    allLessons.map((lesson: any) => Number(lesson.id)),
+    isEnrolled && !previewToken,
   );
 
   // Sang bài khác → đóng giao diện quiz toàn màn hình.
   useEffect(() => {
     setQuizOpen(false);
   }, [lessonData?.id]);
+
+  useEffect(() => {
+    if (requestedQuizId && isEnrolled && !previewToken) {
+      setQuizOpen(true);
+    }
+  }, [requestedQuizId, isEnrolled, previewToken]);
 
   const lessonProgressMap = new Map<number, { isCompleted: boolean; progressPercent: number; watchSeconds: number }>();
   courseProgress?.lessons?.forEach((lp) => {
@@ -201,6 +217,7 @@ export const LearningPage = () => {
         totalLessons={isEnrolled ? totalLessons : undefined}
         remainingMinutes={isEnrolled ? remainingMinutes : undefined}
         previewMode={!!previewToken}
+        isEnrolled={isEnrolled}
         previewToken={previewToken ?? undefined}
         editUrl={
           previewToken
@@ -212,7 +229,7 @@ export const LearningPage = () => {
       <div className="flex flex-1 flex-col lg:flex-row h-[calc(100vh-64px)]">
         <div className="flex-1 overflow-y-auto min-w-0 custom-scrollbar flex flex-col bg-slate-50">
           {/* Bài đang khóa → màn hình khóa (không tải player/quiz) */}
-          {lessonData.isLocked ? (
+          {lessonData.isLocked || purchaseLocked ? (
             <div className="w-full p-4 md:p-6">
               <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-6 text-center shadow-[0_4px_20px_rgba(15,23,42,0.06)] md:rounded-3xl">
                 <span className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100">
@@ -220,16 +237,24 @@ export const LearningPage = () => {
                 </span>
                 <p className="text-lg font-extrabold text-slate-900">Bài học đang khóa</p>
                 <p className="max-w-md text-sm font-medium text-slate-500">
-                  {LOCK_MESSAGES.previousIncomplete}
+                  {purchaseLocked ? LOCK_MESSAGES.notEnrolled : LOCK_MESSAGES.previousIncomplete}
                 </p>
-                {prevLesson && (
+                {purchaseLocked ? (
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/checkout/${courseData.slug}`)}
+                    className="mt-1 rounded-xl bg-piemind-pink px-4 py-2 text-sm font-bold text-white shadow-[0_4px_14px_rgba(243,129,129,0.28)] transition hover:bg-piemind-pink/90"
+                  >
+                    Mở khóa khóa học
+                  </button>
+                ) : prevLesson ? (
                   <button
                     onClick={() => navigateToLesson(prevLesson.slug)}
                     className="mt-1 rounded-xl border-2 border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition-all hover:border-slate-300 hover:bg-slate-50"
                   >
                     Quay lại bài trước
                   </button>
-                )}
+                ) : null}
               </div>
             </div>
           ) : lessonData.type === 'quiz' ? (
@@ -355,6 +380,8 @@ export const LearningPage = () => {
               <LearningTabs
                 lesson={lessonData}
                 previewToken={previewToken ?? undefined}
+              isEnrolled={isEnrolled}
+              courseSlug={courseData.slug}
                 videoRef={videoRef}
               />
             </div>
@@ -367,6 +394,7 @@ export const LearningPage = () => {
             courseSlug={courseData.slug}
             isEnrolled={isEnrolled}
             lessonProgressMap={lessonProgressMap}
+            lessonQuizzesByLesson={lessonQuizzesByLesson}
             lockedLessonIds={lockedLessonIds}
             onLessonClickLocked={(message) => toast.warning(message)}
           />
@@ -406,6 +434,7 @@ export const LearningPage = () => {
           <div className="min-h-0 flex-1 overflow-y-auto">
             <QuizLesson
               lessonId={lessonData.id}
+              initialQuizId={requestedQuizId}
               courseId={courseData.id}
               className="mx-auto max-w-4xl md:max-w-5xl"
               onNextLesson={

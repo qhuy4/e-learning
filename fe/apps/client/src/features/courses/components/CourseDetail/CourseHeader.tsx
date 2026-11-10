@@ -3,9 +3,10 @@ import type { CourseDetail } from "@/features/courses/types/course.type";
 
 interface CourseHeaderProps {
   course: CourseDetail;
+  isEnrolled?: boolean;
 }
 
-export const CourseHeader = ({ course }: CourseHeaderProps) => {
+export const CourseHeader = ({ course, isEnrolled = false }: CourseHeaderProps) => {
   const totalLessons = course?.sections?.reduce((acc, s) => acc + (s.lessons?.length || 0), 0) || 0;
   const totalSections = course?.sections?.length || 0;
 
@@ -31,7 +32,7 @@ export const CourseHeader = ({ course }: CourseHeaderProps) => {
               {totalLessons} bài học
             </span>
           )}
-          {course?.statistics?.averageRating > 0 && (
+          {isEnrolled && course?.statistics?.averageRating > 0 && (
             <span className="bg-piemind-pink/10 text-piemind-pink px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 border border-piemind-pink/25">
               <Award className="size-3.5" />
               {course.statistics.averageRating.toFixed(1)} ★
@@ -55,7 +56,7 @@ export const CourseHeader = ({ course }: CourseHeaderProps) => {
                 {course.statistics.studentCount} học viên
               </span>
             )}
-            {course.statistics.reviewCount > 0 && (
+            {isEnrolled && course.statistics.reviewCount > 0 && (
               <span className="rounded-full bg-muted border border-border px-3 py-1 font-semibold">
                 {course.statistics.reviewCount} đánh giá
               </span>

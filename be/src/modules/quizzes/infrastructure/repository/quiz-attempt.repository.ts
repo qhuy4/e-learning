@@ -48,4 +48,28 @@ export class QuizAttemptRepository implements IQuizAttemptRepository {
       },
     });
   }
+
+  async findLatestSubmittedByQuizAndUser(quizId: number, userId: number): Promise<QuizAttempt | null> {
+    const entity = await this.repository.findOne({
+      where: {
+        quizId: quizId.toString(),
+        userId: userId.toString(),
+        status: QuizAttemptStatus.SUBMITTED,
+      },
+      order: { submittedAt: 'DESC' },
+    });
+    return entity ? QuizAttemptMapper.toDomain(entity) : null;
+  }
+
+  async findSubmittedByQuizAndUser(quizId: number, userId: number): Promise<QuizAttempt[]> {
+    const entities = await this.repository.find({
+      where: {
+        quizId: quizId.toString(),
+        userId: userId.toString(),
+        status: QuizAttemptStatus.SUBMITTED,
+      },
+      order: { submittedAt: 'DESC' },
+    });
+    return entities.map(QuizAttemptMapper.toDomain);
+  }
 }

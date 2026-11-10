@@ -19,6 +19,8 @@ interface LearningHeaderProps {
   /** Tổng thời gian của các bài còn lại (phút) */
   remainingMinutes?: number;
   previewMode?: boolean;
+  /** Chỉ học viên đã ghi danh mới được đánh giá khóa học. */
+  isEnrolled?: boolean;
   previewToken?: string;
   editUrl?: string;
 }
@@ -33,6 +35,7 @@ export const LearningHeader = ({
   totalLessons,
   remainingMinutes,
   previewMode,
+  isEnrolled = false,
   previewToken,
   editUrl,
 }: LearningHeaderProps) => {
@@ -42,7 +45,7 @@ export const LearningHeader = ({
 
   const { data: eligibility } = useReviewEligibility(
     courseId || '',
-    !!courseId && !previewMode,
+    !!courseId && !previewMode && isEnrolled,
   );
   const userReview = eligibility?.userReview;
 
@@ -170,13 +173,15 @@ export const LearningHeader = ({
           </>
         ) : (
           <>
-            <button
-              onClick={() => setIsReviewModalOpen(true)}
-              className="hidden sm:inline-flex h-9 items-center gap-1.5 rounded-full border border-slate-200 px-3 text-xs font-bold text-slate-600 transition-colors hover:border-piemind-pink hover:text-piemind-pink"
-            >
-              <Star className="w-3.5 h-3.5" />
-              Đánh giá
-            </button>
+            {isEnrolled && (
+              <button
+                onClick={() => setIsReviewModalOpen(true)}
+                className="hidden sm:inline-flex h-9 items-center gap-1.5 rounded-full border border-slate-200 px-3 text-xs font-bold text-slate-600 transition-colors hover:border-piemind-pink hover:text-piemind-pink"
+              >
+                <Star className="w-3.5 h-3.5" />
+                Đánh giá
+              </button>
+            )}
 
             <Avatar className="hidden sm:flex h-9 w-9 ring-2 ring-white">
               <AvatarImage src={user?.avatar ?? undefined} alt={user?.name || 'Người dùng'} />
@@ -196,7 +201,7 @@ export const LearningHeader = ({
         </button>
       </div>
 
-      {courseId && !previewMode && (
+      {courseId && !previewMode && isEnrolled && (
         <ReviewFormModal
           isOpen={isReviewModalOpen}
           onClose={() => setIsReviewModalOpen(false)}
