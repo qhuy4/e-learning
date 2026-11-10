@@ -34,6 +34,8 @@ export class GetCatalogCoursesHandler
       keyword,
       levels,
       price,
+      minPrice,
+      maxPrice,
       minRating,
       sort,
     } = query;
@@ -61,6 +63,14 @@ export class GetCatalogCoursesHandler
       qb.andWhere('course.price = 0');
     } else if (price === 'paid') {
       qb.andWhere('course.price > 0');
+    }
+
+    if (minPrice !== undefined) {
+      qb.andWhere('course.price >= :minPrice', { minPrice });
+    }
+
+    if (maxPrice !== undefined) {
+      qb.andWhere('course.price <= :maxPrice', { maxPrice });
     }
 
     if (minRating && minRating > 0) {

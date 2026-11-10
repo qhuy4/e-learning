@@ -149,6 +149,8 @@ export class CoursesController {
         query.keyword,
         levels,
         query.price ?? 'all',
+        query.minPrice,
+        query.maxPrice,
         query.minRating,
         query.sort,
       ),

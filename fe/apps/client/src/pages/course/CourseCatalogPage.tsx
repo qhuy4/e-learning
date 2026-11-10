@@ -9,9 +9,12 @@ import {
   BookOpen,
   BarChart3,
   LockOpen,
-  ArrowLeft,
   Home,
   CheckCircle,
+  Filter,
+  X,
+  ChevronDown,
+  Check,
 } from "lucide-react";
 import { Button } from "@fe/components/ui/button";
 import { Input } from "@fe/components/ui/input";
@@ -27,12 +30,12 @@ const levelMap: Record<number, { label: string; cefr: string; group: string }> =
   3: { label: "Nâng cao", cefr: "B2-C1", group: "advanced" },
 };
 
-const skillTags = [
-  { label: "Lưu loát giao tiếp", icon: "🗣" },
-  { label: "Phát âm & âm tố", icon: "🎵" },
-  { label: "Công sở & kinh doanh", icon: "💼" },
-  { label: "Luyện thi IELTS / TOEFL", icon: "🎓" },
-  { label: "Ngữ pháp & độ linh hoạt câu", icon: "✍" },
+const priceRanges = [
+  { id: "all", label: "Mọi mức giá" },
+  { id: "free", label: "Miễn phí", price: "free" as const },
+  { id: "under-500", label: "Dưới 500.000 ₫", minPrice: 1, maxPrice: 499_999 },
+  { id: "500-1000", label: "500.000 – 1.000.000 ₫", minPrice: 500_000, maxPrice: 1_000_000 },
+  { id: "over-1000", label: "Trên 1.000.000 ₫", minPrice: 1_000_001 },
 ];
 
 const formatPrice = (price: number) => {
@@ -62,7 +65,9 @@ export const CourseCatalogPage = () => {
   const [limit, setLimit] = useState(8);
   const [selectedLevels, setSelectedLevels] = useState<number[]>([]);
   const [activeLevelTab, setActiveLevelTab] = useState("all");
-  const [activeSkillTags, setActiveSkillTags] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState("all");
+  const [minRating, setMinRating] = useState(0);
+  const selectedPriceRange = priceRanges.find((range) => range.id === priceRange) ?? priceRanges[0];
 
   const { data: stats } = useCatalogStats();
   const { data, isLoading } = useCatalogCourses({
@@ -70,6 +75,10 @@ export const CourseCatalogPage = () => {
     limit,
     keyword: search || undefined,
     levels: selectedLevels.length > 0 ? selectedLevels : undefined,
+    price: selectedPriceRange.price,
+    minPrice: selectedPriceRange.minPrice,
+    maxPrice: selectedPriceRange.maxPrice,
+    minRating: minRating || undefined,
     sort: sort !== "popular" ? sort : undefined,
   });
 
@@ -98,11 +107,19 @@ export const CourseCatalogPage = () => {
     setPage(1);
   };
 
-  const toggleSkillTag = (label: string) => {
-    setActiveSkillTags((prev) =>
-      prev.includes(label) ? prev.filter((t) => t !== label) : [...prev, label]
-    );
+  const clearFilters = () => {
+    setSearch("");
+    setSort("popular");
+    setSelectedLevels([]);
+    setActiveLevelTab("all");
+    setPriceRange("all");
+    setMinRating(0);
+    setPage(1);
   };
+
+  const activeFilterCount =
+    selectedLevels.length + (priceRange !== "all" ? 1 : 0) + (minRating > 0 ? 1 : 0);
+  const firstResult = totalItems === 0 ? 0 : (page - 1) * limit + 1;
 
   return (
     <div className="relative w-full max-w-7xl mx-auto px-4 lg:px-8 py-8 overflow-hidden">
@@ -236,10 +253,10 @@ export const CourseCatalogPage = () => {
       </section>
 
       {/* 2. SEARCH & FILTER BAR */}
-      <Card className="mb-10 p-6 space-y-5">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
-          <div className="lg:col-span-8 relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-m3-outline" size={20} />
+      <Card className="relative z-20 mb-10 overflow-visible border-m3-outline-variant/40 bg-m3-surface-container-lowest shadow-sm">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(280px,340px)] lg:items-center">
+          <div className="relative p-5 pb-3 lg:p-6 lg:pr-4">
+            <Search className="absolute left-10 top-1/2 -translate-y-1/2 text-m3-outline" size={20} />
             <Input
               className="pl-12 pr-10 py-3.5 rounded-lg bg-m3-surface-container-low text-m3-on-surface placeholder:text-m3-outline text-sm focus:outline-none focus:bg-m3-surface transition-all border border-border cursor-text"
               placeholder="Tìm theo tên khóa học, kỹ năng, mục tiêu IELTS/CEFR hoặc từ khóa..."
@@ -250,81 +267,91 @@ export const CourseCatalogPage = () => {
               }}
             />
           </div>
-          <div className="lg:col-span-4 flex items-center justify-between lg:justify-end gap-3">
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-m3-on-surface-variant whitespace-nowrap font-semibold">Sắp xếp theo:</span>
-              <select
-                className="appearance-none bg-m3-surface-container-low text-m3-on-surface text-xs font-semibold py-2 pl-3 pr-8 rounded-full cursor-pointer focus:outline-none focus:bg-m3-surface-container-high transition-colors"
+          <div className="flex flex-col gap-2 px-5 pb-5 lg:border-l lg:border-m3-outline-variant/25 lg:px-6 lg:py-5">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-m3-on-surface-variant">Sắp xếp khóa học</span>
+              <div className="text-xs text-m3-on-surface-variant font-semibold whitespace-nowrap">
+                <strong className="text-m3-on-surface font-bold">{totalItems}</strong> khóa học
+              </div>
+            </div>
+            <CustomSelect
                 value={sort}
                 onChange={(e) => {
-                  setSort(e.target.value);
+                  setSort(e);
                   setPage(1);
                 }}
-              >
-                <option value="popular">Phổ biến nhất</option>
-                <option value="newest">Chương trình mới nhất</option>
-                <option value="price-asc">Giá: Thấp đến cao</option>
-                <option value="price-desc">Giá: Cao đến thấp</option>
-              </select>
-            </div>
-            <div className="text-xs text-m3-on-surface-variant font-semibold whitespace-nowrap px-3 py-1.5 rounded-full bg-m3-surface-container-low">
-              Hiển thị <strong className="text-m3-on-surface font-bold">{(page - 1) * limit + 1}–{Math.min(page * limit, totalItems)}</strong> trong tổng số{" "}
-              {totalItems}
-            </div>
+                options={[
+                  ["popular", "Phổ biến nhất"],
+                  ["newest", "Chương trình mới nhất"],
+                  ["price-asc", "Giá: Thấp đến cao"],
+                  ["price-desc", "Giá: Cao đến thấp"],
+                ]}
+                buttonClassName="bg-m3-surface-container-low"
+              />
+            <p className="text-[11px] text-m3-on-surface-variant">Hiển thị {firstResult}–{Math.min(page * limit, totalItems)}</p>
           </div>
         </div>
 
-        {/* CEFR Level Tabs */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pt-2 border-t border-transparent">
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-            <span className="text-xs font-bold text-m3-on-surface mr-1 flex items-center gap-1">
-              <BarChart3 size={14} className="text-m3-primary" /> Trình độ:
-            </span>
-            {levelTabs.map((tab) => (
+        <div className="border-t border-m3-outline-variant/30 bg-m3-surface-container-low/45 px-5 py-4 lg:px-6">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-xs font-bold text-m3-on-surface">
+              <Filter size={15} className="text-m3-primary" />
+              Lọc kết quả
+              {activeFilterCount > 0 && (
+                <span className="rounded-full bg-m3-primary-container px-2 py-0.5 text-[10px] text-white">
+                  {activeFilterCount} đang áp dụng
+                </span>
+              )}
+            </div>
+            {(activeFilterCount > 0 || search || sort !== "popular") && (
               <button
-                key={tab.id}
-                onClick={() => handleLevelTabClick(tab.id)}
-                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
-                  activeLevelTab === tab.id
-                    ? "bg-m3-primary-container text-white"
-                    : "bg-m3-surface-container hover:bg-m3-surface-container-high text-m3-on-surface-variant hover:text-m3-on-surface"
-                }`}
+                onClick={clearFilters}
+                className="flex items-center gap-1 text-xs font-bold text-m3-primary hover:underline cursor-pointer"
               >
-                {tab.label} ({tab.count})
+                <X size={14} /> Xóa tất cả
               </button>
-            ))}
+            )}
           </div>
-          <button
-            onClick={() => {
-              setActiveLevelTab("all");
-              setSelectedLevels([]);
-              setActiveSkillTags([]);
-              setSearch("");
-              setPage(1);
-            }}
-            className="text-xs text-m3-primary font-bold hover:underline self-end md:self-auto flex items-center gap-1 cursor-pointer"
-          >
-            <ArrowLeft size={12} /> Đặt lại bộ lọc
-          </button>
-        </div>
 
-        {/* Skill Tag Chips */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs text-m3-on-surface-variant font-semibold">Chủ đề trọng tâm:</span>
-          {skillTags.map((tag) => (
-            <button
-              key={tag.label}
-              onClick={() => toggleSkillTag(tag.label)}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
-                activeSkillTags.includes(tag.label)
-                  ? "bg-m3-secondary-fixed text-m3-on-secondary-fixed-variant"
-                  : "bg-m3-surface-container hover:bg-m3-surface-container-high text-m3-on-surface-variant transition-colors"
-              }`}
-            >
-              <span>{tag.icon}</span>
-              {tag.label}
-            </button>
-          ))}
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto_auto] xl:items-end">
+            <div className="min-w-0">
+              <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-m3-on-surface-variant">Trình độ CEFR</p>
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+                {levelTabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => handleLevelTabClick(tab.id)}
+                    className={`px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                      activeLevelTab === tab.id
+                        ? "bg-m3-primary-container text-white shadow-sm"
+                        : "bg-m3-surface-container-lowest border border-m3-outline-variant/40 hover:border-m3-primary/50 text-m3-on-surface-variant hover:text-m3-on-surface"
+                    }`}
+                  >
+                    {tab.label} <span className="opacity-70">{tab.count}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <FilterChoice
+              label="Học phí"
+              value={priceRange}
+              options={priceRanges.map((range) => [range.id, range.label])}
+              onChange={(value) => {
+                setPriceRange(value);
+                setPage(1);
+              }}
+            />
+            <FilterChoice
+              label="Đánh giá"
+              value={String(minRating)}
+              options={[["0", "Mọi đánh giá"], ["5", "Từ 5 sao"], ["4", "Từ 4 sao"], ["3", "Từ 3 sao"], ["2", "Từ 2 sao"], ["1", "Từ 1 sao"]]}
+              onChange={(value) => {
+                setMinRating(Number(value));
+                setPage(1);
+              }}
+            />
+          </div>
         </div>
       </Card>
 
@@ -356,10 +383,7 @@ export const CourseCatalogPage = () => {
             <p className="text-m3-on-surface-variant text-lg font-semibold">Không tìm thấy khóa học nào</p>
             <button
               onClick={() => {
-                setSearch("");
-                setSelectedLevels([]);
-                setActiveLevelTab("all");
-                setPage(1);
+                clearFilters();
               }}
               className="mt-4 text-m3-primary font-bold hover:underline cursor-pointer"
             >
@@ -506,5 +530,81 @@ function CourseCard({ course }: { course: CatalogCourse }) {
         </Button>
       </div>
     </Link>
+  );
+}
+
+function FilterChoice({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  options: string[][];
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className="block min-w-[175px]">
+      <span className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-m3-on-surface-variant">{label}</span>
+      <CustomSelect value={value} options={options} onChange={onChange} />
+    </label>
+  );
+}
+
+function CustomSelect({
+  value,
+  options,
+  onChange,
+  buttonClassName = "bg-m3-surface-container-lowest",
+}: {
+  value: string;
+  options: string[][];
+  onChange: (value: string) => void;
+  buttonClassName?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const selected = options.find(([optionValue]) => optionValue === value)?.[1] ?? options[0]?.[1];
+
+  return (
+    <div className={`relative ${open ? "z-50" : "z-0"}`}>
+      <button
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen((current) => !current)}
+        className={`flex w-full items-center justify-between gap-3 rounded-lg border border-m3-outline-variant/40 px-3 py-2.5 text-left text-xs font-semibold text-m3-on-surface shadow-sm outline-none transition-all hover:border-m3-primary/50 focus-visible:ring-2 focus-visible:ring-m3-primary/30 ${buttonClassName}`}
+      >
+        <span className="truncate">{selected}</span>
+        <ChevronDown size={16} className={`shrink-0 text-m3-on-surface-variant transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div role="listbox" className="absolute z-30 mt-2 w-full overflow-hidden rounded-xl border border-m3-outline-variant/40 bg-m3-surface-container-lowest p-1.5 shadow-xl shadow-black/10">
+          {options.map(([optionValue, optionLabel]) => {
+            const active = optionValue === value;
+            return (
+              <button
+                key={optionValue}
+                type="button"
+                role="option"
+                aria-selected={active}
+                onClick={() => {
+                  onChange(optionValue);
+                  setOpen(false);
+                }}
+                className={`flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left text-xs font-semibold transition-colors ${
+                  active
+                    ? "bg-m3-primary-container text-white"
+                    : "text-m3-on-surface hover:bg-m3-surface-container-low"
+                }`}
+              >
+                <span>{optionLabel}</span>
+                {active && <Check size={15} />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }

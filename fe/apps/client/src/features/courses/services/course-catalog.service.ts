@@ -19,6 +19,8 @@ export interface CatalogParams {
   keyword?: string;
   levels?: number[];
   price?: "all" | "free" | "paid";
+  minPrice?: number;
+  maxPrice?: number;
   minRating?: number;
   sort?: string;
 }
@@ -31,6 +33,8 @@ export const courseCatalogService = {
     if (params.keyword) query.keyword = params.keyword;
     if (params.levels && params.levels.length > 0) query.levels = params.levels.join(",");
     if (params.price && params.price !== "all") query.price = params.price;
+    if (params.minPrice !== undefined) query.minPrice = params.minPrice;
+    if (params.maxPrice !== undefined) query.maxPrice = params.maxPrice;
     if (params.minRating) query.minRating = params.minRating;
     if (params.sort) query.sort = params.sort;
 

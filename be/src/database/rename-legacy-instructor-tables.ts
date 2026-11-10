@@ -121,20 +121,30 @@ END $$;
 
 DO $$
 BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_constraint
-    WHERE conname = 'instructor_applications_user_id_fkey'
-      AND conrelid = 'public.instructor_applications'::regclass
-  ) THEN
+  -- Dùng to_regclass thay ::regclass: bảng instructor_applications có thể CHƯA
+  -- tồn tại (init-db tạo nó SAU bước rename) → ::regclass ném 42P01 và làm
+  -- sập bootstrap trên DB chưa có bảng (lỗi "relation does not exist").
+  IF to_regclass('public.instructor_applications') IS NOT NULL
+     AND NOT EXISTS (
+       SELECT 1 FROM pg_constraint
+       WHERE conname = 'instructor_applications_user_id_fkey'
+         AND conrelid = to_regclass('public.instructor_applications')
+     ) THEN
     ALTER TABLE public.instructor_applications
       ADD CONSTRAINT instructor_applications_user_id_fkey
       FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE SET NULL;
   END IF;
 END $$;
 
-UPDATE email_outbox
-  SET template = replace(template, 'MENTOR_', 'INSTRUCTOR_')
-  WHERE template LIKE 'MENTOR_%';
+-- email_outbox cũng chưa tồn tại trên DB chưa boot lần đầu → chỉ UPDATE khi có bảng.
+DO $$
+BEGIN
+  IF to_regclass('public.email_outbox') IS NOT NULL THEN
+    UPDATE email_outbox
+      SET template = replace(template, 'MENTOR_', 'INSTRUCTOR_')
+      WHERE template LIKE 'MENTOR_%';
+  END IF;
+END $$;
 `;
 
 export async function renameLegacyInstructorTables(
