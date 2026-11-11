@@ -20,6 +20,7 @@ function normalizeInstructor(raw: ApiInstructor): InstructorListItem {
     bio: profile?.bio ?? raw.bio ?? null,
     avgRating: Number(profile?.avgRating ?? raw.avgRating ?? 0),
     totalStudents: profile?.totalStudents ?? 0,
+    hourlyRate: Number(profile?.hourlyRate ?? 0),
     certificateTags: profile?.certificateTags ?? [],
   };
 }

@@ -18,6 +18,9 @@ export interface Booking {
     startTime: string;
     endTime: string;
     status: number;
+    hourlyRate?: number;
+    totalAmount?: number;
+    paymentStatus?: number;
     notes: string | null;
     meetingRoomId: number | null;
 }

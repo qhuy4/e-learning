@@ -7,7 +7,10 @@ import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.en
 import { BookingRepository } from './infrastructure/repository/booking.repository';
 import { AdminBookingsController } from './presentation/admin-bookings.controller';
 import { InstructorBookingsController } from './presentation/instructor-bookings.controller';
-import { StudentBookingsController } from './presentation/student-bookings.controller';
+import {
+  BookingPaymentCallbackController,
+  StudentBookingsController,
+} from './presentation/student-bookings.controller';
 import { CreateBookingHandler } from './application/command-handler/create-booking.handler';
 import { UpdateBookingStatusHandler } from './application/command-handler/update-booking-status.handler';
 import { DeleteBookingHandler } from './application/command-handler/delete-booking.handler';
@@ -25,6 +28,10 @@ import {
 import {
   InstructorAvailabilityExceptionOrmEntity,
 } from '@/modules/instructors/infrastructure/entity/instructor-availability-exception.orm.entity';
+import { InstructorProfileTypeOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-profile.orm.entity';
+import { BookingPaymentOrmEntity } from './infrastructure/entity/booking-payment.orm-entity';
+import { BookingCheckoutService } from './application/booking-checkout.service';
+import { PaymentsModule } from '@/modules/payments/payments.module';
 
 const QueryHandlers = [
   GetBookingsHandler,
@@ -47,19 +54,24 @@ const CommandHandlers = [
       UserOrmEntity,
       InstructorAvailabilityRecurringOrmEntity,
       InstructorAvailabilityExceptionOrmEntity,
+      InstructorProfileTypeOrmEntity,
+      BookingPaymentOrmEntity,
     ]),
     CqrsModule,
+    PaymentsModule,
   ],
   controllers: [
     AdminBookingsController,
     InstructorBookingsController,
     StudentBookingsController,
+    BookingPaymentCallbackController,
     AvailabilityController,
   ],
   providers: [
     BookingRepository,
     AvailabilityRepository,
     MeetingRoomRepositoryImpl,
+    BookingCheckoutService,
     ...QueryHandlers,
     ...CommandHandlers,
   ],

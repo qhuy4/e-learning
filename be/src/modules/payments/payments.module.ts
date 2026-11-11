@@ -68,6 +68,6 @@ const QueryHandlers = [
     ...CommandHandlers,
     ...QueryHandlers,
   ],
-  exports: [PAYMENT_REPOSITORY, PAYMENT_GATEWAY_SERVICE],
+  exports: [PAYMENT_REPOSITORY, PAYMENT_GATEWAY_SERVICE, VnpayService],
 })
 export class PaymentsModule {}

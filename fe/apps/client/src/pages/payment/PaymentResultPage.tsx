@@ -7,6 +7,7 @@ import {
   GraduationCap,
   Home,
   BookOpen,
+  CalendarDays,
 } from "lucide-react";
 import { Button } from "@fe/components/ui/button";
 import { formatCurrency } from "@fe/lib/utils";
@@ -14,6 +15,12 @@ import { formatCurrency } from "@fe/lib/utils";
 interface LastCheckout {
   slug?: string | null;
   title?: string | null;
+}
+
+interface LastBookingCheckout {
+  bookingId?: number;
+  instructorName?: string;
+  amount?: number;
 }
 
 export const PaymentResultPage = () => {
@@ -25,9 +32,12 @@ export const PaymentResultPage = () => {
   const vnpTxnRef = searchParams.get("vnp_TxnRef");
   const vnpAmount = searchParams.get("vnp_Amount");
   const vnpTransactionStatus = searchParams.get("vnp_TransactionStatus");
+  const isBooking = searchParams.get("type") === "booking";
+  const bookingId = searchParams.get("bookingId");
 
-  const isSuccess =
-    status === "success" || status === "3" || vnpResponseCode === "00" || vnpTransactionStatus === "00";
+  const isSuccess = isBooking
+    ? status === "success"
+    : status === "success" || status === "3" || vnpResponseCode === "00" || vnpTransactionStatus === "00";
 
   const displayOrderId = orderId || vnpTxnRef;
   const displayAmount = vnpAmount ? Number(vnpAmount) / 100 : null;
@@ -42,6 +52,16 @@ export const PaymentResultPage = () => {
   }
 
   const courseSlug = lastCheckout?.slug || null;
+  let lastBooking: LastBookingCheckout | null = null;
+  try {
+    const raw = sessionStorage.getItem("piemind:lastBookingCheckout");
+    if (raw) lastBooking = JSON.parse(raw) as LastBookingCheckout;
+  } catch {
+    lastBooking = null;
+  }
+
+  const bookingAmount = displayAmount ?? lastBooking?.amount ?? null;
+  const bookingReference = bookingId || lastBooking?.bookingId;
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-slate-50 dark:bg-background px-4 py-12">
@@ -69,27 +89,37 @@ export const PaymentResultPage = () => {
           </h1>
           <p className="mx-auto mt-2.5 max-w-sm text-sm leading-relaxed text-muted-foreground sm:text-base">
             {isSuccess
-              ? "Khóa học đã được thêm vào tài khoản của bạn. Bắt đầu học nào!"
-              : "Giao dịch chưa hoàn tất. Bạn có thể thử lại hoặc chọn phương thức thanh toán khác."}
+              ? isBooking
+                ? "Buổi học 1:1 đã được xác nhận. Phòng học trực tuyến sẽ có trong Lịch hẹn của bạn."
+                : "Khóa học đã được thêm vào tài khoản của bạn. Bắt đầu học nào!"
+              : isBooking
+                ? "Giao dịch chưa hoàn tất nên khung giờ chưa được xác nhận. Bạn có thể chọn lại một lịch học khác."
+                : "Giao dịch chưa hoàn tất. Bạn có thể thử lại hoặc chọn phương thức thanh toán khác."}
           </p>
 
           {/* Thông tin đơn hàng */}
-          {(displayOrderId || displayAmount || (isSuccess && lastCheckout?.title)) && (
+          {(displayOrderId || displayAmount || (isSuccess && lastCheckout?.title) || isBooking) && (
             <div className="mt-6 divide-y divide-border overflow-hidden rounded-xl border border-border bg-muted text-left">
-              {displayOrderId && (
+              {(isBooking ? bookingReference : displayOrderId) && (
                 <div className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
-                  <span className="text-muted-foreground">Mã đơn hàng</span>
+                  <span className="text-muted-foreground">{isBooking ? "Mã lịch hẹn" : "Mã đơn hàng"}</span>
                   <span className="font-mono font-bold text-foreground">
-                    #{displayOrderId}
+                    #{isBooking ? bookingReference : displayOrderId}
                   </span>
                 </div>
               )}
-              {displayAmount && (
+              {(isBooking ? bookingAmount : displayAmount) && (
                 <div className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
                   <span className="text-muted-foreground">Số tiền</span>
                   <span className="font-bold text-foreground">
-                    {formatCurrency(displayAmount)}
+                    {formatCurrency(isBooking ? bookingAmount! : displayAmount!)}
                   </span>
+                </div>
+              )}
+              {isBooking && lastBooking?.instructorName && (
+                <div className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
+                  <span className="text-muted-foreground">Giảng viên</span>
+                  <span className="font-semibold text-foreground">{lastBooking.instructorName}</span>
                 </div>
               )}
               {isSuccess && lastCheckout?.title && (
@@ -113,7 +143,14 @@ export const PaymentResultPage = () => {
           {/* Hành động */}
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
             {isSuccess ? (
-              <>
+              isBooking ? (
+                <Link to="/my-bookings" className="flex-1">
+                  <Button className="h-11 w-full rounded-xl text-sm font-semibold">
+                    <CalendarDays className="size-4" />
+                    Xem lịch hẹn của tôi
+                  </Button>
+                </Link>
+              ) : <>
                 {courseSlug && (
                   <Link to={`/learning/${courseSlug}`} className="flex-1">
                     <Button className="h-11 w-full rounded-xl text-sm font-semibold">
@@ -132,6 +169,13 @@ export const PaymentResultPage = () => {
                   </Button>
                 </Link>
               </>
+            ) : isBooking ? (
+              <Link to="/instructors" className="flex-1">
+                <Button className="h-11 w-full rounded-xl text-sm font-semibold">
+                  <RefreshCcw className="size-4" />
+                  Chọn lại lịch học
+                </Button>
+              </Link>
             ) : courseSlug ? (
               <>
                 <Link to={`/checkout/${courseSlug}`} className="flex-1">

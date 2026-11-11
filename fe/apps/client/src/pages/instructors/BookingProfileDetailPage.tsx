@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Navigate, useNavigate, useParams } from "react-router";
+import { Navigate, useParams } from "react-router";
 import { useMutation } from "@tanstack/react-query";
 import { api } from "@/shared/lib/axios";
 import { useAuth } from "@/features/auth/hooks/use-auth";
@@ -10,12 +10,9 @@ import {
     BookingNotFound,
     BookingSubmitSection,
     DateSlotPicker,
-    DiagnosticShareCard,
-    FocusSelectionCard,
     InstructorSummaryCard,
     QuickNotesCard,
 } from "@/features/instructors/components/booking";
-import { FOCUS_OPTIONS } from "@/features/instructors/config/focus";
 import {
     formatSummaryDate,
     getUpcomingDays,
@@ -36,7 +33,6 @@ import {
 export const BookingProfileDetailPage = () => {
     const { instructorId } = useParams<{ instructorId: string }>();
     const { user, isAuthenticated } = useAuth();
-    const navigate = useNavigate();
 
     const daysList = useMemo(() => getUpcomingDays(), []);
     const initialValidDay = daysList[0];
@@ -44,11 +40,6 @@ export const BookingProfileDetailPage = () => {
     const [selectedDate, setSelectedDate] = useState(initialValidDay.dateStr);
     const [selectedTime, setSelectedTime] = useState("");
     const [duration, setDuration] = useState<DurationMinutes>(DURATIONS[2]);
-    const [timezone, setTimezone] = useState("CET (GMT+1)");
-    const [selectedFocus, setSelectedFocus] = useState<string[]>([
-        FOCUS_OPTIONS[0].id,
-    ]);
-    const [shareReport, setShareReport] = useState(true);
     const [notes, setNotes] = useState("");
     const [now, setNow] = useState(() => new Date());
 
@@ -90,40 +81,39 @@ export const BookingProfileDetailPage = () => {
         return startTimes[0] ?? "";
     }, [selectedTime, startTimes]);
 
-    const focusTitles = useMemo(
-        () =>
-            selectedFocus
-                .map((fid) => FOCUS_OPTIONS.find((o) => o.id === fid)?.title)
-                .filter(Boolean) as string[],
-        [selectedFocus],
-    );
-
     const selectedTimeLabel = activeTime ? formatSlotLabel(activeTime) : "";
     const activeDay = daysList.find((d) => d.dateStr === selectedDate);
     const summaryDate = formatSummaryDate(activeDay, selectedDate);
 
     const booking = useMutation({
-        mutationFn: () => {
+        mutationFn: async () => {
             const endTime = addMinutesToTime(activeTime, duration);
 
-            return api.post("/admin/bookings", {
-                studentId: user!.id,
-                instructorId: instructor!.id,
+            const response = await api.post(`/bookings/checkout/${instructor!.id}`, {
                 bookingDate: selectedDate,
                 startTime: `${activeTime}:00`,
                 endTime: `${endTime}:00`,
                 notes:
                     [
-                        focusTitles.join(", "),
                         notes,
-                        shareReport ? "Đã chia sẻ báo cáo chẩn đoán" : "",
-                        `Múi giờ: ${timezone}`,
+                        "Múi giờ: ICT (GMT+7)",
                     ]
                         .filter(Boolean)
                         .join(" — ") || undefined,
             });
+            return response.data?.data ?? response.data;
         },
-        onSuccess: () => navigate("/instructors"),
+        onSuccess: (checkout) => {
+            sessionStorage.setItem(
+                "piemind:lastBookingCheckout",
+                JSON.stringify({
+                    bookingId: checkout.bookingId,
+                    instructorName: instructor?.name,
+                    amount: checkout.amount,
+                }),
+            );
+            window.location.assign(checkout.paymentUrl);
+        },
     });
 
     if (!isAuthenticated) return <Navigate to="/student/login" replace />;
@@ -131,13 +121,13 @@ export const BookingProfileDetailPage = () => {
     if (isError || !instructor) return <BookingNotFound />;
 
     return (
-        <main className="w-full bg-background text-foreground min-h-screen pb-20 pt-8">
+        <main className="min-h-screen w-full bg-muted/30 pb-20 pt-8 text-foreground">
             <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6">
                 <BookingBreadcrumbs instructorName={instructor.name} />
                 <BookingHero instructorName={instructor.name} />
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                    <div className="lg:col-span-8 flex flex-col gap-6">
+                <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
+                    <div className="flex flex-col gap-6 lg:col-span-8">
                         <DateSlotPicker
                             daysList={daysList}
                             activeDay={activeDay}
@@ -146,14 +136,6 @@ export const BookingProfileDetailPage = () => {
                                 setSelectedDate(date);
                                 setSelectedTime("");
                             }}
-                            timezone={timezone}
-                            onToggleTimezone={() =>
-                                setTimezone(
-                                    timezone === "CET (GMT+1)"
-                                        ? "ICT (GMT+7)"
-                                        : "CET (GMT+1)",
-                                )
-                            }
                             slotsLoading={slotsLoading}
                             window={availability}
                             dayWindows={dayWindows}
@@ -168,19 +150,6 @@ export const BookingProfileDetailPage = () => {
                             onSelectTime={setSelectedTime}
                         />
 
-                        <FocusSelectionCard
-                            instructorName={instructor.name}
-                            selectedFocus={selectedFocus}
-                            onFocusChange={setSelectedFocus}
-                        />
-
-                        <DiagnosticShareCard
-                            instructorName={instructor.name}
-                            studentName={user?.name || ""}
-                            shareReport={shareReport}
-                            onShareReportChange={setShareReport}
-                        />
-
                         <QuickNotesCard
                             instructorName={instructor.name}
                             notes={notes}
@@ -190,13 +159,14 @@ export const BookingProfileDetailPage = () => {
                         <BookingSubmitSection
                             isError={booking.isError}
                             isPending={booking.isPending}
-                            disabled={!activeTime || booking.isPending}
+                            disabled={!activeTime || booking.isPending || instructor.hourlyRate <= 0}
+                            amount={Math.round((instructor.hourlyRate * duration) / 60)}
                             userEmail={user?.email}
                             onConfirm={() => booking.mutate()}
                         />
                     </div>
 
-                    <aside className="lg:col-span-4 flex flex-col gap-4 sticky top-6">
+                    <aside className="sticky top-6 flex flex-col gap-4 lg:col-span-4">
                         <InstructorSummaryCard
                             instructor={instructor}
                             summaryDate={summaryDate}

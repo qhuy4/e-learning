@@ -32,7 +32,8 @@ export class VnpayService implements PaymentGatewayService {
   }
 
   async createPaymentUrl(input: CreatePaymentInput): Promise<CreatePaymentOutput> {
-    if (!this.tmnCode || !this.hashSecret || !this.returnUrl) {
+    const returnUrl = input.returnUrl ?? this.returnUrl;
+    if (!this.tmnCode || !this.hashSecret || !returnUrl) {
       throw new Error(
         'VNPAY is not configured: set VNP_TMN_CODE, VNP_HASH_SECRET and VNP_RETURN_URL in environment',
       );
@@ -49,10 +50,10 @@ export class VnpayService implements PaymentGatewayService {
       vnp_Locale: 'vn',
       vnp_CurrCode: input.currency,
       vnp_TxnRef: input.orderId.toString(),
-      vnp_OrderInfo: `Thanh toan don hang ${input.orderId}`,
+      vnp_OrderInfo: input.description ?? `Thanh toan don hang ${input.orderId}`,
       vnp_OrderType: 'other',
       vnp_Amount: Math.round(input.amount * 100).toString(),
-      vnp_ReturnUrl: this.returnUrl,
+      vnp_ReturnUrl: returnUrl,
       vnp_IpAddr: '127.0.0.1',
       vnp_CreateDate: createDate,
       vnp_ExpireDate: expireDate,

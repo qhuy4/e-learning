@@ -10,6 +10,13 @@ import {
 } from "lucide-react";
 import type { InstructorListItem } from "../../types/instructor.type";
 
+const formatVnd = (amount: number) =>
+    new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND",
+        maximumFractionDigits: 0,
+    }).format(amount);
+
 interface InstructorSummaryCardProps {
     instructor: InstructorListItem;
     summaryDate: string;
@@ -23,6 +30,7 @@ export function InstructorSummaryCard({
     selectedTimeLabel,
     durationMinutes,
 }: InstructorSummaryCardProps) {
+    const total = Math.round((instructor.hourlyRate * durationMinutes) / 60);
     return (
         <Card className="rounded-2xl border border-border bg-card p-6 flex flex-col gap-5">
             <div className="flex items-start gap-4">
@@ -125,8 +133,15 @@ export function InstructorSummaryCard({
                         <ShieldCheck className="size-4 text-m3-secondary" />
                         Chi phí buổi học
                     </span>
-                    <span className="font-extrabold text-m3-secondary text-sm">
-                        MIỄN PHÍ ($0.00)
+                    <span className="font-extrabold text-m3-secondary text-sm text-right">
+                        {formatVnd(total)}
+                    </span>
+                </div>
+
+                <div className="flex items-center justify-between pb-2 border-b border-border">
+                    <span className="text-muted-foreground">Đơn giá</span>
+                    <span className="font-semibold text-foreground">
+                        {formatVnd(instructor.hourlyRate)}/giờ
                     </span>
                 </div>
 
@@ -136,7 +151,7 @@ export function InstructorSummaryCard({
                         Hình thức
                     </span>
                     <span className="font-semibold text-foreground">
-                        PiEMind Web Video
+                        Phòng học trực tuyến
                     </span>
                 </div>
             </div>

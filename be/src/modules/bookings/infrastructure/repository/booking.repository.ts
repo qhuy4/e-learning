@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Brackets, EntityManager } from 'typeorm';
 import { BookingOrmEntity } from '@/modules/bookings/infrastructure/entity/booking.orm-entity';
+import { BookingStatusEnum } from '@/modules/bookings/domain/enum/booking-status.enum';
 
 @Injectable()
 export class BookingRepository {
@@ -21,7 +22,13 @@ export class BookingRepository {
       .createQueryBuilder('b')
       .where('b.instructor_id = :instructorId', { instructorId })
       .andWhere('b.booking_date = :bookingDate', { bookingDate })
-      .andWhere('b.status != 2')
+      .andWhere(
+        '(b.status = :confirmed OR (b.status = :pending AND b.created_at > NOW() - INTERVAL \'15 minutes\'))',
+        {
+          confirmed: BookingStatusEnum.CONFIRMED,
+          pending: BookingStatusEnum.PENDING,
+        },
+      )
       .andWhere('b.start_time < :endTime', { endTime })
       .andWhere('b.end_time > :startTime', { startTime });
 
@@ -104,6 +111,9 @@ export class BookingRepository {
       startTime: e.start_time,
       endTime: e.end_time,
       status: e.status,
+      hourlyRate: Number(e.hourly_rate),
+      totalAmount: Number(e.total_amount),
+      paymentStatus: e.payment_status,
       notes: e.notes,
       meetingRoomId: e.meetingRoom ? Number(e.meetingRoom.id) : null,
       meetingRoom: e.meetingRoom
@@ -143,6 +153,9 @@ export class BookingRepository {
       startTime: entity.start_time,
       endTime: entity.end_time,
       status: entity.status,
+      hourlyRate: Number(entity.hourly_rate),
+      totalAmount: Number(entity.total_amount),
+      paymentStatus: entity.payment_status,
       notes: entity.notes,
       meetingRoomId: entity.meetingRoom ? Number(entity.meetingRoom.id) : null,
       meetingRoom: entity.meetingRoom

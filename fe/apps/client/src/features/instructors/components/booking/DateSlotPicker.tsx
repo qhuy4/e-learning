@@ -25,8 +25,6 @@ interface DateSlotPickerProps {
     activeDay?: DayOption;
     selectedDate: string;
     onSelectDate: (dateStr: string) => void;
-    timezone: string;
-    onToggleTimezone: () => void;
     slotsLoading: boolean;
     window?: AvailabilityWindow;
     dayWindows?: Record<string, AvailabilityWindow>;
@@ -52,8 +50,6 @@ export function DateSlotPicker({
     activeDay,
     selectedDate,
     onSelectDate,
-    timezone,
-    onToggleTimezone,
     slotsLoading,
     window: win,
     dayWindows,
@@ -75,14 +71,10 @@ export function DateSlotPicker({
                 action={
                     <button
                         type="button"
-                        onClick={onToggleTimezone}
-                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted hover:bg-muted/80 text-foreground text-xs font-semibold border border-border cursor-pointer transition-colors"
+                        className="inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3 py-1.5 text-xs font-semibold text-foreground"
                     >
                         <Globe className="size-3.5 text-primary" />
-                        <span>{timezone}</span>
-                        <span className="text-[10px] text-muted-foreground">
-                            (nhấn để đổi)
-                        </span>
+                        <span>Giờ Việt Nam (GMT+7)</span>
                     </button>
                 }
             />

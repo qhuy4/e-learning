@@ -22,6 +22,15 @@ function normalizeTime(time: string): string {
   return time.length === 5 ? `${time}:00` : time;
 }
 
+/** A checkout holds its slot only while the VNPay link is valid (15 minutes). */
+function blocksSlot(booking: BookingOrmEntity): boolean {
+  if (Number(booking.status) === BookingStatusEnum.CONFIRMED) return true;
+  return (
+    Number(booking.status) === BookingStatusEnum.PENDING &&
+    booking.created_at.getTime() > Date.now() - 15 * 60 * 1000
+  );
+}
+
 @Injectable()
 export class AvailabilityRepository {
   constructor(
@@ -138,7 +147,10 @@ export class AvailabilityRepository {
           .andWhere('booking.booking_date = :bookingDate')
           .andWhere('booking.start_time < :searchEndTime')
           .andWhere('booking.end_time > :searchStartTime')
-          .andWhere('booking.status = :confirmedStatus')
+          .andWhere(
+            `(booking.status = :confirmedStatus OR
+              (booking.status = :pendingStatus AND booking.created_at > NOW() - INTERVAL '15 minutes'))`,
+          )
           .getQuery();
         return `NOT EXISTS ${subQuery}`;
       })
@@ -148,6 +160,7 @@ export class AvailabilityRepository {
         searchStartTime,
         searchEndTime,
         confirmedStatus: BookingStatusEnum.CONFIRMED,
+        pendingStatus: BookingStatusEnum.PENDING,
       });
 
     const [rawIds, totalRow] = await Promise.all([
@@ -251,7 +264,7 @@ export class AvailabilityRepository {
       (e) => e.is_extra && e.start_time && e.end_time,
     );
     const blockingExceptions = activeExceptions.filter((e) => !e.is_extra);
-    const activeBookings = bookings.filter((b) => Number(b.status) !== 2);
+    const activeBookings = bookings.filter(blocksSlot);
 
     const result: Record<string, boolean> = {};
 
@@ -383,7 +396,7 @@ export class AvailabilityRepository {
     }
 
     for (const b of bookings) {
-      if (Number(b.status) === 2) continue;
+      if (!blocksSlot(b)) continue;
       busy.push({ start: b.start_time, end: b.end_time });
     }
 

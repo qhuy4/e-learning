@@ -1,5 +1,5 @@
 import { Badge } from "@fe/components/ui/badge";
-import { ShieldCheck, Clock, Video } from "lucide-react";
+import { CreditCard, Clock, Video } from "lucide-react";
 
 interface BookingHeroProps {
     instructorName: string;
@@ -13,8 +13,8 @@ export function BookingHero({ instructorName }: BookingHeroProps) {
                     variant="secondary"
                     className="bg-secondary text-secondary-foreground font-semibold px-3 py-1 text-xs rounded-full inline-flex items-center gap-1.5"
                 >
-                    <ShieldCheck className="size-3.5" />
-                    Miễn phí 100% · Không cần thẻ
+                    <CreditCard className="size-3.5" />
+                    Thanh toán an toàn qua VNPay
                 </Badge>
                 <Badge
                     variant="outline"
@@ -33,12 +33,11 @@ export function BookingHero({ instructorName }: BookingHeroProps) {
             </div>
 
             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
-                Đặt lịch buổi tư vấn miễn phí
+                Đặt lịch học 1:1 cùng {instructorName}
             </h1>
             <p className="mt-2.5 max-w-3xl text-muted-foreground text-base leading-relaxed">
-                Gặp gỡ 1-1 với {instructorName} để đánh giá nhịp hội thoại của bạn,
-                xác định các điểm gây ngập ngừng và xây dựng lộ trình cá nhân
-                hóa — hoàn toàn không ràng buộc.
+                Chọn thời lượng và khung giờ phù hợp. Lịch học cùng phòng trực tuyến
+                sẽ được xác nhận ngay sau khi thanh toán thành công.
             </p>
         </header>
     );

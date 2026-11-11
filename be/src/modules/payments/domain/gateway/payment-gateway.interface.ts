@@ -5,6 +5,8 @@ export interface CreatePaymentInput {
   amount: number;
   currency: string;
   description?: string;
+  /** Overrides the default gateway callback URL for a different payment flow. */
+  returnUrl?: string;
 }
 
 export interface CreatePaymentOutput {

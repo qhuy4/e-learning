@@ -5,6 +5,9 @@ import { ErrorCode } from '@/common/enum/error-code.enum';
 import { CreateBookingCommand } from '@/modules/bookings/application/command/create-booking.command';
 import { BookingRepository } from '@/modules/bookings/infrastructure/repository/booking.repository';
 import { AvailabilityRepository } from '@/modules/bookings/infrastructure/repository/availability.repository';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { InstructorProfileTypeOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-profile.orm.entity';
 
 function toMin(t: string): number {
   const [h, m] = t.split(':').map(Number);
@@ -25,6 +28,8 @@ export class CreateBookingHandler implements ICommandHandler<CreateBookingComman
   constructor(
     private readonly bookingRepository: BookingRepository,
     private readonly availabilityRepository: AvailabilityRepository,
+    @InjectRepository(InstructorProfileTypeOrmEntity)
+    private readonly instructorProfiles: Repository<InstructorProfileTypeOrmEntity>,
   ) {}
 
   async execute(command: CreateBookingCommand) {
@@ -75,6 +80,15 @@ export class CreateBookingHandler implements ICommandHandler<CreateBookingComman
       throw new AppException(ErrorCode.BOOKING_TIME_CONFLICT, HttpStatus.CONFLICT);
     }
 
+    const instructorProfile = await this.instructorProfiles.findOne({
+      where: { userId: command.instructorId },
+    });
+    const hourlyRate = Number(instructorProfile?.hourlyRate ?? 0);
+    if (hourlyRate <= 0) {
+      throw new AppException(ErrorCode.VALIDATION_ERROR, HttpStatus.BAD_REQUEST);
+    }
+    const totalAmount = Math.round((hourlyRate * (endMin - startMin)) / 60);
+
     return this.bookingRepository.create({
       student_id: command.studentId,
       instructor_id: command.instructorId,
@@ -83,6 +97,9 @@ export class CreateBookingHandler implements ICommandHandler<CreateBookingComman
       end_time: command.endTime,
       notes: command.notes ?? null,
       status: 1,
+      hourly_rate: hourlyRate,
+      total_amount: totalAmount,
+      payment_status: 1,
     });
   }
 }

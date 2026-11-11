@@ -7,6 +7,7 @@ import { BookingRepository } from '@/modules/bookings/infrastructure/repository/
 import { DataSource } from 'typeorm';
 import { MeetingRoomStatus } from '@/modules/bookings/domain/enum/meeting-room-status.enum';
 import { BookingStatusEnum } from '@/modules/bookings/domain/enum/booking-status.enum';
+import { BookingPaymentStatus } from '@/modules/bookings/domain/enum/booking-payment-status.enum';
 import { MeetingRoomRepositoryImpl } from '@/modules/meeting-room/infrastructure/repository/meeting-room.repository';
 
 const VALID_TRANSITIONS: Record<number, number[]> = {
@@ -38,6 +39,13 @@ export class UpdateBookingStatusHandler implements ICommandHandler<UpdateBooking
         ErrorCode.BOOKING_INVALID_STATUS_TRANSITION,
         HttpStatus.BAD_REQUEST,
       );
+    }
+
+    if (
+      command.status === BookingStatusEnum.CONFIRMED &&
+      booking.paymentStatus !== BookingPaymentStatus.PAID
+    ) {
+      throw new AppException(ErrorCode.VALIDATION_ERROR, HttpStatus.BAD_REQUEST);
     }
 
     return this.dataSource.transaction(async (manager) => {

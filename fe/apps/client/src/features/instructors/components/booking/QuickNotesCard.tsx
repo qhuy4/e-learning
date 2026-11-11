@@ -16,23 +16,23 @@ export function QuickNotesCard({
     return (
         <Card className="rounded-2xl border border-border bg-card p-6 sm:p-7">
             <StepHeader
-                step={4}
+                step={2}
                 title={
                     <>
-                        Ghi chú nhanh cho giảng viên {instructorName}{" "}
+                        Ghi chú cho giảng viên {instructorName}{" "}
                         <span className="text-xs font-normal text-muted-foreground">
                             (Tùy chọn)
                         </span>
                     </>
                 }
-                description="Nêu rõ điều bạn quan tâm: buổi phỏng vấn sắp tới, tình huống khó, hoặc giọng bạn muốn hướng tới"
+                description="Gửi trước bối cảnh hoặc mục tiêu để buổi học hiệu quả hơn."
             />
 
             <CardContent className="px-0 pt-6">
                 <Textarea
                     value={notes}
                     onChange={(e) => onNotesChange(e.target.value)}
-                    placeholder="Chia sẻ với giảng viên điều bạn đang gặp (VD: 'Mình bị đơ khi được yêu cầu nói tự nhiên trong cuộc họp gấp' hoặc 'Đang tập giọng Anh chuẩn Anh Quốc')..."
+                    placeholder="Ví dụ: Mình muốn luyện giao tiếp cho buổi phỏng vấn tuần tới..."
                     className="min-h-24 rounded-xl border border-input bg-card p-3 text-sm focus-visible:ring-primary"
                 />
             </CardContent>

@@ -17,7 +17,7 @@ export function BookingBreadcrumbs({ instructorName }: BookingBreadcrumbsProps) 
                     {instructorName}
                 </Link>
                 <ChevronRight className="size-4" />
-                <span className="text-foreground font-bold">Đặt buổi tư vấn</span>
+                <span className="text-foreground font-bold">Đặt lịch 1:1</span>
             </nav>
             <Link
                 to="/instructors"

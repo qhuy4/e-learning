@@ -20,6 +20,7 @@ export interface InstructorProfile {
   bio: string | null;
   avgRating: number;
   totalStudents: number;
+  hourlyRate?: number;
   certificateTags?: string[];
 }
 
@@ -45,6 +46,7 @@ export interface InstructorListItem {
   bio: string | null;
   avgRating: number;
   totalStudents: number;
+  hourlyRate: number;
   certificateTags: string[];
 }
 

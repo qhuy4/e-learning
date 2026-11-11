@@ -291,19 +291,27 @@ export const FindInstructorsPage = () => {
                                         <Clock size={14} className="text-muted-foreground" />
                                         <span>Sẵn sàng hôm nay</span>
                                     </div>
-                                    <span className="font-bold text-piemind-pink">
-                                        Đã bao gồm gói
+                                    <span className="font-bold text-piemind-pink tabular-nums">
+                                        {instructor.hourlyRate > 0
+                                            ? `${new Intl.NumberFormat("vi-VN").format(instructor.hourlyRate)} ₫/giờ`
+                                            : "Chưa mở lịch"}
                                     </span>
                                 </div>
                             </div>
 
                             <div className="flex items-center gap-2 pt-4 mt-4 border-t border-border">
-                                <Link
-                                    to={`/instructors/${instructor.id}/book`}
-                                    className="flex-1 py-2.5 px-3 rounded-xl bg-piemind-pink hover:bg-piemind-pink/90 text-white text-xs font-bold transition-all text-center cursor-pointer"
-                                >
-                                    Đặt buổi tư vấn
-                                </Link>
+                                {instructor.hourlyRate > 0 ? (
+                                    <Link
+                                        to={`/instructors/${instructor.id}/book`}
+                                        className="flex-1 py-2.5 px-3 rounded-xl bg-piemind-pink hover:bg-piemind-pink/90 text-white text-xs font-bold transition-all text-center cursor-pointer"
+                                    >
+                                        Đặt buổi học
+                                    </Link>
+                                ) : (
+                                    <span className="flex-1 py-2.5 px-3 rounded-xl bg-muted text-muted-foreground text-xs font-bold text-center">
+                                        Chưa mở lịch
+                                    </span>
+                                )}
                                 <Link
                                     to={`/instructors/${instructor.id}/book`}
                                     className="px-3.5 py-2.5 rounded-xl border border-border hover:bg-muted text-foreground text-xs font-bold transition-colors whitespace-nowrap cursor-pointer"

@@ -282,6 +282,26 @@ export async function initDatabaseTables(dataSource: DataSource) {
       CREATE INDEX IF NOT EXISTS idx_bookings_student_id ON bookings(student_id);
       CREATE INDEX IF NOT EXISTS idx_bookings_instructor_id ON bookings(instructor_id);
       CREATE INDEX IF NOT EXISTS idx_bookings_booking_date ON bookings(booking_date);
+      ALTER TABLE bookings ADD COLUMN IF NOT EXISTS hourly_rate NUMERIC(12, 2) NOT NULL DEFAULT 0;
+      ALTER TABLE bookings ADD COLUMN IF NOT EXISTS total_amount NUMERIC(12, 2) NOT NULL DEFAULT 0;
+      ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_status SMALLINT NOT NULL DEFAULT 1;
+      ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_reference VARCHAR(64);
+    `);
+
+    await dataSource.query(`
+      CREATE TABLE IF NOT EXISTS booking_payments (
+        id BIGSERIAL PRIMARY KEY,
+        booking_id BIGINT NOT NULL UNIQUE REFERENCES bookings(id) ON DELETE CASCADE,
+        gateway VARCHAR(24) NOT NULL DEFAULT 'VNPAY',
+        status SMALLINT NOT NULL DEFAULT 1,
+        amount NUMERIC(12, 2) NOT NULL,
+        currency VARCHAR(8) NOT NULL DEFAULT 'VND',
+        transaction_id VARCHAR(100),
+        gateway_response JSONB,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_booking_payments_status ON booking_payments(status);
     `);
     // Migration: exam_questions.type (question type is an enum on the question itself)
     try {
