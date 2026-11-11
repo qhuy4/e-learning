@@ -34,6 +34,7 @@ import LessonCommentsPage from "@/pages/lesson-comments/lesson-comments-page"
 import LessonCommentDetailPage from "@/pages/lesson-comments/lesson-comment-detail-page"
 import LoginPage from "@/pages/authen/login-page"
 import TeachingProfilePage from "@/pages/teaching-profile/teaching-profile-page"
+import SessionPricingPage from "@/pages/session-pricing/session-pricing-page"
 import SkillProfilePage from "@/pages/skill-profile/skill-profile-page"
 import EvidencePage from "@/pages/evidence/evidence-page"
 import RecommendationsPage from "@/pages/recommendations/recommendations-page"
@@ -92,6 +93,7 @@ export const router = createBrowserRouter([
                     { path: "lesson-comments/:id", element: <LessonCommentDetailPage /> },
                     { path: "profile", element: <ProfilePage /> },
                     { path: "teaching-profile", element: <TeachingProfilePage /> },
+                    { path: "session-pricing", element: <SessionPricingPage /> },
                     { path: "skill-profile", element: <SkillProfilePage /> },
                     { path: "evidence", element: <EvidencePage /> },
                     { path: "recommendations", element: <RecommendationsPage /> },

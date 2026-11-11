@@ -56,6 +56,7 @@ export class TeachingProfileService {
       bio: profile.bio,
       websiteUrl: profile.websiteUrl,
       experienceYears: profile.experienceYears,
+      hourlyRate: Number(profile.hourlyRate ?? 0),
       teachingLevels: profile.teachingLevels,
       stats: {
         courseCount: stats.courseCount,
@@ -77,6 +78,7 @@ export class TeachingProfileService {
     if ('experienceYears' in dto)
       patch.experienceYears = dto.experienceYears ?? null;
     if ('websiteUrl' in dto) patch.websiteUrl = dto.websiteUrl ?? null;
+    if ('hourlyRate' in dto) patch.hourlyRate = dto.hourlyRate ?? 0;
     if ('teachingLevels' in dto)
       patch.teachingLevels =
         dto.teachingLevels && dto.teachingLevels.length > 0

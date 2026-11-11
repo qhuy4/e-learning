@@ -43,6 +43,15 @@ export function createBookingColumns(): ColumnDef<DataTableFeatures, Booking>[] 
       cell: ({ row }) => <span>{row.original.endTime}</span>,
     },
     {
+      accessorKey: "totalAmount",
+      header: "Học phí",
+      cell: ({ row }) => (
+        <span className="font-medium tabular-nums">
+          {new Intl.NumberFormat("vi-VN").format(row.original.totalAmount)} ₫
+        </span>
+      ),
+    },
+    {
       accessorKey: "status",
       header: "Trạng thái",
       cell: ({ row }) => {

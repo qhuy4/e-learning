@@ -21,6 +21,9 @@ export interface Booking {
   startTime: string;
   endTime: string;
   status: BookingStatus;
+  hourlyRate: number;
+  totalAmount: number;
+  paymentStatus: 0 | 1 | 2;
   notes: string | null;
   meetingRoomId: number | null;
   meetingRoom: MeetingRoomInfo | null;
@@ -48,6 +51,12 @@ export const BOOKING_STATUS_LABELS: Record<number, string> = {
   0: "Đã hủy",
   1: "Chờ xác nhận",
   2: "Đã xác nhận",
+};
+
+export const BOOKING_PAYMENT_STATUS_LABELS: Record<number, string> = {
+  0: "Thanh toán thất bại",
+  1: "Chờ thanh toán",
+  2: "Đã thanh toán",
 };
 
 export const BOOKING_STATUS_CLASSES: Record<number, string> = {
@@ -81,8 +90,11 @@ export function isBookingEnded(
 }
 
 export function getBookingStatusBadge(
-  booking: Pick<Booking, "bookingDate" | "endTime" | "status">,
+  booking: Pick<Booking, "bookingDate" | "endTime" | "status"> & Partial<Pick<Booking, "paymentStatus">>,
 ): { label: string; className: string } {
+  if (booking.status === BookingStatusValue.PENDING && booking.paymentStatus === 1) {
+    return { label: "Chờ thanh toán", className: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400" };
+  }
   if (isBookingEnded(booking)) {
     return { label: BOOKING_ENDED_LABEL, className: BOOKING_ENDED_CLASS };
   }

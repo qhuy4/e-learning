@@ -29,6 +29,7 @@ export async function initDatabaseTables(dataSource: DataSource) {
       CREATE INDEX IF NOT EXISTS idx_instructor_profiles_user_id ON instructor_profiles(user_id);
       CREATE UNIQUE INDEX IF NOT EXISTS uq_instructor_profiles_user_id ON instructor_profiles(user_id);
       ALTER TABLE instructor_profiles ADD COLUMN IF NOT EXISTS review_reason TEXT;
+      ALTER TABLE instructor_profiles ADD COLUMN IF NOT EXISTS hourly_rate NUMERIC(12, 2) NOT NULL DEFAULT 0;
     `);
 
     // 3. Tạo bảng instructor_certificates nếu chưa có

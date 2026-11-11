@@ -15,6 +15,7 @@ import {
   CalendarDays,
   ClipboardList,
   Sparkles,
+  Banknote,
 } from "lucide-react";
 import type { NavGroup, NavItem } from "@/shared/types/navigation";
 
@@ -72,6 +73,11 @@ export const navigation: Navigation = {
           title: "Đặt lịch",
           url: "/bookings",
           icon: CalendarClock,
+        },
+        {
+          title: "Học phí 1:1",
+          url: "/session-pricing",
+          icon: Banknote,
         },
         {
           title: "Doanh thu",

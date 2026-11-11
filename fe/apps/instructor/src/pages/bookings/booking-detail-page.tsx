@@ -21,6 +21,7 @@ import {
 } from "@/features/bookings/hooks/use-bookings";
 import {
   BookingStatusValue,
+  BOOKING_PAYMENT_STATUS_LABELS,
   MEETING_ROOM_STATUS_CLASSES,
   MEETING_ROOM_STATUS_LABELS,
   getBookingStatusBadge,
@@ -76,7 +77,7 @@ export default function BookingDetailPage() {
     );
   }
 
-  const canConfirm = booking.status === BookingStatusValue.PENDING;
+  const canConfirm = booking.status === BookingStatusValue.PENDING && booking.paymentStatus === 2;
   const hasEnded = isBookingEnded(booking);
   const canJoin =
     booking.status === BookingStatusValue.CONFIRMED &&
@@ -169,6 +170,12 @@ export default function BookingDetailPage() {
                 </p>
                 <p className="font-medium">
                   {booking.startTime} - {booking.endTime}
+                </p>
+              </div>
+              <div className="col-span-2">
+                <p className="text-muted-foreground">Thanh toán</p>
+                <p className="font-medium">
+                  {new Intl.NumberFormat("vi-VN").format(booking.totalAmount)} ₫ · {BOOKING_PAYMENT_STATUS_LABELS[booking.paymentStatus] ?? "—"}
                 </p>
               </div>
               <div className="col-span-2">

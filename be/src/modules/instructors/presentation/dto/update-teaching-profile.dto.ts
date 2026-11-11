@@ -34,6 +34,13 @@ export class UpdateTeachingProfileDto {
   experienceYears?: number | null;
 
   @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  @Max(100000000)
+  hourlyRate?: number;
+
+  @IsOptional()
   @Transform(({ value }: { value: unknown }) => (value === '' ? null : value))
   @ValidateIf((dto: { websiteUrl?: string | null }) => Boolean(dto.websiteUrl))
   @IsUrl({ protocols: ['http', 'https'], require_protocol: true })

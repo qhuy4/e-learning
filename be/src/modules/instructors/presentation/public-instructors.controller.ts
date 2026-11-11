@@ -162,6 +162,7 @@ export class PublicInstructorsController {
         websiteUrl: profile.websiteUrl,
         socialLinks: profile.socialLinks,
         avgRating: Number(profile.avgRating ?? 0),
+        hourlyRate: Number(profile.hourlyRate ?? 0),
         totalStudents: profile.totalStudents,
         approvalStatus: 'APPROVED',
         approvedAt: profile.approvedAt,

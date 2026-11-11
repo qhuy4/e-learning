@@ -92,6 +92,9 @@ export class InstructorProfileTypeOrmEntity {
   @Column({ name: 'total_students', type: 'int', default: 0 })
   totalStudents: number;
 
+  @Column({ name: 'hourly_rate', type: 'numeric', precision: 12, scale: 2, default: 0 })
+  hourlyRate: number;
+
   @Column({
     name: 'avg_rating',
     type: 'decimal',

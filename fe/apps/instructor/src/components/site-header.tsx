@@ -18,6 +18,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/qa": "Câu hỏi & Thảo luận",
   "/profile": "Hồ sơ",
   "/teaching-profile": "Hồ sơ giảng dạy",
+  "/session-pricing": "Học phí 1:1",
   "/skill-profile": "Hồ sơ kỹ năng AI",
   "/evidence": "Bằng chứng",
   "/recommendations": "Khuyến nghị",

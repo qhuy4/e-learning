@@ -18,6 +18,7 @@ export interface TeachingProfile {
   bio: string | null;
   websiteUrl: string | null;
   experienceYears: number | null;
+  hourlyRate: number;
   /** Các band CEFR giảng dạy — null = chưa khai báo. */
   teachingLevels: string[] | null;
   stats: TeachingProfileStats;
@@ -31,6 +32,7 @@ export interface TeachingProfile {
 /** undefined = không đổi, null = xóa */
 export interface UpdateTeachingProfileRequest {
   experienceYears?: number | null;
+  hourlyRate?: number;
   websiteUrl?: string | null;
   teachingLevels?: string[] | null;
 }
