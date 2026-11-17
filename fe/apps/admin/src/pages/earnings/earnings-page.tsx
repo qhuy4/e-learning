@@ -52,7 +52,6 @@ export default function EarningsPage() {
 }
 
 function RevenueSplitTab() {
-  const navigate = useNavigate();
   const {
     page,
     limit,

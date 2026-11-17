@@ -2,7 +2,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@fe/components/ui/button.tsx";
 import { Badge } from "@fe/components/ui/badge.tsx";
-import { Separator } from "@fe/components/ui/separator.tsx";
 import { useEnrollment } from "@/features/enrollments/hooks/use-enrollment";
 import { EnrollmentStatus, enrollmentStatusLabel, enrollmentStatusClassName } from "@/features/enrollments/types/enrollment";
 
@@ -229,15 +228,6 @@ export default function EnrollmentDetailPage() {
           </div>
         </div>
       </div>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-2">
-      <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{title}</p>
-      <div className="space-y-1.5">{children}</div>
-    </div>
   );
 }
 
