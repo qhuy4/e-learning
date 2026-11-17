@@ -18,7 +18,7 @@ const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gi
 
 export function AvatarUpload({value, onChange, className, disabled}: AvatarUploadProps) {
     const [isDragging, setIsDragging] = useState(false)
-    const [uploading, setUploading] = useState(false)
+    const [uploading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [mode, setMode] = useState<"upload" | "url">(value ? "url" : "upload")
     const fileInputRef = useRef<HTMLInputElement>(null)

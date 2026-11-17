@@ -5,7 +5,6 @@ import { ArrowLeft, Star, EyeOff, Trash2, CheckCircle } from "lucide-react";
 import { Button } from "@fe/components/ui/button.tsx";
 import { Badge } from "@fe/components/ui/badge.tsx";
 import { Separator } from "@fe/components/ui/separator.tsx";
-import { Skeleton } from "@fe/components/ui/skeleton.tsx";
 import {
   useReviewReport,
   useResolveReviewReport,

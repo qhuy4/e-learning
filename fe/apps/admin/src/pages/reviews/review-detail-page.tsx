@@ -5,7 +5,6 @@ import { toast } from "sonner";
 import { Button } from "@fe/components/ui/button.tsx";
 import { Badge } from "@fe/components/ui/badge.tsx";
 import { Avatar, AvatarFallback } from "@fe/components/ui/avatar.tsx";
-import { Skeleton } from "@fe/components/ui/skeleton.tsx";
 import { useReview, useUpdateReviewStatus } from "@/features/reviews/hook/use-review.ts";
 import { reviewStatusLabel, reviewStatusClassName, type ReviewStatus } from "@/features/reviews/types/review.ts";
 

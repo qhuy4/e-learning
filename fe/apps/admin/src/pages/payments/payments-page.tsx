@@ -5,7 +5,7 @@ import { useListPage } from "@/components/common/page/use-list-page";
 import { usePayments } from "@/features/payments/hooks/use-payments";
 import { createPaymentColumns } from "@/features/payments/components/payment-columns";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@fe/components/ui/select";
-import { PaymentStatus, paymentStatusLabel, PaymentGateway, paymentGatewayLabel } from "@/features/payments/types/payments";
+import { paymentStatusLabel, paymentGatewayLabel } from "@/features/payments/types/payments";
 
 const statusOptions = [
   { value: "all", label: "Tất cả trạng thái" },

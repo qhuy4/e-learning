@@ -15,8 +15,8 @@ export function CreateLessonPage() {
   const isEditing = !!id;
 
   const { data: lessonData, isLoading } = useGetLesson(isEditing ? Number(id) : 0);
-  const { mutate: createLesson, isPending: isCreating } = useCreateLesson();
-  const { mutate: updateLesson, isPending: isUpdating } = useUpdateLesson();
+  const { mutate: createLesson } = useCreateLesson();
+  const { mutate: updateLesson } = useUpdateLesson();
 
   const handleSave = (data: LessonFormData) => {
     if (isEditing) {

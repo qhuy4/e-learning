@@ -15,10 +15,8 @@ import {
     Users,
     DollarSign,
     CreditCard,
-    Plus,
     Building2,
     Check,
-    X,
 } from "lucide-react"
 
 import {Button} from "@fe/components/ui/button"
@@ -36,7 +34,6 @@ import {
 } from "@/features/instructors/constants/instructor.constants.ts";
 import {userStatusLabel} from "@/features/users/constants/users.constants.ts";
 import {DeleteConfirmDialog} from "@/features/users/components/delete-confirm-diialog.tsx";
-import type {Instructor} from "@/features/instructors/type/instructor.ts";
 import {usePayoutAccounts, useDeletePayoutAccount} from "@/features/instructors/hooks/use-payout-accounts.ts";
 import {accountTypeLabel, accountTypeClassName, type AccountType, type PayoutAccount} from "@/features/instructors/types/payout-account.ts";
 import {toast} from "sonner";

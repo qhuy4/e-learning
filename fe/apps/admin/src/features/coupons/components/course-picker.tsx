@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search, X } from "lucide-react";
 import { Button } from "@fe/components/ui/button";
@@ -36,8 +36,6 @@ export function CoursePicker({ value, onChange }: CoursePickerProps) {
   const toggle = (id: string) => {
     onChange(value.includes(id) ? value.filter((v) => v !== id) : [...value, id]);
   };
-
-  const selectedCourses = courses.filter((c) => value.includes(c.id));
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

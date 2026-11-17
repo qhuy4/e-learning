@@ -4,7 +4,7 @@ import { DataTable } from "@/components/common/data-table/data-table";
 import { useListPage } from "@/components/common/page/use-list-page";
 import { useAchievements } from "@/features/achievements/hooks/use-achievements";
 import { achievementColumns } from "@/features/achievements/components/achievement-columns";
-import { achievementCriteriaLabel, type AchievementCriteria } from "@/features/achievements/types/achievement";
+import { achievementCriteriaLabel } from "@/features/achievements/types/achievement";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@fe/components/ui/select";
 
 const criteriaOptions = Object.entries(achievementCriteriaLabel).map(([value, label]) => ({

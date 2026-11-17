@@ -11,13 +11,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@fe/components/ui/select"
-import {type Gender, genderLabel, type UserRole, UserRole as UserRoles, type UserStatus, UserStatus as UserStatuses} from "@/features/users/constants/users.constants.ts";
+import {type Gender, type UserRole, UserRole as UserRoles, type UserStatus, UserStatus as UserStatuses} from "@/features/users/constants/users.constants.ts";
 import {createUserSchema} from "@/features/users/schema/user.schema.ts";
 import {useCreateUser} from "@/features/users/hook/use-user.ts";
 import {useCreateForm} from "@/features/users/hook/use-create-form.ts";
-import {useEffect, useState} from "react";
-import {locationService} from "@/shared/service/location.service.ts";
-import type {City, Country} from "@fe/api/location";
 
 interface UserCreateFormState {
     name: string; email: string; password: string; status: UserStatus; role: UserRole;
@@ -86,9 +83,6 @@ function buildWriteInput(form: ReturnType<typeof emptyForm>) {
 export function UserCreatePage() {
     const navigate = useNavigate()
     const createUser = useCreateUser()
-    const [countries, setCountries] = useState<Country[]>([])
-    const [cities, setCities] = useState<City[]>([])
-
 
     const { form, errors, setField, handleSubmit } = useCreateForm({
         emptyForm: emptyForm(),
@@ -98,23 +92,6 @@ export function UserCreatePage() {
         successMessage: "Tạo người dùng thành công",
         redirectTo: "/users",
     })
-    useEffect(() => {
-        locationService
-            .getCountries()
-            .then(setCountries)
-            .catch(console.error)
-    }, [])
-    useEffect(() => {
-        if (!form?.country) {
-            setCities([])
-            return
-        }
-
-        locationService
-            .getCities(form.country)
-            .then(setCities)
-            .catch(console.error)
-    }, [form?.country])
     return (
         <div className="p-6  mx-auto space-y-6">
             <Button variant="ghost" size="sm" onClick={() => navigate("/users")} className="-ml-2">

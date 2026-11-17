@@ -1,6 +1,5 @@
 import type {
   Achievement,
-  AchievementUser,
   PaginatedAchievementResponse,
   PaginatedAchievementUserResponse,
 } from "../types/achievement";

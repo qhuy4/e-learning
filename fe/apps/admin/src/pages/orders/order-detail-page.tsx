@@ -210,12 +210,3 @@ function Field({label, value}: { label: string; value: string }) {
         </div>
     );
 }
-
-function FieldInline({label, value}: { label: string; value: string }) {
-    return (
-        <div className="flex items-baseline gap-2 text-sm">
-            <span className="text-muted-foreground">{label}:</span>
-            <span className="font-medium">{value}</span>
-        </div>
-    );
-}

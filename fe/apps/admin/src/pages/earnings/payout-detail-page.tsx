@@ -14,13 +14,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@fe/components/ui/dialog.tsx";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@fe/components/ui/select.tsx";
 import { usePayout, useUpdatePayoutStatus } from "@/features/earnings/hooks/use-earnings";
 import {
   PayoutStatus,
@@ -40,10 +33,6 @@ function formatDate(date: Date | string | null) {
     hour: "2-digit",
     minute: "2-digit",
   });
-}
-
-function formatPeriod(start: string, end: string) {
-  return `${formatDate(start)} - ${formatDate(end)}`;
 }
 
 export default function PayoutDetailPage() {
