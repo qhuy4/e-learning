@@ -8,7 +8,7 @@ on:
       - ".github/workflows/frontend-ci.yml"
 
   push:
-    branches: [main, develop,production]
+    branches: [main, dev, production]
     paths:
       - "fe/**"
       - ".github/workflows/frontend-ci.yml"
