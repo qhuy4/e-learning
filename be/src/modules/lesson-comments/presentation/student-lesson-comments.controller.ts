@@ -19,6 +19,7 @@ import { GetLessonCommentsQuery } from '../application/query/get-lesson-comments
 import { CreateLessonCommentDto } from './dto/create-lesson-comment.dto';
 import { UpdateLessonCommentDto } from './dto/update-lesson-comment.dto';
 import { LessonCommentResponse } from '../application/query-handler/get-lesson-comments.handler';
+import { LessonComment } from '../domain/entity/lesson-comment.entity';
 
 @Controller('lesson-comments')
 @UseGuards(JwtAuthGuard)
@@ -41,7 +42,7 @@ export class StudentLessonCommentsController {
     @CurrentUser('id') userId: number,
     @Body() dto: CreateLessonCommentDto,
   ) {
-    return this.commandBus.execute(
+    return this.commandBus.execute<CreateLessonCommentCommand, LessonComment>(
       new CreateLessonCommentCommand(
         userId,
         dto.lessonId,
@@ -57,7 +58,7 @@ export class StudentLessonCommentsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateLessonCommentDto,
   ) {
-    return this.commandBus.execute(
+    return this.commandBus.execute<UpdateLessonCommentCommand, LessonComment>(
       new UpdateLessonCommentCommand(userId, id, dto.content),
     );
   }

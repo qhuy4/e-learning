@@ -40,7 +40,7 @@ export class MatchInstructorsDto {
 
   /** Band CEFR của sinh viên (A1–C2). Không truyền = không dùng level. */
   @IsOptional()
-  @IsIn(CEFR_LEVELS as unknown as string[])
+  @IsIn(CEFR_LEVELS)
   studentLevel?: string;
 
   /**

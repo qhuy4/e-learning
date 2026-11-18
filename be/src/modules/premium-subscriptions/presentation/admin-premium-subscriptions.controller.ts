@@ -54,7 +54,7 @@ export class AdminPremiumSubscriptionsController {
     if (body.expiredAt) updateData.expiredAt = new Date(body.expiredAt);
     if (body.status !== undefined) updateData.status = body.status;
 
-    return this.repo.update(id, updateData as any);
+    return this.repo.update(id, updateData);
   }
 
   @Delete(':id')

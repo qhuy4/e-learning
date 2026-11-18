@@ -41,7 +41,7 @@ export class PaymentRepository implements IPaymentRepository {
     }
 
     if (status) {
-      where.status = status as PaymentOrmEntity['status'];
+      where.status = status;
     }
 
     if (gateway) {
@@ -56,7 +56,7 @@ export class PaymentRepository implements IPaymentRepository {
     });
 
     return {
-      payments: entities.map(PaymentMapper.toDomain),
+      payments: entities.map((entity) => PaymentMapper.toDomain(entity)),
       total,
     };
   }

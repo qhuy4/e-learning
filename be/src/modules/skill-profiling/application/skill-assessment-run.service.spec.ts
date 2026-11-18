@@ -23,9 +23,10 @@ function harness(options?: { newerRun?: boolean; aggregateError?: Error }) {
       kept: 0,
     })),
   };
+  const aggregateError = options?.aggregateError;
   const aggregation = {
-    recompute: options?.aggregateError
-      ? jest.fn(() => Promise.reject(options.aggregateError))
+    recompute: aggregateError
+      ? jest.fn(() => Promise.reject(aggregateError))
       : jest.fn(() => []),
   };
   const service = new SkillAssessmentRunService(

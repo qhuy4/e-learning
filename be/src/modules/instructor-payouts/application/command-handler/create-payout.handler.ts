@@ -22,7 +22,8 @@ export class CreatePayoutHandler implements ICommandHandler<CreatePayoutCommand>
   ) {}
 
   async execute(command: CreatePayoutCommand) {
-    const { instructorId, payoutAccountId, periodStart, periodEnd } = command.data;
+    const { instructorId, payoutAccountId, periodStart, periodEnd } =
+      command.data;
 
     // Find pending revenue splits for this instructor in the period
     const { data: splits } = await this.revenueSplitRepository.findAll({
@@ -33,8 +34,8 @@ export class CreatePayoutHandler implements ICommandHandler<CreatePayoutCommand>
     });
 
     // Filter splits within period
-    const periodSplits = splits.filter((split: any) => {
-      const created = new Date(split.createdAt);
+    const periodSplits = splits.filter((split) => {
+      const created = new Date(split.createdAt!);
       return created >= new Date(periodStart) && created <= new Date(periodEnd);
     });
 
@@ -42,9 +43,18 @@ export class CreatePayoutHandler implements ICommandHandler<CreatePayoutCommand>
       return { message: 'No pending revenue splits found for this period' };
     }
 
-    const totalGross = periodSplits.reduce((sum: number, s: any) => sum + s.grossAmount, 0);
-    const totalPlatformFee = periodSplits.reduce((sum: number, s: any) => sum + s.platformFeeAmount, 0);
-    const totalInstructorAmount = periodSplits.reduce((sum: number, s: any) => sum + s.instructorAmount, 0);
+    const totalGross = periodSplits.reduce(
+      (sum, s) => sum + s.grossAmount,
+      0,
+    );
+    const totalPlatformFee = periodSplits.reduce(
+      (sum, s) => sum + s.platformFeeAmount,
+      0,
+    );
+    const totalInstructorAmount = periodSplits.reduce(
+      (sum, s) => sum + s.instructorAmount,
+      0,
+    );
 
     const payout = await this.payoutRepository.create({
       instructorId,
@@ -60,9 +70,7 @@ export class CreatePayoutHandler implements ICommandHandler<CreatePayoutCommand>
     });
 
     // Mark splits as included_in_payout
-    for (const split of periodSplits) {
-      // Update split status would need a repository method - for now just return
-    }
+    // Update split status would need a repository method - for now just return
 
     return payout;
   }

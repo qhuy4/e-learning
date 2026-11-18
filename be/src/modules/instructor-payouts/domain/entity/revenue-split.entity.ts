@@ -1,5 +1,18 @@
 import { RevenueSplitPayoutStatus } from '@/modules/instructor-payouts/domain/enum/revenue-split-payout-status.enum';
 
+/** Course được mapper nạp (relation `course`). */
+export interface RevenueSplitCourseRef {
+  id: number;
+  title: string;
+  thumbnail: string | null;
+}
+
+/** User được mapper nạp (relation `instructor`). */
+export interface RevenueSplitInstructorRef {
+  id: number;
+  name: string;
+}
+
 export class RevenueSplit {
   private constructor(
     public readonly id: number,
@@ -15,8 +28,8 @@ export class RevenueSplit {
     public readonly payoutStatus: RevenueSplitPayoutStatus,
     public readonly createdAt: Date | null,
     public readonly updatedAt: Date | null,
-    public readonly course?: any,
-    public readonly instructor?: any,
+    public readonly course?: RevenueSplitCourseRef,
+    public readonly instructor?: RevenueSplitInstructorRef,
   ) {}
 
   static restore(params: {
@@ -33,8 +46,8 @@ export class RevenueSplit {
     payoutStatus: RevenueSplitPayoutStatus;
     createdAt: Date | null;
     updatedAt: Date | null;
-    course?: any;
-    instructor?: any;
+    course?: RevenueSplitCourseRef;
+    instructor?: RevenueSplitInstructorRef;
   }): RevenueSplit {
     return new RevenueSplit(
       params.id,

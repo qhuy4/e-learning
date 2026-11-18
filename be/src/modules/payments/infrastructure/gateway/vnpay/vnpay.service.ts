@@ -31,7 +31,7 @@ export class VnpayService implements PaymentGatewayService {
     this.returnUrl = this.configService.get<string>('VNP_RETURN_URL', '');
   }
 
-  async createPaymentUrl(input: CreatePaymentInput): Promise<CreatePaymentOutput> {
+  createPaymentUrl(input: CreatePaymentInput): Promise<CreatePaymentOutput> {
     const returnUrl = input.returnUrl ?? this.returnUrl;
     if (!this.tmnCode || !this.hashSecret || !returnUrl) {
       throw new Error(
@@ -67,13 +67,13 @@ export class VnpayService implements PaymentGatewayService {
 
     this.logger.log(`VNPAY URL for order ${input.orderId}: ${paymentUrl}`);
 
-    return {
+    return Promise.resolve({
       paymentUrl,
       transactionId: `VNP_${input.orderId}_${Date.now()}`,
-    };
+    });
   }
 
-  async refundPayment(input: RefundPaymentInput): Promise<RefundPaymentOutput> {
+  refundPayment(input: RefundPaymentInput): Promise<RefundPaymentOutput> {
     const params: Record<string, string> = {
       vnp_Version: '2.1.0',
       vnp_Command: 'refund',
@@ -90,14 +90,14 @@ export class VnpayService implements PaymentGatewayService {
     const hmac = crypto.createHmac('sha512', this.hashSecret);
     const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
 
-    return {
+    return Promise.resolve({
       success: true,
       refundTransactionId: `VNP_REF_${input.transactionId}_${Date.now()}`,
       rawResponse: { ...params, vnp_SecureHash: signed },
-    };
+    });
   }
 
-  async verifyCallback(input: VerifyCallbackInput): Promise<VerifyCallbackOutput> {
+  verifyCallback(input: VerifyCallbackInput): Promise<VerifyCallbackOutput> {
     const { query } = input;
 
     const secureHash = query.vnp_SecureHash;
@@ -111,25 +111,25 @@ export class VnpayService implements PaymentGatewayService {
 
     if (secureHash !== checkSum) {
       this.logger.warn('VNPay callback checksum mismatch');
-      return {
+      return Promise.resolve({
         transactionId: query.vnp_TransactionNo ?? '',
         orderId: Number(query.vnp_TxnRef),
         amount: Number(query.vnp_Amount) / 100,
         status: 'failed',
         rawResponse: query,
-      };
+      });
     }
 
     const responseCode = query.vnp_ResponseCode;
     const isSuccess = responseCode === '00';
 
-    return {
+    return Promise.resolve({
       transactionId: query.vnp_TransactionNo ?? '',
       orderId: Number(query.vnp_TxnRef),
       amount: Number(query.vnp_Amount) / 100,
       status: isSuccess ? 'success' : 'failed',
       rawResponse: query,
-    };
+    });
   }
 
   private getSortedQueryString(params: Record<string, string>): string {

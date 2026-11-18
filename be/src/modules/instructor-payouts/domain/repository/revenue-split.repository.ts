@@ -1,4 +1,20 @@
+import { RevenueSplit } from '@/modules/instructor-payouts/domain/entity/revenue-split.entity';
+
 export const REVENUE_SPLIT_REPOSITORY = 'REVENUE_SPLIT_REPOSITORY';
+
+export interface AdminRevenueSplitsPage {
+  data: RevenueSplit[];
+  meta: { page: number; limit: number; total: number; totalPages: number };
+}
+
+export interface RevenueSummary {
+  totalGross: number;
+  totalPlatformFee: number;
+  totalInstructorAmount: number;
+  totalSplits: number;
+  pendingCount: number;
+  paidCount: number;
+}
 
 export interface IRevenueSplitRepository {
   findAll(options: {
@@ -9,19 +25,12 @@ export interface IRevenueSplitRepository {
     payoutStatus?: string;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
-  }): Promise<{ data: any[]; meta: { page: number; limit: number; total: number; totalPages: number } }>;
+  }): Promise<AdminRevenueSplitsPage>;
 
   getSummary(options: {
     instructorId?: number;
     payoutStatus?: string;
-  }): Promise<{
-    totalGross: number;
-    totalPlatformFee: number;
-    totalInstructorAmount: number;
-    totalSplits: number;
-    pendingCount: number;
-    paidCount: number;
-  }>;
+  }): Promise<RevenueSummary>;
 
-  findById(id: number): Promise<any | null>;
+  findById(id: number): Promise<RevenueSplit | null>;
 }

@@ -9,10 +9,7 @@ import {
 import { QueryBus } from '@nestjs/cqrs';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
-import {
-  GetInstructorLessonCommentsQuery,
-  LessonCommentStatusFilter,
-} from '../application/query/get-instructor-lesson-comments.query';
+import { GetInstructorLessonCommentsQuery } from '../application/query/get-instructor-lesson-comments.query';
 import { GetLessonCommentThreadQuery } from '../application/query/get-lesson-comment-thread.query';
 import { InstructorLessonCommentsResult } from '../application/query-handler/get-instructor-lesson-comments.handler';
 import { LessonCommentThreadResponse } from '../application/query-handler/get-lesson-comment-thread.handler';
@@ -38,9 +35,7 @@ export class InstructorLessonCommentsController {
         courseId: courseId ? Number(courseId) : undefined,
         lessonId: lessonId ? Number(lessonId) : undefined,
         status:
-          status === 'answered' || status === 'unanswered'
-            ? (status as LessonCommentStatusFilter)
-            : undefined,
+          status === 'answered' || status === 'unanswered' ? status : undefined,
         page: page ? Number(page) : undefined,
         limit: limit ? Number(limit) : undefined,
       }),

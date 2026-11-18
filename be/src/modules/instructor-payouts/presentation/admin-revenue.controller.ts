@@ -1,9 +1,20 @@
-import { Controller, Get, Param, Query, ParseIntPipe, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Query,
+  ParseIntPipe,
+  UseGuards,
+} from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { GetAdminRevenueSplitsQuery } from '@/modules/instructor-payouts/application/query/get-admin-revenue-splits.query';
 import { GetAdminRevenueSummaryQuery } from '@/modules/instructor-payouts/application/query/get-admin-revenue-summary.query';
 import { AdminRevenueResponseMapper } from '@/modules/instructor-payouts/presentation/mapper/admin-revenue-response.mapper';
+import {
+  AdminRevenueSplitsPage,
+  RevenueSummary,
+} from '@/modules/instructor-payouts/domain/repository/revenue-split.repository';
 
 @Controller('admin/revenue')
 @UseGuards(JwtAuthGuard)
@@ -20,7 +31,10 @@ export class AdminRevenueController {
     @Query('sortBy') sortBy?: string,
     @Query('sortOrder') sortOrder?: 'asc' | 'desc',
   ) {
-    const result = await this.queryBus.execute(
+    const result = await this.queryBus.execute<
+      GetAdminRevenueSplitsQuery,
+      AdminRevenueSplitsPage
+    >(
       new GetAdminRevenueSplitsQuery({
         page: page ? parseInt(page, 10) : 1,
         limit: limit ? parseInt(limit, 10) : 10,
@@ -33,14 +47,19 @@ export class AdminRevenueController {
     );
 
     return {
-      data: result.data.map((split: any) => AdminRevenueResponseMapper.toResponse(split)),
+      data: result.data.map((split) =>
+        AdminRevenueResponseMapper.toResponse(split),
+      ),
       meta: result.meta,
     };
   }
 
   @Get('summary')
   async getSummary(@Query('instructorId') instructorId?: string) {
-    return this.queryBus.execute(
+    return this.queryBus.execute<
+      GetAdminRevenueSummaryQuery,
+      RevenueSummary
+    >(
       new GetAdminRevenueSummaryQuery({
         instructorId: instructorId ? parseInt(instructorId, 10) : undefined,
       }),
@@ -49,7 +68,7 @@ export class AdminRevenueController {
 
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    const result = await this.queryBus.execute(
+    await this.queryBus.execute(
       new GetAdminRevenueSplitsQuery({ page: 1, limit: 1 }),
     );
     // Use a dedicated query for single item - for now reuse

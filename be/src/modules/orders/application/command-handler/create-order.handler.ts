@@ -58,7 +58,7 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
     });
     if (
       courses.length !== courseIds.length ||
-      courses.some((c) => Number(c.status) !== CourseStatus.PUBLISHED)
+      courses.some((c) => c.status !== CourseStatus.PUBLISHED)
     ) {
       throw new BadRequestException(
         'Một số khóa học không còn khả dụng để mua.',

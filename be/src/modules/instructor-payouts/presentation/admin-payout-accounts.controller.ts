@@ -19,6 +19,7 @@ import { DeletePayoutAccountCommand } from '@/modules/instructor-payouts/applica
 import { CreatePayoutAccountDto } from '@/modules/instructor-payouts/presentation/dto/create-payout-account.dto';
 import { UpdatePayoutAccountDto } from '@/modules/instructor-payouts/presentation/dto/update-payout-account.dto';
 import { AdminPayoutAccountResponseMapper } from '@/modules/instructor-payouts/presentation/mapper/admin-payout-account-response.mapper';
+import { PayoutAccount } from '@/modules/instructor-payouts/domain/entity/payout-account.entity';
 
 @Controller('admin/payout-accounts')
 @UseGuards(JwtAuthGuard)
@@ -30,17 +31,25 @@ export class AdminPayoutAccountsController {
 
   @Get()
   async findAll(@Query('instructorProfileId') instructorProfileId: string) {
-    const result = await this.queryBus.execute(
+    const result = await this.queryBus.execute<
+      GetInstructorPayoutAccountsQuery,
+      PayoutAccount[]
+    >(
       new GetInstructorPayoutAccountsQuery({
         instructorProfileId: parseInt(instructorProfileId, 10),
       }),
     );
-    return result.map((account: any) => AdminPayoutAccountResponseMapper.toResponse(account));
+    return result.map((account) =>
+      AdminPayoutAccountResponseMapper.toResponse(account),
+    );
   }
 
   @Post()
   async create(@Body() dto: CreatePayoutAccountDto) {
-    const account = await this.commandBus.execute(
+    const account = await this.commandBus.execute<
+      CreatePayoutAccountCommand,
+      PayoutAccount
+    >(
       new CreatePayoutAccountCommand({
         instructorProfileId: dto.instructorProfileId,
         accountType: dto.accountType,
@@ -59,7 +68,10 @@ export class AdminPayoutAccountsController {
 
   @Patch(':id')
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdatePayoutAccountDto) {
-    const account = await this.commandBus.execute(
+    const account = await this.commandBus.execute<
+      UpdatePayoutAccountCommand,
+      PayoutAccount
+    >(
       new UpdatePayoutAccountCommand({
         id,
         accountType: dto.accountType,

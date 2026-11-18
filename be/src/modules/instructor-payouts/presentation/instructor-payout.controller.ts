@@ -25,6 +25,7 @@ import {
   IPayoutAccountRepository,
   PAYOUT_ACCOUNT_REPOSITORY,
 } from '@/modules/instructor-payouts/domain/repository/payout-account.repository';
+import { PayoutAccountOrmEntity } from '@/modules/instructor-payouts/infrastructure/entity/payout-account.orm-entity';
 import {
   IInstructorPayoutRepository,
   INSTRUCTOR_PAYOUT_REPOSITORY,
@@ -103,7 +104,7 @@ export class InstructorPayoutController {
   ) {
     const instructorProfileId = await this.resolveInstructorProfileId(userId);
     return this.payoutAccountRepo.create({
-      instructorProfileId,
+      instructorProfileId: instructorProfileId.toString(),
       accountType: dto.accountType,
       accountHolderName: dto.accountHolderName,
       accountNumber: dto.accountNumber ?? null,
@@ -127,7 +128,7 @@ export class InstructorPayoutController {
     const instructorProfileId = await this.resolveInstructorProfileId(userId);
     await this.validateAccountOwnership(id, instructorProfileId);
 
-    const updateData: Record<string, any> = {};
+    const updateData: Partial<PayoutAccountOrmEntity> = {};
     if (dto.accountType !== undefined) updateData.accountType = dto.accountType;
     if (dto.accountHolderName !== undefined) updateData.accountHolderName = dto.accountHolderName;
     if (dto.accountNumber !== undefined) updateData.accountNumber = dto.accountNumber;
@@ -270,15 +271,24 @@ export class InstructorPayoutController {
     });
 
     let periodSplits = splits;
-    const periodStart = body.periodStart || splits[0]?.createdAt?.split('T')[0] || new Date().toISOString().split('T')[0];
-    const periodEnd = body.periodEnd || splits[splits.length - 1]?.createdAt?.split('T')[0] || new Date().toISOString().split('T')[0];
+    // createdAt là Date (mapper) — giữ nguyên runtime gọi split như ban đầu.
+    const periodStart =
+      body.periodStart ||
+      (splits[0]?.createdAt as unknown as string | undefined)?.split('T')[0] ||
+      new Date().toISOString().split('T')[0];
+    const periodEnd =
+      body.periodEnd ||
+      (
+        splits[splits.length - 1]?.createdAt as unknown as string | undefined
+      )?.split('T')[0] ||
+      new Date().toISOString().split('T')[0];
 
     if (body.periodStart && body.periodEnd) {
       const start = new Date(body.periodStart);
       const end = new Date(body.periodEnd);
       end.setHours(23, 59, 59, 999);
-      periodSplits = splits.filter((split: any) => {
-        const created = new Date(split.createdAt);
+      periodSplits = splits.filter((split) => {
+        const created = new Date(split.createdAt!);
         return created >= start && created <= end;
       });
     }
@@ -287,9 +297,18 @@ export class InstructorPayoutController {
       throw new AppException(ErrorCode.PAYOUT_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
-    const totalGross = periodSplits.reduce((sum: number, s: any) => sum + Number(s.grossAmount), 0);
-    const totalPlatformFee = periodSplits.reduce((sum: number, s: any) => sum + Number(s.platformFeeAmount), 0);
-    const totalInstructorAmount = periodSplits.reduce((sum: number, s: any) => sum + Number(s.instructorAmount), 0);
+    const totalGross = periodSplits.reduce(
+      (sum, s) => sum + Number(s.grossAmount),
+      0,
+    );
+    const totalPlatformFee = periodSplits.reduce(
+      (sum, s) => sum + Number(s.platformFeeAmount),
+      0,
+    );
+    const totalInstructorAmount = periodSplits.reduce(
+      (sum, s) => sum + Number(s.instructorAmount),
+      0,
+    );
 
     return this.payoutRepo.create({
       instructorId: instructorProfileId,

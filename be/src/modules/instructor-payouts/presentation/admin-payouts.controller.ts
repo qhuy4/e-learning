@@ -8,6 +8,8 @@ import { UpdatePayoutStatusCommand } from '@/modules/instructor-payouts/applicat
 import { CreatePayoutDto } from '@/modules/instructor-payouts/presentation/dto/create-payout.dto';
 import { UpdatePayoutStatusDto } from '@/modules/instructor-payouts/presentation/dto/update-payout-status.dto';
 import { AdminPayoutResponseMapper } from '@/modules/instructor-payouts/presentation/mapper/admin-payout-response.mapper';
+import { AdminPayoutsPage } from '@/modules/instructor-payouts/domain/repository/instructor-payout.repository';
+import { InstructorPayout } from '@/modules/instructor-payouts/domain/entity/instructor-payout.entity';
 
 @Controller('admin/payouts')
 @UseGuards(JwtAuthGuard)
@@ -26,7 +28,10 @@ export class AdminPayoutsController {
     @Query('sortBy') sortBy?: string,
     @Query('sortOrder') sortOrder?: 'asc' | 'desc',
   ) {
-    const result = await this.queryBus.execute(
+    const result = await this.queryBus.execute<
+      GetAdminPayoutsQuery,
+      AdminPayoutsPage
+    >(
       new GetAdminPayoutsQuery({
         page: page ? parseInt(page, 10) : 1,
         limit: limit ? parseInt(limit, 10) : 10,
@@ -38,20 +43,28 @@ export class AdminPayoutsController {
     );
 
     return {
-      data: result.data.map((payout: any) => AdminPayoutResponseMapper.toResponse(payout)),
+      data: result.data.map((payout) =>
+        AdminPayoutResponseMapper.toResponse(payout),
+      ),
       meta: result.meta,
     };
   }
 
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    const payout = await this.queryBus.execute(new GetAdminPayoutDetailQuery({ id }));
+    const payout = await this.queryBus.execute<
+      GetAdminPayoutDetailQuery,
+      InstructorPayout
+    >(new GetAdminPayoutDetailQuery({ id }));
     return AdminPayoutResponseMapper.toResponse(payout);
   }
 
   @Post()
   async create(@Body() dto: CreatePayoutDto) {
-    const payout = await this.commandBus.execute(
+    const payout = await this.commandBus.execute<
+      CreatePayoutCommand,
+      InstructorPayout
+    >(
       new CreatePayoutCommand({
         instructorId: dto.instructorId,
         payoutAccountId: dto.payoutAccountId,
@@ -64,7 +77,10 @@ export class AdminPayoutsController {
 
   @Patch(':id')
   async updateStatus(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdatePayoutStatusDto) {
-    const payout = await this.commandBus.execute(
+    const payout = await this.commandBus.execute<
+      UpdatePayoutStatusCommand,
+      InstructorPayout
+    >(
       new UpdatePayoutStatusCommand({
         id,
         status: dto.status,

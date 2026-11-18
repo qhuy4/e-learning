@@ -25,6 +25,22 @@ export interface LessonCommentThreadResponse {
   comments: LessonCommentResponse[];
 }
 
+/** Dòng kết quả của raw query thread (snake_case từ SQL). */
+interface LessonCommentThreadRow {
+  id: string | number;
+  parent_id: string | number | null;
+  user_id: string | number;
+  content: string;
+  created_at: Date | null;
+  updated_at: Date | null;
+  user_name: string;
+  lesson_id: string | number;
+  lesson_title: string;
+  course_id: string | number;
+  course_title: string;
+  is_instructor: boolean;
+}
+
 /**
  * Chi tiết một nhánh bình luận (câu hỏi): danh sách đầy đủ các cấp
  * để giảng viên đọc và trả lời. Chỉ giảng viên của khóa chứa bài học mới xem được.
@@ -62,7 +78,7 @@ export class GetLessonCommentThreadHandler
       ORDER BY c.created_at ASC, c.id ASC
     `;
 
-    const rows: any[] = await this.commentRepo.query(sql, [
+    const rows = await this.commentRepo.query<LessonCommentThreadRow[]>(sql, [
       query.rootId,
       query.instructorId,
     ]);

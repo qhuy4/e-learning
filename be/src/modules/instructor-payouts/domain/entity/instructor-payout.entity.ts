@@ -1,6 +1,21 @@
 import { PayoutStatus } from '@/modules/instructor-payouts/domain/enum/payout-status.enum';
 import { PaymentMethod } from '@/modules/instructor-payouts/domain/enum/payment-method.enum';
 
+/** User được mapper nạp (relation `instructor`). */
+export interface PayoutInstructorRef {
+  id: number;
+  name: string;
+}
+
+/** Payout account được mapper nạp (relation `payoutAccount`). */
+export interface PayoutAccountRef {
+  id: number;
+  accountHolderName: string;
+  bankName: string | null;
+  accountNumber: string | null;
+  paypalEmail: string | null;
+}
+
 export class InstructorPayout {
   private constructor(
     public readonly id: number,
@@ -19,8 +34,8 @@ export class InstructorPayout {
     public readonly paidAt: Date | null,
     public readonly createdAt: Date | null,
     public readonly updatedAt: Date | null,
-    public readonly instructor?: any,
-    public readonly payoutAccount?: any,
+    public readonly instructor?: PayoutInstructorRef,
+    public readonly payoutAccount?: PayoutAccountRef,
   ) {}
 
   static restore(params: {
@@ -40,8 +55,8 @@ export class InstructorPayout {
     paidAt: Date | null;
     createdAt: Date | null;
     updatedAt: Date | null;
-    instructor?: any;
-    payoutAccount?: any;
+    instructor?: PayoutInstructorRef;
+    payoutAccount?: PayoutAccountRef;
   }): InstructorPayout {
     return new InstructorPayout(
       params.id,

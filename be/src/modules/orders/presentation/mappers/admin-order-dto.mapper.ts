@@ -1,6 +1,8 @@
 import { Order } from '@/modules/orders/domain/entity/order.entity';
 import { AdminOrderListResponseDto } from '@/modules/orders/presentation/dto/admin-order-list-response.dto';
-import { AdminOrderDetailResponseDto, AdminOrderItemDto } from '@/modules/orders/presentation/dto/admin-order-detail-response.dto';
+import {
+  AdminOrderDetailResponseDto,
+} from '@/modules/orders/presentation/dto/admin-order-detail-response.dto';
 
 export class AdminOrderDtoMapper {
   static toListDto(order: Order): AdminOrderListResponseDto {

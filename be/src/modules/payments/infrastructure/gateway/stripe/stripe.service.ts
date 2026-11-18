@@ -32,7 +32,9 @@ export class StripeService implements PaymentGatewayService {
     return this.stripe;
   }
 
-  async createPaymentUrl(input: CreatePaymentInput): Promise<CreatePaymentOutput> {
+  async createPaymentUrl(
+    input: CreatePaymentInput,
+  ): Promise<CreatePaymentOutput> {
     const client = this.getClient();
 
     const session = await client.checkout.sessions.create({
@@ -89,7 +91,7 @@ export class StripeService implements PaymentGatewayService {
     };
   }
 
-  async verifyCallback(input: VerifyCallbackInput): Promise<VerifyCallbackOutput> {
+  verifyCallback(input: VerifyCallbackInput): Promise<VerifyCallbackOutput> {
     const client = this.getClient();
 
     const sig = input.query['stripe-signature'];
@@ -108,33 +110,33 @@ export class StripeService implements PaymentGatewayService {
       );
     } catch (err) {
       this.logger.warn(`Stripe webhook signature verification failed: ${err}`);
-      return {
+      return Promise.resolve({
         transactionId: '',
         orderId: 0,
         amount: 0,
         status: 'failed',
         rawResponse: input.query,
-      };
+      });
     }
 
     if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as Stripe.Checkout.Session;
+      const session = event.data.object;
 
-      return {
+      return Promise.resolve({
         transactionId: session.id,
         orderId: Number(session.metadata?.orderId ?? 0),
         amount: (session.amount_total ?? 0) / 100,
         status: 'success',
-        rawResponse: event as unknown as Record<string, any>,
-      };
+        rawResponse: event,
+      });
     }
 
-    return {
+    return Promise.resolve({
       transactionId: '',
       orderId: 0,
       amount: 0,
       status: 'failed',
-      rawResponse: event as unknown as Record<string, any>,
-    };
+      rawResponse: event,
+    });
   }
 }

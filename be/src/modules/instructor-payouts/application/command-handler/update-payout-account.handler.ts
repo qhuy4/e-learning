@@ -5,6 +5,7 @@ import {
   IPayoutAccountRepository,
   PAYOUT_ACCOUNT_REPOSITORY,
 } from '@/modules/instructor-payouts/domain/repository/payout-account.repository';
+import { PayoutAccountOrmEntity } from '@/modules/instructor-payouts/infrastructure/entity/payout-account.orm-entity';
 import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';
 
@@ -35,7 +36,7 @@ export class UpdatePayoutAccountHandler implements ICommandHandler<UpdatePayoutA
       }
     }
 
-    const updateData: any = {};
+    const updateData: Partial<PayoutAccountOrmEntity> = {};
     if (rest.accountType !== undefined) updateData.accountType = rest.accountType;
     if (rest.accountHolderName !== undefined) updateData.accountHolderName = rest.accountHolderName;
     if (rest.accountNumber !== undefined) updateData.accountNumber = rest.accountNumber;

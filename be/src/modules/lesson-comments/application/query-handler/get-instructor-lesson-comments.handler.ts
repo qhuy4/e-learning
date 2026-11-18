@@ -43,6 +43,28 @@ export interface InstructorLessonCommentsResult {
   meta: { page: number; limit: number; total: number; totalPages: number };
 }
 
+/** Dòng stats thô từ SQL (count trả string trong pg). */
+interface LessonCommentStatsRow {
+  total?: string | number | null;
+  answered?: string | number | null;
+}
+
+/** Dòng danh sách thô từ SQL (snake_case từ SQL). */
+interface LessonCommentListRow {
+  id: string | number;
+  lesson_id: string | number;
+  user_id: string | number | null;
+  content: string;
+  created_at: Date | null;
+  updated_at: Date | null;
+  lesson_title: string;
+  course_id: string | number;
+  course_title: string;
+  user_name: string;
+  reply_count: string | number;
+  answered: boolean;
+}
+
 /** CTE dựng cây nhánh từ bình luận gốc — dùng chung cho stats và list. */
 const THREAD_CTE = `
   RECURSIVE roots AS (
@@ -127,8 +149,12 @@ export class GetInstructorLessonCommentsHandler
     `;
 
     const [statsRows, listRows] = await Promise.all([
-      this.commentRepo.query(statsSql, [instructorId, courseId, lessonId]),
-      this.commentRepo.query(listSql, [
+      this.commentRepo.query<LessonCommentStatsRow[]>(statsSql, [
+        instructorId,
+        courseId,
+        lessonId,
+      ]),
+      this.commentRepo.query<LessonCommentListRow[]>(listSql, [
         instructorId,
         courseId,
         lessonId,
@@ -154,7 +180,7 @@ export class GetInstructorLessonCommentsHandler
           : stats.total;
 
     return {
-      data: listRows.map((r: any) => this.toItem(r)),
+      data: listRows.map((r) => this.toItem(r)),
       stats,
       meta: {
         page,
@@ -165,7 +191,7 @@ export class GetInstructorLessonCommentsHandler
     };
   }
 
-  private toItem(row: any): InstructorLessonCommentItem {
+  private toItem(row: LessonCommentListRow): InstructorLessonCommentItem {
     return {
       id: Number(row.id),
       lessonId: Number(row.lesson_id),

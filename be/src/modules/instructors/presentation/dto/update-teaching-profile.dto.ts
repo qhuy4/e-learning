@@ -51,6 +51,6 @@ export class UpdateTeachingProfileDto {
   @IsOptional()
   @IsArray()
   @ArrayMaxSize(CEFR_LEVELS.length)
-  @IsIn(CEFR_LEVELS as unknown as string[], { each: true })
+  @IsIn(CEFR_LEVELS, { each: true })
   teachingLevels?: string[] | null;
 }

@@ -231,11 +231,11 @@ function extractCandidateName(text: string): string | null {
   // Bảng IELTS TRF tách họ và tên ra hai cột: "Family Name" + "First Name(s)".
   const family = extractAfterLabel(
     text,
-    /^family\s*name\s*[:\-]\s*([^\n]{1,60})/im,
+    /^family\s*name\s*[:-]\s*([^\n]{1,60})/im,
   );
   const given = extractAfterLabel(
     text,
-    /^first\s*name(?:\s*\(s\)|s)?\s*[:\-]\s*([^\n]{1,60})/im,
+    /^first\s*name(?:\s*\(s\)|s)?\s*[:-]\s*([^\n]{1,60})/im,
   );
   const fromColumns = cleanName([family, given].filter(Boolean).join(' '));
   if (fromColumns && !isBoilerplateName(fromColumns)) return fromColumns;
@@ -243,7 +243,7 @@ function extractCandidateName(text: string): string | null {
   // "This is to certify that\nJane Smith" — the form used on TOEIC score reports.
   const certified = extractAfterLabel(
     text,
-    /this\s+is\s+to\s+certify\s+that\s*[:\-]?\s*([^\n]{2,80})/i,
+    /this\s+is\s+to\s+certify\s+that\s*[:-]?\s*([^\n]{2,80})/i,
   );
   if (certified && !isBoilerplateName(certified)) {
     return cleanName(certified);
@@ -251,7 +251,7 @@ function extractCandidateName(text: string): string | null {
 
   const direct = extractAfterLabel(
     text,
-    /(?:candidate\s*name|full\s*name|name)\s*[:\-]?\s*([^\n]{2,80})/i,
+    /(?:candidate\s*name|full\s*name|name)\s*[:-]?\s*([^\n]{2,80})/i,
   );
   if (direct && !isBoilerplateName(direct)) {
     return cleanName(direct);
@@ -319,7 +319,7 @@ function extractIssuingOrganization(text: string): string | null {
   }
   const labeled = extractAfterLabel(
     text,
-    /(?:issued?\s*by|issuer|organis?ation|cấp\s*bởi)\s*[:\-]?\s*([^\n]{3,80})/i,
+    /(?:issued?\s*by|issuer|organis?ation|cấp\s*bởi)\s*[:-]?\s*([^\n]{3,80})/i,
   );
   return labeled;
 }
@@ -355,23 +355,23 @@ function extractIeltsScores(text: string): CertificateOcrScores {
 
   scores.listening = extractBandAfterLabel(
     text,
-    /(?:listening|nghe)\s*(?:score|band)?\s*[:\-]?\s*(\d(?:\.\d)?)/i,
+    /(?:listening|nghe)\s*(?:score|band)?\s*[:-]?\s*(\d(?:\.\d)?)/i,
   );
   scores.reading = extractBandAfterLabel(
     text,
-    /(?:reading|đọc)\s*(?:score|band)?\s*[:\-]?\s*(\d(?:\.\d)?)/i,
+    /(?:reading|đọc)\s*(?:score|band)?\s*[:-]?\s*(\d(?:\.\d)?)/i,
   );
   scores.writing = extractBandAfterLabel(
     text,
-    /(?:writing|viết)\s*(?:score|band)?\s*[:\-]?\s*(\d(?:\.\d)?)/i,
+    /(?:writing|viết)\s*(?:score|band)?\s*[:-]?\s*(\d(?:\.\d)?)/i,
   );
   scores.speaking = extractBandAfterLabel(
     text,
-    /(?:speaking|nói)\s*(?:score|band)?\s*[:\-]?\s*(\d(?:\.\d)?)/i,
+    /(?:speaking|nói)\s*(?:score|band)?\s*[:-]?\s*(\d(?:\.\d)?)/i,
   );
   scores.overall = extractBandAfterLabel(
     text,
-    /(?:overall(?:\s*band)?(?:\s*score)?|tổng\s*điểm(?:\s*band)?(?:\s*score)?|total(?:\s*band)?(?:\s*score)?)\s*[:\-]?\s*(\d(?:\.\d)?)/i,
+    /(?:overall(?:\s*band)?(?:\s*score)?|tổng\s*điểm(?:\s*band)?(?:\s*score)?|total(?:\s*band)?(?:\s*score)?)\s*[:-]?\s*(\d(?:\.\d)?)/i,
   );
 
   if (scores.overall == null) {
@@ -419,15 +419,15 @@ function extractToeicScores(text: string): CertificateOcrScores {
   };
 
   scores.listening = lineValue(
-    /\blistening\b\s*(?:score)?\s*[:\-]?\s*(\d{2,4})\b/i,
+    /\blistening\b\s*(?:score)?\s*[:-]?\s*(\d{2,4})\b/i,
     495,
   );
   scores.reading = lineValue(
-    /\breading\b\s*(?:score)?\s*[:\-]?\s*(\d{2,4})\b/i,
+    /\breading\b\s*(?:score)?\s*[:-]?\s*(\d{2,4})\b/i,
     495,
   );
   scores.overall = lineValue(
-    /\b(?:total|overall)\b\s*(?:score)?\s*[:\-]?\s*(\d{2,4})\b/i,
+    /\b(?:total|overall)\b\s*(?:score)?\s*[:-]?\s*(\d{2,4})\b/i,
     990,
   );
 
@@ -612,11 +612,11 @@ export function extractCertificateOcr(
   // stealing "date of birth".
   const testDate = extractDateAfterLabel(
     text,
-    /(?:test\s*date|date\s*of\s*test|exam\s*date|date(?!\s*of\s*birth))\s*[:\-]?\s*([^\n]{0,40})/i,
+    /(?:test\s*date|date\s*of\s*test|exam\s*date|date(?!\s*of\s*birth))\s*[:-]?\s*([^\n]{0,40})/i,
   );
   const dateOfBirth = extractDateAfterLabel(
     text,
-    /(?:date\s*of\s*birth|dob|birth\s*date)\s*[:\-]?\s*([^\n]{0,40})/i,
+    /(?:date\s*of\s*birth|dob|birth\s*date)\s*[:-]?\s*([^\n]{0,40})/i,
   );
   const testType = extractTestType(text);
   const issuingOrganization = extractIssuingOrganization(text);

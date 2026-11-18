@@ -17,6 +17,25 @@ export interface CasIdentityResponse {
   bankCode: string | null;
 }
 
+/** Response body linh hoạt của CAS exchange (nhiều shape khác nhau). */
+interface CasExchangeResponseBody {
+  accessToken?: string;
+  access_token?: string;
+  data?: { accessToken?: string };
+}
+
+/** Response body của CAS identity lookup. */
+interface CasIdentityResponseBody {
+  accounts?: Array<{ accountName?: string; accountNumber?: string | null }>;
+  fiService?: { code?: string | null };
+}
+
+/** Shape đọc message lỗi từ Axios error. */
+interface CasErrorResponse {
+  response?: { data?: { errorMessage?: string; message?: string } };
+  message?: string;
+}
+
 @Injectable()
 export class CasService {
   private readonly logger = new Logger(CasService.name);
@@ -40,7 +59,7 @@ export class CasService {
 
     try {
       const { data } = await firstValueFrom(
-        this.httpService.post(
+        this.httpService.post<CasGrantTokenResponse>(
           url,
           {
             scopes: 'identity',
@@ -57,7 +76,7 @@ export class CasService {
 
       return { grantToken: data.grantToken };
     } catch (error) {
-      const err = error as any;
+      const err = error as CasErrorResponse;
       const casMessage =
         err?.response?.data?.errorMessage ||
         err?.response?.data?.message ||
@@ -73,7 +92,7 @@ export class CasService {
 
     try {
       const { data } = await firstValueFrom(
-        this.httpService.post(
+        this.httpService.post<CasExchangeResponseBody>(
           url,
           { publicToken },
           { headers: this.commonHeaders },
@@ -82,15 +101,21 @@ export class CasService {
 
       this.logger.log(`Cas exchange response: ${JSON.stringify(data)}`);
 
-      const accessToken = data?.accessToken ?? data?.access_token ?? data?.data?.accessToken ?? '';
+      const accessToken =
+        data?.accessToken ??
+        data?.access_token ??
+        data?.data?.accessToken ??
+        '';
 
       if (!accessToken) {
-        throw new Error('Cas exchangePublicToken: missing accessToken in response');
+        throw new Error(
+          'Cas exchangePublicToken: missing accessToken in response',
+        );
       }
 
       return { accessToken };
     } catch (error) {
-      const err = error as any;
+      const err = error as CasErrorResponse;
       const casMessage =
         err?.response?.data?.errorMessage ||
         err?.response?.data?.message ||
@@ -106,7 +131,7 @@ export class CasService {
 
     try {
       const { data } = await firstValueFrom(
-        this.httpService.get(url, {
+        this.httpService.get<CasIdentityResponseBody>(url, {
           headers: {
             ...this.commonHeaders,
             Authorization: accessToken,
@@ -124,7 +149,7 @@ export class CasService {
         bankCode: data?.fiService?.code ?? null,
       };
     } catch (error) {
-      const err = error as any;
+      const err = error as CasErrorResponse;
 
       const casMessage =
         err?.response?.data?.errorMessage ||
@@ -140,7 +165,11 @@ export class CasService {
     }
   }
 
-  buildCasLinkUrl(grantToken: string, redirectUri: string, state?: string): string {
+  buildCasLinkUrl(
+    grantToken: string,
+    redirectUri: string,
+    state?: string,
+  ): string {
     let url = `${this.config.linkUrl}?grantToken=${encodeURIComponent(grantToken)}&redirectUri=${encodeURIComponent(redirectUri)}`;
     if (state) {
       url += `&state=${encodeURIComponent(state)}`;

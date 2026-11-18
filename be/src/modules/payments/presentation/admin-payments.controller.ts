@@ -1,4 +1,12 @@
-import { Controller, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetPaymentsQuery } from '@/modules/payments/application/query/get-payments.query';
 import { GetPaymentByIdQuery } from '@/modules/payments/application/query/get-payment-by-id.query';
@@ -31,7 +39,7 @@ export class AdminPaymentsController {
         status: status ? Number(status) : undefined,
         gateway,
         sortBy,
-        sortOrder: sortOrder as 'asc' | 'desc' | undefined,
+        sortOrder: sortOrder,
       }),
     );
   }
@@ -46,9 +54,7 @@ export class AdminPaymentsController {
     @Param('id', ParseIntPipe) id: number,
     @Query('reason') reason?: string,
   ) {
-    return this.commandBus.execute(
-      new RefundPaymentCommand({ id, reason }),
-    );
+    return this.commandBus.execute(new RefundPaymentCommand({ id, reason }));
   }
 
   @Post(':id/retry')

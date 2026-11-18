@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { RevenueSplitOrmEntity } from '@/modules/instructor-payouts/infrastructure/entity/revenue-split.orm-entity';
 import { IRevenueSplitRepository } from '@/modules/instructor-payouts/domain/repository/revenue-split.repository';
 import { RevenueSplitMapper } from '@/modules/instructor-payouts/infrastructure/mapper/revenue-split.mapper';
@@ -21,7 +21,15 @@ export class RevenueSplitRepository implements IRevenueSplitRepository {
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
   }) {
-    const { page, limit, instructorId, courseId, payoutStatus, sortBy, sortOrder } = options;
+    const {
+      page,
+      limit,
+      instructorId,
+      courseId,
+      payoutStatus,
+      sortBy,
+      sortOrder,
+    } = options;
 
     const query = this.repository
       .createQueryBuilder('rs')
@@ -47,8 +55,12 @@ export class RevenueSplitRepository implements IRevenueSplitRepository {
       createdAt: 'rs.created_at',
     };
 
-    const sortKey = sortBy && sortableColumns[sortBy] ? sortableColumns[sortBy] : 'rs.created_at';
-    const sortDirection: 'ASC' | 'DESC' = sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+    const sortKey =
+      sortBy && sortableColumns[sortBy]
+        ? sortableColumns[sortBy]
+        : 'rs.created_at';
+    const sortDirection: 'ASC' | 'DESC' =
+      sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
     query
       .orderBy(sortKey, sortDirection)
@@ -69,7 +81,9 @@ export class RevenueSplitRepository implements IRevenueSplitRepository {
     const query = this.repository.createQueryBuilder('rs');
 
     if (options.instructorId) {
-      query.andWhere('rs.instructor_id = :instructorId', { instructorId: options.instructorId });
+      query.andWhere('rs.instructor_id = :instructorId', {
+        instructorId: options.instructorId,
+      });
     }
 
     const result = await query
@@ -79,7 +93,12 @@ export class RevenueSplitRepository implements IRevenueSplitRepository {
         'COALESCE(SUM(rs.instructor_amount), 0)::numeric(14,2) AS "totalInstructorAmount"',
         'COUNT(*)::int AS "totalSplits"',
       ])
-      .getRawOne();
+      .getRawOne<{
+        totalGross: string;
+        totalPlatformFee: string;
+        totalInstructorAmount: string;
+        totalSplits: string;
+      }>();
 
     const pendingCount = await query
       .clone()

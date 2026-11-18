@@ -1,4 +1,4 @@
-import { IsNumber, IsString, IsDateString } from 'class-validator';
+import { IsNumber, IsDateString } from 'class-validator';
 
 export class CreatePayoutDto {
   @IsNumber()

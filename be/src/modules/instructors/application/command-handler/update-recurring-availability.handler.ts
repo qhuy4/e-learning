@@ -1,5 +1,4 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { ConflictException } from '@nestjs/common';
 import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';
 import { HttpStatus } from '@nestjs/common';
@@ -8,7 +7,9 @@ import { InstructorAvailabilityRecurringRepository } from '@/modules/instructors
 
 @CommandHandler(UpdateRecurringAvailabilityCommand)
 export class UpdateRecurringAvailabilityHandler implements ICommandHandler<UpdateRecurringAvailabilityCommand> {
-  constructor(private readonly repo: InstructorAvailabilityRecurringRepository) {}
+  constructor(
+    private readonly repo: InstructorAvailabilityRecurringRepository,
+  ) {}
 
   async execute(command: UpdateRecurringAvailabilityCommand) {
     const existing = await this.repo.findById(command.id);
