@@ -30,13 +30,12 @@ import {
   countExamQuestions,
   countSectionQuestions,
   type SeedExam,
-  type SeedGroup,
   type SeedQuestion,
 } from './seed-content/types';
 import { validateExamContent } from './seed-content/validate';
 
-// pg has no bundled TypeScript types in this project -> plain require.
-const { Client } = require('pg') as { Client: any };
+// pg has no bundled TypeScript types in this project (resolved as implicit any).
+import { Client } from 'pg';
 
 const ENV_PATH = path.resolve(__dirname, '../../.env');
 
@@ -289,40 +288,121 @@ const FORMATS: FormatDef[] = [
     typeName: 'TOEIC',
     name: 'TOEIC Format 2026',
     version: 'v1',
-    description: 'Định dạng bài thi TOEIC Listening & Reading — 7 Part (100 câu Nghe + 100 câu Đọc, 200 câu).',
+    description:
+      'Định dạng bài thi TOEIC Listening & Reading — 7 Part (100 câu Nghe + 100 câu Đọc, 200 câu).',
     durationSeconds: 7200,
     sections: [
-      { name: 'Part 1', description: 'Photographs — 6 câu nghe mô tả ảnh', questionCount: 6, durationSeconds: 300, sectionType: 'LISTENING' },
-      { name: 'Part 2', description: 'Question-Response — 25 câu hỏi và đáp', questionCount: 25, durationSeconds: 750, sectionType: 'LISTENING' },
-      { name: 'Part 3', description: 'Conversations — 13 hội thoại × 3 câu = 39', questionCount: 39, durationSeconds: 900, sectionType: 'LISTENING' },
-      { name: 'Part 4', description: 'Talks — 10 đoạn nói × 3 câu = 30', questionCount: 30, durationSeconds: 750, sectionType: 'LISTENING' },
-      { name: 'Part 5', description: 'Incomplete Sentences — 30 câu hoàn thành câu', questionCount: 30, durationSeconds: 900, sectionType: 'READING' },
-      { name: 'Part 6', description: 'Text Completion — 4 đoạn × 4 chỗ trống = 16', questionCount: 16, durationSeconds: 900, sectionType: 'READING' },
-      { name: 'Part 7', description: 'Reading Comprehension — 12 văn bản = 54 câu', questionCount: 54, durationSeconds: 2700, sectionType: 'READING' },
+      {
+        name: 'Part 1',
+        description: 'Photographs — 6 câu nghe mô tả ảnh',
+        questionCount: 6,
+        durationSeconds: 300,
+        sectionType: 'LISTENING',
+      },
+      {
+        name: 'Part 2',
+        description: 'Question-Response — 25 câu hỏi và đáp',
+        questionCount: 25,
+        durationSeconds: 750,
+        sectionType: 'LISTENING',
+      },
+      {
+        name: 'Part 3',
+        description: 'Conversations — 13 hội thoại × 3 câu = 39',
+        questionCount: 39,
+        durationSeconds: 900,
+        sectionType: 'LISTENING',
+      },
+      {
+        name: 'Part 4',
+        description: 'Talks — 10 đoạn nói × 3 câu = 30',
+        questionCount: 30,
+        durationSeconds: 750,
+        sectionType: 'LISTENING',
+      },
+      {
+        name: 'Part 5',
+        description: 'Incomplete Sentences — 30 câu hoàn thành câu',
+        questionCount: 30,
+        durationSeconds: 900,
+        sectionType: 'READING',
+      },
+      {
+        name: 'Part 6',
+        description: 'Text Completion — 4 đoạn × 4 chỗ trống = 16',
+        questionCount: 16,
+        durationSeconds: 900,
+        sectionType: 'READING',
+      },
+      {
+        name: 'Part 7',
+        description: 'Reading Comprehension — 12 văn bản = 54 câu',
+        questionCount: 54,
+        durationSeconds: 2700,
+        sectionType: 'READING',
+      },
     ],
   },
   {
     typeName: 'IELTS',
     name: 'IELTS Format 2026',
     version: 'v1',
-    description: 'Định dạng bài thi IELTS Academic (Listening, Reading, Writing, Speaking).',
+    description:
+      'Định dạng bài thi IELTS Academic (Listening, Reading, Writing, Speaking).',
     durationSeconds: 9600,
     sections: [
-      { name: 'Listening', description: 'Phần Nghe', questionCount: 40, durationSeconds: 1800, sectionType: 'LISTENING' },
-      { name: 'Reading', description: 'Phần Đọc', questionCount: 40, durationSeconds: 3600, sectionType: 'READING' },
-      { name: 'Writing', description: 'Phần Viết', questionCount: 2, durationSeconds: 3600, sectionType: 'WRITING' },
-      { name: 'Speaking', description: 'Phần Nói', questionCount: 17, durationSeconds: 900, sectionType: 'SPEAKING' },
+      {
+        name: 'Listening',
+        description: 'Phần Nghe',
+        questionCount: 40,
+        durationSeconds: 1800,
+        sectionType: 'LISTENING',
+      },
+      {
+        name: 'Reading',
+        description: 'Phần Đọc',
+        questionCount: 40,
+        durationSeconds: 3600,
+        sectionType: 'READING',
+      },
+      {
+        name: 'Writing',
+        description: 'Phần Viết',
+        questionCount: 2,
+        durationSeconds: 3600,
+        sectionType: 'WRITING',
+      },
+      {
+        name: 'Speaking',
+        description: 'Phần Nói',
+        questionCount: 17,
+        durationSeconds: 900,
+        sectionType: 'SPEAKING',
+      },
     ],
   },
   {
     typeName: 'GENERAL',
     name: 'Đề tổng hợp Format 2026',
     version: 'v1',
-    description: 'Định dạng đề tổng hợp kiểm tra kiến thức chung (Nghe hiểu + Đọc hiểu, 20 câu).',
+    description:
+      'Định dạng đề tổng hợp kiểm tra kiến thức chung (Nghe hiểu + Đọc hiểu, 20 câu).',
     durationSeconds: 1800,
     sections: [
-      { name: 'Nghe hiểu', description: 'Phần Nghe hiểu — đoạn ghi âm + câu hỏi', questionCount: 10, durationSeconds: 600, sectionType: 'LISTENING' },
-      { name: 'Đọc hiểu', description: 'Phần Đọc hiểu — câu hỏi kiến thức + đoạn văn', questionCount: 10, durationSeconds: 1200, sectionType: 'READING' },
+      {
+        name: 'Nghe hiểu',
+        description: 'Phần Nghe hiểu — đoạn ghi âm + câu hỏi',
+        questionCount: 10,
+        durationSeconds: 600,
+        sectionType: 'LISTENING',
+      },
+      {
+        name: 'Đọc hiểu',
+        description: 'Phần Đọc hiểu — câu hỏi kiến thức + đoạn văn',
+        questionCount: 10,
+        durationSeconds: 1200,
+        sectionType: 'READING',
+      },
     ],
   },
   // --- Định dạng cho các đề thi riêng từng kỹ năng (TOEIC Writing/Speaking, IELTS × 4).
@@ -330,20 +410,34 @@ const FORMATS: FormatDef[] = [
     typeName: 'TOEIC',
     name: 'TOEIC Writing Format 2026',
     version: 'v1',
-    description: 'Định dạng bài thi TOEIC Writing — 8 task viết (mô tả tranh, phản hồi email, bài luận).',
+    description:
+      'Định dạng bài thi TOEIC Writing — 8 task viết (mô tả tranh, phản hồi email, bài luận).',
     durationSeconds: 3600,
     sections: [
-      { name: 'Writing', description: '8 task viết — trả lời bằng ô văn bản, chấm theo rubric', questionCount: 8, durationSeconds: 3600, sectionType: 'WRITING' },
+      {
+        name: 'Writing',
+        description: '8 task viết — trả lời bằng ô văn bản, chấm theo rubric',
+        questionCount: 8,
+        durationSeconds: 3600,
+        sectionType: 'WRITING',
+      },
     ],
   },
   {
     typeName: 'TOEIC',
     name: 'TOEIC Speaking Format 2026',
     version: 'v1',
-    description: 'Định dạng bài thi TOEIC Speaking — 11 task nói (Read Aloud, Describe Picture, Respond, Opinion).',
+    description:
+      'Định dạng bài thi TOEIC Speaking — 11 task nói (Read Aloud, Describe Picture, Respond, Opinion).',
     durationSeconds: 1200,
     sections: [
-      { name: 'Speaking', description: '11 task nói — ghi âm từng task, đếm giờ chuẩn ETS', questionCount: 11, durationSeconds: 1200, sectionType: 'SPEAKING' },
+      {
+        name: 'Speaking',
+        description: '11 task nói — ghi âm từng task, đếm giờ chuẩn ETS',
+        questionCount: 11,
+        durationSeconds: 1200,
+        sectionType: 'SPEAKING',
+      },
     ],
   },
   {
@@ -353,7 +447,13 @@ const FORMATS: FormatDef[] = [
     description: 'Định dạng bài thi IELTS Listening — 4 section × 10 câu.',
     durationSeconds: 1800,
     sections: [
-      { name: 'Listening', description: '4 section × 10 câu — audio + transcript', questionCount: 40, durationSeconds: 1800, sectionType: 'LISTENING' },
+      {
+        name: 'Listening',
+        description: '4 section × 10 câu — audio + transcript',
+        questionCount: 40,
+        durationSeconds: 1800,
+        sectionType: 'LISTENING',
+      },
     ],
   },
   {
@@ -363,27 +463,49 @@ const FORMATS: FormatDef[] = [
     description: 'Định dạng bài thi IELTS Reading — 3 passage, 40 câu.',
     durationSeconds: 3600,
     sections: [
-      { name: 'Reading', description: '3 passage (13 + 13 + 14) — cột bài đọc và câu hỏi cuộn độc lập', questionCount: 40, durationSeconds: 3600, sectionType: 'READING' },
+      {
+        name: 'Reading',
+        description:
+          '3 passage (13 + 13 + 14) — cột bài đọc và câu hỏi cuộn độc lập',
+        questionCount: 40,
+        durationSeconds: 3600,
+        sectionType: 'READING',
+      },
     ],
   },
   {
     typeName: 'IELTS',
     name: 'IELTS Writing Format 2026',
     version: 'v1',
-    description: 'Định dạng bài thi IELTS Writing — Task 1 (150+ từ) + Task 2 (250+ từ).',
+    description:
+      'Định dạng bài thi IELTS Writing — Task 1 (150+ từ) + Task 2 (250+ từ).',
     durationSeconds: 3600,
     sections: [
-      { name: 'Writing', description: 'Task 1 biểu đồ + Task 2 essay — ô soạn thảo kèm đếm từ', questionCount: 2, durationSeconds: 3600, sectionType: 'WRITING' },
+      {
+        name: 'Writing',
+        description: 'Task 1 biểu đồ + Task 2 essay — ô soạn thảo kèm đếm từ',
+        questionCount: 2,
+        durationSeconds: 3600,
+        sectionType: 'WRITING',
+      },
     ],
   },
   {
     typeName: 'IELTS',
     name: 'IELTS Speaking Format 2026',
     version: 'v1',
-    description: 'Định dạng bài thi IELTS Speaking — Part 1 / Part 2 (cue card) / Part 3.',
+    description:
+      'Định dạng bài thi IELTS Speaking — Part 1 / Part 2 (cue card) / Part 3.',
     durationSeconds: 900,
     sections: [
-      { name: 'Speaking', description: '3 phần — Part 2 có cue card, 1 phút chuẩn bị / 2 phút nói', questionCount: 17, durationSeconds: 900, sectionType: 'SPEAKING' },
+      {
+        name: 'Speaking',
+        description:
+          '3 phần — Part 2 có cue card, 1 phút chuẩn bị / 2 phút nói',
+        questionCount: 17,
+        durationSeconds: 900,
+        sectionType: 'SPEAKING',
+      },
     ],
   },
 ];
@@ -428,7 +550,10 @@ interface InsertStats {
 async function insertExam(
   client: any,
   exam: SeedExam,
-  registry: { formatId: number; sections: Record<string, { id: number; sectionType: string | null }> },
+  registry: {
+    formatId: number;
+    sections: Record<string, { id: number; sectionType: string | null }>;
+  },
 ): Promise<InsertStats> {
   const stats: InsertStats = {
     sections: 0,
@@ -442,7 +567,13 @@ async function insertExam(
   const examRes = await client.query(
     `INSERT INTO exams (exam_format_id, title, description, is_premium, duration_seconds, status, created_by, published_at)
      VALUES ($1, $2, $3, $4, $5, 'PUBLISHED', NULL, NOW()) RETURNING id`,
-    [registry.formatId, exam.title, exam.description, exam.isPremium ?? false, exam.durationSeconds],
+    [
+      registry.formatId,
+      exam.title,
+      exam.description,
+      exam.isPremium ?? false,
+      exam.durationSeconds,
+    ],
   );
   const examId = Number(examRes.rows[0].id);
 
@@ -526,7 +657,13 @@ async function insertExam(
       const groupRes = await client.query(
         `INSERT INTO exam_question_groups (section_id, group_type, title, instructions, position)
          VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-        [sectionId, group.groupType ?? 'CUSTOM', group.title ?? null, group.instructions ?? null, groupPosition],
+        [
+          sectionId,
+          group.groupType ?? 'CUSTOM',
+          group.title ?? null,
+          group.instructions ?? null,
+          groupPosition,
+        ],
       );
       const groupId = Number(groupRes.rows[0].id);
       stats.groups++;
@@ -579,11 +716,16 @@ async function main() {
     const gradable = exam.sections.reduce(
       (n, s) =>
         n +
-        (s.questions ?? []).filter((q) => q.options?.length || q.answers?.length).length +
+        (s.questions ?? []).filter(
+          (q) => q.options?.length || q.answers?.length,
+        ).length +
         (s.groups ?? []).reduce(
-          (m, g) => m + g.questions.filter((q) => q.options?.length || q.answers?.length).length,
+          (m, g) =>
+            m +
+            g.questions.filter((q) => q.options?.length || q.answers?.length)
+              .length,
           0,
-      ),
+        ),
       0,
     );
     console.log(
@@ -620,7 +762,9 @@ async function main() {
     for (const sql of SCHEMA_STATEMENTS) {
       await client.query(sql);
     }
-    console.log('[schema] exam tables ensured (CREATE TABLE IF NOT EXISTS + column patches).');
+    console.log(
+      '[schema] exam tables ensured (CREATE TABLE IF NOT EXISTS + column patches).',
+    );
 
     // 2) Exam types.
     const typeIds: Record<string, number> = {};
@@ -639,16 +783,34 @@ async function main() {
 
     // 3) Formats + format sections (một registry cho MỖI format — key = tên format,
     //    vì một type giờ có nhiều format: TOEIC L&R / Writing / Speaking, IELTS × 5).
-    const formatRegistry: Record<string, { formatId: number; sections: Record<string, { id: number; sectionType: string | null }> }> = {};
+    const formatRegistry: Record<
+      string,
+      {
+        formatId: number;
+        sections: Record<string, { id: number; sectionType: string | null }>;
+      }
+    > = {};
     const defaultFormatName: Record<string, string> = {};
     for (const format of FORMATS) {
       const typeId = typeIds[format.typeName];
-      let formatId = await getIdByName(client, 'exam_formats', format.name, ' AND exam_type_id = $2', [typeId]);
+      let formatId = await getIdByName(
+        client,
+        'exam_formats',
+        format.name,
+        ' AND exam_type_id = $2',
+        [typeId],
+      );
       if (formatId === null) {
         const res = await client.query(
           `INSERT INTO exam_formats (exam_type_id, name, version, description, duration_seconds, is_active)
            VALUES ($1, $2, $3, $4, $5, TRUE) RETURNING id`,
-          [typeId, format.name, format.version, format.description, format.durationSeconds],
+          [
+            typeId,
+            format.name,
+            format.version,
+            format.description,
+            format.durationSeconds,
+          ],
         );
         formatId = Number(res.rows[0].id);
         created.formats++;
@@ -658,7 +820,12 @@ async function main() {
         await client.query(
           `UPDATE exam_formats SET version = $2, description = $3, duration_seconds = $4, updated_at = NOW()
             WHERE id = $1`,
-          [formatId, format.version, format.description, format.durationSeconds],
+          [
+            formatId,
+            format.version,
+            format.description,
+            format.durationSeconds,
+          ],
         );
       }
 
@@ -676,16 +843,30 @@ async function main() {
         [formatId],
       );
 
-      const sections: Record<string, { id: number; sectionType: string | null }> = {};
+      const sections: Record<
+        string,
+        { id: number; sectionType: string | null }
+      > = {};
       let position = 1;
       for (const section of format.sections) {
         const res = await client.query(
           `INSERT INTO exam_format_sections
              (exam_format_id, name, description, position, duration_seconds, question_count, section_type)
            VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-          [formatId, section.name, section.description, position, section.durationSeconds, section.questionCount, section.sectionType],
+          [
+            formatId,
+            section.name,
+            section.description,
+            position,
+            section.durationSeconds,
+            section.questionCount,
+            section.sectionType,
+          ],
         );
-        sections[section.name] = { id: Number(res.rows[0].id), sectionType: section.sectionType };
+        sections[section.name] = {
+          id: Number(res.rows[0].id),
+          sectionType: section.sectionType,
+        };
         created.formatSections++;
         position++;
       }
@@ -735,7 +916,10 @@ async function main() {
     }
 
     // 6) Demo student account (role STUDENT = 3, ACTIVE = 1).
-    const userExists = await client.query('SELECT id FROM users WHERE email = $1', [DEMO_STUDENT.email]);
+    const userExists = await client.query(
+      'SELECT id FROM users WHERE email = $1',
+      [DEMO_STUDENT.email],
+    );
     if (!userExists.rows.length) {
       const hash = bcrypt.hashSync(DEMO_STUDENT.password, 10);
       await client.query(
@@ -784,8 +968,12 @@ async function main() {
     console.log(`questions       (DB)     : ${live.questions}`);
     console.log(`options         (DB)     : ${live.options}`);
     console.log(`attempts        (DB)     : ${live.attempts}`);
-    console.log(`trắc nghiệm chấm tự động : ${created.gradable}/${created.questions}`);
-    console.log(`demo credentials         : ${DEMO_STUDENT.email} / ${DEMO_STUDENT.password}`);
+    console.log(
+      `trắc nghiệm chấm tự động : ${created.gradable}/${created.questions}`,
+    );
+    console.log(
+      `demo credentials         : ${DEMO_STUDENT.email} / ${DEMO_STUDENT.password}`,
+    );
     console.log('==================================');
   } finally {
     await client.end();

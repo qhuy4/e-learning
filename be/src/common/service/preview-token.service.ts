@@ -5,7 +5,7 @@ import { UserRole } from '@/modules/users/domain/enum/user.role';
 export interface CoursePreviewPayload {
   courseId: number;
   userId: number;
-  role: UserRole | number;
+  role: UserRole;
   type: string;
 }
 
@@ -16,7 +16,7 @@ export class PreviewTokenService {
   generateCoursePreviewToken(
     courseId: number,
     userId: number | null | undefined,
-    role: UserRole | number,
+    role: UserRole,
   ): string {
     return this.jwtService.sign(
       {

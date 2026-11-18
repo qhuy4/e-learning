@@ -44,7 +44,7 @@ export class StorageController {
       });
 
       return res.redirect(downloadUrl);
-    } catch (error) {
+    } catch {
       throw new NotFoundException('File not found');
     }
   }

@@ -90,7 +90,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     });
   }
 
-  private getHttpErrorCode(status: number): string {
+  private getHttpErrorCode(status: HttpStatus): string {
     switch (status) {
       case HttpStatus.BAD_REQUEST:
         return 'BAD_REQUEST';
