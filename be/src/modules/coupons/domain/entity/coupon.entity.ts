@@ -2,6 +2,20 @@ import { CouponType } from '@/modules/coupons/domain/enum/coupon-type.enum';
 import { CouponScope } from '@/modules/coupons/domain/enum/coupon-scope.enum';
 import { CouponOwnerType } from '@/modules/coupons/domain/enum/coupon-owner-type.enum';
 
+/** Khóa học áp dụng mã — `title/thumbnail/price` chỉ có khi relation `course` được load. */
+export interface CouponCourseInfo {
+  id: number;
+  title?: string;
+  thumbnail?: string | null;
+  price?: number;
+}
+
+/** Người tạo mã (relation `creator`). */
+export interface CouponCreatorInfo {
+  id: number;
+  name: string;
+}
+
 export class Coupon {
   private constructor(
     public readonly id: number | null,
@@ -22,8 +36,8 @@ export class Coupon {
     public readonly validUntil: Date | null,
     public readonly createdAt: Date | null,
     public readonly updatedAt: Date | null,
-    public courses?: any[],
-    public creator?: any,
+    public courses?: CouponCourseInfo[],
+    public creator?: CouponCreatorInfo,
   ) {}
 
   static restore(params: {
@@ -45,8 +59,8 @@ export class Coupon {
     validUntil: Date | null;
     createdAt: Date | null;
     updatedAt: Date | null;
-    courses?: any[];
-    creator?: any;
+    courses?: CouponCourseInfo[];
+    creator?: CouponCreatorInfo;
   }): Coupon {
     return new Coupon(
       params.id,

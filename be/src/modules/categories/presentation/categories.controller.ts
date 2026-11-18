@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, IsNull } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CategoryOrmEntity } from '@/modules/categories/infrastructure/entity/category.orm-entity';
 
 @Controller('categories')
@@ -35,7 +35,11 @@ export class CategoriesController {
           id: parent.id,
           name: parent.name,
           slug: parent.slug,
-          children: children.map((c) => ({ id: c.id, name: c.name, slug: c.slug })),
+          children: children.map((c) => ({
+            id: c.id,
+            name: c.name,
+            slug: c.slug,
+          })),
         };
       }),
     );

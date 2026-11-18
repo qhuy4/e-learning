@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, IsNull, Brackets } from 'typeorm';
+import { Repository, Brackets } from 'typeorm';
 import { CategoryOrmEntity } from '@/modules/categories/infrastructure/entity/category.orm-entity';
 import { CategoryCourseOrmEntity } from '@/modules/categories/infrastructure/entity/category-course.orm-entity';
 import { ICategoryRepository } from '@/modules/categories/domain/repository/category.repository';
@@ -31,8 +31,9 @@ export class CategoryRepository implements ICategoryRepository {
     if (keyword) {
       query.andWhere(
         new Brackets((qb) => {
-          qb.where('cat.name ILIKE :keyword', { keyword: `%${keyword}%` })
-            .orWhere('cat.slug ILIKE :keyword', { keyword: `%${keyword}%` });
+          qb.where('cat.name ILIKE :keyword', {
+            keyword: `%${keyword}%`,
+          }).orWhere('cat.slug ILIKE :keyword', { keyword: `%${keyword}%` });
         }),
       );
     }
@@ -145,11 +146,19 @@ export class CategoryRepository implements ICategoryRepository {
 
   async delete(id: number) {
     // Move children to parent before delete
-    const entity = await this.repository.findOne({ where: { id: id.toString() } });
+    const entity = await this.repository.findOne({
+      where: { id: id.toString() },
+    });
     if (entity?.parentId) {
-      await this.repository.update({ parentId: id.toString() }, { parentId: entity.parentId });
+      await this.repository.update(
+        { parentId: id.toString() },
+        { parentId: entity.parentId },
+      );
     } else {
-      await this.repository.update({ parentId: id.toString() }, { parentId: null });
+      await this.repository.update(
+        { parentId: id.toString() },
+        { parentId: null },
+      );
     }
     await this.repository.delete(id.toString());
   }

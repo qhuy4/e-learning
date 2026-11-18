@@ -10,7 +10,7 @@ export class UpdateCategoryDto {
   slug?: string;
 
   @IsOptional()
-  @ValidateIf((o) => o.parentId != null)
+  @ValidateIf((o: UpdateCategoryDto) => o.parentId != null)
   @IsNumber()
   parentId?: number | null;
 }

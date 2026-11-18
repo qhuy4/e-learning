@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { BookingOrmEntity } from '@/modules/bookings/infrastructure/entity/booking.orm-entity';
+import { BookingPaymentStatus } from '@/modules/bookings/domain/enum/booking-payment-status.enum';
 
 /** Gateway transaction for a paid 1:1 booking. Kept separate from course orders. */
 @Entity('booking_payments')
@@ -22,7 +23,7 @@ export class BookingPaymentOrmEntity {
   gateway: string;
 
   @Column({ type: 'smallint', default: 1 })
-  status: number;
+  status: BookingPaymentStatus;
 
   @Column({ type: 'numeric', precision: 12, scale: 2 })
   amount: number;

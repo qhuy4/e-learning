@@ -1,9 +1,11 @@
 import { ICommandHandler, CommandHandler } from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
 import { DeleteCouponCommand } from '@/modules/coupons/application/command/delete-coupon.command';
-import { ICouponRepository, COUPON_REPOSITORY } from '@/modules/coupons/domain/repository/coupon.repository';
+import {
+  ICouponRepository,
+  COUPON_REPOSITORY,
+} from '@/modules/coupons/domain/repository/coupon.repository';
 import { ErrorCode } from '@/common/enum/error-code.enum';
-import { ERROR_MESSAGES } from '@/common/constants/error.message';
 import { AppException } from '@/common/exception/app.exception';
 
 @CommandHandler(DeleteCouponCommand)

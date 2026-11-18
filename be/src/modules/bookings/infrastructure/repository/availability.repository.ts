@@ -6,11 +6,7 @@ import { BookingOrmEntity } from '@/modules/bookings/infrastructure/entity/booki
 import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
 import { InstructorAvailabilityRecurringOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-availability-recurring.orm.entity';
 import { InstructorAvailabilityExceptionOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-availability-exception.orm.entity';
-import {
-  formatNextAvailableDisplay,
-  getVNDateTimeParts,
-  parseDateOnly,
-} from '@/common/utils/helper.util';
+import { getVNDateTimeParts, parseDateOnly } from '@/common/utils/helper.util';
 import { BookingStatusEnum } from '@/modules/bookings/domain/enum/booking-status.enum';
 
 function toMinutes(time: string): number {
@@ -24,9 +20,9 @@ function normalizeTime(time: string): string {
 
 /** A checkout holds its slot only while the VNPay link is valid (15 minutes). */
 function blocksSlot(booking: BookingOrmEntity): boolean {
-  if (Number(booking.status) === BookingStatusEnum.CONFIRMED) return true;
+  if (booking.status === BookingStatusEnum.CONFIRMED) return true;
   return (
-    Number(booking.status) === BookingStatusEnum.PENDING &&
+    booking.status === BookingStatusEnum.PENDING &&
     booking.created_at.getTime() > Date.now() - 15 * 60 * 1000
   );
 }
@@ -197,12 +193,11 @@ export class AvailabilityRepository {
       .leftJoinAndSelect('teacher.reviews', 'review')
       .where('teacher.id IN (:...teacherIds)', { teacherIds })
       .getMany();
-    console.log(teachers)
+    console.log(teachers);
     return {
       data: teachers.map((item) => ({
         id: item.id,
-        name: item.name
-
+        name: item.name,
       })),
       meta: {
         total,
@@ -237,16 +232,22 @@ export class AvailabilityRepository {
     const nowMinutes = toMinutes(currentTimeStr);
 
     const [recurring, exceptions, bookings] = await Promise.all([
-      this.userRepository.manager.find(InstructorAvailabilityRecurringOrmEntity, {
-        where: {
-          instructor_id: instructorId,
-          day_of_week: dayOfWeek,
-          is_active: true,
+      this.userRepository.manager.find(
+        InstructorAvailabilityRecurringOrmEntity,
+        {
+          where: {
+            instructor_id: instructorId,
+            day_of_week: dayOfWeek,
+            is_active: true,
+          },
         },
-      }),
-      this.userRepository.manager.find(InstructorAvailabilityExceptionOrmEntity, {
-        where: { instructor_id: instructorId, specific_date: bookingDate },
-      }),
+      ),
+      this.userRepository.manager.find(
+        InstructorAvailabilityExceptionOrmEntity,
+        {
+          where: { instructor_id: instructorId, specific_date: bookingDate },
+        },
+      ),
       this.bookingRepository.find({
         where: {
           instructor_id: instructorId,
@@ -306,8 +307,7 @@ export class AvailabilityRepository {
 
       const blockedByBooking = activeBookings.some(
         (b) =>
-          toMinutes(b.start_time) < endMin &&
-          toMinutes(b.end_time) > startMin,
+          toMinutes(b.start_time) < endMin && toMinutes(b.end_time) > startMin,
       );
       result[slot] = !blockedByBooking;
     }
@@ -340,16 +340,22 @@ export class AvailabilityRepository {
     const today = getVNDateTimeParts().dateStr;
 
     const [recurring, exceptions, bookings] = await Promise.all([
-      this.userRepository.manager.find(InstructorAvailabilityRecurringOrmEntity, {
-        where: {
-          instructor_id: instructorId,
-          day_of_week: dayOfWeek,
-          is_active: true,
+      this.userRepository.manager.find(
+        InstructorAvailabilityRecurringOrmEntity,
+        {
+          where: {
+            instructor_id: instructorId,
+            day_of_week: dayOfWeek,
+            is_active: true,
+          },
         },
-      }),
-      this.userRepository.manager.find(InstructorAvailabilityExceptionOrmEntity, {
-        where: { instructor_id: instructorId, specific_date: date },
-      }),
+      ),
+      this.userRepository.manager.find(
+        InstructorAvailabilityExceptionOrmEntity,
+        {
+          where: { instructor_id: instructorId, specific_date: date },
+        },
+      ),
       this.bookingRepository.find({
         where: { instructor_id: instructorId, booking_date: date },
       }),
@@ -385,7 +391,7 @@ export class AvailabilityRepository {
     }
 
     let windowStart = Math.min(...starts);
-    let windowEnd = Math.max(...ends);
+    const windowEnd = Math.max(...ends);
 
     const busy: { start: string; end: string }[] = [];
 

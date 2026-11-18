@@ -70,7 +70,14 @@ export class BookingPaymentCallbackController {
   @Get('vnpay')
   async handleVnpayCallback(@Req() req: Request, @Res() res: Response) {
     const query = Object.fromEntries(
-      Object.entries(req.query).map(([key, value]) => [key, String(value)]),
+      Object.entries(req.query).map(([key, value]) => [
+        key,
+        typeof value === 'string'
+          ? value
+          : Array.isArray(value)
+            ? value.map((v) => (typeof v === 'string' ? v : '')).join(',')
+            : '',
+      ]),
     );
     const result = await this.checkoutService.processVnpayCallback(query);
     const params = new URLSearchParams({

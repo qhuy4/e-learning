@@ -8,7 +8,7 @@ export class CreateCategoryDto {
   slug: string;
 
   @IsOptional()
-  @ValidateIf((o) => o.parentId != null)
+  @ValidateIf((o: CreateCategoryDto) => o.parentId != null)
   @IsNumber()
   parentId?: number | null;
 }

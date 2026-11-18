@@ -17,6 +17,10 @@ import { UpdateCategoryCommand } from '@/modules/categories/application/command/
 import { DeleteCategoryCommand } from '@/modules/categories/application/command/delete-category.command';
 import { CreateCategoryDto } from '@/modules/categories/presentation/dto/create-category.dto';
 import { UpdateCategoryDto } from '@/modules/categories/presentation/dto/update-category.dto';
+import {
+  AdminCategoriesPage,
+  CategoryItem,
+} from '@/modules/categories/domain/repository/category.repository';
 
 @Controller('admin/categories')
 export class AdminCategoriesController {
@@ -33,7 +37,7 @@ export class AdminCategoriesController {
     @Query('parentId') parentId?: string,
     @Query('getAll') getAll?: string,
   ) {
-    return this.queryBus.execute(
+    return this.queryBus.execute<GetAdminCategoriesQuery, AdminCategoriesPage>(
       new GetAdminCategoriesQuery({
         page: page ? parseInt(page, 10) : 1,
         limit: limit ? parseInt(limit, 10) : 50,
@@ -46,12 +50,14 @@ export class AdminCategoriesController {
 
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.queryBus.execute(new GetAdminCategoryByIdQuery({ id }));
+    return this.queryBus.execute<GetAdminCategoryByIdQuery, CategoryItem>(
+      new GetAdminCategoryByIdQuery({ id }),
+    );
   }
 
   @Post()
   async create(@Body() dto: CreateCategoryDto) {
-    return this.commandBus.execute(
+    return this.commandBus.execute<CreateCategoryCommand, CategoryItem | null>(
       new CreateCategoryCommand({
         name: dto.name,
         slug: dto.slug,
@@ -62,7 +68,7 @@ export class AdminCategoriesController {
 
   @Patch(':id')
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateCategoryDto) {
-    return this.commandBus.execute(
+    return this.commandBus.execute<UpdateCategoryCommand, CategoryItem | null>(
       new UpdateCategoryCommand({
         id,
         name: dto.name,

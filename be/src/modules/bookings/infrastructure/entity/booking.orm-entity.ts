@@ -10,6 +10,8 @@ import {
 } from 'typeorm';
 import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
 import { MeetingRoomOrmEntity } from '@/modules/bookings/infrastructure/entity/meeting-room.orm-entity';
+import { BookingStatusEnum } from '@/modules/bookings/domain/enum/booking-status.enum';
+import { BookingPaymentStatus } from '@/modules/bookings/domain/enum/booking-payment-status.enum';
 
 @Entity('bookings')
 export class BookingOrmEntity {
@@ -32,7 +34,7 @@ export class BookingOrmEntity {
   end_time: string;
 
   @Column({ type: 'smallint', default: 1 })
-  status: number;
+  status: BookingStatusEnum;
 
   @Column({ type: 'text', nullable: true })
   notes: string | null;
@@ -44,7 +46,7 @@ export class BookingOrmEntity {
   total_amount: number;
 
   @Column({ name: 'payment_status', type: 'smallint', default: 1 })
-  payment_status: number;
+  payment_status: BookingPaymentStatus;
 
   @Column({ name: 'payment_reference', type: 'varchar', length: 64, nullable: true })
   payment_reference: string | null;

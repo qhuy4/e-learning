@@ -1,9 +1,11 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { Inject, HttpStatus } from '@nestjs/common';
 import { GetAdminCouponByIdQuery } from '@/modules/coupons/application/query/get-admin-coupon-by-id.query';
-import { ICouponRepository, COUPON_REPOSITORY } from '@/modules/coupons/domain/repository/coupon.repository';
+import {
+  ICouponRepository,
+  COUPON_REPOSITORY,
+} from '@/modules/coupons/domain/repository/coupon.repository';
 import { ErrorCode } from '@/common/enum/error-code.enum';
-import { ERROR_MESSAGES } from '@/common/constants/error.message';
 import { AppException } from '@/common/exception/app.exception';
 
 @QueryHandler(GetAdminCouponByIdQuery)

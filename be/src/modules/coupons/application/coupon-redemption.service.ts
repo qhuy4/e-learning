@@ -117,9 +117,7 @@ export class CouponRedemptionService {
 
     // Scope: nếu mã chỉ áp dụng cho vài khóa học nhất định
     if (courseId != null && coupon.scope === CouponScope.SPECIFIC_COURSES) {
-      const courseIds = (coupon.courses ?? []).map((c: any) =>
-        Number(c?.id ?? c?.courseId ?? c),
-      );
+      const courseIds = (coupon.courses ?? []).map((c) => Number(c.id));
       if (!courseIds.includes(Number(courseId))) {
         throw new BadRequestException('Mã giảm giá không áp dụng cho khóa học này');
       }

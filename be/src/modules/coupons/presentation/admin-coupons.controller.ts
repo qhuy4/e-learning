@@ -22,6 +22,9 @@ import { ToggleCouponActiveCommand } from '@/modules/coupons/application/command
 import { CreateCouponDto } from '@/modules/coupons/presentation/dto/create-coupon.dto';
 import { UpdateCouponDto } from '@/modules/coupons/presentation/dto/update-coupon.dto';
 import { AdminCouponListResponseMapper } from '@/modules/coupons/presentation/mapper/admin-coupon-list-response.mapper';
+import { AuthenticatedUser } from '@/common/decorators/current-user.decorator';
+import { Coupon } from '@/modules/coupons/domain/entity/coupon.entity';
+import { AdminCouponsPage } from '@/modules/coupons/domain/repository/coupon.repository';
 
 @Controller('admin/coupons')
 @UseGuards(JwtAuthGuard)
@@ -41,7 +44,7 @@ export class AdminCouponsController {
     @Query('sortBy') sortBy?: string,
     @Query('sortOrder') sortOrder?: 'asc' | 'desc',
   ) {
-    const result = await this.queryBus.execute(
+    const result = await this.queryBus.execute<GetAdminCouponsQuery, AdminCouponsPage>(
       new GetAdminCouponsQuery({
         page: page ? parseInt(page, 10) : 1,
         limit: limit ? parseInt(limit, 10) : 10,
@@ -54,20 +57,22 @@ export class AdminCouponsController {
     );
 
     return {
-      data: result.data.map((coupon: any) => AdminCouponListResponseMapper.toResponse(coupon)),
+      data: result.data.map((coupon) => AdminCouponListResponseMapper.toResponse(coupon)),
       meta: result.meta,
     };
   }
 
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    const coupon = await this.queryBus.execute(new GetAdminCouponByIdQuery({ id }));
+    const coupon = await this.queryBus.execute<GetAdminCouponByIdQuery, Coupon>(
+      new GetAdminCouponByIdQuery({ id }),
+    );
     return AdminCouponListResponseMapper.toResponse(coupon);
   }
 
   @Post()
-  async create(@Body() dto: CreateCouponDto, @Request() req: any) {
-    const coupon = await this.commandBus.execute(
+  async create(@Body() dto: CreateCouponDto, @Request() req: { user: AuthenticatedUser }) {
+    const coupon = await this.commandBus.execute<CreateCouponCommand, Coupon>(
       new CreateCouponCommand({
         createdBy: req.user.id,
         code: dto.code,
@@ -90,7 +95,7 @@ export class AdminCouponsController {
 
   @Patch(':id')
   async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateCouponDto) {
-    const coupon = await this.commandBus.execute(
+    const coupon = await this.commandBus.execute<UpdateCouponCommand, Coupon>(
       new UpdateCouponCommand({
         id,
         code: dto.code,
@@ -112,7 +117,9 @@ export class AdminCouponsController {
 
   @Patch(':id/toggle')
   async toggleActive(@Param('id', ParseIntPipe) id: number) {
-    const coupon = await this.commandBus.execute(new ToggleCouponActiveCommand({ id }));
+    const coupon = await this.commandBus.execute<ToggleCouponActiveCommand, Coupon>(
+      new ToggleCouponActiveCommand({ id }),
+    );
     return AdminCouponListResponseMapper.toResponse(coupon);
   }
 
