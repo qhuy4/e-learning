@@ -189,7 +189,12 @@ export class ExamImportNormalizer {
     ctx: ExamImportContext,
   ): { data: NormalizedExamImport; warnings: ImportIssue[] } {
     const warnings: ImportIssue[] = [];
-    const warn = (code: string, message: string, path = '', excelRow?: number | null) =>
+    const warn = (
+      code: string,
+      message: string,
+      path = '',
+      excelRow?: number | null,
+    ) =>
       warnings.push({
         severity: 'warning',
         code,
@@ -226,7 +231,13 @@ export class ExamImportNormalizer {
     ): GroupDraft => {
       let g = section.groups.get(name);
       if (!g) {
-        g = { name, groupTypeRaw: null, materials: [], questions: [], sourceRow };
+        g = {
+          name,
+          groupTypeRaw: null,
+          materials: [],
+          questions: [],
+          sourceRow,
+        };
         section.groups.set(name, g);
       }
       if (rowTypeRaw) {
@@ -248,7 +259,9 @@ export class ExamImportNormalizer {
       // pre-filled) carry no content yet — skip them without noise.
       const hasContent = Object.entries(row).some(
         ([key, value]) =>
-          key !== 'section' && !isMetaKey(key) && String(value ?? '').trim() !== '',
+          key !== 'section' &&
+          !isMetaKey(key) &&
+          String(value ?? '').trim() !== '',
       );
       if (!hasContent) return;
 
@@ -342,7 +355,8 @@ export class ExamImportNormalizer {
       let questionType: QuestionType;
       if (typeRaw) {
         const canonical = foldKey(typeRaw);
-        questionType = QUESTION_TYPE_ALIAS[canonical] ?? (canonical as QuestionType);
+        questionType =
+          QUESTION_TYPE_ALIAS[canonical] ?? (canonical as QuestionType);
       } else {
         questionType =
           mapper?.inferQuestionType(
@@ -372,7 +386,8 @@ export class ExamImportNormalizer {
           (row.groupType ?? '').trim(),
           sourceRow,
         );
-        question.position = parsePosition(row.position) ?? group.questions.length + 1;
+        question.position =
+          parsePosition(row.position) ?? group.questions.length + 1;
         group.questions.push(question);
 
         // Media on the question row (e.g. one photo/audio shared by the group's
@@ -388,13 +403,16 @@ export class ExamImportNormalizer {
               typeRaw: null,
               title: mediaTitle(mediaRaw),
               content: null,
-              fileUrl: looksLikeUrl(mediaRaw) ? mediaRaw : `package://${mediaRaw}`,
+              fileUrl: looksLikeUrl(mediaRaw)
+                ? mediaRaw
+                : `package://${mediaRaw}`,
               sourceRow,
             });
           }
         }
       } else {
-        question.position = parsePosition(row.position) ?? section.direct.length + 1;
+        question.position =
+          parsePosition(row.position) ?? section.direct.length + 1;
         section.direct.push(question);
         if (mediaRaw) {
           // Sections without groups cannot hold materials — see package validator
@@ -500,7 +518,7 @@ export class ExamImportNormalizer {
     const { letters, outOfRange } = answerLetters(correctRaw);
     if (outOfRange) {
       warn(
-        `Câu "${((row.question ?? '') as string).slice(0, 40)}..." có correct_answer ngoài A–D — phần thừa bị bỏ qua.`,
+        `Câu "${(row.question ?? '').slice(0, 40)}..." có correct_answer ngoài A–D — phần thừa bị bỏ qua.`,
         'ANSWER_RANGE',
       );
     }
@@ -515,15 +533,23 @@ export class ExamImportNormalizer {
       ];
     }
 
-    if (questionType === QuestionType.FILL_BLANK || questionType === QuestionType.SHORT_ANSWER) {
+    if (
+      questionType === QuestionType.FILL_BLANK ||
+      questionType === QuestionType.SHORT_ANSWER
+    ) {
       const answer = correctRaw || (row.optionA ?? '').trim();
       return answer ? [{ content: answer, isCorrect: true, position: 1 }] : [];
     }
 
-    if (questionType === QuestionType.ESSAY || questionType === QuestionType.AUDIO_RECORD) {
+    if (
+      questionType === QuestionType.ESSAY ||
+      questionType === QuestionType.AUDIO_RECORD
+    ) {
       const hasChoiceData =
         correctRaw !== '' ||
-        [row.optionA, row.optionB, row.optionC, row.optionD].some((o) => (o ?? '').trim() !== '');
+        [row.optionA, row.optionB, row.optionC, row.optionD].some(
+          (o) => (o ?? '').trim() !== '',
+        );
       if (hasChoiceData) {
         warn(
           `Câu dạng ${questionType} không dùng đáp án trắc nghiệm — cột answer/option bị bỏ qua.`,
@@ -534,8 +560,8 @@ export class ExamImportNormalizer {
     }
 
     // MULTIPLE_CHOICE / MULTI_SELECT / MATCHING / unknown types
-    const columns = [row.optionA, row.optionB, row.optionC, row.optionD].map((o) =>
-      (o ?? '').trim(),
+    const columns = [row.optionA, row.optionB, row.optionC, row.optionD].map(
+      (o) => (o ?? '').trim(),
     );
     return columns
       .map((content, i) => ({

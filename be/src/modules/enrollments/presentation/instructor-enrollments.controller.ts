@@ -1,9 +1,31 @@
-import { Controller, Get, Param, Query, UseGuards, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Query,
+  UseGuards,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
-import { GetInstructorEnrollmentsQuery } from '@/modules/enrollments/application/query/get-instructor-enrollments.query';
+import {
+  GetInstructorEnrollmentsQuery,
+  InstructorEnrollmentsPage,
+} from '@/modules/enrollments/application/query/get-instructor-enrollments.query';
 import { EnrollmentRepository } from '@/modules/enrollments/infrastructure/repository/enrollment.repository';
+import { LessonProgressRow } from '@/modules/enrollments/domain/repository/enrollment.repository';
+
+/** Section kèm danh sách lesson trong tiến độ học (getProgress). */
+interface SectionProgressItem {
+  sectionId: number | string;
+  sectionTitle: string;
+  sectionPosition: number;
+  lessons: Array<
+    Omit<LessonProgressRow, 'sectionId' | 'sectionTitle' | 'sectionPosition'>
+  >;
+}
 
 @UseGuards(JwtAuthGuard)
 @Controller('instructor/enrollments')
@@ -22,7 +44,10 @@ export class InstructorEnrollmentsController {
     @Query('status') status?: string,
     @Query('courseId') courseId?: string,
   ) {
-    return this.queryBus.execute(
+    return this.queryBus.execute<
+      GetInstructorEnrollmentsQuery,
+      InstructorEnrollmentsPage
+    >(
       new GetInstructorEnrollmentsQuery({
         instructorId,
         page: Number(page) || 1,
@@ -42,11 +67,7 @@ export class InstructorEnrollmentsController {
     const enrollment = await this.enrollmentRepo.findById(Number(id));
     if (!enrollment) throw new NotFoundException('Enrollment not found');
 
-    if (enrollment.course?.instructorName === undefined) {
-      const courseRepo = this.enrollmentRepo as any;
-    }
-
-    const course = enrollment.course as any;
+    const course = enrollment.course;
     if (course && Number(course.id)) {
       const isOwner = await this.enrollmentRepo.isCourseOwnedByInstructor(
         Number(course.id),
@@ -58,11 +79,11 @@ export class InstructorEnrollmentsController {
     return {
       id: enrollment.id,
       userId: enrollment.userId,
-      userName: (enrollment.user as any)?.name ?? '',
-      userEmail: (enrollment.user as any)?.email ?? '',
+      userName: enrollment.user?.name ?? '',
+      userEmail: enrollment.user?.email ?? '',
       courseId: enrollment.courseId,
-      courseTitle: (enrollment.course as any)?.title ?? '',
-      courseThumbnail: (enrollment.course as any)?.thumbnail ?? null,
+      courseTitle: enrollment.course?.title ?? '',
+      courseThumbnail: enrollment.course?.thumbnail ?? null,
       progress: enrollment.progress,
       status: enrollment.status,
       pricePaid: enrollment.pricePaid,
@@ -81,7 +102,7 @@ export class InstructorEnrollmentsController {
     const enrollment = await this.enrollmentRepo.findById(Number(id));
     if (!enrollment) throw new NotFoundException('Enrollment not found');
 
-    const course = enrollment.course as any;
+    const course = enrollment.course;
     if (course) {
       const isOwner = await this.enrollmentRepo.isCourseOwnedByInstructor(
         Number(course.id),
@@ -90,7 +111,8 @@ export class InstructorEnrollmentsController {
       if (!isOwner) throw new ForbiddenException('You do not own this course');
     }
 
-    const result = await (this.enrollmentRepo as any).query(`
+    const result = await this.enrollmentRepo.query(
+      `
       SELECT
         s.id AS "sectionId",
         s.title AS "sectionTitle",
@@ -109,10 +131,12 @@ export class InstructorEnrollmentsController {
       LEFT JOIN lesson_progress lp ON lp.lesson_id = l.id AND lp.user_id = $1
       WHERE s.course_id = $2
       ORDER BY s.position, l.position
-    `, [enrollment.userId, enrollment.courseId]);
+    `,
+      [enrollment.userId, enrollment.courseId],
+    );
 
-    const sections = new Map<number, any>();
-    for (const row of result as any[]) {
+    const sections = new Map<number | string, SectionProgressItem>();
+    for (const row of result) {
       if (!sections.has(row.sectionId)) {
         sections.set(row.sectionId, {
           sectionId: row.sectionId,
@@ -135,16 +159,22 @@ export class InstructorEnrollmentsController {
     }
 
     const sectionsArray = Array.from(sections.values());
-    const totalLessons = (result as any[]).length;
-    const completedLessons = (result as any[]).filter((r) => r.isCompleted).length;
-    const totalWatchSeconds = (result as any[]).reduce((sum, r) => sum + r.watchSeconds, 0);
+    const totalLessons = result.length;
+    const completedLessons = result.filter((r) => r.isCompleted).length;
+    const totalWatchSeconds = result.reduce(
+      (sum, r) => sum + r.watchSeconds,
+      0,
+    );
 
     return {
       sections: sectionsArray,
       summary: {
         totalLessons,
         completedLessons,
-        completionPercent: totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0,
+        completionPercent:
+          totalLessons > 0
+            ? Math.round((completedLessons / totalLessons) * 100)
+            : 0,
         totalWatchSeconds,
         totalWatchHours: Math.round((totalWatchSeconds / 3600) * 10) / 10,
       },

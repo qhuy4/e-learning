@@ -18,7 +18,7 @@ export class ExamOptionRepository implements IExamOptionRepository {
       where: { questionId: questionId.toString() },
       order: { position: 'ASC' },
     });
-    return entities.map(ExamOptionMapper.toDomain);
+    return entities.map((entity) => ExamOptionMapper.toDomain(entity));
   }
 
   async saveAll(options: ExamOption[]): Promise<void> {

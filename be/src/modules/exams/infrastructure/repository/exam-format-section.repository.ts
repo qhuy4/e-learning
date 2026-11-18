@@ -18,7 +18,7 @@ export class ExamFormatSectionRepository implements IExamFormatSectionRepository
       where: { examFormatId: examFormatId.toString() },
       order: { position: 'ASC' },
     });
-    return entities.map(ExamFormatSectionMapper.toDomain);
+    return entities.map((entity) => ExamFormatSectionMapper.toDomain(entity));
   }
 
   async saveAll(sections: ExamFormatSection[]): Promise<void> {
@@ -43,7 +43,9 @@ export class ExamFormatSectionRepository implements IExamFormatSectionRepository
   }
 
   async findById(id: number): Promise<ExamFormatSection | null> {
-    const entity = await this.repository.findOne({ where: { id: id.toString() } });
+    const entity = await this.repository.findOne({
+      where: { id: id.toString() },
+    });
     return entity ? ExamFormatSectionMapper.toDomain(entity) : null;
   }
 
@@ -60,7 +62,7 @@ export class ExamFormatSectionRepository implements IExamFormatSectionRepository
       sectionType: section.sectionType,
     });
     const saved = await this.repository.save(entity);
-    return ExamFormatSectionMapper.toDomain(saved as any);
+    return ExamFormatSectionMapper.toDomain(saved);
   }
 
   async delete(id: number): Promise<void> {

@@ -5,6 +5,7 @@ import { EnrollmentOrmEntity } from '@/modules/enrollments/infrastructure/entity
 import { IEnrollmentRepository } from '@/modules/enrollments/domain/repository/enrollment.repository';
 import { EnrollmentMapper } from '@/modules/enrollments/infrastructure/mapper/enrollment.mapper';
 import { Enrollment } from '@/modules/enrollments/domain/entity/enrollment.entity';
+import { LessonProgressRow } from '@/modules/enrollments/domain/repository/enrollment.repository';
 
 @Injectable()
 export class EnrollmentRepository implements IEnrollmentRepository {
@@ -201,7 +202,7 @@ export class EnrollmentRepository implements IEnrollmentRepository {
     };
   }
 
-  async create(enrollment: any): Promise<Enrollment> {
+  async create(enrollment: Enrollment): Promise<Enrollment> {
     const entity = this.repository.create({
       userId: String(enrollment.userId),
       courseId: String(enrollment.courseId),
@@ -213,8 +214,10 @@ export class EnrollmentRepository implements IEnrollmentRepository {
     });
 
     const saved = await this.repository.save(entity);
-    const result = Array.isArray(saved) ? saved[0] : saved;
-    return EnrollmentMapper.toDomain(result);
+    const entities: EnrollmentOrmEntity[] = Array.isArray(saved)
+      ? saved
+      : [saved];
+    return EnrollmentMapper.toDomain(entities[0]);
   }
 
   async existsActiveByUserAndCourse(userId: number, courseId: number): Promise<boolean> {
@@ -251,7 +254,7 @@ export class EnrollmentRepository implements IEnrollmentRepository {
     return count > 0;
   }
 
-  async query(sql: string, params?: any[]): Promise<any[]> {
+  async query(sql: string, params?: unknown[]): Promise<LessonProgressRow[]> {
     return this.repository.query(sql, params);
   }
 }

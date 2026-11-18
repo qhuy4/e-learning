@@ -16,7 +16,6 @@ import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { Role } from '@/common/enum/role.enum';
-import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import {
   IExamTypeRepository,
   EXAM_TYPE_REPOSITORY,

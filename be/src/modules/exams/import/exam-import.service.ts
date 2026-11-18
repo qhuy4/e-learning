@@ -1,7 +1,11 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import type { Exam } from '../domain/entity/exam.entity';
 import type { ExamSection } from '../domain/entity/exam-section.entity';
-import { ExamGroupType } from '../domain/enums/exam-group-type.enum';
 import type { IExamFormatRepository } from '../domain/repository/exam-format.repository';
 import { EXAM_FORMAT_REPOSITORY } from '../domain/repository/exam-format.repository';
 import type { IExamGroupMaterialRepository } from '../domain/repository/exam-group-material.repository';
@@ -81,10 +85,16 @@ export class ExamImportService {
     private readonly validator: ExamImportValidator,
   ) {}
 
-  async preview(examId: number, file: UploadedFileLike): Promise<ExamImportPreview> {
+  async preview(
+    examId: number,
+    file: UploadedFileLike,
+  ): Promise<ExamImportPreview> {
     const { sections, ctx } = await this.context(examId);
 
-    const parser = this.parserRegistry.resolve(file.originalname, file.mimetype);
+    const parser = this.parserRegistry.resolve(
+      file.originalname,
+      file.mimetype,
+    );
     const parsed = await parser.parse(file.buffer, file.originalname);
 
     const normalized = this.normalizer.normalize(parsed.rows, ctx);
@@ -110,17 +120,33 @@ export class ExamImportService {
     };
   }
 
-  async validate(examId: number, data: NormalizedExamImport): Promise<ImportValidationReport> {
+  async validate(
+    examId: number,
+    data: NormalizedExamImport,
+  ): Promise<ImportValidationReport> {
     this.assertShape(data);
     const { sections, ctx } = await this.context(examId);
-    return this.validator.validate(data, sections, ctx, this.packageRefIssues(data));
+    return this.validator.validate(
+      data,
+      sections,
+      ctx,
+      this.packageRefIssues(data),
+    );
   }
 
-  async save(examId: number, data: NormalizedExamImport): Promise<ExamImportSaveSummary> {
+  async save(
+    examId: number,
+    data: NormalizedExamImport,
+  ): Promise<ExamImportSaveSummary> {
     this.assertShape(data);
     const { sections, ctx } = await this.context(examId);
 
-    const report = this.validator.validate(data, sections, ctx, this.packageRefIssues(data));
+    const report = this.validator.validate(
+      data,
+      sections,
+      ctx,
+      this.packageRefIssues(data),
+    );
     if (!report.canSave) {
       throw new BadRequestException({
         message: 'Dữ liệu import chưa hợp lệ — không thể lưu.',
@@ -141,7 +167,9 @@ export class ExamImportService {
       options: 0,
     };
 
-    const sortedSections = [...sections].sort((a, b) => a.position - b.position);
+    const sortedSections = [...sections].sort(
+      (a, b) => a.position - b.position,
+    );
     for (const examSection of sortedSections) {
       const imported = importedByKey.get(this.key(examSection.name));
       if (!imported) continue;
@@ -152,12 +180,13 @@ export class ExamImportService {
 
       let groupPosition = 0;
       for (const group of imported.groups) {
-        if (group.questions.length === 0 && group.materials.length === 0) continue;
+        if (group.questions.length === 0 && group.materials.length === 0)
+          continue;
         groupPosition += 1;
         const savedGroup = await this.groupRepo.save(
           ExamQuestionGroup.create({
             sectionId: examSection.id!,
-            groupType: group.groupType as ExamGroupType,
+            groupType: group.groupType,
             title: group.name,
             position: groupPosition,
           }),
@@ -180,13 +209,15 @@ export class ExamImportService {
           summary.materials += 1;
         }
 
-        const ordered = [...group.questions].sort((a, b) => a.position - b.position);
+        const ordered = [...group.questions].sort(
+          (a, b) => a.position - b.position,
+        );
         let questionPosition = 0;
         for (const question of ordered) {
           questionPosition += 1;
           await this.saveQuestion(
             examSection.id!,
-            savedGroup.id!,
+            savedGroup.id,
             question,
             questionPosition,
             summary,
@@ -195,11 +226,19 @@ export class ExamImportService {
         summary.groups += 1;
       }
 
-      const direct = [...imported.directQuestions].sort((a, b) => a.position - b.position);
+      const direct = [...imported.directQuestions].sort(
+        (a, b) => a.position - b.position,
+      );
       let directPosition = 0;
       for (const question of direct) {
         directPosition += 1;
-        await this.saveQuestion(examSection.id!, null, question, directPosition, summary);
+        await this.saveQuestion(
+          examSection.id!,
+          null,
+          question,
+          directPosition,
+          summary,
+        );
       }
 
       summary.sections += 1;
@@ -243,7 +282,10 @@ export class ExamImportService {
     );
     const buffer = buildExamImportTemplateBuffer({
       title: exam.title,
-      sections: sections.map((s) => ({ name: s.name, questionCount: s.questionCount ?? 0 })),
+      sections: sections.map((s) => ({
+        name: s.name,
+        questionCount: s.questionCount ?? 0,
+      })),
     });
     return { buffer, fileName: buildExamImportTemplateFileName(exam.title) };
   }
@@ -325,7 +367,12 @@ export class ExamImportService {
     path: string;
     message: string;
   }[] {
-    const issues: { severity: 'error'; code: string; path: string; message: string }[] = [];
+    const issues: {
+      severity: 'error';
+      code: string;
+      path: string;
+      message: string;
+    }[] = [];
     data.sections.forEach((section, si) => {
       section.groups.forEach((group, gi) => {
         group.materials.forEach((material, mi) => {
@@ -348,7 +395,9 @@ export class ExamImportService {
 
   private assertShape(data: NormalizedExamImport): void {
     if (!data || !Array.isArray(data.sections)) {
-      throw new BadRequestException('Payload import không hợp lệ (thiếu danh sách sections).');
+      throw new BadRequestException(
+        'Payload import không hợp lệ (thiếu danh sách sections).',
+      );
     }
   }
 

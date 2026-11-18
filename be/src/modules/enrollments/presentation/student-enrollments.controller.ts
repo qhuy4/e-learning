@@ -49,7 +49,10 @@ export class StudentEnrollmentsController {
     if (!userId) {
       return { enrolled: false, enrollment: null };
     }
-    return this.queryBus.execute(
+    return this.queryBus.execute<
+      CheckEnrollmentQuery,
+      { enrolled: boolean; enrollment: { status: number } | null }
+    >(
       new CheckEnrollmentQuery({
         userId,
         courseSlug,

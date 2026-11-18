@@ -42,7 +42,7 @@ export class ExamRepository implements IExamRepository {
 
   async findByStatus(status: string): Promise<Exam[]> {
     const entities = await this.repository.find({ where: { status: status as any } });
-    return entities.map(ExamMapper.toDomain);
+    return entities.map((entity) => ExamMapper.toDomain(entity));
   }
 
   /** Published exams for the student listing, each with `examTypeName` + `examFormatName`. */
@@ -67,7 +67,7 @@ export class ExamRepository implements IExamRepository {
 
   async findByCreatedBy(createdBy: number): Promise<Exam[]> {
     const entities = await this.repository.find({ where: { createdBy: createdBy.toString() } });
-    return entities.map(ExamMapper.toDomain);
+    return entities.map((entity) => ExamMapper.toDomain(entity));
   }
 
   /**
@@ -83,7 +83,7 @@ export class ExamRepository implements IExamRepository {
       relations: { examFormat: { examType: true } },
       order: { id: 'ASC' },
     });
-    return entities.map(ExamMapper.toDomain);
+    return entities.map((entity) => ExamMapper.toDomain(entity));
   }
 
   /** Đề đã xóa mềm — trang "Đã xóa" của admin (mới xóa lên trước). */
@@ -92,7 +92,7 @@ export class ExamRepository implements IExamRepository {
       where: { deletedAt: Not(IsNull()) },
       order: { deletedAt: 'DESC' },
     });
-    return entities.map(ExamMapper.toDomain);
+    return entities.map((entity) => ExamMapper.toDomain(entity));
   }
 
   /** Xóa mềm: chỉ set deleted_at — sections/questions/attempts/answers giữ nguyên. */

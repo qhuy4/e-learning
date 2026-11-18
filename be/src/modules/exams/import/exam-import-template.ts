@@ -22,16 +22,34 @@ export const IMPORT_TEMPLATE_COLUMNS = [
 const GUIDE_ROWS: (string | number)[][] = [
   ['HƯỚNG DẪN IMPORT ĐỀ THI', ''],
   ['Cột', 'Ý nghĩa / Quy ước'],
-  ['section', 'Tên phần thi — phải TRÙNG tên phần thi của đề thi (vd: Part 3, Reading, Section 1). Ô trống sẽ lấy giá trị dòng phía trên.'],
-  ['group', 'Tên nhóm câu hỏi (vd: Group 1). Ô trống = lấy group gần nhất phía trên; ghi "-" hoặc "direct" = câu hỏi trực tiếp.'],
-  ['group_type', 'AUDIO | PASSAGE | IMAGE | CUSTOM. Bỏ trống để hệ thống tự suy luận theo loại đề (TOEIC/IELTS...).'],
-  ['material_type', 'AUDIO | PASSAGE | IMAGE | TEXT — dùng cho dòng CHỈ có tài liệu (không có question).'],
+  [
+    'section',
+    'Tên phần thi — phải TRÙNG tên phần thi của đề thi (vd: Part 3, Reading, Section 1). Ô trống sẽ lấy giá trị dòng phía trên.',
+  ],
+  [
+    'group',
+    'Tên nhóm câu hỏi (vd: Group 1). Ô trống = lấy group gần nhất phía trên; ghi "-" hoặc "direct" = câu hỏi trực tiếp.',
+  ],
+  [
+    'group_type',
+    'AUDIO | PASSAGE | IMAGE | CUSTOM. Bỏ trống để hệ thống tự suy luận theo loại đề (TOEIC/IELTS...).',
+  ],
+  [
+    'material_type',
+    'AUDIO | PASSAGE | IMAGE | TEXT — dùng cho dòng CHỈ có tài liệu (không có question).',
+  ],
   ['material_title', 'Tiêu đề tài liệu.'],
   ['material_content', 'Nội dung (passage/văn bản) HOẶC URL file (audio/ảnh).'],
   ['question', 'Nội dung câu hỏi (bắt buộc với dòng câu hỏi).'],
-  ['question_type', 'MULTIPLE_CHOICE | MULTI_SELECT | TRUE_FALSE | FILL_BLANK | MATCHING | SHORT_ANSWER | ESSAY | AUDIO_RECORD (mặc định MULTIPLE_CHOICE).'],
+  [
+    'question_type',
+    'MULTIPLE_CHOICE | MULTI_SELECT | TRUE_FALSE | FILL_BLANK | MATCHING | SHORT_ANSWER | ESSAY | AUDIO_RECORD (mặc định MULTIPLE_CHOICE).',
+  ],
   ['option_a .. option_d', '4 phương án trả lời.'],
-  ['correct_answer', 'Đáp án: chữ cái A–D (nhiều đáp án ghi: AC), TRUE/FALSE với TRUE_FALSE, hoặc nội dung đáp án với FILL_BLANK/SHORT_ANSWER.'],
+  [
+    'correct_answer',
+    'Đáp án: chữ cái A–D (nhiều đáp án ghi: AC), TRUE/FALSE với TRUE_FALSE, hoặc nội dung đáp án với FILL_BLANK/SHORT_ANSWER.',
+  ],
   ['explanation', 'Lời giải (tùy chọn).'],
   ['position', 'Thứ tự câu hỏi (tùy chọn — để trống sẽ xếp theo thứ tự dòng).'],
   ['', ''],
@@ -236,8 +254,12 @@ export function buildExamImportTemplateFileName(examTitle?: string): string {
  * With `sections` (the exam's parts), the Import sheet gets one scaffold row
  * per part plus the expected question count in `expected_questions`.
  */
-export function buildExamImportTemplateBuffer(options: ExamTemplateOptions = {}): Buffer {
-  const sections = (options.sections ?? []).filter((section) => section.name.trim() !== '');
+export function buildExamImportTemplateBuffer(
+  options: ExamTemplateOptions = {},
+): Buffer {
+  const sections = (options.sections ?? []).filter(
+    (section) => section.name.trim() !== '',
+  );
   const examScoped = sections.length > 0;
   const columns: string[] = examScoped
     ? [...IMPORT_TEMPLATE_COLUMNS, 'expected_questions']
@@ -248,7 +270,8 @@ export function buildExamImportTemplateBuffer(options: ExamTemplateOptions = {})
     for (const section of sections) {
       const row: (string | number)[] = columns.map(() => '');
       row[0] = section.name.trim();
-      if (section.questionCount > 0) row[columns.length - 1] = section.questionCount;
+      if (section.questionCount > 0)
+        row[columns.length - 1] = section.questionCount;
       importRows.push(row);
     }
   } else {
@@ -259,7 +282,9 @@ export function buildExamImportTemplateBuffer(options: ExamTemplateOptions = {})
 
   const importSheet = XLSX.utils.aoa_to_sheet(importRows);
   importSheet['!cols'] = columns.map((column) => ({
-    wch: ['question', 'material_content', 'explanation'].includes(column) ? 40 : 18,
+    wch: ['question', 'material_content', 'explanation'].includes(column)
+      ? 40
+      : 18,
   }));
   XLSX.utils.book_append_sheet(workbook, importSheet, 'Import');
 
@@ -286,7 +311,7 @@ export function buildExamImportTemplateBuffer(options: ExamTemplateOptions = {})
   ];
   XLSX.utils.book_append_sheet(workbook, guideSheet, 'Hướng dẫn');
 
-  return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' }) as unknown as Buffer;
+  return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
 }
 
 /** Guide sheet rows, extended with the exam's parts when the template is exam-scoped. */
@@ -299,7 +324,10 @@ function buildGuideRows(
   if (!examScoped) return guideRows;
 
   const title = options.title?.trim() || 'Đề thi';
-  const total = sections.reduce((sum, s) => sum + (s.questionCount > 0 ? s.questionCount : 0), 0);
+  const total = sections.reduce(
+    (sum, s) => sum + (s.questionCount > 0 ? s.questionCount : 0),
+    0,
+  );
 
   guideRows[0] = [`HƯỚNG DẪN IMPORT — ${title}`, ''];
   // Replace the generic sample note: exam-scoped templates ship scaffold rows instead.
@@ -312,12 +340,12 @@ function buildGuideRows(
   guideRows.push(
     ['', ''],
     ['CÁC PHẦN THI CỦA ĐỀ NÀY', total > 0 ? `Tổng ${total} câu dự kiến` : ''],
-    ...sections.map(
-      (section): (string | number)[] => [
-        section.name,
-        section.questionCount > 0 ? `${section.questionCount} câu` : 'chưa đặt số câu',
-      ],
-    ),
+    ...sections.map((section): (string | number)[] => [
+      section.name,
+      section.questionCount > 0
+        ? `${section.questionCount} câu`
+        : 'chưa đặt số câu',
+    ]),
     [
       'Lưu ý',
       'Giữ nguyên dòng tiêu đề cột; cột "section" phải trùng tên phần thi (không phân biệt hoa/thường).',

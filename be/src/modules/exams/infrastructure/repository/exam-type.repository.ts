@@ -23,7 +23,7 @@ export class ExamTypeRepository implements IExamTypeRepository {
     const entities = await this.repository.find({
       where: { deletedAt: IsNull() },
     });
-    return entities.map(ExamTypeMapper.toDomain);
+    return entities.map((entity) => ExamTypeMapper.toDomain(entity));
   }
 
   /** Loại đề đã xóa mềm — trang "Đã xóa" của admin (mới xóa lên trước). */
@@ -32,7 +32,7 @@ export class ExamTypeRepository implements IExamTypeRepository {
       where: { deletedAt: Not(IsNull()) },
       order: { deletedAt: 'DESC' },
     });
-    return entities.map(ExamTypeMapper.toDomain);
+    return entities.map((entity) => ExamTypeMapper.toDomain(entity));
   }
 
   /** Xóa mềm: chỉ set deleted_at — dữ liệu đề thi liên quan giữ nguyên. */

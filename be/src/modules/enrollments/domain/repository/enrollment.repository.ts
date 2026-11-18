@@ -2,6 +2,22 @@ import { Enrollment } from '@/modules/enrollments/domain/entity/enrollment.entit
 
 export const ENROLLMENT_REPOSITORY = Symbol('ENROLLMENT_REPOSITORY');
 
+/** Dòng kết quả của raw query tiến độ bài học (instructor getProgress). */
+export interface LessonProgressRow {
+  sectionId: number | string;
+  sectionTitle: string;
+  sectionPosition: number;
+  lessonId: number | string;
+  lessonTitle: string;
+  lessonType: string;
+  lessonDuration: number | null;
+  lessonPosition: number;
+  watchSeconds: number;
+  progressPercent: number;
+  isCompleted: boolean;
+  completedAt: Date | null;
+}
+
 export interface IEnrollmentRepository {
   findAll(options: {
     page: number;
@@ -19,7 +35,7 @@ export interface IEnrollmentRepository {
     keyword?: string;
     status?: number;
     courseId?: number;
-  }): Promise<{ data: any[]; meta: { page: number; limit: number; total: number; totalPages: number } }>;
+  }): Promise<{ data: Enrollment[]; meta: { page: number; limit: number; total: number; totalPages: number } }>;
 
   findById(id: number): Promise<Enrollment | null>;
 
@@ -37,7 +53,7 @@ export interface IEnrollmentRepository {
     },
   ): Promise<{ data: Enrollment[]; total: number }>;
 
-  create(enrollment: any): Promise<Enrollment>;
+  create(enrollment: Enrollment): Promise<Enrollment>;
 
   existsActiveByUserAndCourse(userId: number, courseId: number): Promise<boolean>;
 

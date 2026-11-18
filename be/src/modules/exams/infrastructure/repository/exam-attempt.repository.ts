@@ -31,7 +31,7 @@ export class ExamAttemptRepository implements IExamAttemptRepository {
       where: { examId: examId.toString(), userId: userId.toString() },
       order: { startedAt: 'DESC' },
     });
-    return entities.map(ExamAttemptMapper.toDomain);
+    return entities.map((entity) => ExamAttemptMapper.toDomain(entity));
   }
 
   async findByUserId(userId: number, limit = 10): Promise<ExamAttempt[]> {
@@ -40,7 +40,7 @@ export class ExamAttemptRepository implements IExamAttemptRepository {
       order: { startedAt: 'DESC' },
       take: limit,
     });
-    return entities.map(ExamAttemptMapper.toDomain);
+    return entities.map((entity) => ExamAttemptMapper.toDomain(entity));
   }
 
   async create(attempt: ExamAttempt): Promise<ExamAttempt> {

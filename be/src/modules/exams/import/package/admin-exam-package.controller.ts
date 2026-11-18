@@ -182,7 +182,12 @@ export class AdminExamPackageImportController {
         }
         for (const [key, cell] of cells) {
           if (typeof key !== 'string' || key === '' || key === '__excelRow') continue;
-          const text = cell == null ? '' : String(cell);
+          const text =
+            typeof cell === 'string' ||
+            typeof cell === 'number' ||
+            typeof cell === 'boolean'
+              ? String(cell)
+              : '';
           if (text.length > PATCH_LIMITS.maxCellLength) {
             throw new BadRequestException(
               `Ô "${key}" vượt giới hạn ${PATCH_LIMITS.maxCellLength} ký tự.`,

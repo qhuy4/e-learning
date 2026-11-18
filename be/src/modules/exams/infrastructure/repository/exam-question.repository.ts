@@ -18,7 +18,7 @@ export class ExamQuestionRepository implements IExamQuestionRepository {
       where: { sectionId: sectionId.toString(), groupId: IsNull() },
       order: { position: 'ASC' },
     });
-    return entities.map(ExamQuestionMapper.toDomain);
+    return entities.map((entity) => ExamQuestionMapper.toDomain(entity));
   }
 
   async findByGroupId(groupId: number): Promise<ExamQuestion[]> {
@@ -26,16 +26,20 @@ export class ExamQuestionRepository implements IExamQuestionRepository {
       where: { groupId: groupId.toString() },
       order: { position: 'ASC' },
     });
-    return entities.map(ExamQuestionMapper.toDomain);
+    return entities.map((entity) => ExamQuestionMapper.toDomain(entity));
   }
 
   async findById(id: number): Promise<ExamQuestion | null> {
-    const entity = await this.repository.findOne({ where: { id: id.toString() } });
+    const entity = await this.repository.findOne({
+      where: { id: id.toString() },
+    });
     return entity ? ExamQuestionMapper.toDomain(entity) : null;
   }
 
   async countBySectionId(sectionId: number): Promise<number> {
-    return this.repository.count({ where: { sectionId: sectionId.toString() } });
+    return this.repository.count({
+      where: { sectionId: sectionId.toString() },
+    });
   }
 
   async save(question: ExamQuestion): Promise<ExamQuestion> {
@@ -49,7 +53,7 @@ export class ExamQuestionRepository implements IExamQuestionRepository {
       points: question.points,
       position: question.position,
     });
-    const saved = await this.repository.save(entity) as ExamQuestionOrmEntity;
+    const saved = await this.repository.save(entity);
     return ExamQuestionMapper.toDomain(saved);
   }
 

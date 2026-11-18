@@ -18,7 +18,7 @@ export class ExamQuestionGroupRepository implements IExamQuestionGroupRepository
       where: { sectionId: sectionId.toString() },
       order: { position: 'ASC' },
     });
-    return entities.map(ExamQuestionGroupMapper.toDomain);
+    return entities.map((entity) => ExamQuestionGroupMapper.toDomain(entity));
   }
 
   async findById(id: number): Promise<ExamQuestionGroup | null> {

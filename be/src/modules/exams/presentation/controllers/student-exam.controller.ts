@@ -8,8 +8,6 @@ import {
   UseGuards,
   Inject,
   NotFoundException,
-  Query,
-  BadRequestException,
 } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
@@ -53,7 +51,10 @@ import { ExamAnswer } from '../../domain/entity/exam-answer.entity';
 import { ExamQuestion } from '../../domain/entity/exam-question.entity';
 import { ExamOption } from '../../domain/entity/exam-option.entity';
 import { QuestionType } from '../../domain/enums/question-type.enum';
-import { SubmitExamAttemptDto, SubmitExamAnswerDto } from '../dto/submit-exam-attempt.dto';
+import {
+  SubmitExamAttemptDto,
+  SubmitExamAnswerDto,
+} from '../dto/submit-exam-attempt.dto';
 import { GetStudentExamDetailQuery } from '../../application/query/get-student-exam-detail.query';
 
 /**
@@ -185,7 +186,6 @@ export class StudentExamController {
   async submit(
     @Param('attemptId', ParseIntPipe) attemptId: number,
     @Body() dto: SubmitExamAttemptDto,
-    @CurrentUser('id') userId: number,
   ) {
     const attempt = await this.examAttemptRepo.findById(attemptId);
     if (!attempt) {
@@ -197,14 +197,20 @@ export class StudentExamController {
     const sections = await this.examSectionRepo.findByExamId(attempt.examId);
     for (const section of sections) {
       if (section.id == null) continue;
-      const directQuestions = await this.examQuestionRepo.findBySectionId(section.id);
+      const directQuestions = await this.examQuestionRepo.findBySectionId(
+        section.id,
+      );
       for (const question of directQuestions) {
         if (question.id != null) questionById.set(question.id, question);
       }
-      const groups = await this.examQuestionGroupRepo.findBySectionId(section.id);
+      const groups = await this.examQuestionGroupRepo.findBySectionId(
+        section.id,
+      );
       for (const group of groups) {
         if (group.id == null) continue;
-        const groupedQuestions = await this.examQuestionRepo.findByGroupId(group.id);
+        const groupedQuestions = await this.examQuestionRepo.findByGroupId(
+          group.id,
+        );
         for (const question of groupedQuestions) {
           if (question.id != null) questionById.set(question.id, question);
         }
@@ -269,7 +275,9 @@ export class StudentExamController {
           // Option id "cũ" không còn tồn tại (admin vừa thay option / tab trình
           // duyệt để lâu) → không chèn vào DB (vi phạm FK) mà ghi nhận câu này
           // chưa chọn; nộp bài KHÔNG bị lỗi nữa.
-          const optionStillExists = options.some((o) => o.id === item.selectedOptionId);
+          const optionStillExists = options.some(
+            (o) => o.id === item.selectedOptionId,
+          );
           if (optionStillExists) {
             selectedOptionIds.add(item.selectedOptionId);
             if (firstSelectedOptionId == null) {
@@ -298,7 +306,8 @@ export class StudentExamController {
         typed.length > 0 &&
         options.some(
           (option) =>
-            option.isCorrect && normalizeAnswer(option.content) === normalizeAnswer(typed),
+            option.isCorrect &&
+            normalizeAnswer(option.content) === normalizeAnswer(typed),
         );
 
       const isCorrect = isChoiceCorrect || isTextCorrect;
@@ -322,10 +331,13 @@ export class StudentExamController {
     // answer key — key-less text answers (essay / audio record …) never
     // shrink the score.
     const totalQuestions = [...questionById.values()].filter(
-      (q) => choiceTypes.has(q.type) || (q.id != null && keyedTextIds.has(q.id)),
+      (q) =>
+        choiceTypes.has(q.type) || (q.id != null && keyedTextIds.has(q.id)),
     ).length;
     const score =
-      totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
+      totalQuestions > 0
+        ? Math.round((correctCount / totalQuestions) * 100)
+        : 0;
 
     // 4. Persist the graded answers FIRST, then flip the attempt to SUBMITTED:
     //    nếu có lỗi giữa chừng thì attempt vẫn IN_PROGRESS và client gửi lại
@@ -351,9 +363,7 @@ export class StudentExamController {
   @Get('attempts/:attemptId/answers')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.STUDENT)
-  async getAnswers(
-    @Param('attemptId', ParseIntPipe) attemptId: number,
-  ) {
+  async getAnswers(@Param('attemptId', ParseIntPipe) attemptId: number) {
     return this.examAnswerRepo.findByAttemptId(attemptId);
   }
 

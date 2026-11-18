@@ -71,10 +71,7 @@ export class AdminExamController {
   ) {}
 
   @Post()
-  async create(
-    @Body() dto: CreateExamDto,
-    @CurrentUser('id') userId: number,
-  ) {
+  async create(@Body() dto: CreateExamDto, @CurrentUser('id') userId: number) {
     const format = await this.examFormatRepo.findById(dto.examFormatId);
     if (!format) {
       throw new NotFoundException('ExamFormat not found');
@@ -91,8 +88,9 @@ export class AdminExamController {
 
     const savedExam = await this.examRepo.create(exam);
 
-    const formatSections =
-      await this.examFormatSectionRepo.findByExamFormatId(dto.examFormatId);
+    const formatSections = await this.examFormatSectionRepo.findByExamFormatId(
+      dto.examFormatId,
+    );
 
     if (formatSections.length > 0) {
       const sections = formatSections.map((fs) =>
@@ -149,7 +147,6 @@ export class AdminExamController {
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateExamDto,
-    @CurrentUser('id') userId: number,
   ) {
     const existing = await this.examRepo.findById(id);
     if (!existing) {
@@ -228,10 +225,7 @@ export class AdminExamController {
   }
 
   @Put(':id/publish')
-  async publish(
-    @Param('id', ParseIntPipe) id: number,
-    @CurrentUser('id') userId: number,
-  ) {
+  async publish(@Param('id', ParseIntPipe) id: number) {
     const existing = await this.examRepo.findById(id);
     if (!existing) {
       throw new NotFoundException('Exam not found');
@@ -239,7 +233,9 @@ export class AdminExamController {
 
     const sections = await this.examSectionRepo.findByExamId(id);
     for (const section of sections) {
-      const questionCount = await this.questionRepo.countBySectionId(section.id!);
+      const questionCount = await this.questionRepo.countBySectionId(
+        section.id!,
+      );
       if (questionCount !== section.questionCount) {
         throw new BadRequestException(
           `Section "${section.name}" có ${questionCount} câu hỏi, cần ${section.questionCount} câu hỏi theo cấu trúc. Vui lòng kiểm tra lại.`,
@@ -252,10 +248,7 @@ export class AdminExamController {
   }
 
   @Put(':id/archive')
-  async archive(
-    @Param('id', ParseIntPipe) id: number,
-    @CurrentUser('id') userId: number,
-  ) {
+  async archive(@Param('id', ParseIntPipe) id: number) {
     const existing = await this.examRepo.findById(id);
     if (!existing) {
       throw new NotFoundException('Exam not found');

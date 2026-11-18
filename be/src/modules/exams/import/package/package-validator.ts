@@ -122,7 +122,7 @@ export class PackageValidator {
       issues.push(this.enrich({ ...issue }, data));
     }
 
-    issues.push(...this.rowLevelIssues(rows, data));
+    issues.push(...this.rowLevelIssues(rows));
 
     const errorCount = issues.filter((i) => i.severity === 'error').length;
     const warningCount = issues.filter((i) => i.severity === 'warning').length;
@@ -136,7 +136,7 @@ export class PackageValidator {
   }
 
   /** Duplicate question text / Question Number within the same section. */
-  private rowLevelIssues(rows: ImportRow[], data: NormalizedExamImport): PackageImportIssue[] {
+  private rowLevelIssues(rows: ImportRow[]): PackageImportIssue[] {
     const issues: PackageImportIssue[] = [];
     const seenText = new Map<string, number>();
     const seenNumber = new Map<string, number>();
@@ -189,7 +189,10 @@ export class PackageValidator {
   }
 
   /** Attach Excel row / Section / Question / Field to a base-validator issue. */
-  private enrich(issue: PackageImportIssue, data: NormalizedExamImport): PackageImportIssue {
+  private enrich(
+    issue: PackageImportIssue,
+    data: NormalizedExamImport,
+  ): PackageImportIssue {
     const out: PackageImportIssue = { ...issue };
 
     // The message may name the section directly (SECTION_COUNT indexes exam
@@ -197,8 +200,14 @@ export class PackageValidator {
     const named = /Phần "([^"]+)"/.exec(issue.message)?.[1];
     let source = this.locate(issue.path, data);
     if (named) {
-      const section = data.sections.find((s) => sectionKey(s.name) === sectionKey(named));
-      if (section && (!source || sectionKey(source.section ?? '') !== sectionKey(section.name))) {
+      const section = data.sections.find(
+        (s) => sectionKey(s.name) === sectionKey(named),
+      );
+      if (
+        section &&
+        (!source ||
+          sectionKey(source.section ?? '') !== sectionKey(section.name))
+      ) {
         source = {
           section: section.name,
           question: null,
@@ -216,12 +225,19 @@ export class PackageValidator {
         for (const section of data.sections) {
           for (const group of section.groups) {
             if (sectionKey(group.name) === sectionKey(groupName)) {
-              matches.push({ section: section.name, row: group.sourceRow ?? null });
+              matches.push({
+                section: section.name,
+                row: group.sourceRow ?? null,
+              });
             }
           }
         }
         if (matches.length === 1) {
-          source = { section: matches[0].section, question: null, excelRow: matches[0].row };
+          source = {
+            section: matches[0].section,
+            question: null,
+            excelRow: matches[0].row,
+          };
         }
       }
     }

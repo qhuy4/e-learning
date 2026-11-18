@@ -152,12 +152,19 @@ interface HeaderRow {
  * always wins; otherwise the first row is trusted, and a header below title
  * rows must match at least two known columns.
  */
+function cellText(cell: unknown): string {
+  if (typeof cell === 'string') return cell;
+  if (typeof cell === 'number') return String(cell);
+  if (typeof cell === 'boolean') return String(cell);
+  return '';
+}
+
 function findHeaderRow(aoa: unknown[][]): HeaderRow | null {
   const limit = Math.min(aoa.length, MAX_HEADER_SCAN_ROWS);
   const scored: { index: number; keys: (RowKey | null)[]; score: number }[] = [];
   for (let r = 0; r < limit; r++) {
     const keys = (aoa[r] ?? []).map(
-      (cell) => HEADER_MAP[normalizeHeader(String(cell ?? ''))] ?? null,
+      (cell) => HEADER_MAP[normalizeHeader(cellText(cell))] ?? null,
     );
     const score = keys.filter((key) => key !== null).length;
     if (score > 0) scored.push({ index: r, keys, score });
@@ -180,7 +187,7 @@ function findHeaderRow(aoa: unknown[][]): HeaderRow | null {
 function firstRowsPreview(aoa: unknown[][]): string {
   for (let r = 0; r < Math.min(aoa.length, 3); r++) {
     const values = (aoa[r] ?? [])
-      .map((cell) => String(cell ?? '').trim())
+      .map((cell) => cellText(cell).trim())
       .filter((value) => value !== '');
     if (values.length > 0) {
       const line = values.slice(0, 5).join(' | ');
@@ -199,7 +206,7 @@ export class ExcelExamFileParser implements ExamFileParser {
     return this.extensions.some((ext) => fileName.toLowerCase().endsWith(ext));
   }
 
-  async parse(buffer: Buffer, fileName?: string): Promise<ParsedExamFile> {
+  parse(buffer: Buffer, fileName?: string): Promise<ParsedExamFile> {
     const workbook = this.readWorkbook(buffer, fileName);
     const rows: ImportRow[] = [];
     const warnings: string[] = [];
@@ -248,7 +255,7 @@ export class ExcelExamFileParser implements ExamFileParser {
         const row: ImportRow = {};
         mappedKeys.forEach((key, ci) => {
           if (!key) return;
-          row[key] = String(cells[ci] ?? '').trim();
+          row[key] = cellText(cells[ci]).trim();
         });
 
         if (row.section) currentSection = row.section;
@@ -296,7 +303,7 @@ export class ExcelExamFileParser implements ExamFileParser {
           'Hãy tải template mới nhất và nhập dữ liệu vào sheet "Import".',
       );
     }
-    return { rows, warnings };
+    return Promise.resolve({ rows, warnings });
   }
 
   private readWorkbook(buffer: Buffer, fileName?: string): XLSX.WorkBook {

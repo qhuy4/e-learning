@@ -10,6 +10,10 @@ import { IExamSectionRepository, EXAM_SECTION_REPOSITORY } from '../../domain/re
 import { ExamQuestionGroup } from '../../domain/entity/exam-question-group.entity';
 import { ExamQuestion } from '../../domain/entity/exam-question.entity';
 import { ExamOption } from '../../domain/entity/exam-option.entity';
+import {
+  ExamGroupBody,
+  ExamQuestionBody,
+} from '../../presentation/dto/admin-exam-question-body.interface';
 
 @Controller('admin/exam-question-groups')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -28,7 +32,7 @@ export class AdminExamQuestionGroupController {
   }
 
   @Post('section/:sectionId')
-  async create(@Param('sectionId', ParseIntPipe) sectionId: number, @Body() dto: any) {
+  async create(@Param('sectionId', ParseIntPipe) sectionId: number, @Body() dto: ExamGroupBody) {
     // Position is assigned server-side (max + 1 within the section) so client
     // caches/stale lists can never violate UNIQUE (section_id, position).
     const existing = await this.groupRepo.findBySectionId(sectionId);
@@ -44,7 +48,7 @@ export class AdminExamQuestionGroupController {
   }
 
   @Put(':id')
-  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: any) {
+  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: ExamGroupBody) {
     const existing = await this.groupRepo.findById(id);
     if (!existing) throw new NotFoundException('Group not found');
     existing.update({ groupType: dto.groupType, title: dto.title, instructions: dto.instructions, position: dto.position });
@@ -69,7 +73,7 @@ export class AdminExamQuestionGroupController {
   }
 
   @Post(':groupId/questions')
-  async createQuestion(@Param('groupId', ParseIntPipe) groupId: number, @Body() dto: any) {
+  async createQuestion(@Param('groupId', ParseIntPipe) groupId: number, @Body() dto: ExamQuestionBody) {
     const group = await this.groupRepo.findById(groupId);
     if (!group) throw new NotFoundException('Group not found');
 
@@ -84,7 +88,7 @@ export class AdminExamQuestionGroupController {
     });
     const saved = await this.questionRepo.save(question);
     if (dto.options && dto.options.length > 0) {
-      const options = dto.options.map((o: any) => ExamOption.create({
+      const options = dto.options.map((o) => ExamOption.create({
         questionId: saved.id!, content: o.content, isCorrect: o.isCorrect, position: o.position,
       }));
       await this.optionRepo.saveAll(options);
@@ -95,7 +99,7 @@ export class AdminExamQuestionGroupController {
   }
 
   @Put('questions/:questionId')
-  async updateQuestion(@Param('questionId', ParseIntPipe) questionId: number, @Body() dto: any) {
+  async updateQuestion(@Param('questionId', ParseIntPipe) questionId: number, @Body() dto: ExamQuestionBody) {
     const existing = await this.questionRepo.findById(questionId);
     if (!existing) throw new NotFoundException('Question not found');
     existing.update({ type: dto.type, question: dto.question, explanation: dto.explanation, points: dto.points, position: dto.position });
@@ -105,7 +109,7 @@ export class AdminExamQuestionGroupController {
     if (dto.options !== undefined) {
       await this.optionRepo.deleteAllByQuestionId(questionId);
       if (dto.options.length > 0) {
-        const options = dto.options.map((o: any) => ExamOption.create({
+        const options = dto.options.map((o) => ExamOption.create({
           questionId: saved.id!, content: o.content, isCorrect: o.isCorrect, position: o.position,
         }));
         await this.optionRepo.saveAll(options);

@@ -18,11 +18,13 @@ export class ExamGroupMaterialRepository implements IExamGroupMaterialRepository
       where: { groupId: groupId.toString() },
       order: { position: 'ASC' },
     });
-    return entities.map(ExamGroupMaterialMapper.toDomain);
+    return entities.map((entity) => ExamGroupMaterialMapper.toDomain(entity));
   }
 
   async findById(id: number): Promise<ExamGroupMaterial | null> {
-    const entity = await this.repository.findOne({ where: { id: id.toString() } });
+    const entity = await this.repository.findOne({
+      where: { id: id.toString() },
+    });
     return entity ? ExamGroupMaterialMapper.toDomain(entity) : null;
   }
 
@@ -37,7 +39,7 @@ export class ExamGroupMaterialRepository implements IExamGroupMaterialRepository
       transcript: material.transcript,
       position: material.position,
     });
-    const saved = await this.repository.save(entity) as ExamGroupMaterialOrmEntity;
+    const saved = await this.repository.save(entity);
     return ExamGroupMaterialMapper.toDomain(saved);
   }
 

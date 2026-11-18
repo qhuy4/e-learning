@@ -34,6 +34,10 @@ import {
 import { ExamQuestionGroup } from '../../domain/entity/exam-question-group.entity';
 import { ExamQuestion } from '../../domain/entity/exam-question.entity';
 import { ExamOption } from '../../domain/entity/exam-option.entity';
+import {
+  ExamGroupBody,
+  ExamQuestionBody,
+} from '../../presentation/dto/admin-exam-question-body.interface';
 
 @Controller('admin/exam-sections')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -58,7 +62,7 @@ export class AdminExamSectionController {
   @Post(':sectionId/groups')
   async createGroup(
     @Param('sectionId', ParseIntPipe) sectionId: number,
-    @Body() dto: any,
+    @Body() dto: ExamGroupBody,
   ) {
     // Position is assigned server-side (max + 1 within the section) so client
     // caches/stale lists can never violate UNIQUE (section_id, position).
@@ -77,7 +81,7 @@ export class AdminExamSectionController {
   @Put('groups/:groupId')
   async updateGroup(
     @Param('groupId', ParseIntPipe) groupId: number,
-    @Body() dto: any,
+    @Body() dto: ExamGroupBody,
   ) {
     const existing = await this.groupRepo.findById(groupId);
     if (!existing) throw new BadRequestException('Group not found');
@@ -105,7 +109,7 @@ export class AdminExamSectionController {
   @Post(':sectionId/questions')
   async createDirectQuestion(
     @Param('sectionId', ParseIntPipe) sectionId: number,
-    @Body() dto: any,
+    @Body() dto: ExamQuestionBody,
   ) {
     const question = ExamQuestion.create({
       sectionId,
@@ -118,7 +122,7 @@ export class AdminExamSectionController {
     const saved = await this.questionRepo.save(question);
 
     if (dto.options && dto.options.length > 0) {
-      const options = dto.options.map((o: any) => ExamOption.create({
+      const options = dto.options.map((o) => ExamOption.create({
         questionId: saved.id!, content: o.content, isCorrect: o.isCorrect, position: o.position,
       }));
       await this.optionRepo.saveAll(options);
@@ -131,7 +135,7 @@ export class AdminExamSectionController {
   @Put('questions/:questionId')
   async updateQuestion(
     @Param('questionId', ParseIntPipe) questionId: number,
-    @Body() dto: any,
+    @Body() dto: ExamQuestionBody,
   ) {
     const existing = await this.questionRepo.findById(questionId);
     if (!existing) throw new BadRequestException('Question not found');
@@ -150,7 +154,7 @@ export class AdminExamSectionController {
     if (dto.options !== undefined) {
       await this.optionRepo.deleteAllByQuestionId(questionId);
       if (dto.options.length > 0) {
-        const options = dto.options.map((o: any) =>
+        const options = dto.options.map((o) =>
           ExamOption.create({
             questionId: saved.id!,
             content: o.content,

@@ -1,5 +1,21 @@
 import { EnrollmentStatus } from '@/modules/enrollments/domain/enum/enrollment-status.enum';
 
+/** User được mapper nạp (relation `user`). */
+export interface EnrollmentUserRef {
+  id: number;
+  name: string;
+  email: string;
+}
+
+/** Course được mapper nạp (relation `course` kèm tên instructor). */
+export interface EnrollmentCourseRef {
+  id: string;
+  title: string;
+  thumbnail: string | null;
+  slug: string;
+  instructorName: string | null;
+}
+
 export class Enrollment {
   private constructor(
     public readonly id: number | null,
@@ -15,8 +31,8 @@ export class Enrollment {
     public readonly enrolledAt: Date | null,
     public readonly createdAt: Date | null,
     public readonly updatedAt: Date | null,
-    public user?: any,
-    public course?: any,
+    public user?: EnrollmentUserRef,
+    public course?: EnrollmentCourseRef,
   ) {}
 
   static restore(params: {
@@ -33,8 +49,8 @@ export class Enrollment {
     enrolledAt: Date | null;
     createdAt: Date | null;
     updatedAt: Date | null;
-    user?: any;
-    course?: any;
+    user?: EnrollmentUserRef;
+    course?: EnrollmentCourseRef;
   }): Enrollment {
     return new Enrollment(
       params.id,

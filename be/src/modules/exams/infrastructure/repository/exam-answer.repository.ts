@@ -17,7 +17,7 @@ export class ExamAnswerRepository implements IExamAnswerRepository {
     const entities = await this.repository.find({
       where: { attemptId: attemptId.toString() },
     });
-    return entities.map(ExamAnswerMapper.toDomain);
+    return entities.map((entity) => ExamAnswerMapper.toDomain(entity));
   }
 
   async saveAll(answers: ExamAnswer[]): Promise<void> {

@@ -89,7 +89,7 @@ export class DocxExamFileParser implements ExamFileParser {
     return fileName.toLowerCase().endsWith('.docx');
   }
 
-  async parse(buffer: Buffer, fileName: string): Promise<ParsedExamFile> {
+  parse(buffer: Buffer, fileName: string): Promise<ParsedExamFile> {
     let text: string;
     try {
       text = docxToText(buffer);
@@ -101,11 +101,11 @@ export class DocxExamFileParser implements ExamFileParser {
     if (!text.trim()) {
       throw new BadRequestException('File DOCX không có nội dung văn bản.');
     }
-    return {
+    return Promise.resolve({
       rows: parseTextToRows(text),
       warnings: [
         'DOCX được xử lý tự động — kiểm tra kỹ cấu trúc (section/group/câu hỏi) ở bước xem trước.',
       ],
-    };
+    });
   }
 }

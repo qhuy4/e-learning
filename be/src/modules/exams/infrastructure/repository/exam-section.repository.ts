@@ -23,7 +23,7 @@ export class ExamSectionRepository implements IExamSectionRepository {
       where: { examId: examId.toString() },
       order: { position: 'ASC' },
     });
-    return entities.map(ExamSectionMapper.toDomain);
+    return entities.map((entity) => ExamSectionMapper.toDomain(entity));
   }
 
   async saveAll(sections: ExamSection[]): Promise<void> {

@@ -20,12 +20,12 @@ export class ExamFormatRepository implements IExamFormatRepository {
 
   async findByExamTypeId(examTypeId: number): Promise<ExamFormat[]> {
     const entities = await this.repository.find({ where: { examTypeId: examTypeId.toString() } });
-    return entities.map(ExamFormatMapper.toDomain);
+    return entities.map((entity) => ExamFormatMapper.toDomain(entity));
   }
 
   async findAll(): Promise<ExamFormat[]> {
     const entities = await this.repository.find({ where: { deletedAt: IsNull() } });
-    return entities.map(ExamFormatMapper.toDomain);
+    return entities.map((entity) => ExamFormatMapper.toDomain(entity));
   }
 
   async findDeleted(): Promise<ExamFormat[]> {
@@ -33,7 +33,7 @@ export class ExamFormatRepository implements IExamFormatRepository {
       where: { deletedAt: Not(IsNull()) },
       order: { deletedAt: 'DESC' },
     });
-    return entities.map(ExamFormatMapper.toDomain);
+    return entities.map((entity) => ExamFormatMapper.toDomain(entity));
   }
 
   async create(examFormat: ExamFormat): Promise<ExamFormat> {
