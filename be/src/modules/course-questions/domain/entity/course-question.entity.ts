@@ -1,3 +1,26 @@
+/** Relation course được mapper nạp (`id` đã chuyển number). */
+export interface CourseQuestionCourseRef {
+  id: number;
+  title: string;
+}
+
+/** Relation user được mapper nạp. */
+export interface CourseQuestionUserRef {
+  id: number;
+  name: string;
+}
+
+/** Answer được mapper nạp (kèm user trả lời). */
+export interface CourseQuestionAnswerRef {
+  id: number;
+  questionId: number;
+  userId: number;
+  content: string;
+  status: number;
+  createdAt: Date | null;
+  user?: CourseQuestionUserRef;
+}
+
 export class CourseQuestion {
   private constructor(
     public readonly id: number,
@@ -8,9 +31,9 @@ export class CourseQuestion {
     public readonly lastActivityAt: Date | null,
     public readonly createdAt: Date | null,
     public readonly updatedAt: Date | null,
-    public readonly course?: any,
-    public readonly user?: any,
-    public readonly answers?: any[],
+    public readonly course?: CourseQuestionCourseRef,
+    public readonly user?: CourseQuestionUserRef,
+    public readonly answers?: CourseQuestionAnswerRef[],
     public readonly answerCount?: number,
   ) {}
 
@@ -23,9 +46,9 @@ export class CourseQuestion {
     lastActivityAt: Date | null;
     createdAt: Date | null;
     updatedAt: Date | null;
-    course?: any;
-    user?: any;
-    answers?: any[];
+    course?: CourseQuestionCourseRef;
+    user?: CourseQuestionUserRef;
+    answers?: CourseQuestionAnswerRef[];
     answerCount?: number;
   }): CourseQuestion {
     return new CourseQuestion(

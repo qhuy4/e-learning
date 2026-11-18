@@ -3,6 +3,8 @@ import { UpdateDictationCommand } from '../command/update-dictation.command';
 import { Inject, NotFoundException, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { IDictationRepository, DICTATION_REPOSITORY } from '../../domain/repository/dictation.repository';
 import { IDictationSentenceRepository, DICTATION_SENTENCE_REPOSITORY } from '../../domain/repository/dictation-sentence.repository';
+import { Dictation } from '../../domain/entity/dictation.entity';
+import { DictationSentenceInput } from '../dictation-input.interface';
 import { FILE_STORAGE, FileStorage } from '@/common/storage/domain/interface/file-storage.interface';
 import { extname } from 'path';
 import { randomUUID } from 'crypto';
@@ -61,7 +63,7 @@ export class UpdateDictationHandler implements ICommandHandler<UpdateDictationCo
 
     this.validateSentences(dto.sentences);
 
-    const updateData: any = {
+    const updateData: Partial<Dictation> = {
       title: dto.title ?? dict.title,
       description: dto.description ?? dict.description,
       audioUrl,
@@ -77,7 +79,7 @@ export class UpdateDictationHandler implements ICommandHandler<UpdateDictationCo
 
     if (dto.sentences) {
       await this.sentenceRepo.deleteAllByDictationId(Number(id));
-      const sentences = dto.sentences.map((s: any, i: number) => ({
+      const sentences = dto.sentences.map((s, i) => ({
         sentence: s.sentence,
         startTime: s.startTime,
         endTime: s.endTime,
@@ -91,7 +93,7 @@ export class UpdateDictationHandler implements ICommandHandler<UpdateDictationCo
     return { success: true };
   }
 
-  private validateSentences(sentences: any[]) {
+  private validateSentences(sentences: DictationSentenceInput[] | undefined) {
     if (!sentences || !Array.isArray(sentences)) return;
     for (let i = 0; i < sentences.length; i++) {
       const s = sentences[i];

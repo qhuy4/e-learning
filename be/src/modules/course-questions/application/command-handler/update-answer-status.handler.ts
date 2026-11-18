@@ -5,8 +5,6 @@ import {
   ICourseQuestionRepository,
   COURSE_QUESTION_REPOSITORY,
 } from '@/modules/course-questions/domain/repository/course-question.repository';
-import { AppException } from '@/common/exception/app.exception';
-import { ErrorCode } from '@/common/enum/error-code.enum';
 
 @CommandHandler(UpdateAnswerStatusCommand)
 export class UpdateAnswerStatusHandler implements ICommandHandler<UpdateAnswerStatusCommand> {
@@ -16,6 +14,9 @@ export class UpdateAnswerStatusHandler implements ICommandHandler<UpdateAnswerSt
   ) {}
 
   async execute(command: UpdateAnswerStatusCommand) {
-    return this.questionRepository.updateAnswerStatus(command.data.id, command.data.status);
+    return this.questionRepository.updateAnswerStatus(
+      command.data.id,
+      command.data.status,
+    );
   }
 }

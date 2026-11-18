@@ -1,3 +1,5 @@
+import { CourseStatus } from '@/modules/courses/domain/enum/course-status.enum';
+
 export class UpdateCourseCommand {
   constructor(
     public readonly id: number,
@@ -8,7 +10,7 @@ export class UpdateCourseCommand {
       thumbnailFile?: Express.Multer.File;
       level?: number;
       price?: number;
-      status?: number;
+      status?: CourseStatus;
       parentId?: number | null;
       categories?: string[];
     },

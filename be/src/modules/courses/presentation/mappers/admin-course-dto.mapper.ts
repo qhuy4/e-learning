@@ -1,4 +1,3 @@
-import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { Course } from '@/modules/courses/domain/entity/course.entity';
 import { AdminCourseDetailResponseDto } from '@/modules/courses/presentation/dto/admin-course-detail-response.dto';

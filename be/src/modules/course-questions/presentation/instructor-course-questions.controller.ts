@@ -17,6 +17,9 @@ import { GetAdminQuestionDetailQuery } from '@/modules/course-questions/applicat
 import { AnswerQuestionCommand } from '@/modules/course-questions/application/command/answer-question.command';
 import { UpdateQuestionStatusCommand } from '@/modules/course-questions/application/command/update-question-status.command';
 import { AdminQuestionResponseMapper } from '@/modules/course-questions/presentation/mapper/admin-question-response.mapper';
+import { InstructorQuestionsPage } from '@/modules/course-questions/application/query/get-instructor-questions.query';
+import { AnswerQuestionResult } from '@/modules/course-questions/application/command/answer-question.command';
+import { CourseQuestion } from '@/modules/course-questions/domain/entity/course-question.entity';
 
 @UseGuards(JwtAuthGuard)
 @Controller('instructor/course-questions')
@@ -35,7 +38,10 @@ export class InstructorCourseQuestionsController {
     @Query('status') status?: string,
     @Query('keyword') keyword?: string,
   ) {
-    const result = await this.queryBus.execute(
+    const result = await this.queryBus.execute<
+      GetInstructorQuestionsQuery,
+      InstructorQuestionsPage
+    >(
       new GetInstructorQuestionsQuery(instructorId, {
         page: page ? parseInt(page, 10) : 1,
         limit: limit ? parseInt(limit, 10) : 10,
@@ -46,7 +52,7 @@ export class InstructorCourseQuestionsController {
     );
 
     return {
-      data: result.data.map((q: any) => AdminQuestionResponseMapper.toResponse(q)),
+      data: result.data.map((q) => AdminQuestionResponseMapper.toResponse(q)),
       meta: result.meta,
     };
   }
@@ -56,7 +62,10 @@ export class InstructorCourseQuestionsController {
     @CurrentUser('id') instructorId: number,
     @Param('id', ParseIntPipe) id: number,
   ) {
-    const question = await this.queryBus.execute(new GetAdminQuestionDetailQuery({ id }));
+    const question = await this.queryBus.execute<
+      GetAdminQuestionDetailQuery,
+      CourseQuestion
+    >(new GetAdminQuestionDetailQuery({ id }));
     return AdminQuestionResponseMapper.toResponse(question);
   }
 
@@ -66,7 +75,7 @@ export class InstructorCourseQuestionsController {
     @Param('id', ParseIntPipe) id: number,
     @Body('content') content: string,
   ) {
-    return this.commandBus.execute(
+    return this.commandBus.execute<AnswerQuestionCommand, AnswerQuestionResult>(
       new AnswerQuestionCommand(id, userId, content),
     );
   }
@@ -76,7 +85,7 @@ export class InstructorCourseQuestionsController {
     @Param('id', ParseIntPipe) id: number,
     @Body('status') status: number,
   ) {
-    return this.commandBus.execute(
+    return this.commandBus.execute<UpdateQuestionStatusCommand, CourseQuestion>(
       new UpdateQuestionStatusCommand({ id, status }),
     );
   }

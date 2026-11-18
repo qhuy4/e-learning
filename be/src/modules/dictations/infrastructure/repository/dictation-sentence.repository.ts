@@ -7,10 +7,10 @@ import { IDictationSentenceRepository } from '../../domain/repository/dictation-
 @Injectable()
 export class DictationSentenceRepository implements IDictationSentenceRepository {
   constructor(@InjectRepository(DictationSentenceOrmEntity) private readonly repo: Repository<DictationSentenceOrmEntity>) {}
-  async findByDictationId(dictationId: number): Promise<any[]> {
+  async findByDictationId(dictationId: number): Promise<DictationSentenceOrmEntity[]> {
     return this.repo.find({ where: { dictationId: dictationId.toString() } });
   }
-  async saveAll(sentences: any[]): Promise<any[]> {
+  async saveAll(sentences: Partial<DictationSentenceOrmEntity>[]): Promise<Partial<DictationSentenceOrmEntity>[]> {
     for (const s of sentences) {
       await this.repo.save(this.repo.create(s));
     }

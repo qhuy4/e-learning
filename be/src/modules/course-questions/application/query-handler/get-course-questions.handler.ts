@@ -31,13 +31,15 @@ export class GetCourseQuestionsHandler implements IQueryHandler<GetCourseQuestio
     const [entities, total] = await qb.getManyAndCount();
 
     const ids = entities.map((e) => Number(e.id));
-    let answerCounts: Record<number, number> = {};
+    const answerCounts: Record<number, number> = {};
     if (ids.length > 0) {
-      const counts = await this.repo.query(
+      const counts = await this.repo.query<
+        Array<{ question_id: string; count: number }>
+      >(
         `SELECT question_id, COUNT(*)::int AS count FROM course_question_answers WHERE question_id = ANY($1) GROUP BY question_id`,
         [ids.map(String)],
       );
-      for (const row of counts as any[]) {
+      for (const row of counts) {
         answerCounts[Number(row.question_id)] = row.count;
       }
     }

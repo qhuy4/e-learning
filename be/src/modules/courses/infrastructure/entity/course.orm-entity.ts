@@ -12,6 +12,7 @@ import {
 } from 'typeorm';
 import { SectionOrmEntity } from '@/modules/sections/infrastructure/entity/section.orm-entity';
 import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
+import { CourseStatus } from '@/modules/courses/domain/enum/course-status.enum';
 @Entity({
   name: 'courses',
   schema: 'public',
@@ -48,7 +49,7 @@ export class CourseOrmEntity {
   price: string;
 
   @Column({ type: 'smallint', default: 1 })
-  status: number;
+  status: CourseStatus;
 
   @Column({ name: 'reviewed_by', type: 'bigint', nullable: true })
   reviewedBy: string | null;

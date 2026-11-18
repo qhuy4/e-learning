@@ -13,7 +13,7 @@ export class LessonDictationRepository implements ILessonDictationRepository {
   async delete(lessonId: number, dictationId: number): Promise<void> {
     await this.repo.delete({ lessonId: lessonId.toString(), dictationId: dictationId.toString() });
   }
-  async findByLessonId(lessonId: number): Promise<any[]> {
+  async findByLessonId(lessonId: number): Promise<LessonDictationOrmEntity[]> {
     return this.repo.find({ where: { lessonId: lessonId.toString() } });
   }
 }

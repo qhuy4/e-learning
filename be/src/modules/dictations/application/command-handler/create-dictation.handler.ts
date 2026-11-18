@@ -3,6 +3,7 @@ import { CreateDictationCommand } from '../command/create-dictation.command';
 import { Inject, BadRequestException } from '@nestjs/common';
 import { IDictationRepository, DICTATION_REPOSITORY } from '../../domain/repository/dictation.repository';
 import { IDictationSentenceRepository, DICTATION_SENTENCE_REPOSITORY } from '../../domain/repository/dictation-sentence.repository';
+import { DictationSentenceInput } from '../dictation-input.interface';
 import { Dictation } from '../../domain/entity/dictation.entity';
 import { FILE_STORAGE, FileStorage } from '@/common/storage/domain/interface/file-storage.interface';
 import { extname } from 'path';
@@ -67,7 +68,7 @@ export class CreateDictationHandler implements ICommandHandler<CreateDictationCo
     const saved = await this.dictRepo.create(dict);
 
     if (dto.sentences && dto.sentences.length > 0) {
-      const sentences = dto.sentences.map((s: any, i: number) => ({
+      const sentences = dto.sentences.map((s, i) => ({
         sentence: s.sentence,
         startTime: s.startTime,
         endTime: s.endTime,
@@ -81,7 +82,7 @@ export class CreateDictationHandler implements ICommandHandler<CreateDictationCo
     return saved;
   }
 
-  private validateSentences(sentences: any[]) {
+  private validateSentences(sentences: DictationSentenceInput[] | undefined) {
     if (!sentences || !Array.isArray(sentences)) return;
     for (let i = 0; i < sentences.length; i++) {
       const s = sentences[i];

@@ -19,6 +19,8 @@ import { DeleteQuestionCommand } from '@/modules/course-questions/application/co
 import { DeleteAnswerCommand } from '@/modules/course-questions/application/command/delete-answer.command';
 import { UpdateStatusDto } from '@/modules/course-questions/presentation/dto/update-status.dto';
 import { AdminQuestionResponseMapper } from '@/modules/course-questions/presentation/mapper/admin-question-response.mapper';
+import { AdminQuestionsPage } from '@/modules/course-questions/domain/repository/course-question.repository';
+import { CourseQuestion } from '@/modules/course-questions/domain/entity/course-question.entity';
 
 @Controller('admin/course-questions')
 @UseGuards(JwtAuthGuard)
@@ -38,7 +40,10 @@ export class AdminCourseQuestionsController {
     @Query('sortBy') sortBy?: string,
     @Query('sortOrder') sortOrder?: 'asc' | 'desc',
   ) {
-    const result = await this.queryBus.execute(
+    const result = await this.queryBus.execute<
+      GetAdminQuestionsQuery,
+      AdminQuestionsPage
+    >(
       new GetAdminQuestionsQuery({
         page: page ? parseInt(page, 10) : 1,
         limit: limit ? parseInt(limit, 10) : 10,
@@ -51,22 +56,26 @@ export class AdminCourseQuestionsController {
     );
 
     return {
-      data: result.data.map((q: any) => AdminQuestionResponseMapper.toResponse(q)),
+      data: result.data.map((q) => AdminQuestionResponseMapper.toResponse(q)),
       meta: result.meta,
     };
   }
 
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    const question = await this.queryBus.execute(new GetAdminQuestionDetailQuery({ id }));
+    const question = await this.queryBus.execute<
+      GetAdminQuestionDetailQuery,
+      CourseQuestion
+    >(new GetAdminQuestionDetailQuery({ id }));
     return AdminQuestionResponseMapper.toResponse(question);
   }
 
   @Patch(':id/status')
   async updateStatus(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateStatusDto) {
-    const question = await this.commandBus.execute(
-      new UpdateQuestionStatusCommand({ id, status: dto.status }),
-    );
+    const question = await this.commandBus.execute<
+      UpdateQuestionStatusCommand,
+      CourseQuestion
+    >(new UpdateQuestionStatusCommand({ id, status: dto.status }));
     return AdminQuestionResponseMapper.toResponse(question);
   }
 

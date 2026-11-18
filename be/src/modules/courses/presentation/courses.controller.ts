@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -11,16 +10,13 @@ import {
   Post,
   Query,
   UploadedFile,
-  UploadedFiles,
   UseGuards,
   UseInterceptors,
   Req,
 } from '@nestjs/common';
 
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
-import { extname } from 'path';
-import { randomUUID } from 'crypto';
 
 import { GetCoursesDto } from '@/modules/courses/presentation/dto/get-courses.dto';
 import { GetCoursesQuery } from '@/modules/courses/application/query/get-courses.query';
@@ -63,9 +59,6 @@ import {
   FileStorage,
 } from '@/common/storage/domain/interface/file-storage.interface';
 
-import { CreateReviewCommand } from '@/modules/reviews/application/command/create-review.command';
-import { GetCourseReviewsQuery } from '@/modules/reviews/application/query/get-course-reviews.query';
-import { CheckReviewEligibilityQuery } from '@/modules/reviews/application/query/check-review-eligibility.query';
 
 @Controller('courses')
 export class CoursesController {
@@ -139,7 +132,10 @@ export class CoursesController {
     @Query() query: GetCatalogCoursesDto,
   ): Promise<{ data: CatalogCourseDto[]; meta: any }> {
     const levels = query.levels
-      ? query.levels.split(',').map((l) => Number(l.trim())).filter((n) => !isNaN(n))
+      ? query.levels
+          .split(',')
+          .map((l) => Number(l.trim()))
+          .filter((n) => !isNaN(n))
       : undefined;
 
     return this.queryBus.execute(
@@ -157,8 +153,6 @@ export class CoursesController {
     );
   }
 
-
-
   @Post(':id/preview-token')
   @UseGuards(JwtAuthGuard)
   async createPreviewToken(
@@ -173,9 +167,7 @@ export class CoursesController {
     @Param('slug') slug: string,
     @Query('limit') limit?: number,
   ): Promise<CatalogCourseDto[]> {
-    return this.queryBus.execute(
-      new GetRelatedCoursesQuery(slug, limit ?? 4),
-    );
+    return this.queryBus.execute(new GetRelatedCoursesQuery(slug, limit ?? 4));
   }
 
   @Get(':slug')
@@ -283,7 +275,12 @@ export class CoursesController {
   @Post(':id/view')
   async recordView(
     @Param('id', ParseIntPipe) id: number,
-    @Req() req: any,
+    @Req()
+    req: {
+      user?: { id: number };
+      ip?: string;
+      headers: { 'user-agent'?: string };
+    },
   ): Promise<void> {
     const userId = req.user?.id ?? null;
     const ipAddress = req.ip ?? null;

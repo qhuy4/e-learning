@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
 import { Type } from 'class-transformer';

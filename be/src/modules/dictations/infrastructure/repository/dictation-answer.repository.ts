@@ -7,7 +7,7 @@ import { IDictationAnswerRepository } from '../../domain/repository/dictation-an
 @Injectable()
 export class DictationAnswerRepository implements IDictationAnswerRepository {
   constructor(@InjectRepository(DictationAnswerOrmEntity) private readonly repo: Repository<DictationAnswerOrmEntity>) {}
-  async saveAll(answers: any[]): Promise<any[]> {
+  async saveAll(answers: Partial<DictationAnswerOrmEntity>[]): Promise<Partial<DictationAnswerOrmEntity>[]> {
     for (const a of answers) {
       await this.repo.save(this.repo.create(a));
     }

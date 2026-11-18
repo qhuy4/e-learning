@@ -17,6 +17,10 @@ import { GetAdminQuestionDetailQuery } from '@/modules/course-questions/applicat
 import { CreateQuestionCommand } from '@/modules/course-questions/application/command/create-question.command';
 import { AnswerQuestionCommand } from '@/modules/course-questions/application/command/answer-question.command';
 import { AdminQuestionResponseMapper } from '@/modules/course-questions/presentation/mapper/admin-question-response.mapper';
+import { CourseQuestionsPage } from '@/modules/course-questions/application/query/get-course-questions.query';
+import { CreateQuestionResult } from '@/modules/course-questions/application/command/create-question.command';
+import { AnswerQuestionResult } from '@/modules/course-questions/application/command/answer-question.command';
+import { CourseQuestion } from '@/modules/course-questions/domain/entity/course-question.entity';
 
 @Controller()
 export class StudentCourseQuestionsController {
@@ -33,7 +37,10 @@ export class StudentCourseQuestionsController {
     @Query('limit') limit?: string,
     @Query('status') status?: string,
   ) {
-    const result = await this.queryBus.execute(
+    const result = await this.queryBus.execute<
+      GetCourseQuestionsQuery,
+      CourseQuestionsPage
+    >(
       new GetCourseQuestionsQuery(courseId, {
         page: page ? parseInt(page, 10) : 1,
         limit: limit ? parseInt(limit, 10) : 10,
@@ -42,7 +49,7 @@ export class StudentCourseQuestionsController {
     );
 
     return {
-      data: result.data.map((q: any) => ({
+      data: result.data.map((q) => ({
         id: q.id,
         content: q.content,
         status: q.status,
@@ -62,7 +69,7 @@ export class StudentCourseQuestionsController {
     @Param('courseId', ParseIntPipe) courseId: number,
     @Body('content') content: string,
   ) {
-    return this.commandBus.execute(
+    return this.commandBus.execute<CreateQuestionCommand, CreateQuestionResult>(
       new CreateQuestionCommand(courseId, userId, content),
     );
   }
@@ -70,7 +77,10 @@ export class StudentCourseQuestionsController {
   @Get('course-questions/:id')
   @UseGuards(JwtOptionalAuthGuard)
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    const question = await this.queryBus.execute(new GetAdminQuestionDetailQuery({ id }));
+    const question = await this.queryBus.execute<
+      GetAdminQuestionDetailQuery,
+      CourseQuestion
+    >(new GetAdminQuestionDetailQuery({ id }));
     return AdminQuestionResponseMapper.toResponse(question);
   }
 
@@ -81,7 +91,7 @@ export class StudentCourseQuestionsController {
     @Param('id', ParseIntPipe) id: number,
     @Body('content') content: string,
   ) {
-    return this.commandBus.execute(
+    return this.commandBus.execute<AnswerQuestionCommand, AnswerQuestionResult>(
       new AnswerQuestionCommand(id, userId, content),
     );
   }

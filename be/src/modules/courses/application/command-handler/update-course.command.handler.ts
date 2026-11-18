@@ -33,7 +33,7 @@ import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.en
 import { UserRole } from '@/modules/users/domain/enum/user.role';
 import { CourseStatus } from '@/modules/courses/domain/enum/course-status.enum';
 
-const PENDING_REVIEW_STATUS = 2;
+const PENDING_REVIEW_STATUS = CourseStatus.PENDING_REVIEW;
 
 @CommandHandler(UpdateCourseCommand)
 export class UpdateCourseHandler implements ICommandHandler<UpdateCourseCommand> {
@@ -70,7 +70,7 @@ export class UpdateCourseHandler implements ICommandHandler<UpdateCourseCommand>
       throw new AppException(ErrorCode.COURSE_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
-    const newStatus = command.data.status != null ? Number(command.data.status) : undefined;
+    const newStatus = command.data.status != null ? command.data.status : undefined;
     const owner = newStatus !== undefined
       ? await this.userRepo.findOne({ where: { id: Number(course.instructorId) } })
       : null;
