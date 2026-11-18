@@ -45,7 +45,7 @@ jobs:
         run: npm run lint --if-present
 
       - name: Unit tests
-        run: npm run test --if-present -- --runInBand
+        run: npm run test:ci
 
       - name: Build NestJS
         run: npm run build

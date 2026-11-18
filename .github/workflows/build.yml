@@ -1,0 +1,51 @@
+
+name: PieMind SonarCloud
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - production
+    paths:
+      - "be/**"
+      - "fe/**"
+      - "sonar-project.properties"
+      - ".github/workflows/sonarcloud.yml"
+
+  pull_request:
+    branches:
+      - main
+      - dev
+    paths:
+      - "be/**"
+      - "fe/**"
+      - "sonar-project.properties"
+      - ".github/workflows/sonarcloud.yml"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sonarcloud:
+    name: SonarCloud Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v8.5.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.host.url=https://sonarcloud.io
+            -Dsonar.organization=qhuy4
+            -Dsonar.projectKey=qhuy4_e-learning
+            -Dsonar.qualitygate.wait=true
