@@ -41,7 +41,7 @@ export function mapUserRole(role: UserRole): UserRoleApi {
       return UserRoleApi.STUDENT;
 
     default:
-      throw new Error(`Unknown user role: ${role}`);
+      throw new Error(`Unknown user role: ${String(role)}`);
   }
 }
 
@@ -57,7 +57,7 @@ export function mapUserStatus(status: UserStatus): UserStatusApi {
       return UserStatusApi.PENDING;
 
     default:
-      throw new Error(`Unknown user status: ${status}`);
+      throw new Error(`Unknown user status: ${String(status)}`);
   }
 }
 
@@ -73,7 +73,7 @@ export function mapGender(gender: Gender): GenderApi {
       return GenderApi.OTHER;
 
     default:
-      throw new Error(`Unknown gender: ${gender}`);
+      throw new Error(`Unknown gender: ${String(gender)}`);
   }
 }
 export function mapGenderToDomain(gender: GenderApi): Gender {
@@ -88,7 +88,7 @@ export function mapGenderToDomain(gender: GenderApi): Gender {
       return Gender.OTHER;
 
     default:
-      throw new Error(`Unknown gender: ${gender}`);
+      throw new Error(`Unknown gender: ${String(gender)}`);
   }
 }
 export function mapUserRoleToDomain(role: UserRoleApi): UserRole {
@@ -103,7 +103,7 @@ export function mapUserRoleToDomain(role: UserRoleApi): UserRole {
       return UserRole.STUDENT;
 
     default:
-      throw new Error(`Unknown user role: ${role}`);
+      throw new Error(`Unknown user role: ${String(role)}`);
   }
 }
 
@@ -121,6 +121,6 @@ export function mapUserStatusToDomain(
       return UserStatus.PENDING;
 
     default:
-      throw new Error(`Unknown user status: ${status}`);
+      throw new Error(`Unknown user status: ${String(status)}`);
   }
 }

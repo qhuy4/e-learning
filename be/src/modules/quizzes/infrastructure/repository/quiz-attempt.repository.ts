@@ -70,6 +70,6 @@ export class QuizAttemptRepository implements IQuizAttemptRepository {
       },
       order: { submittedAt: 'DESC' },
     });
-    return entities.map(QuizAttemptMapper.toDomain);
+    return entities.map((entity) => QuizAttemptMapper.toDomain(entity));
   }
 }

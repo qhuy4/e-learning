@@ -5,7 +5,7 @@ import { UpdateQuizCommand } from '../../application/command/update-quiz.command
 import { DeleteQuizCommand } from '../../application/command/delete-quiz.command';
 import { AttachQuizToLessonCommand } from '../../application/command/attach-quiz-to-lesson.command';
 import { DetachQuizFromLessonCommand } from '../../application/command/detach-quiz-from-lesson.command';
-import { GetQuizByIdQuery } from '../../application/query/get-quiz-by-id.query';
+import { GetQuizByIdQuery, QuizWithQuestions } from '../../application/query/get-quiz-by-id.query';
 import { GetQuizListQuery } from '../../application/query/get-quiz-list.query';
 import { CreateQuizDto } from '../dto/create-quiz.dto';
 import { UpdateQuizDto } from '../dto/update-quiz.dto';
@@ -15,6 +15,8 @@ import { RolesGuard } from '@/common/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { Role } from '@/common/enum/role.enum';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { Quiz } from '../../domain/entity/quiz.entity';
+import { LessonQuiz } from '../../domain/entity/lesson-quiz.entity';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.ADMIN)
@@ -24,37 +26,52 @@ export class AdminQuizController {
 
   @Post()
   async create(@Body() dto: CreateQuizDto, @CurrentUser('id') adminId: number) {
-    return this.commandBus.execute(new CreateQuizCommand(dto, adminId.toString()));
+    return this.commandBus.execute<CreateQuizCommand, Quiz>(
+      new CreateQuizCommand(dto, adminId.toString()),
+    );
   }
 
   @Get()
   async findAll() {
-    return this.queryBus.execute(new GetQuizListQuery());
+    return this.queryBus.execute<GetQuizListQuery, Quiz[]>(
+      new GetQuizListQuery(),
+    );
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    return this.queryBus.execute(new GetQuizByIdQuery(id));
+    return this.queryBus.execute<GetQuizByIdQuery, QuizWithQuestions>(
+      new GetQuizByIdQuery(id),
+    );
   }
 
   @Put(':id')
   async update(@Param('id') id: string, @Body() dto: UpdateQuizDto) {
-    return this.commandBus.execute(new UpdateQuizCommand(id, null, dto));
+    return this.commandBus.execute<UpdateQuizCommand, Quiz>(
+      new UpdateQuizCommand(id, null, dto),
+    );
   }
 
   // Admin attach/detach: userId = null bypasses ownership check (admin manages all quizzes)
   @Post(':quizId/attach')
   async attachToLesson(@Param('quizId') quizId: string, @Body() dto: AttachQuizDto) {
-    return this.commandBus.execute(new AttachQuizToLessonCommand(quizId, dto.lessonId, null));
+    return this.commandBus.execute<AttachQuizToLessonCommand, LessonQuiz>(
+      new AttachQuizToLessonCommand(quizId, dto.lessonId, null),
+    );
   }
 
   @Delete(':quizId/detach/:lessonId')
   async detachFromLesson(@Param('quizId') quizId: string, @Param('lessonId') lessonId: string) {
-    return this.commandBus.execute(new DetachQuizFromLessonCommand(quizId, lessonId, null));
+    return this.commandBus.execute<
+      DetachQuizFromLessonCommand,
+      { success: boolean }
+    >(new DetachQuizFromLessonCommand(quizId, lessonId, null));
   }
 
   @Delete(':id')
   async delete(@Param('id') id: string) {
-    return this.commandBus.execute(new DeleteQuizCommand(id, null));
+    return this.commandBus.execute<DeleteQuizCommand, { success: boolean }>(
+      new DeleteQuizCommand(id, null),
+    );
   }
 }

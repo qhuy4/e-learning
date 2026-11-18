@@ -11,6 +11,6 @@ export class QuizQuestionRepository implements IQuizQuestionRepository {
   constructor(@InjectRepository(QuizQuestionOrmEntity) private readonly repository: Repository<QuizQuestionOrmEntity>) {}
   async findByQuizId(quizId: number): Promise<QuizQuestion[]> {
     const entities = await this.repository.find({ where: { quizId: quizId.toString() }, order: { position: 'ASC' } });
-    return entities.map(QuizQuestionMapper.toDomain);
+    return entities.map((entity) => QuizQuestionMapper.toDomain(entity));
   }
 }

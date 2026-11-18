@@ -7,7 +7,6 @@ import { SkillCatalogRepository } from '@/modules/skill-profiling/infrastructure
 import { SkillMatchingService } from '@/modules/skill-profiling/application/skill-matching.service';
 import {
   ModelClientService,
-  VocabFreeTextResponse,
 } from '@/modules/student-assessment/infrastructure/model-client.service';
 import {
   chunkWriting,
@@ -117,8 +116,11 @@ export class StudentAssessmentService {
       bandSource: vocab.band_source,
     };
 
-    const focusDrafts = mapFocusTargets({ vocab: vocabInput, grammar: grammarSignal });
-    const focusTargets = await this.resolveFocusTargets(focusDrafts);
+    const focusDrafts = mapFocusTargets({
+      vocab: vocabInput,
+      grammar: grammarSignal,
+    });
+    await this.resolveFocusTargets(focusDrafts);
 
     const versions = await this.models.getVersions();
     const raw: AssessmentRaw = {
@@ -342,9 +344,7 @@ export class StudentAssessmentService {
               ? chunk.charOffset + change.char_start
               : null,
           char_end:
-            change.char_end != null
-              ? chunk.charOffset + change.char_end
-              : null,
+            change.char_end != null ? chunk.charOffset + change.char_end : null,
           chunk: chunk.index,
         });
       }
@@ -419,7 +419,9 @@ export class StudentAssessmentService {
       }
       const skill = await this.catalog.findByCode(draft.code);
       if (!skill?.is_active) {
-        this.logger.warn(`focus target skill "${draft.code}" not active — skipped`);
+        this.logger.warn(
+          `focus target skill "${draft.code}" not active — skipped`,
+        );
         continue;
       }
       resolved.push(draft);
@@ -466,7 +468,8 @@ export class StudentAssessmentService {
       createdAt: row.created_at,
       cefr: {
         band: row.cefr_band,
-        meanLevel: row.cefr_mean_level == null ? null : Number(row.cefr_mean_level),
+        meanLevel:
+          row.cefr_mean_level == null ? null : Number(row.cefr_mean_level),
         coverage:
           row.vocab_coverage == null ? null : Number(row.vocab_coverage),
         lowConfidence: row.vocab_low_confidence,
@@ -509,11 +512,10 @@ export class StudentAssessmentService {
     items: T[],
     limit: number,
     fn: (item: T, index: number) => Promise<R>,
-  ): Promise<
-    Array<{ ok: true; value: R } | { ok: false; error: unknown }>
-  > {
-    const results: Array<{ ok: true; value: R } | { ok: false; error: unknown }> =
-      new Array(items.length);
+  ): Promise<Array<{ ok: true; value: R } | { ok: false; error: unknown }>> {
+    const results: Array<
+      { ok: true; value: R } | { ok: false; error: unknown }
+    > = new Array(items.length);
     let next = 0;
 
     const worker = async () => {

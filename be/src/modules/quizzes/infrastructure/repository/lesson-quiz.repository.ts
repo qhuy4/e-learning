@@ -12,7 +12,7 @@ export class LessonQuizRepository implements ILessonQuizRepository {
 
   async findByLessonId(lessonId: number): Promise<LessonQuiz[]> {
     const entities = await this.repository.find({ where: { lessonId: lessonId.toString() } });
-    return entities.map(LessonQuizMapper.toDomain);
+    return entities.map((entity) => LessonQuizMapper.toDomain(entity));
   }
 
   async create(lessonQuiz: LessonQuiz): Promise<LessonQuiz> {

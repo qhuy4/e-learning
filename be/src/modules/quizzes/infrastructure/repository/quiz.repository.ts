@@ -21,12 +21,12 @@ export class QuizRepository implements IQuizRepository {
   
   async findAll(): Promise<Quiz[]> {
     const entities = await this.repository.find();
-    return entities.map(QuizMapper.toDomain);
+    return entities.map((entity) => QuizMapper.toDomain(entity));
   }
 
   async findByCreator(userId: number): Promise<Quiz[]> {
     const entities = await this.repository.find({ where: { createdBy: userId.toString() } });
-    return entities.map(QuizMapper.toDomain);
+    return entities.map((entity) => QuizMapper.toDomain(entity));
   }
 
   async create(quiz: Quiz): Promise<Quiz> {

@@ -138,7 +138,7 @@ describe('vocabularyWeight (nhu cầu, không phải điểm năng lực)', () =
     ['C2', 0.5],
     [null, 1.5],
   ])('band %s → weight %s', (band, weight) => {
-    expect(vocabularyWeight(band as string | null)).toBe(weight);
+    expect(vocabularyWeight(band)).toBe(weight);
   });
 });
 

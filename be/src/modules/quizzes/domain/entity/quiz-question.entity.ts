@@ -13,7 +13,18 @@ export class QuizQuestion {
     public createdAt: Date | null,
   ) {}
 
-  static restore(params: any): QuizQuestion {
+  static restore(params: {
+    id: number;
+    quizId: number;
+    question: string;
+    type: QuizQuestionType;
+    audioUrl: string | null;
+    imageUrl: string | null;
+    explanation: string | null;
+    points: number;
+    position: number;
+    createdAt: Date | null;
+  }): QuizQuestion {
     return new QuizQuestion(
       params.id, params.quizId, params.question, params.type,
       params.audioUrl, params.imageUrl, params.explanation,

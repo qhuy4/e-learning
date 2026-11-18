@@ -14,6 +14,6 @@ export class QuizOptionRepository implements IQuizOptionRepository {
     const entities = await this.repository.find({ 
       where: { questionId: In(questionIds.map(id => id.toString())) } 
     });
-    return entities.map(QuizOptionMapper.toDomain);
+    return entities.map((entity) => QuizOptionMapper.toDomain(entity));
   }
 }

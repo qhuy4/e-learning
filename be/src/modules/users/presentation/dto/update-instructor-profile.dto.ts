@@ -1,4 +1,10 @@
-import { IsOptional, IsString, IsEmail, ValidateNested, IsEnum, IsDateString } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  ValidateNested,
+  IsEnum,
+  IsDateString,
+} from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { GenderApi } from '@/modules/users/presentation/mapper/enum.mapper';
 

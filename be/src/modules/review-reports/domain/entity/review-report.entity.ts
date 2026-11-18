@@ -1,3 +1,19 @@
+/** Relation review được mapper nạp (kèm user viết review & khóa học). */
+export interface ReviewReportReviewRef {
+  id: number;
+  rating: number;
+  comment: string | null;
+  status: number;
+  user?: { id: number; name: string };
+  course?: { id: number; title: string };
+}
+
+/** User được mapper nạp (`reporter`/`resolver`). */
+export interface ReviewReportUserRef {
+  id: number;
+  name: string;
+}
+
 export class ReviewReport {
   private constructor(
     public readonly id: number,
@@ -9,9 +25,9 @@ export class ReviewReport {
     public readonly resolvedAt: Date | null,
     public readonly createdAt: Date | null,
     public readonly updatedAt: Date | null,
-    public readonly review?: any,
-    public readonly reporter?: any,
-    public readonly resolver?: any,
+    public readonly review?: ReviewReportReviewRef,
+    public readonly reporter?: ReviewReportUserRef,
+    public readonly resolver?: ReviewReportUserRef,
   ) {}
 
   static restore(params: {
@@ -24,9 +40,9 @@ export class ReviewReport {
     resolvedAt: Date | null;
     createdAt: Date | null;
     updatedAt: Date | null;
-    review?: any;
-    reporter?: any;
-    resolver?: any;
+    review?: ReviewReportReviewRef;
+    reporter?: ReviewReportUserRef;
+    resolver?: ReviewReportUserRef;
   }): ReviewReport {
     return new ReviewReport(
       params.id,

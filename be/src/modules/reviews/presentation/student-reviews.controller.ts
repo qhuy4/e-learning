@@ -32,6 +32,7 @@ import { DeleteReviewCommand } from '@/modules/reviews/application/command/delet
 import { GetCourseReviewsQuery } from '@/modules/reviews/application/query/get-course-reviews.query';
 import { CheckReviewEligibilityQuery } from '@/modules/reviews/application/query/check-review-eligibility.query';
 import { ReviewDtoMapper } from '@/modules/reviews/presentation/mappers/review-dto.mapper';
+import { ReviewOrmEntity } from '@/modules/reviews/infrastructure/entity/review.orm-entity';
 
 export class CreateReviewDto {
   @Type(() => Number)
@@ -64,7 +65,15 @@ export class StudentReviewsController {
     @CurrentUser('id') userId: number,
     @Param('courseId') courseId: string,
   ) {
-    return this.queryBus.execute(
+    return this.queryBus.execute<
+      CheckReviewEligibilityQuery,
+      {
+        isEnrolled: boolean;
+        canReview: boolean;
+        hasReviewed: boolean;
+        userReview: ReturnType<typeof ReviewDtoMapper.toDto>;
+      }
+    >(
       new CheckReviewEligibilityQuery(String(userId), courseId),
     );
   }
@@ -79,7 +88,14 @@ export class StudentReviewsController {
     @CurrentUser('id') userId: number,
     @Param('courseId') courseId: string,
     @Body() dto: CreateReviewDto,
-    @Req() req: any,
+    @Req()
+    req: {
+      body?: {
+        rating?: unknown;
+        existingImageUrls?: string | string[];
+        comment?: string;
+      };
+    },
     @UploadedFiles() files?: Express.Multer.File[],
   ) {
     // Robust rating extraction (from dto or req.body in case of multipart form data)
@@ -123,7 +139,10 @@ export class StudentReviewsController {
 
     const commentText = dto.comment ?? req?.body?.comment ?? undefined;
 
-    const result = await this.commandBus.execute(
+    const result = await this.commandBus.execute<
+      CreateReviewCommand,
+      ReviewOrmEntity | null
+    >(
       new CreateReviewCommand(
         String(userId),
         courseId,
@@ -145,7 +164,23 @@ export class StudentReviewsController {
     @Query('sortOrder') sortOrder?: 'asc' | 'desc',
     @Query('hasImage') hasImage?: string,
   ) {
-    return this.queryBus.execute(
+    return this.queryBus.execute<
+      GetCourseReviewsQuery,
+      {
+        data: ReturnType<typeof ReviewDtoMapper.toDtoList>;
+        stats: {
+          averageRating: number;
+          totalReviews: number;
+          starCounts: Record<number, number>;
+        };
+        meta: {
+          page: number;
+          limit: number;
+          total: number;
+          totalPages: number;
+        };
+      }
+    >(
       new GetCourseReviewsQuery(
         courseId,
         page ? Number(page) : 1,
@@ -163,7 +198,7 @@ export class StudentReviewsController {
     @CurrentUser('id') userId: number,
     @Param('id') id: string,
   ) {
-    return this.commandBus.execute(
+    return this.commandBus.execute<DeleteReviewCommand, { success: boolean }>(
       new DeleteReviewCommand(id, String(userId)),
     );
   }

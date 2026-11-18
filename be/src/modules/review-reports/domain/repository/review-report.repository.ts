@@ -1,4 +1,11 @@
+import { ReviewReport } from '@/modules/review-reports/domain/entity/review-report.entity';
+
 export const REVIEW_REPORT_REPOSITORY = 'REVIEW_REPORT_REPOSITORY';
+
+export interface AdminReviewReportsPage {
+  data: ReviewReport[];
+  meta: { page: number; limit: number; total: number; totalPages: number };
+}
 
 export interface IReviewReportRepository {
   findAll(options: {
@@ -8,10 +15,10 @@ export interface IReviewReportRepository {
     keyword?: string;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
-  }): Promise<{ data: any[]; meta: { page: number; limit: number; total: number; totalPages: number } }>;
+  }): Promise<AdminReviewReportsPage>;
 
-  findById(id: number): Promise<any | null>;
-  resolve(id: number, resolvedBy: number): Promise<any>;
-  dismiss(id: number): Promise<any>;
+  findById(id: number): Promise<ReviewReport | null>;
+  resolve(id: number, resolvedBy: number): Promise<ReviewReport | null>;
+  dismiss(id: number): Promise<ReviewReport | null>;
   delete(id: number): Promise<void>;
 }

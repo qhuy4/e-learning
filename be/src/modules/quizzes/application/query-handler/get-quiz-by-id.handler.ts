@@ -4,6 +4,7 @@ import { Inject, NotFoundException } from '@nestjs/common';
 import { IQuizRepository, QUIZ_REPOSITORY } from '../../domain/repository/quiz.repository';
 import { IQuizQuestionRepository, QUIZ_QUESTION_REPOSITORY } from '../../domain/repository/quiz-question.repository';
 import { IQuizOptionRepository, QUIZ_OPTION_REPOSITORY } from '../../domain/repository/quiz-option.repository';
+import { QuizOption } from '../../domain/entity/quiz-option.entity';
 
 @QueryHandler(GetQuizByIdQuery)
 export class GetQuizByIdHandler implements IQueryHandler<GetQuizByIdQuery> {
@@ -17,7 +18,7 @@ export class GetQuizByIdHandler implements IQueryHandler<GetQuizByIdQuery> {
     if (!quiz) throw new NotFoundException('Quiz not found');
 
     const questions = await this.questionRepo.findByQuizId(quiz.id!);
-    let options: any[] = [];
+    let options: QuizOption[] = [];
     if (questions.length > 0) {
       options = await this.optionRepo.findByQuestionIds(questions.map(q => q.id!));
     }

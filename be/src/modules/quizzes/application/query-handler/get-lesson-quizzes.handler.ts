@@ -1,5 +1,8 @@
 import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
-import { GetLessonQuizzesQuery } from '../query/get-lesson-quizzes.query';
+import {
+  GetLessonQuizzesQuery,
+  LessonQuizzesResult,
+} from '../query/get-lesson-quizzes.query';
 import { Inject } from '@nestjs/common';
 import { ILessonQuizRepository, LESSON_QUIZ_REPOSITORY } from '../../domain/repository/lesson-quiz.repository';
 import { IQuizRepository, QUIZ_REPOSITORY } from '../../domain/repository/quiz.repository';
@@ -17,7 +20,7 @@ export class GetLessonQuizzesHandler implements IQueryHandler<GetLessonQuizzesQu
     if (!mappings || mappings.length === 0) return [];
     
     // Fetch all quizzes by IDs
-    const quizzes: any[] = [];
+    const quizzes: LessonQuizzesResult = [];
     for (const m of mappings) {
       const quiz = await this.quizRepo.findById(Number(m.quizId));
       if (quiz) {

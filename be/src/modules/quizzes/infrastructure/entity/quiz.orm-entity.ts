@@ -1,8 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
-import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
-import { LessonQuizOrmEntity } from './lesson-quiz.orm-entity';
-import { QuizQuestionOrmEntity } from './quiz-question.orm-entity';
-import { QuizAttemptOrmEntity } from './quiz-attempt.orm-entity';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity({ name: 'quizzes', schema: 'public' })
 export class QuizOrmEntity {

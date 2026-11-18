@@ -17,7 +17,18 @@ export class QuizAttempt {
     return new QuizAttempt(null, params.quizId, params.userId, 0, 0, 0, QuizAttemptStatus.IN_PROGRESS, new Date(), null, null);
   }
 
-  static restore(params: any): QuizAttempt {
+  static restore(params: {
+    id: number;
+    quizId: number;
+    userId: number;
+    score: number;
+    correctCount: number;
+    totalQuestions: number;
+    status: QuizAttemptStatus;
+    startedAt: Date;
+    submittedAt: Date | null;
+    createdAt: Date | null;
+  }): QuizAttempt {
     return new QuizAttempt(params.id, params.quizId, params.userId, params.score, params.correctCount, params.totalQuestions, params.status, params.startedAt, params.submittedAt, params.createdAt);
   }
 }

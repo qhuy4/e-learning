@@ -1,5 +1,8 @@
 import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
-import { GetStudentLessonQuizzesQuery } from '../query/get-student-lesson-quizzes.query';
+import {
+  GetStudentLessonQuizzesQuery,
+  StudentLessonQuizItem,
+} from '../query/get-student-lesson-quizzes.query';
 import { ForbiddenException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -49,7 +52,7 @@ export class GetStudentLessonQuizzesHandler implements IQueryHandler<GetStudentL
     const mappings = await this.lessonQuizRepo.findByLessonId(Number(query.lessonId));
     if (!mappings || mappings.length === 0) return [];
 
-    const quizzes: any[] = [];
+    const quizzes: StudentLessonQuizItem[] = [];
     for (const m of mappings) {
       const quiz = await this.quizRepo.findById(Number(m.quizId));
       if (!quiz) continue;

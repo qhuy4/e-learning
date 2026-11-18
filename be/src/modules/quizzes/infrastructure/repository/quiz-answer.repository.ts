@@ -25,6 +25,6 @@ export class QuizAnswerRepository implements IQuizAnswerRepository {
     const entities = await this.repository.find({
       where: { attemptId: attemptId.toString() },
     });
-    return entities.map(QuizAnswerMapper.toDomain);
+    return entities.map((entity) => QuizAnswerMapper.toDomain(entity));
   }
 }
