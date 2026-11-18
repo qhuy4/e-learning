@@ -33,9 +33,7 @@ function getDateRangeStart(range: string): Date {
 
 @QueryHandler(GetCourseAnalyticsQuery)
 @Injectable()
-export class GetCourseAnalyticsHandler
-  implements IQueryHandler<GetCourseAnalyticsQuery>
-{
+export class GetCourseAnalyticsHandler implements IQueryHandler<GetCourseAnalyticsQuery> {
   constructor(
     @InjectRepository(CourseViewOrmEntity)
     private readonly courseViewRepo: Repository<CourseViewOrmEntity>,
@@ -56,14 +54,24 @@ export class GetCourseAnalyticsHandler
   ) {}
 
   async execute(query: GetCourseAnalyticsQuery) {
-    const { instructorId, courseId, dateRange, startDate: customStartDate, endDate: customEndDate } = query;
+    const {
+      instructorId,
+      courseId,
+      dateRange,
+      startDate: customStartDate,
+    } = query;
 
-    const course = await this.courseRepo.findOne({ where: { id: String(courseId) } });
-    if (!course) throw new AppException(ErrorCode.COURSE_NOT_FOUND, HttpStatus.NOT_FOUND);
+    const course = await this.courseRepo.findOne({
+      where: { id: String(courseId) },
+    });
+    if (!course)
+      throw new AppException(ErrorCode.COURSE_NOT_FOUND, HttpStatus.NOT_FOUND);
     if (Number(course.instructorId) !== instructorId)
       throw new ForbiddenException('Access denied');
 
-    const startDate = customStartDate ? new Date(customStartDate) : getDateRangeStart(dateRange);
+    const startDate = customStartDate
+      ? new Date(customStartDate)
+      : getDateRangeStart(dateRange);
 
     // ── Overview ──────────────────────────────────────────────────────────
     const totalStudents = await this.enrollmentRepo.count({
@@ -75,7 +83,7 @@ export class GetCourseAnalyticsHandler
         dateRange === 'all'
           ? { courseId }
           : { courseId, viewedAt: MoreThanOrEqual(startDate) },
-    } as any);
+    });
 
     const completedStudents = await this.enrollmentRepo.count({
       where: { courseId: String(courseId), status: 2 },
@@ -93,7 +101,7 @@ export class GetCourseAnalyticsHandler
       .addSelect('COUNT(*)', 'totalReviews')
       .where('r.course_id = :courseId', { courseId: String(courseId) })
       .andWhere('r.deleted_at IS NULL')
-      .getRawOne();
+      .getRawOne<{ avgRating: string | null; totalReviews: string }>();
 
     const avgRating = ratingRows?.avgRating
       ? Math.round(Number(ratingRows.avgRating) * 10) / 10
@@ -108,7 +116,7 @@ export class GetCourseAnalyticsHandler
       .andWhere('r.deleted_at IS NULL')
       .groupBy('r.rating')
       .orderBy('r.rating', 'DESC')
-      .getRawMany();
+      .getRawMany<{ rating: string; count: string }>();
 
     // ── Enrollment Trend ──────────────────────────────────────────────────
     const enrollmentTrend = await this.enrollmentRepo
@@ -116,16 +124,13 @@ export class GetCourseAnalyticsHandler
       .select("TO_CHAR(e.enrolled_at, 'YYYY-MM-DD')", 'date')
       .addSelect('COUNT(*)', 'count')
       .where('e.course_id = :courseId', { courseId: String(courseId) })
-      .andWhere(
-        dateRange === 'all'
-          ? '1=1'
-          : 'e.enrolled_at >= :startDate',
-        { startDate },
-      )
+      .andWhere(dateRange === 'all' ? '1=1' : 'e.enrolled_at >= :startDate', {
+        startDate,
+      })
       .andWhere('e.enrolled_at IS NOT NULL')
       .groupBy("TO_CHAR(e.enrolled_at, 'YYYY-MM-DD')")
       .orderBy("TO_CHAR(e.enrolled_at, 'YYYY-MM-DD')", 'ASC')
-      .getRawMany();
+      .getRawMany<{ date: string; count: string }>();
 
     // ── Views Trend ───────────────────────────────────────────────────────
     const viewsTrend = await this.courseViewRepo
@@ -133,15 +138,12 @@ export class GetCourseAnalyticsHandler
       .select("TO_CHAR(v.viewed_at, 'YYYY-MM-DD')", 'date')
       .addSelect('COUNT(*)', 'count')
       .where('v.course_id = :courseId', { courseId })
-      .andWhere(
-        dateRange === 'all'
-          ? '1=1'
-          : 'v.viewed_at >= :startDate',
-        { startDate },
-      )
+      .andWhere(dateRange === 'all' ? '1=1' : 'v.viewed_at >= :startDate', {
+        startDate,
+      })
       .groupBy("TO_CHAR(v.viewed_at, 'YYYY-MM-DD')")
       .orderBy("TO_CHAR(v.viewed_at, 'YYYY-MM-DD')", 'ASC')
-      .getRawMany();
+      .getRawMany<{ date: string; count: string }>();
 
     // ── Enrollment Growth ─────────────────────────────────────────────────
     const periodMs =
@@ -160,7 +162,7 @@ export class GetCourseAnalyticsHandler
         enrolledAt: MoreThanOrEqual(startDate),
       },
     });
-    const prevPeriodEnrollments = await this.enrollmentRepo.count({
+    await this.enrollmentRepo.count({
       where: {
         courseId: String(courseId),
         enrolledAt: MoreThanOrEqual(prevStart),
@@ -182,7 +184,7 @@ export class GetCourseAnalyticsHandler
       .select('AVG(e.progress)', 'avgProgress')
       .where('e.course_id = :courseId', { courseId: String(courseId) })
       .andWhere('e.status IN (:...statuses)', { statuses: [1, 2] })
-      .getRawOne();
+      .getRawOne<{ avgProgress: string | null }>();
 
     const avgProgress = avgProgressResult?.avgProgress
       ? Math.round(Number(avgProgressResult.avgProgress) * 10) / 10
@@ -194,23 +196,25 @@ export class GetCourseAnalyticsHandler
       .select('AVG(lp.watch_seconds)', 'avgWatchSeconds')
       .addSelect('SUM(lp.watch_seconds)', 'totalWatchSeconds')
       .where('lp.course_id = :courseId', { courseId })
-      .getRawOne();
+      .getRawOne<{
+        avgWatchSeconds: string | null;
+        totalWatchSeconds: string | null;
+      }>();
 
     const avgWatchSeconds = Number(learningTimeResult?.avgWatchSeconds ?? 0);
-    const totalWatchSeconds = Number(learningTimeResult?.totalWatchSeconds ?? 0);
+    const totalWatchSeconds = Number(
+      learningTimeResult?.totalWatchSeconds ?? 0,
+    );
 
     // ── Active Students (had lesson progress in period) ───────────────────
     const activeStudents = await this.lessonProgressRepo
       .createQueryBuilder('lp')
       .select('COUNT(DISTINCT lp.user_id)', 'count')
       .where('lp.course_id = :courseId', { courseId })
-      .andWhere(
-        dateRange === 'all'
-          ? '1=1'
-          : 'lp.updated_at >= :startDate',
-        { startDate },
-      )
-      .getRawOne();
+      .andWhere(dateRange === 'all' ? '1=1' : 'lp.updated_at >= :startDate', {
+        startDate,
+      })
+      .getRawOne<{ count: string }>();
 
     // ── Lesson Performance ────────────────────────────────────────────────
     const sections = await this.sectionRepo.find({
@@ -240,11 +244,21 @@ export class GetCourseAnalyticsHandler
           .addSelect('AVG(lp.watch_seconds)', 'avgWatchTime')
           .where('lp.lesson_id IN (:...lessonIds)', { lessonIds })
           .groupBy('lp.lesson_id')
-          .getRawMany()
+          .getRawMany<{
+            lessonId: string;
+            totalStarted: string;
+            completed: string;
+            avgWatchTime: string;
+          }>()
       : [];
 
     const lessonProgressMap = new Map(
-      lessonProgressStats.map((row: any) => [Number(row.lessonId), row]),
+      lessonProgressStats.map(
+        (row): [number, (typeof lessonProgressStats)[number]] => [
+          Number(row.lessonId),
+          row,
+        ],
+      ),
     );
 
     const lessonPerformance = lessons.map((lesson) => {
@@ -278,9 +292,7 @@ export class GetCourseAnalyticsHandler
       id: section.id,
       title: section.title,
       position: section.position,
-      lessons: lessonPerformance.filter(
-        (lp) => lp.sectionId === section.id,
-      ),
+      lessons: lessonPerformance.filter((lp) => lp.sectionId === section.id),
     }));
 
     // ── Revenue ───────────────────────────────────────────────────────────
@@ -296,7 +308,10 @@ export class GetCourseAnalyticsHandler
       .andWhere("o.status = '1'")
       .andWhere('o.created_at IS NOT NULL')
       .setParameters({ startDate })
-      .getRawOne();
+      .getRawOne<{
+        totalRevenue: string | null;
+        periodRevenue: string | null;
+      }>();
 
     const totalRevenue = Number(revenueResult?.totalRevenue ?? 0);
     const periodRevenue = Number(revenueResult?.periodRevenue ?? 0);
@@ -310,15 +325,12 @@ export class GetCourseAnalyticsHandler
       .where('oi.course_id = :courseId', { courseId: String(courseId) })
       .andWhere("o.status = '1'")
       .andWhere('o.created_at IS NOT NULL')
-      .andWhere(
-        dateRange === 'all'
-          ? '1=1'
-          : 'o.created_at >= :startDate',
-        { startDate },
-      )
+      .andWhere(dateRange === 'all' ? '1=1' : 'o.created_at >= :startDate', {
+        startDate,
+      })
       .groupBy("TO_CHAR(o.created_at, 'YYYY-MM-DD')")
       .orderBy("TO_CHAR(o.created_at, 'YYYY-MM-DD')", 'ASC')
-      .getRawMany();
+      .getRawMany<{ date: string; revenue: string }>();
 
     return {
       overview: {
@@ -328,11 +340,11 @@ export class GetCourseAnalyticsHandler
         avgRating,
         totalRevenue,
       },
-      enrollmentTrend: enrollmentTrend.map((row: any) => ({
+      enrollmentTrend: enrollmentTrend.map((row) => ({
         date: row.date,
         count: Number(row.count),
       })),
-      viewsTrend: viewsTrend.map((row: any) => ({
+      viewsTrend: viewsTrend.map((row) => ({
         date: row.date,
         count: Number(row.count),
       })),
@@ -359,7 +371,7 @@ export class GetCourseAnalyticsHandler
       rating: {
         avgRating,
         totalReviews,
-        distribution: ratingDistribution.map((row: any) => ({
+        distribution: ratingDistribution.map((row) => ({
           rating: Number(row.rating),
           count: Number(row.count),
         })),
@@ -367,7 +379,7 @@ export class GetCourseAnalyticsHandler
       revenue: {
         totalRevenue,
         periodRevenue,
-        trend: revenueTrend.map((row: any) => ({
+        trend: revenueTrend.map((row) => ({
           date: row.date,
           revenue: Number(row.revenue),
         })),

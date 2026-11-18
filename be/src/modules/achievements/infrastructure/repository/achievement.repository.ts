@@ -19,15 +19,19 @@ export class AchievementRepository {
     criteria?: string;
     isActive?: boolean;
   }) {
-    const { page, limit, keyword, sortBy, sortOrder, criteria, isActive } = options;
+    const { page, limit, keyword, sortBy, sortOrder, criteria, isActive } =
+      options;
 
     const query = this.repository.createQueryBuilder('a');
 
     if (keyword) {
       query.andWhere(
         new Brackets((qb) => {
-          qb.where('a.name ILIKE :keyword', { keyword: `%${keyword}%` })
-            .orWhere('a.description ILIKE :keyword', { keyword: `%${keyword}%` });
+          qb.where('a.name ILIKE :keyword', {
+            keyword: `%${keyword}%`,
+          }).orWhere('a.description ILIKE :keyword', {
+            keyword: `%${keyword}%`,
+          });
         }),
       );
     }
@@ -47,8 +51,12 @@ export class AchievementRepository {
       threshold: 'a.threshold',
     };
 
-    const sortKey = sortBy && sortableColumns[sortBy] ? sortableColumns[sortBy] : 'a.updated_at';
-    const sortDirection: 'ASC' | 'DESC' = sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+    const sortKey =
+      sortBy && sortableColumns[sortBy]
+        ? sortableColumns[sortBy]
+        : 'a.updated_at';
+    const sortDirection: 'ASC' | 'DESC' =
+      sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
     query
       .orderBy(sortKey, sortDirection)
@@ -77,7 +85,9 @@ export class AchievementRepository {
   }
 
   async findById(id: number) {
-    const entity = await this.repository.findOne({ where: { id: id.toString() } });
+    const entity = await this.repository.findOne({
+      where: { id: id.toString() },
+    });
     if (!entity) return null;
 
     const earnedCount = await this.repository.manager
@@ -118,21 +128,26 @@ export class AchievementRepository {
     };
   }
 
-  async update(id: number, data: {
-    name?: string;
-    description?: string;
-    icon?: string | null;
-    criteria?: string;
-    threshold?: number;
-    reward?: Record<string, unknown> | null;
-    isActive?: boolean;
-  }) {
+  async update(
+    id: number,
+    data: {
+      name?: string;
+      description?: string;
+      icon?: string | null;
+      criteria?: string;
+      threshold?: number;
+      reward?: Record<string, unknown> | null;
+      isActive?: boolean;
+    },
+  ) {
     const updateData: Record<string, unknown> = { ...data };
     if (data.reward === null) {
       updateData.reward = null;
     }
-    await this.repository.update(id.toString(), updateData as any);
-    const entity = await this.repository.findOne({ where: { id: id.toString() } });
+    await this.repository.update(id.toString(), updateData);
+    const entity = await this.repository.findOne({
+      where: { id: id.toString() },
+    });
     return {
       id: Number(entity!.id),
       name: entity!.name,

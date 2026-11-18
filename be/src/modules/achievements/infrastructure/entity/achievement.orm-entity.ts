@@ -30,7 +30,7 @@ export class AchievementOrmEntity {
   threshold: number;
 
   @Column({ name: 'reward', type: 'jsonb', nullable: true })
-  reward: unknown | null;
+  reward: unknown;
 
   @Column({ name: 'is_active', type: 'boolean', default: true })
   isActive: boolean;

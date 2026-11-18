@@ -12,7 +12,10 @@ export class CreateAchievementHandler implements ICommandHandler<CreateAchieveme
   async execute(command: CreateAchievementCommand) {
     const existing = await this.achievementRepository.findByName(command.name);
     if (existing) {
-      throw new AppException(ErrorCode.ACHIEVEMENT_NAME_EXISTS, HttpStatus.CONFLICT);
+      throw new AppException(
+        ErrorCode.ACHIEVEMENT_NAME_EXISTS,
+        HttpStatus.CONFLICT,
+      );
     }
 
     const saved = await this.achievementRepository.create({
@@ -21,7 +24,7 @@ export class CreateAchievementHandler implements ICommandHandler<CreateAchieveme
       icon: command.icon,
       criteria: command.criteria,
       threshold: command.threshold,
-      reward: command.reward as any,
+      reward: command.reward,
     });
 
     return { data: saved };

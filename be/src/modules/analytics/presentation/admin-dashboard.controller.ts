@@ -17,21 +17,52 @@ export class AdminDashboardController {
       params.push(from, to);
     }
 
-    const [users, courses, enrollments, orders, revenue, pendingCerts, revenueByMonth, recentOrders, recentEnrollments] = await Promise.all([
-      this.ds.query('SELECT COUNT(*)::int AS count FROM users'),
-      this.ds.query('SELECT COUNT(*)::int AS count FROM courses'),
-      this.ds.query('SELECT COUNT(*)::int AS count FROM enrollments'),
-      this.ds.query('SELECT COUNT(*)::int AS count FROM orders'),
-      this.ds.query('SELECT COALESCE(SUM(total), 0)::numeric AS sum FROM orders'),
-      this.ds.query('SELECT COUNT(*)::int AS count FROM instructor_certificates WHERE certificate_status = 1'),
-      this.ds.query(`
+    const [
+      users,
+      courses,
+      enrollments,
+      orders,
+      revenue,
+      pendingCerts,
+      revenueByMonth,
+      recentOrders,
+      recentEnrollments,
+    ] = await Promise.all([
+      this.ds.query<Array<{ count: number }>>(
+        'SELECT COUNT(*)::int AS count FROM users',
+      ),
+      this.ds.query<Array<{ count: number }>>(
+        'SELECT COUNT(*)::int AS count FROM courses',
+      ),
+      this.ds.query<Array<{ count: number }>>(
+        'SELECT COUNT(*)::int AS count FROM enrollments',
+      ),
+      this.ds.query<Array<{ count: number }>>(
+        'SELECT COUNT(*)::int AS count FROM orders',
+      ),
+      this.ds.query<Array<{ sum: string }>>(
+        'SELECT COALESCE(SUM(total), 0)::numeric AS sum FROM orders',
+      ),
+      this.ds.query<Array<{ count: number }>>(
+        'SELECT COUNT(*)::int AS count FROM instructor_certificates WHERE certificate_status = 1',
+      ),
+      this.ds.query<Array<{ month: string; revenue: string }>>(`
         SELECT TO_CHAR(created_at, 'YYYY-MM') AS month, COALESCE(SUM(total), 0)::numeric AS revenue
         FROM orders
         ${revenueWhere}
         GROUP BY TO_CHAR(created_at, 'YYYY-MM')
         ORDER BY month ASC
       `, params),
-      this.ds.query(`
+      this.ds.query<
+        Array<{
+          id: string;
+          orderCode: string;
+          total: string;
+          status: number;
+          createdAt: Date;
+          userName: string | null;
+        }>
+      >(`
         SELECT o.id, o.order_code AS "orderCode", o.total, o.status, o.created_at AS "createdAt",
                u.name AS "userName"
         FROM orders o
@@ -39,7 +70,14 @@ export class AdminDashboardController {
         ORDER BY o.created_at DESC
         LIMIT 5
       `),
-      this.ds.query(`
+      this.ds.query<
+        Array<{
+          id: string;
+          createdAt: Date;
+          userName: string | null;
+          courseTitle: string | null;
+        }>
+      >(`
         SELECT e.id, e.created_at AS "createdAt",
                u.name AS "userName", c.title AS "courseTitle"
         FROM enrollments e

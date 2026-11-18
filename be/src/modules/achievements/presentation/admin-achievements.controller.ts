@@ -12,7 +12,6 @@ import {
   UseInterceptors,
   UploadedFile,
   Inject,
-  BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -25,7 +24,10 @@ import { DeleteAchievementCommand } from '@/modules/achievements/application/com
 import { CreateAchievementDto } from '@/modules/achievements/presentation/dto/create-achievement.dto';
 import { UpdateAchievementDto } from '@/modules/achievements/presentation/dto/update-achievement.dto';
 import { UserAchievementRepository } from '@/modules/achievements/infrastructure/repository/user-achievement.repository';
-import { FILE_STORAGE, FileStorage } from '@/common/storage/domain/interface/file-storage.interface';
+import {
+  FILE_STORAGE,
+  FileStorage,
+} from '@/common/storage/domain/interface/file-storage.interface';
 
 @Controller('admin/achievements')
 @UseGuards(JwtAuthGuard)
