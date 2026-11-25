@@ -9,9 +9,14 @@ import {
   Post,
   Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enum/role.enum';
+import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
 import { GetUsersQuery } from '@/modules/users/application/query/get-users.query';
 import { PaginationDto } from '@/common/pagination/pagination.dto';
 import { GetUserByIdQuery } from '@/modules/users/application/query/get-user-by-id.query';
@@ -31,6 +36,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { avatarUploadConfig } from '@/config/multer.config';
 
 @Controller('admin/users')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
 export class UsersController {
   constructor(
     private readonly commandBus: CommandBus,

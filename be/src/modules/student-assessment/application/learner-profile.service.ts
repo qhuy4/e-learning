@@ -6,19 +6,25 @@ import { SkillCatalogRepository } from '@/modules/skill-profiling/infrastructure
 import { SkillMatchingService } from '@/modules/skill-profiling/application/skill-matching.service';
 import { ModelClientService } from '@/modules/student-assessment/infrastructure/model-client.service';
 import { StudentAssessmentService } from '@/modules/student-assessment/application/student-assessment.service';
-import {
-  FocusTargetDraft,
-  vocabularyWeight,
-  weightPctSummary,
-} from '@/modules/student-assessment/application/assessment-mapping';
 import { QuizScoreDto } from '@/modules/student-assessment/presentation/dto/quiz-score.dto';
 import { MatchFromProfileDto } from '@/modules/student-assessment/presentation/dto/match-from-profile.dto';
+import { ListeningScoreDto } from '@/modules/student-assessment/presentation/dto/listening-score.dto';
+import {
+  isListeningForm,
+  isListeningItem,
+  isListeningLevel,
+  listeningForm,
+  listeningLevelForVersion,
+  scoreListening,
+} from '@/modules/student-assessment/domain/listening-assessment';
 
 /**
- * Hồ sơ học viên hợp nhất cho skill-match 3 bước:
+ * Hồ sơ học viên hợp nhất cho skill-match 6 bước:
  *   Bước 1 self-assessment  → student_self_assessments
  *   Bước 2 quiz từ vựng     → student_quiz_attempts (model /vocab/score)
- *   Bước 2 writing (tuỳ chọn) → student_assessments (đã có từ Phase 1)
+ *   Bước 3 writing (tuỳ chọn) → student_assessments (đã có từ Phase 1)
+ *   Bước 4 listening (tuỳ chọn) → student_listening_attempts
+ *   Bước 5 mục tiêu học tập  → payload matching (không tự suy từ assessment)
  *
  * Nguyên tắc: KHÔNG bịa điểm. Mỗi kỹ năng mang trạng thái
  * assessed | insufficient | not_assessed kèm nguồn bằng chứng.
@@ -31,7 +37,8 @@ export interface LearnerSkillStatus {
   code: string;
   status: SkillAssessmentStatus;
   band: string | null;
-  source: 'quiz' | 'writing' | null;
+  source: 'quiz' | 'writing' | 'listening' | 'speaking' | null;
+  scorePct?: number | null;
   /** Heuristic 0–100 của grammar (null với kỹ năng khác) — không phải accuracy. */
   qualityScore: number | null;
   note: string;
@@ -41,12 +48,7 @@ export interface LearnerSkillStatus {
 const MIN_QUIZ_ITEMS_FOR_BAND = 15;
 
 /** Kỹ năng chưa có nguồn đo nào — luôn not_assessed, không bao giờ được gán điểm. */
-const UNASSESSED_SKILL_CODES = [
-  'speaking',
-  'listening',
-  'reading',
-  'pronunciation',
-] as const;
+const UNASSESSED_SKILL_CODES = ['reading', 'pronunciation'] as const;
 
 /** reliability 'low' = tín hiệu yếu → insufficient, không phải assessed. */
 const RELIABILITY_ASSESSED: readonly string[] = ['high', 'medium'];
@@ -65,6 +67,30 @@ interface QuizAttemptRow {
   per_band: unknown;
   raw: Record<string, unknown> | null;
   model_version: string | null;
+  created_at: Date | string;
+}
+
+interface ListeningAttemptRow {
+  id: string | number;
+  answered_count: number;
+  total_items: number;
+  raw_score: number;
+  score_pct: number;
+  form_version: string;
+  created_at: Date | string;
+}
+
+interface SpeakingSignalRow {
+  id: string | number;
+  level: string;
+  transcript: string | null;
+  transcription_status: 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  assessment_status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  grammar_score: number | null;
+  vocabulary_score: number | null;
+  fluency_score: number | null;
+  overall_score: number | null;
+  duration_seconds: number;
   created_at: Date | string;
 }
 
@@ -186,6 +212,137 @@ export class LearnerProfileService {
     return this.quizAttemptResponse(rows[0]);
   }
 
+  // --- Listening MVP -------------------------------------------------------
+
+  async listeningForm(userId: number) {
+    const selected = await this.resolveAssessmentLevel(userId);
+    return {
+      ...listeningForm(selected.level),
+      selectionBasis: selected.basis,
+    };
+  }
+
+  async resolveAssessmentLevel(userId: number) {
+    const [selfAssessment, quiz] = await Promise.all([
+      this.latestSelfAssessment(userId),
+      this.latestQuiz(userId),
+    ]);
+    const selfBand = selfAssessment?.band;
+    const quizBand = this.usableQuizBand(quiz);
+
+    const level =
+      selfBand && selfBand !== 'auto' && isListeningLevel(selfBand)
+        ? selfBand
+        : quizBand && isListeningLevel(quizBand)
+          ? quizBand
+          : 'A2';
+    const selectionBasis =
+      selfBand && selfBand !== 'auto' && isListeningLevel(selfBand)
+        ? 'self_assessment'
+        : quizBand && isListeningLevel(quizBand)
+          ? 'quiz'
+          : 'default';
+
+    return { level, basis: selectionBasis };
+  }
+
+  async listeningScore(userId: number, dto: ListeningScoreDto) {
+    if (!isListeningForm(dto.version)) {
+      throw new AppException(
+        ErrorCode.VALIDATION_ERROR,
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    }
+    const seen = new Set<string>();
+    for (const response of dto.responses) {
+      if (
+        seen.has(response.itemId) ||
+        !isListeningItem(dto.version, response.itemId)
+      ) {
+        throw new AppException(
+          ErrorCode.VALIDATION_ERROR,
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        );
+      }
+      seen.add(response.itemId);
+    }
+
+    const score = scoreListening(dto.version, dto.responses);
+    if (!score) {
+      throw new AppException(
+        ErrorCode.VALIDATION_ERROR,
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    }
+    const rows: Array<{ id: string | number; created_at: Date }> =
+      await this.dataSource.query(
+        `INSERT INTO student_listening_attempts (
+           user_id, answered_count, total_items, raw_score, score_pct,
+           responses, form_version
+         ) VALUES ($1,$2,$3,$4,$5,$6::jsonb,$7)
+         RETURNING id, created_at`,
+        [
+          userId,
+          score.answered,
+          score.total,
+          score.rawScore,
+          score.scorePct,
+          JSON.stringify(dto.responses),
+          dto.version,
+        ],
+      );
+
+    return this.listeningAttemptResponse({
+      id: rows[0].id,
+      answered_count: score.answered,
+      total_items: score.total,
+      raw_score: score.rawScore,
+      score_pct: score.scorePct,
+      form_version: dto.version,
+      created_at: rows[0].created_at,
+    });
+  }
+
+  async latestListening(userId: number) {
+    const rows: ListeningAttemptRow[] = await this.dataSource.query(
+      `SELECT id, answered_count, total_items, raw_score, score_pct,
+              form_version, created_at
+       FROM student_listening_attempts
+       WHERE user_id = $1
+       ORDER BY created_at DESC, id DESC
+       LIMIT 1`,
+      [userId],
+    );
+    return rows[0] ? this.listeningAttemptResponse(rows[0]) : null;
+  }
+
+  private async latestSpeakingSignal(userId: number) {
+    const rows: SpeakingSignalRow[] = await this.dataSource.query(
+      `SELECT id, level, transcript, transcription_status, assessment_status,
+              grammar_score, vocabulary_score, fluency_score, overall_score,
+              duration_seconds, created_at
+       FROM student_speaking_attempts
+       WHERE user_id = $1
+       ORDER BY created_at DESC, id DESC
+       LIMIT 1`,
+      [userId],
+    );
+    if (!rows[0]) return null;
+    return {
+      attemptId: Number(rows[0].id),
+      level: rows[0].level,
+      transcript: rows[0].transcript,
+      transcriptionStatus: rows[0].transcription_status,
+      assessmentStatus: rows[0].assessment_status,
+      grammarScore: rows[0].grammar_score,
+      vocabularyScore: rows[0].vocabulary_score,
+      fluencyScore: rows[0].fluency_score,
+      overallScore: rows[0].overall_score,
+      durationSeconds: rows[0].duration_seconds,
+      createdAt: rows[0].created_at,
+    };
+  }
+
   // --- Bước 1: self-assessment ---------------------------------------------
 
   /** Lưu tự đánh giá (mỗi lần gọi = 1 bản ghi mới; profile lấy bản mới nhất). */
@@ -217,11 +374,14 @@ export class LearnerProfileService {
   // --- Bước 3: hồ sơ hợp nhất ----------------------------------------------
 
   async getProfile(userId: number) {
-    const [quiz, writing, selfAssessment] = await Promise.all([
-      this.latestQuiz(userId),
-      this.assessments.latest(userId),
-      this.latestSelfAssessment(userId),
-    ]);
+    const [quiz, writing, listening, speaking, selfAssessment] =
+      await Promise.all([
+        this.latestQuiz(userId),
+        this.assessments.latest(userId),
+        this.latestListening(userId),
+        this.latestSpeakingSignal(userId),
+        this.latestSelfAssessment(userId),
+      ]);
 
     const writingInfo = writing
       ? {
@@ -238,107 +398,72 @@ export class LearnerProfileService {
         }
       : null;
 
-    const levelBand = writing?.cefr.band ?? this.usableQuizBand(quiz);
-    const levelSource = writing?.cefr.band
-      ? 'writing'
-      : this.usableQuizBand(quiz)
-        ? 'quiz'
+    const quizBand = this.usableQuizBand(quiz);
+    const levelBand = quizBand ?? writing?.cefr.band ?? null;
+    const levelSource = quizBand
+      ? 'quiz'
+      : writing?.cefr.band
+        ? 'writing'
         : null;
 
     return {
       selfAssessment,
       quiz,
+      listening,
+      speaking,
       writing: writingInfo,
       levelBand,
       levelSource,
-      skills: await this.buildSkillStatuses({ quiz, writing }),
+      skills: await this.buildSkillStatuses({
+        quiz,
+        writing,
+        listening,
+        speaking,
+      }),
     };
   }
 
   // --- Matching từ hồ sơ ----------------------------------------------------
 
-  /**
-   * Dùng focus đã lưu của writing (hành vi cũ giữ nguyên) + band quiz để
-   * chốt trọng số vocabulary (bằng chứng trực tiếp thắng ước lượng free-text).
-   */
+  /** Mục tiêu do học viên chọn; assessment chỉ cung cấp mức ước lượng. */
   async matchFromProfile(userId: number, dto: MatchFromProfileDto) {
     const [quiz, writing] = await Promise.all([
       this.latestQuiz(userId),
       this.assessments.latest(userId),
     ]);
-    if (!quiz && !writing) {
+    const quizBand = this.usableQuizBand(quiz);
+    if (!quizBand) {
       throw new AppException(
         ErrorCode.ASSESSMENT_NOT_FOUND,
         HttpStatus.NOT_FOUND,
       );
     }
 
-    const drafts: FocusTargetDraft[] = (writing?.focusTargets ?? []).map(
-      (f) => ({
-        code: f.code,
-        weight: Number(f.weight),
-        reason: f.reason,
-      }),
-    );
-
-    if (quiz && quiz.total >= MIN_QUIZ_ITEMS_FOR_BAND && quiz.band) {
-      const reason = `Quiz từ vựng ${quiz.total} câu → mức ${quiz.band}`;
-      const idx = drafts.findIndex((d) => d.code === 'vocabulary');
-      if (idx >= 0) {
-        drafts[idx] = {
-          code: 'vocabulary',
-          weight: vocabularyWeight(quiz.band),
-          reason,
-        };
-      } else {
-        drafts.push({
-          code: 'vocabulary',
-          weight: vocabularyWeight(quiz.band),
-          reason,
-        });
-      }
-    }
-
-    if (drafts.length === 0) {
-      // Chưa có bằng chứng dùng được (quiz quá ngắn + chưa có writing).
-      throw new AppException(
-        ErrorCode.ASSESSMENT_NOT_FOUND,
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    const targets: Array<{ skillId: number; weight: number }> = [];
-    for (const draft of drafts) {
-      const skill = await this.catalog.findByCode(draft.code);
-      if (skill?.is_active) {
-        targets.push({ skillId: Number(skill.id), weight: draft.weight });
-      }
-    }
-    if (targets.length === 0) {
-      throw new AppException(ErrorCode.SKILL_NOT_FOUND, HttpStatus.BAD_REQUEST);
-    }
-
-    const levelBand = writing?.cefr.band ?? this.usableQuizBand(quiz);
+    const targets = dto.targets.map(({ skillId }) => ({ skillId, weight: 1 }));
     const result = await this.matching.match(
       { targets, limit: dto.limit ?? 10 },
       {
-        studentLevel: levelBand,
-        requireLevelMatch: dto.requireLevelMatch ?? true,
+        studentLevel: quizBand,
+        requireLevelMatch: dto.requireLevelMatch ?? false,
+        priceMode: dto.priceMode,
+        minHourlyRate: dto.minHourlyRate,
+        maxHourlyRate: dto.maxHourlyRate,
       },
     );
 
-    const focus = weightPctSummary(drafts);
+    const focus = result.targets.map((target) => ({
+      code: target.code,
+      weight: target.weight,
+      weightPct: target.weight * 100,
+      reason: 'Mục tiêu do học viên chọn',
+    }));
     const needFit = await this.assessments.buildNeedFit(focus, result.ranked);
 
     return {
       profile: {
-        levelBand,
-        levelSource: writing?.cefr.band
-          ? 'writing'
-          : this.usableQuizBand(quiz)
-            ? 'quiz'
-            : null,
-        quizBand: this.usableQuizBand(quiz),
+        levelBand: quizBand,
+        levelSource: 'quiz',
+        quizBand,
         writingBand: writing?.cefr.band ?? null,
       },
       ...result,
@@ -362,9 +487,13 @@ export class LearnerProfileService {
   private async buildSkillStatuses(input: {
     quiz: Awaited<ReturnType<LearnerProfileService['latestQuiz']>>;
     writing: Awaited<ReturnType<StudentAssessmentService['latest']>>;
+    listening: Awaited<ReturnType<LearnerProfileService['latestListening']>>;
+    speaking: Awaited<
+      ReturnType<LearnerProfileService['latestSpeakingSignal']>
+    >;
   }): Promise<LearnerSkillStatus[]> {
     const statuses: LearnerSkillStatus[] = [];
-    const { quiz, writing } = input;
+    const { quiz, writing, listening, speaking } = input;
 
     // vocabulary — từ quiz cloze
     if (!quiz) {
@@ -397,6 +526,58 @@ export class LearnerProfileService {
               quiz.ability?.se ?? 'n/a'
             })`
           : `Quiz ${quiz.total} câu — band tạm tính theo heuristic ≥80%/band`,
+      });
+    }
+
+    if (!listening) {
+      statuses.push({
+        code: 'listening',
+        status: 'not_assessed',
+        band: null,
+        source: null,
+        scorePct: null,
+        qualityScore: null,
+        note: 'Chưa làm bài kiểm tra nghe',
+      });
+    } else {
+      statuses.push({
+        code: 'listening',
+        status: listening.complete ? 'assessed' : 'insufficient',
+        band: null,
+        source: 'listening',
+        scorePct: listening.scorePct,
+        qualityScore: null,
+        note: listening.complete
+          ? `Đúng ${listening.rawScore}/${listening.total} câu trong bài Listening MVP`
+          : `Mới trả lời ${listening.answered}/${listening.total} câu`,
+      });
+    }
+
+    if (!speaking) {
+      statuses.push({
+        code: 'speaking',
+        status: 'not_assessed',
+        band: null,
+        source: null,
+        qualityScore: null,
+        note: 'Chưa có bản ghi Speaking',
+      });
+    } else {
+      const assessed =
+        speaking.assessmentStatus === 'COMPLETED' &&
+        speaking.overallScore != null;
+      statuses.push({
+        code: 'speaking',
+        status: assessed ? 'assessed' : 'insufficient',
+        band: null,
+        source: 'speaking',
+        scorePct: assessed ? speaking.overallScore : null,
+        qualityScore: null,
+        note: assessed
+          ? `Ước lượng MVP từ transcript và nhịp nói (${speaking.durationSeconds} giây); chưa chấm phát âm, không phải CEFR chính thức`
+          : speaking.transcriptionStatus === 'COMPLETED'
+            ? 'Đã có transcript nhưng phần phân tích AI chưa hoàn tất'
+            : 'Đã lưu bản ghi; transcript chưa sẵn sàng',
       });
     }
 
@@ -506,6 +687,20 @@ export class LearnerProfileService {
       /** true = band chưa qua calibration Rasch (heuristic ≥80%/band). */
       provisional: row.calibrated !== true,
       modelVersion: row.model_version,
+      createdAt: row.created_at,
+    };
+  }
+
+  private listeningAttemptResponse(row: ListeningAttemptRow) {
+    return {
+      attemptId: Number(row.id),
+      answered: row.answered_count,
+      total: row.total_items,
+      rawScore: row.raw_score,
+      scorePct: row.score_pct,
+      complete: row.answered_count === row.total_items,
+      formVersion: row.form_version,
+      level: listeningLevelForVersion(row.form_version),
       createdAt: row.created_at,
     };
   }
