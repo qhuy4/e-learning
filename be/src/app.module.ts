@@ -30,8 +30,6 @@ import { InstructorPayoutsModule } from '@/modules/instructor-payouts/instructor
 import { CourseQuestionsModule } from '@/modules/course-questions/course-questions.module';
 import { ReviewReportsModule } from '@/modules/review-reports/review-reports.module';
 import { NotificationsModule } from '@/modules/notifications/notifications.module';
-import { PremiumSubscriptionsModule } from '@/modules/premium-subscriptions/premium-subscriptions.module';
-import { WishlistsModule } from '@/modules/wishlists/wishlists.module';
 import { AdminDashboardModule } from '@/modules/analytics/admin-dashboard.module';
 import { AchievementsModule } from '@/modules/achievements/achievements.module';
 import { ExamsModule } from '@/modules/exams/exams.module';
@@ -66,8 +64,6 @@ import { InstructorApplicationsModule } from '@/modules/instructor-applications/
     CourseQuestionsModule,
     ReviewReportsModule,
     NotificationsModule,
-    PremiumSubscriptionsModule,
-    WishlistsModule,
     AdminDashboardModule,
     AchievementsModule,
     BookingsModule,

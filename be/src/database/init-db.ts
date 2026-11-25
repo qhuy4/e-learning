@@ -7,6 +7,12 @@ export async function initDatabaseTables(dataSource: DataSource) {
   try {
     await renameLegacyInstructorTables(dataSource);
 
+    // Wishlist đã bị gỡ khỏi sản phẩm; xóa bảng con trước để không vướng khóa ngoại.
+    await dataSource.query(`
+      DROP TABLE IF EXISTS wishlist_items;
+      DROP TABLE IF EXISTS wishlists;
+    `);
+
     // 1. Tạo bảng instructor_profiles nếu chưa có
     await dataSource.query(`
       CREATE TABLE IF NOT EXISTS instructor_profiles (
@@ -30,6 +36,9 @@ export async function initDatabaseTables(dataSource: DataSource) {
       CREATE UNIQUE INDEX IF NOT EXISTS uq_instructor_profiles_user_id ON instructor_profiles(user_id);
       ALTER TABLE instructor_profiles ADD COLUMN IF NOT EXISTS review_reason TEXT;
       ALTER TABLE instructor_profiles ADD COLUMN IF NOT EXISTS hourly_rate NUMERIC(12, 2) NOT NULL DEFAULT 0;
+      ALTER TABLE instructor_profiles DROP CONSTRAINT IF EXISTS chk_instructor_profiles_hourly_rate;
+      ALTER TABLE instructor_profiles ADD CONSTRAINT chk_instructor_profiles_hourly_rate
+        CHECK (hourly_rate >= 0 AND hourly_rate <= 1000000);
     `);
 
     // 3. Tạo bảng instructor_certificates nếu chưa có
@@ -861,6 +870,67 @@ export async function initDatabaseTables(dataSource: DataSource) {
       );
       CREATE INDEX IF NOT EXISTS idx_student_self_assessments_user_created
         ON student_self_assessments (user_id, created_at DESC);
+
+      CREATE TABLE IF NOT EXISTS student_listening_attempts (
+        id BIGSERIAL PRIMARY KEY,
+        user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        answered_count INT NOT NULL,
+        total_items INT NOT NULL,
+        raw_score INT NOT NULL,
+        score_pct INT NOT NULL,
+        responses JSONB NOT NULL,
+        form_version VARCHAR(40) NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_student_listening_attempts_user_created
+        ON student_listening_attempts (user_id, created_at DESC);
+
+      CREATE TABLE IF NOT EXISTS student_speaking_attempts (
+        id BIGSERIAL PRIMARY KEY,
+        user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        prompt_id VARCHAR(40) NOT NULL,
+        level VARCHAR(8) NOT NULL,
+        duration_seconds INT NOT NULL,
+        audio_key VARCHAR(500) NOT NULL,
+        audio_mime_type VARCHAR(100) NOT NULL,
+        audio_size INT NOT NULL,
+        transcript TEXT,
+        transcription_status VARCHAR(16) NOT NULL,
+        transcription_model VARCHAR(80),
+        transcription_error VARCHAR(255),
+        assessment_status VARCHAR(16) NOT NULL DEFAULT 'PENDING',
+        grammar_score INT,
+        vocabulary_score INT,
+        fluency_score INT,
+        overall_score INT,
+        assessment_feedback JSONB,
+        assessment_model VARCHAR(100),
+        assessment_error VARCHAR(255),
+        processing_attempts INT NOT NULL DEFAULT 0,
+        next_attempt_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        locked_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      ALTER TABLE student_speaking_attempts
+        ADD COLUMN IF NOT EXISTS assessment_status VARCHAR(16) NOT NULL DEFAULT 'PENDING',
+        ADD COLUMN IF NOT EXISTS grammar_score INT,
+        ADD COLUMN IF NOT EXISTS vocabulary_score INT,
+        ADD COLUMN IF NOT EXISTS fluency_score INT,
+        ADD COLUMN IF NOT EXISTS overall_score INT,
+        ADD COLUMN IF NOT EXISTS assessment_feedback JSONB,
+        ADD COLUMN IF NOT EXISTS assessment_model VARCHAR(100),
+        ADD COLUMN IF NOT EXISTS assessment_error VARCHAR(255),
+        ADD COLUMN IF NOT EXISTS processing_attempts INT NOT NULL DEFAULT 0,
+        ADD COLUMN IF NOT EXISTS next_attempt_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        ADD COLUMN IF NOT EXISTS locked_at TIMESTAMPTZ;
+      CREATE INDEX IF NOT EXISTS idx_student_speaking_attempts_user_created
+        ON student_speaking_attempts (user_id, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_student_speaking_attempts_queue
+        ON student_speaking_attempts (next_attempt_at, id)
+        WHERE transcription_status = 'PROCESSING'
+           OR (transcription_status = 'COMPLETED'
+               AND assessment_status IN ('PENDING', 'PROCESSING'));
     `);
     // END: Learner quiz
   } catch (error) {
