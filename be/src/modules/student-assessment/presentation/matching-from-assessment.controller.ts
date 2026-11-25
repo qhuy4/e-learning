@@ -5,6 +5,7 @@ import { StudentAssessmentService } from '@/modules/student-assessment/applicati
 import { LearnerProfileService } from '@/modules/student-assessment/application/learner-profile.service';
 import { MatchFromAssessmentDto } from '@/modules/student-assessment/presentation/dto/match-from-assessment.dto';
 import { MatchFromProfileDto } from '@/modules/student-assessment/presentation/dto/match-from-profile.dto';
+import { CourseMatchingService } from '@/modules/student-assessment/application/course-matching.service';
 
 /**
  * Matching từ assessment: dùng focus targets + CEFR band đã lưu để xếp hạng
@@ -16,6 +17,7 @@ export class MatchingFromAssessmentController {
   constructor(
     private readonly assessments: StudentAssessmentService,
     private readonly profile: LearnerProfileService,
+    private readonly courseMatching: CourseMatchingService,
   ) {}
 
   @Post('from-assessment')
@@ -26,12 +28,17 @@ export class MatchingFromAssessmentController {
     return this.assessments.matchFromAssessment(userId, dto);
   }
 
-  /** Matching từ hồ sơ hợp nhất (quiz +/hoặc writing) — không cần assessmentId. */
+  /** Matching từ quiz bắt buộc + 1–3 mục tiêu do học viên chọn. */
   @Post('from-profile')
   matchFromProfile(
     @CurrentUser('id') userId: number,
     @Body() dto: MatchFromProfileDto,
   ) {
     return this.profile.matchFromProfile(userId, dto);
+  }
+
+  @Post('courses')
+  matchCourses(@CurrentUser('id') userId: number) {
+    return this.courseMatching.match(userId);
   }
 }

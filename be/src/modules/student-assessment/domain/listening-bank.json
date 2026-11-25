@@ -1,0 +1,909 @@
+{
+  "source": {
+    "title": "PiEMind Levelled Listening Bank",
+    "author": "PiEMind Content Team",
+    "contentOrigin": "Original practice content authored for PiEMind; it is not copied from IELTS, TOEIC, Cambridge, or another standardized examination.",
+    "frameworkTitle": "Common European Framework of Reference for Languages: Companion Volume (2020)",
+    "frameworkUrl": "https://www.coe.int/en/web/common-european-framework-reference-languages/cefr-companion-volume-and-its-language-versions",
+    "alignmentNote": "Difficulty is provisionally aligned to CEFR listening descriptors. This MVP item bank requires educator review and learner-data calibration before high-stakes use.",
+    "license": "Internal educational use"
+  },
+  "tests": [
+    {
+      "id": "prea1-classroom",
+      "level": "pre-A1",
+      "title": "In the classroom",
+      "audioUrl": "/audio/listening/prea1-classroom.wav",
+      "transcript": "Hello, Mia. Look at the table. The red book is for you. Put the blue pen in the box. Sit next to Tom. The lesson starts now.",
+      "items": [
+        [
+          "prea1-c-1",
+          "What colour is Mia's book?",
+          [
+            "Blue",
+            "Red",
+            "Green",
+            "Black"
+          ],
+          1
+        ],
+        [
+          "prea1-c-2",
+          "What object is blue?",
+          [
+            "The pen",
+            "The book",
+            "The box",
+            "The table"
+          ],
+          0
+        ],
+        [
+          "prea1-c-3",
+          "Where should Mia put the pen?",
+          [
+            "On the chair",
+            "In the bag",
+            "In the box",
+            "Under the table"
+          ],
+          2
+        ],
+        [
+          "prea1-c-4",
+          "Who should Mia sit next to?",
+          [
+            "Ben",
+            "Tom",
+            "Anna",
+            "Sam"
+          ],
+          1
+        ],
+        [
+          "prea1-c-5",
+          "What starts now?",
+          [
+            "Lunch",
+            "The lesson",
+            "A game",
+            "A film"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "id": "prea1-family",
+      "level": "pre-A1",
+      "title": "A family photo",
+      "audioUrl": "/audio/listening/prea1-family.wav",
+      "transcript": "This is my family. My mother is Anna. She has a yellow hat. My father is Ben. He is next to the car. My little sister, Lily, has a small dog.",
+      "items": [
+        [
+          "prea1-f-1",
+          "Who is Anna?",
+          [
+            "The mother",
+            "The sister",
+            "The teacher",
+            "The friend"
+          ],
+          0
+        ],
+        [
+          "prea1-f-2",
+          "What colour is Anna's hat?",
+          [
+            "Red",
+            "Blue",
+            "Yellow",
+            "White"
+          ],
+          2
+        ],
+        [
+          "prea1-f-3",
+          "What is the father's name?",
+          [
+            "Tom",
+            "Ben",
+            "Sam",
+            "Leo"
+          ],
+          1
+        ],
+        [
+          "prea1-f-4",
+          "Where is Ben?",
+          [
+            "Next to the car",
+            "In the house",
+            "At school",
+            "By the tree"
+          ],
+          0
+        ],
+        [
+          "prea1-f-5",
+          "What animal does Lily have?",
+          [
+            "A cat",
+            "A bird",
+            "A dog",
+            "A fish"
+          ],
+          2
+        ]
+      ]
+    },
+    {
+      "id": "a1-bus",
+      "level": "A1",
+      "title": "The morning bus",
+      "audioUrl": "/audio/listening/a1-bus.wav",
+      "transcript": "The number twelve bus leaves at eight fifteen from the station. It stops near Green Street and arrives at the city museum at eight forty. A ticket costs two pounds. Please have your ticket ready.",
+      "items": [
+        [
+          "a1-b-1",
+          "What number is the bus?",
+          [
+            "Ten",
+            "Twelve",
+            "Fifteen",
+            "Twenty"
+          ],
+          1
+        ],
+        [
+          "a1-b-2",
+          "When does it leave?",
+          [
+            "8:00",
+            "8:15",
+            "8:30",
+            "8:40"
+          ],
+          1
+        ],
+        [
+          "a1-b-3",
+          "Where does it arrive?",
+          [
+            "The library",
+            "Green Street",
+            "The city museum",
+            "The airport"
+          ],
+          2
+        ],
+        [
+          "a1-b-4",
+          "How much is a ticket?",
+          [
+            "One pound",
+            "Two pounds",
+            "Three pounds",
+            "Four pounds"
+          ],
+          1
+        ],
+        [
+          "a1-b-5",
+          "What should passengers have ready?",
+          [
+            "A passport",
+            "A map",
+            "A ticket",
+            "A bag"
+          ],
+          2
+        ]
+      ]
+    },
+    {
+      "id": "a1-routine",
+      "level": "A1",
+      "title": "Lucy's weekday",
+      "audioUrl": "/audio/listening/a1-routine.wav",
+      "transcript": "Lucy gets up at seven every weekday. She eats bread and fruit for breakfast, then walks to school with her brother. Classes finish at three. In the evening, she does her homework before watching television.",
+      "items": [
+        [
+          "a1-r-1",
+          "When does Lucy get up?",
+          [
+            "Six",
+            "Seven",
+            "Eight",
+            "Nine"
+          ],
+          1
+        ],
+        [
+          "a1-r-2",
+          "What does she eat for breakfast?",
+          [
+            "Eggs and rice",
+            "Bread and fruit",
+            "Soup and bread",
+            "Fruit and yogurt"
+          ],
+          1
+        ],
+        [
+          "a1-r-3",
+          "How does she go to school?",
+          [
+            "By bus",
+            "By bike",
+            "She walks",
+            "By car"
+          ],
+          2
+        ],
+        [
+          "a1-r-4",
+          "When do classes finish?",
+          [
+            "Two",
+            "Three",
+            "Four",
+            "Five"
+          ],
+          1
+        ],
+        [
+          "a1-r-5",
+          "What does she do before television?",
+          [
+            "She cooks",
+            "She reads",
+            "She exercises",
+            "She does homework"
+          ],
+          3
+        ]
+      ]
+    },
+    {
+      "id": "a2-appointment",
+      "level": "A2",
+      "title": "Changing an appointment",
+      "audioUrl": "/audio/listening/a2-appointment.wav",
+      "transcript": "Hello, this is Northside Dental Clinic calling for Mr Patel. Your appointment on Tuesday at ten thirty must be moved because the dentist is attending a conference. We can offer Wednesday at two or Friday at nine. Please call us before five today to confirm.",
+      "items": [
+        [
+          "a2-a-1",
+          "Who is the message for?",
+          [
+            "Mr Patel",
+            "Dr North",
+            "Mrs Green",
+            "Mr Jones"
+          ],
+          0
+        ],
+        [
+          "a2-a-2",
+          "What was the original appointment?",
+          [
+            "Tuesday at 10:30",
+            "Wednesday at 2:00",
+            "Friday at 9:00",
+            "Tuesday at 5:00"
+          ],
+          0
+        ],
+        [
+          "a2-a-3",
+          "Why must it be moved?",
+          [
+            "The clinic is closed",
+            "The dentist is ill",
+            "The dentist has a conference",
+            "The patient requested it"
+          ],
+          2
+        ],
+        [
+          "a2-a-4",
+          "Which is an offered time?",
+          [
+            "Monday at nine",
+            "Wednesday at two",
+            "Thursday at ten",
+            "Friday at five"
+          ],
+          1
+        ],
+        [
+          "a2-a-5",
+          "When should Mr Patel call?",
+          [
+            "Before five today",
+            "Tomorrow morning",
+            "Before Tuesday",
+            "After the conference"
+          ],
+          0
+        ]
+      ]
+    },
+    {
+      "id": "a2-market",
+      "level": "A2",
+      "title": "A weekend market",
+      "audioUrl": "/audio/listening/a2-market.wav",
+      "transcript": "The Riverside Market opens this Saturday at nine in the town square. Local farmers will sell fruit, vegetables, cheese, and fresh bread. There will also be music from eleven until one. Visitors should use the free car park behind the sports centre because the square is closed to traffic.",
+      "items": [
+        [
+          "a2-m-1",
+          "When does the market open?",
+          [
+            "Friday at nine",
+            "Saturday at nine",
+            "Saturday at eleven",
+            "Sunday at one"
+          ],
+          1
+        ],
+        [
+          "a2-m-2",
+          "Where is the market?",
+          [
+            "At the sports centre",
+            "By the river",
+            "In the town square",
+            "Near the station"
+          ],
+          2
+        ],
+        [
+          "a2-m-3",
+          "What will farmers sell?",
+          [
+            "Clothes",
+            "Books",
+            "Food",
+            "Furniture"
+          ],
+          2
+        ],
+        [
+          "a2-m-4",
+          "How long will the music last?",
+          [
+            "One hour",
+            "Two hours",
+            "Three hours",
+            "All day"
+          ],
+          1
+        ],
+        [
+          "a2-m-5",
+          "Where should visitors park?",
+          [
+            "In the square",
+            "Behind the sports centre",
+            "At the station",
+            "Beside the river"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "id": "b1-volunteer",
+      "level": "B1",
+      "title": "Community garden volunteers",
+      "audioUrl": "/audio/listening/b1-volunteer.wav",
+      "transcript": "The community garden is looking for volunteers next Sunday. We will meet at the main gate at half past eight and work until lunchtime. Most people will plant winter vegetables, while a smaller group repairs the wooden fence. Tools are provided, but bring gloves and a bottle of water. If heavy rain is forecast, the event will move to the following weekend.",
+      "items": [
+        [
+          "b1-v-1",
+          "When will volunteers meet?",
+          [
+            "8:00",
+            "8:30",
+            "12:00",
+            "Next Saturday"
+          ],
+          1
+        ],
+        [
+          "b1-v-2",
+          "What will most people do?",
+          [
+            "Repair a gate",
+            "Plant vegetables",
+            "Paint the fence",
+            "Prepare lunch"
+          ],
+          1
+        ],
+        [
+          "b1-v-3",
+          "What is provided?",
+          [
+            "Gloves",
+            "Water",
+            "Tools",
+            "Lunch"
+          ],
+          2
+        ],
+        [
+          "b1-v-4",
+          "What should volunteers bring?",
+          [
+            "Seeds and tools",
+            "Gloves and water",
+            "Wood and paint",
+            "Food and boots"
+          ],
+          1
+        ],
+        [
+          "b1-v-5",
+          "What happens if there is heavy rain?",
+          [
+            "The event is cancelled permanently",
+            "They work indoors",
+            "It moves to the next weekend",
+            "It starts after lunch"
+          ],
+          2
+        ]
+      ]
+    },
+    {
+      "id": "b1-travel",
+      "level": "B1",
+      "title": "A delayed rail journey",
+      "audioUrl": "/audio/listening/b1-travel.wav",
+      "transcript": "Passengers travelling to Brighton should note that the eleven twenty train has been delayed by approximately forty minutes because of a signal failure. You may use your ticket on the eleven forty-five service to Lewes and change there for Brighton. Passengers who decide not to travel can request a full refund from the ticket office.",
+      "items": [
+        [
+          "b1-t-1",
+          "Which destination is affected?",
+          [
+            "Lewes",
+            "Brighton",
+            "London",
+            "Bristol"
+          ],
+          1
+        ],
+        [
+          "b1-t-2",
+          "How long is the expected delay?",
+          [
+            "20 minutes",
+            "25 minutes",
+            "40 minutes",
+            "45 minutes"
+          ],
+          2
+        ],
+        [
+          "b1-t-3",
+          "What caused the delay?",
+          [
+            "Bad weather",
+            "A broken train",
+            "A signal failure",
+            "Staff shortages"
+          ],
+          2
+        ],
+        [
+          "b1-t-4",
+          "Where can passengers change trains?",
+          [
+            "Brighton",
+            "London",
+            "Lewes",
+            "Bristol"
+          ],
+          2
+        ],
+        [
+          "b1-t-5",
+          "Who can request a full refund?",
+          [
+            "All season-ticket holders",
+            "People who do not travel",
+            "Only first-class passengers",
+            "People delayed over an hour"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "id": "b2-remote",
+      "level": "B2",
+      "title": "A revised remote-work policy",
+      "audioUrl": "/audio/listening/b2-remote.wav",
+      "transcript": "From next month, employees may work remotely for up to three days a week, rather than the current two. Teams must still agree on at least one shared office day to support collaboration. The company will contribute towards home-office equipment, although staff must submit receipts within thirty days. Managers will review the policy after six months, focusing on productivity and employee wellbeing rather than office attendance alone.",
+      "items": [
+        [
+          "b2-r-1",
+          "What is the main policy change?",
+          [
+            "Remote work is ending",
+            "Three remote days are allowed",
+            "Office work becomes optional",
+            "Teams choose their managers"
+          ],
+          1
+        ],
+        [
+          "b2-r-2",
+          "Why must teams share an office day?",
+          [
+            "To collect equipment",
+            "To reduce costs",
+            "To support collaboration",
+            "To review attendance"
+          ],
+          2
+        ],
+        [
+          "b2-r-3",
+          "What is required for equipment support?",
+          [
+            "Manager approval before purchase",
+            "Receipts within thirty days",
+            "Weekly attendance records",
+            "A six-month contract"
+          ],
+          1
+        ],
+        [
+          "b2-r-4",
+          "When will the policy be reviewed?",
+          [
+            "After one month",
+            "After three months",
+            "After six months",
+            "After one year"
+          ],
+          2
+        ],
+        [
+          "b2-r-5",
+          "What will managers emphasize?",
+          [
+            "Office attendance only",
+            "Productivity and wellbeing",
+            "Equipment costs",
+            "The number of meetings"
+          ],
+          1
+        ]
+      ]
+    },
+    {
+      "id": "b2-gardens",
+      "level": "B2",
+      "title": "Why cities need small gardens",
+      "audioUrl": "/audio/listening/b2-gardens.wav",
+      "transcript": "Urban planners once treated small community gardens as temporary uses for undeveloped land. Recent research, however, suggests they can reduce local temperatures, absorb rainwater, and strengthen social ties. Their impact depends less on the size of any individual garden than on having a connected network across a neighbourhood. Critics point to maintenance costs, so several cities now fund training rather than relying entirely on unpaid volunteers.",
+      "items": [
+        [
+          "b2-g-1",
+          "How were small gardens previously viewed?",
+          [
+            "As permanent parks",
+            "As temporary land use",
+            "As private businesses",
+            "As flood barriers"
+          ],
+          1
+        ],
+        [
+          "b2-g-2",
+          "Which benefit is mentioned?",
+          [
+            "Lower housing prices",
+            "Reduced local temperatures",
+            "Faster transport",
+            "More commercial space"
+          ],
+          1
+        ],
+        [
+          "b2-g-3",
+          "What most influences their impact?",
+          [
+            "The size of each garden",
+            "The age of volunteers",
+            "A connected network",
+            "The number of trees"
+          ],
+          2
+        ],
+        [
+          "b2-g-4",
+          "What concern do critics raise?",
+          [
+            "Water shortages",
+            "Maintenance costs",
+            "Noise pollution",
+            "Lack of research"
+          ],
+          1
+        ],
+        [
+          "b2-g-5",
+          "How have some cities responded?",
+          [
+            "By closing gardens",
+            "By charging visitors",
+            "By funding training",
+            "By selling the land"
+          ],
+          2
+        ]
+      ]
+    },
+    {
+      "id": "c1-decisions",
+      "level": "C1",
+      "title": "Defaults and decision-making",
+      "audioUrl": "/audio/listening/c1-decisions.wav",
+      "transcript": "Behavioural economists have repeatedly shown that default options influence decisions even when changing the default requires little effort. This does not necessarily imply laziness; accepting a default may signal trust in the institution that selected it, or a belief that it reflects a social norm. Consequently, policymakers using defaults must distinguish between helping people act on existing preferences and quietly shaping those preferences. Transparency can reduce manipulation, although overly prominent warnings may also undermine beneficial programmes.",
+      "items": [
+        [
+          "c1-d-1",
+          "What is the speaker's main claim about defaults?",
+          [
+            "They affect choices",
+            "They remove all choice",
+            "They only affect lazy people",
+            "They always reflect preferences"
+          ],
+          0
+        ],
+        [
+          "c1-d-2",
+          "What alternative to laziness is suggested?",
+          [
+            "Financial pressure",
+            "Trust in an institution",
+            "Lack of information",
+            "Fear of punishment"
+          ],
+          1
+        ],
+        [
+          "c1-d-3",
+          "What distinction should policymakers make?",
+          [
+            "Public versus private institutions",
+            "Short- versus long-term costs",
+            "Supporting versus shaping preferences",
+            "Warnings versus regulations"
+          ],
+          2
+        ],
+        [
+          "c1-d-4",
+          "What can transparency reduce?",
+          [
+            "Social norms",
+            "Manipulation",
+            "Existing preferences",
+            "Institutional trust"
+          ],
+          1
+        ],
+        [
+          "c1-d-5",
+          "What qualification is made about warnings?",
+          [
+            "They are legally required",
+            "They are usually ignored",
+            "They may weaken useful programmes",
+            "They should replace defaults"
+          ],
+          2
+        ]
+      ]
+    },
+    {
+      "id": "c1-energy",
+      "level": "C1",
+      "title": "The limits of energy forecasts",
+      "audioUrl": "/audio/listening/c1-energy.wav",
+      "transcript": "Forecasts of the energy transition often appear precise because they present a single trajectory for future demand. Yet these projections are conditional stories, not predictions in the strict sense. Small changes in assumptions about storage costs, consumer behaviour, or planning approval can produce sharply different outcomes. Their real value therefore lies in comparing scenarios and exposing trade-offs. Treating one scenario as inevitable can encourage governments to postpone difficult decisions while claiming that technology will resolve them.",
+      "items": [
+        [
+          "c1-e-1",
+          "Why can energy forecasts appear precise?",
+          [
+            "They use historic facts only",
+            "They show one future trajectory",
+            "They avoid assumptions",
+            "They predict storage prices"
+          ],
+          1
+        ],
+        [
+          "c1-e-2",
+          "How does the speaker characterize projections?",
+          [
+            "Guaranteed outcomes",
+            "Political promises",
+            "Conditional stories",
+            "Technical errors"
+          ],
+          2
+        ],
+        [
+          "c1-e-3",
+          "What can cause sharply different outcomes?",
+          [
+            "Minor changes in assumptions",
+            "Public access to reports",
+            "A lack of historical data",
+            "Using several scenarios"
+          ],
+          0
+        ],
+        [
+          "c1-e-4",
+          "Where does their real value lie?",
+          [
+            "Naming an exact date",
+            "Comparing scenarios and trade-offs",
+            "Proving technology will succeed",
+            "Avoiding policy decisions"
+          ],
+          1
+        ],
+        [
+          "c1-e-5",
+          "What risk follows from treating one scenario as inevitable?",
+          [
+            "Higher storage costs",
+            "Fewer forecasts",
+            "Delayed difficult decisions",
+            "Immediate planning reform"
+          ],
+          2
+        ]
+      ]
+    },
+    {
+      "id": "c2-pragmatics",
+      "level": "C2",
+      "title": "Meaning beyond literal language",
+      "audioUrl": "/audio/listening/c2-pragmatics.wav",
+      "transcript": "Pragmatic competence is sometimes described as the capacity to infer what a speaker intends beyond the literal content of an utterance. That formulation is useful, but deceptively tidy. Intentions are not simply packaged by speakers and retrieved by listeners; they are negotiated against assumptions about status, irony, shared history, and the consequences of being explicit. A listener may recognise several plausible meanings while deliberately leaving the ambiguity unresolved. In such cases, indeterminacy is not a failure of comprehension but a social resource.",
+      "items": [
+        [
+          "c2-p-1",
+          "Why is the common definition called deceptively tidy?",
+          [
+            "Literal meaning is always sufficient",
+            "It oversimplifies how intentions are constructed",
+            "Listeners cannot infer intentions",
+            "Status has no effect on language"
+          ],
+          1
+        ],
+        [
+          "c2-p-2",
+          "How are intentions portrayed?",
+          [
+            "As fixed packages",
+            "As grammatical rules",
+            "As socially negotiated",
+            "As private facts"
+          ],
+          2
+        ],
+        [
+          "c2-p-3",
+          "Which factor is NOT mentioned in interpretation?",
+          [
+            "Irony",
+            "Shared history",
+            "Status",
+            "Memory capacity"
+          ],
+          3
+        ],
+        [
+          "c2-p-4",
+          "What may a skilled listener deliberately do?",
+          [
+            "Choose the literal meaning",
+            "Correct the speaker",
+            "Leave ambiguity unresolved",
+            "Ignore social consequences"
+          ],
+          2
+        ],
+        [
+          "c2-p-5",
+          "What is the final implication?",
+          [
+            "Ambiguity can serve a social purpose",
+            "Comprehension requires certainty",
+            "Indeterminacy always causes failure",
+            "Explicit speech is always preferable"
+          ],
+          0
+        ]
+      ]
+    },
+    {
+      "id": "c2-archives",
+      "level": "C2",
+      "title": "The ethics of digital archives",
+      "audioUrl": "/audio/listening/c2-archives.wav",
+      "transcript": "Digitising an archive is often celebrated as an unqualified expansion of access. The claim obscures a tension: materials preserved under conditions of practical obscurity can become instantly searchable, detachable from context, and visible to audiences never imagined by their creators. Restricting access may reproduce institutional gatekeeping, yet unrestricted publication can magnify historical harms. Ethical curation therefore requires more than obtaining legal permission; it demands decisions about description, discoverability, and whether some absences should be respected rather than repaired.",
+      "items": [
+        [
+          "c2-a-1",
+          "What assumption about digitisation is challenged?",
+          [
+            "It is too expensive",
+            "It always expands access beneficially",
+            "It damages original documents",
+            "It requires legal reform"
+          ],
+          1
+        ],
+        [
+          "c2-a-2",
+          "What changes when obscure material is digitised?",
+          [
+            "Its authorship becomes certain",
+            "It loses all legal protection",
+            "It becomes searchable and context can detach",
+            "It can no longer be restricted"
+          ],
+          2
+        ],
+        [
+          "c2-a-3",
+          "What tension does the speaker identify?",
+          [
+            "Preservation versus cost",
+            "Gatekeeping versus potential harm",
+            "Description versus translation",
+            "Law versus technology"
+          ],
+          1
+        ],
+        [
+          "c2-a-4",
+          "Why is legal permission insufficient?",
+          [
+            "Copyright never applies",
+            "Ethical curation involves additional choices",
+            "Institutions lack authority",
+            "Digital files cannot be described"
+          ],
+          1
+        ],
+        [
+          "c2-a-5",
+          "What does respecting some absences imply?",
+          [
+            "Not every gap should automatically be filled",
+            "Archives should hide all records",
+            "Missing files are always intentional",
+            "Discovery tools should be removed"
+          ],
+          0
+        ]
+      ]
+    }
+  ]
+}
