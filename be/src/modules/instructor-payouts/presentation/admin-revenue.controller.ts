@@ -8,6 +8,9 @@ import {
 } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enum/role.enum';
 import { GetAdminRevenueSplitsQuery } from '@/modules/instructor-payouts/application/query/get-admin-revenue-splits.query';
 import { GetAdminRevenueSummaryQuery } from '@/modules/instructor-payouts/application/query/get-admin-revenue-summary.query';
 import { AdminRevenueResponseMapper } from '@/modules/instructor-payouts/presentation/mapper/admin-revenue-response.mapper';
@@ -17,7 +20,8 @@ import {
 } from '@/modules/instructor-payouts/domain/repository/revenue-split.repository';
 
 @Controller('admin/revenue')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
 export class AdminRevenueController {
   constructor(private readonly queryBus: QueryBus) {}
 

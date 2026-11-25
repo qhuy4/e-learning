@@ -12,6 +12,9 @@ import {
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enum/role.enum';
 import { GetInstructorPayoutAccountsQuery } from '@/modules/instructor-payouts/application/query/get-instructor-payout-accounts.query';
 import { CreatePayoutAccountCommand } from '@/modules/instructor-payouts/application/command/create-payout-account.command';
 import { UpdatePayoutAccountCommand } from '@/modules/instructor-payouts/application/command/update-payout-account.command';
@@ -22,7 +25,8 @@ import { AdminPayoutAccountResponseMapper } from '@/modules/instructor-payouts/p
 import { PayoutAccount } from '@/modules/instructor-payouts/domain/entity/payout-account.entity';
 
 @Controller('admin/payout-accounts')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
 export class AdminPayoutAccountsController {
   constructor(
     private readonly commandBus: CommandBus,

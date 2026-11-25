@@ -16,14 +16,17 @@ export class RevenueSplitOrmEntity {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: string;
 
-  @Column({ name: 'order_item_id', type: 'bigint' })
-  orderItemId: string;
+  @Column({ name: 'order_item_id', type: 'bigint', nullable: true })
+  orderItemId: string | null;
+
+  @Column({ name: 'booking_id', type: 'bigint', nullable: true })
+  bookingId: string | null;
 
   @Column({ name: 'instructor_id', type: 'bigint' })
   instructorId: string;
 
-  @Column({ name: 'course_id', type: 'bigint' })
-  courseId: string;
+  @Column({ name: 'course_id', type: 'bigint', nullable: true })
+  courseId: string | null;
 
   @Column({ name: 'gross_amount', type: 'numeric', precision: 12, scale: 2 })
   grossAmount: string;
@@ -48,7 +51,7 @@ export class RevenueSplitOrmEntity {
 
   @ManyToOne(() => OrderItemOrmEntity)
   @JoinColumn({ name: 'order_item_id' })
-  orderItem: OrderItemOrmEntity;
+  orderItem: OrderItemOrmEntity | null;
 
   @ManyToOne(() => UserOrmEntity)
   @JoinColumn({ name: 'instructor_id' })
@@ -56,7 +59,7 @@ export class RevenueSplitOrmEntity {
 
   @ManyToOne(() => CourseOrmEntity)
   @JoinColumn({ name: 'course_id' })
-  course: CourseOrmEntity;
+  course: CourseOrmEntity | null;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp', nullable: true })
   createdAt: Date | null;

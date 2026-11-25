@@ -37,7 +37,7 @@ export class UpdateTeachingProfileDto {
   @Type(() => Number)
   @IsInt()
   @Min(0)
-  @Max(100000000)
+  @Max(1000000)
   hourlyRate?: number;
 
   @IsOptional()

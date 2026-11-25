@@ -16,9 +16,10 @@ export interface RevenueSplitInstructorRef {
 export class RevenueSplit {
   private constructor(
     public readonly id: number,
-    public readonly orderItemId: number,
+    public readonly orderItemId: number | null,
+    public readonly bookingId: number | null,
     public readonly instructorId: number,
-    public readonly courseId: number,
+    public readonly courseId: number | null,
     public readonly grossAmount: number,
     public readonly platformFeePct: number,
     public readonly platformFeeAmount: number,
@@ -34,9 +35,10 @@ export class RevenueSplit {
 
   static restore(params: {
     id: number;
-    orderItemId: number;
+    orderItemId: number | null;
+    bookingId: number | null;
     instructorId: number;
-    courseId: number;
+    courseId: number | null;
     grossAmount: number;
     platformFeePct: number;
     platformFeeAmount: number;
@@ -52,6 +54,7 @@ export class RevenueSplit {
     return new RevenueSplit(
       params.id,
       params.orderItemId,
+      params.bookingId,
       params.instructorId,
       params.courseId,
       params.grossAmount,

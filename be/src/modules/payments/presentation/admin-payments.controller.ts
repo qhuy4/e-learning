@@ -1,13 +1,9 @@
-import {
-  Controller,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enum/role.enum';
+import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
 import { GetPaymentsQuery } from '@/modules/payments/application/query/get-payments.query';
 import { GetPaymentByIdQuery } from '@/modules/payments/application/query/get-payment-by-id.query';
 import { RefundPaymentCommand } from '@/modules/payments/application/command/refund-payment.command';
@@ -15,6 +11,8 @@ import { RetryPaymentCommand } from '@/modules/payments/application/command/retr
 import { CancelPaymentCommand } from '@/modules/payments/application/command/cancel-payment.command';
 
 @Controller('admin/payments')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
 export class AdminPaymentsController {
   constructor(
     private readonly queryBus: QueryBus,
@@ -39,7 +37,7 @@ export class AdminPaymentsController {
         status: status ? Number(status) : undefined,
         gateway,
         sortBy,
-        sortOrder: sortOrder,
+        sortOrder: sortOrder as 'asc' | 'desc' | undefined,
       }),
     );
   }
@@ -54,7 +52,9 @@ export class AdminPaymentsController {
     @Param('id', ParseIntPipe) id: number,
     @Query('reason') reason?: string,
   ) {
-    return this.commandBus.execute(new RefundPaymentCommand({ id, reason }));
+    return this.commandBus.execute(
+      new RefundPaymentCommand({ id, reason }),
+    );
   }
 
   @Post(':id/retry')

@@ -1,6 +1,9 @@
 import { Controller, Get, Post, Patch, Param, Query, Body, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enum/role.enum';
 import { GetAdminPayoutsQuery } from '@/modules/instructor-payouts/application/query/get-admin-payouts.query';
 import { GetAdminPayoutDetailQuery } from '@/modules/instructor-payouts/application/query/get-admin-payout-detail.query';
 import { CreatePayoutCommand } from '@/modules/instructor-payouts/application/command/create-payout.command';
@@ -12,7 +15,8 @@ import { AdminPayoutsPage } from '@/modules/instructor-payouts/domain/repository
 import { InstructorPayout } from '@/modules/instructor-payouts/domain/entity/instructor-payout.entity';
 
 @Controller('admin/payouts')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
 export class AdminPayoutsController {
   constructor(
     private readonly commandBus: CommandBus,
