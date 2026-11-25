@@ -43,4 +43,19 @@ describe('SkillSourceValidator eligibility', () => {
       validator.resolve(SkillSourceType.STUDENT_RATING, '12', 3),
     ).resolves.toEqual({ source_updated_at: String(updated) });
   });
+
+  it('requires a completed enrollment for student outcome evidence', async () => {
+    const query = jest
+      .fn()
+      .mockResolvedValueOnce([{ exists: 1 }])
+      .mockResolvedValueOnce([{ source_updated_at: new Date() }])
+      .mockResolvedValueOnce([]);
+    const validator = new SkillSourceValidator({ query } as never);
+
+    await expect(
+      validator.resolve(SkillSourceType.STUDENT_OUTCOME, '13', 3),
+    ).rejects.toBeDefined();
+    expect(query.mock.calls[2][0]).toContain('progress = 100');
+    expect(query.mock.calls[2][0]).toContain('completed_at IS NOT NULL');
+  });
 });

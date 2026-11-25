@@ -23,6 +23,9 @@ export class SkillMatchingController {
     return this.matching.match(dto, {
       studentLevel: dto.studentLevel ?? null,
       requireLevelMatch: dto.requireLevelMatch ?? false,
+      priceMode: dto.priceMode,
+      minHourlyRate: dto.minHourlyRate,
+      maxHourlyRate: dto.maxHourlyRate,
     });
   }
 }

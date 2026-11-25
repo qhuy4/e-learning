@@ -50,4 +50,20 @@ export class MatchInstructorsDto {
   @IsOptional()
   @IsBoolean()
   requireLevelMatch?: boolean;
+
+  @IsOptional()
+  @IsIn(['ALL', 'FREE', 'PAID'])
+  priceMode?: 'ALL' | 'FREE' | 'PAID';
+
+  @Type(() => Number)
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  minHourlyRate?: number;
+
+  @Type(() => Number)
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  maxHourlyRate?: number;
 }

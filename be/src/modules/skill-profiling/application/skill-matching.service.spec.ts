@@ -8,11 +8,13 @@ import { SkillCategory } from '@/modules/skill-profiling/domain/enum/skill-categ
 
 interface EligibleRow {
   id: string | number;
+  user_id?: string | number;
   name: string;
   headline: string | null;
   total_students: number;
   avg_rating: number | null;
   teaching_levels?: string | null;
+  hourly_rate?: number;
 }
 
 interface ProfileRow {
@@ -113,6 +115,25 @@ const bob: EligibleRow = {
 };
 
 describe('SkillMatchingService.match', () => {
+  it('trả users.id cho URL booking nhưng vẫn đọc skill bằng profile id', async () => {
+    const { service } = makeService({
+      eligible: [{ ...ann, id: 21, user_id: 53 }],
+      profiles: [
+        {
+          instructor_id: 21,
+          skill_id: 10,
+          score: 0.8,
+          confidence: 0.7,
+          evidence_count: 1,
+        },
+      ],
+    });
+
+    const res = await service.match({ targets: [{ skillId: 10 }] });
+
+    expect(res.ranked[0].instructor.id).toBe(53);
+  });
+
   it('ranking: coverage-aware matchScore is the primary order', async () => {
     const { service } = makeService({
       eligible: [ann, bob],
@@ -841,5 +862,58 @@ describe('SkillMatchingService.match — level opts', () => {
 
     expect(res.ranked).toHaveLength(1);
     expect(res.ranked[0].instructor.teachesLevel).toBeNull();
+  });
+
+  it('lọc riêng giảng viên miễn phí khi hourly_rate = 0', async () => {
+    const { service } = makeService({
+      eligible: [
+        { ...ann, hourly_rate: 0 },
+        { ...bob, hourly_rate: 200_000 },
+      ],
+      profiles: [profileFor(1), profileFor(2)],
+    });
+
+    const res = await service.match(
+      { targets: [{ skillId: 10 }] },
+      { priceMode: 'FREE' },
+    );
+
+    expect(res.ranked.map((r) => r.instructor.id)).toEqual([1]);
+    expect(res.ranked[0].instructor.hourlyRate).toBe(0);
+    expect(res.meta.priceFilter).toEqual({
+      mode: 'FREE',
+      excludedCount: 1,
+    });
+  });
+
+  it('lọc giảng viên trả phí theo khoảng học phí', async () => {
+    const { service } = makeService({
+      eligible: [
+        { ...ann, hourly_rate: 0 },
+        { ...bob, hourly_rate: 200_000 },
+        { ...ann, id: 3, hourly_rate: 350_000 },
+      ],
+      profiles: [profileFor(1), profileFor(2), profileFor(3)],
+    });
+
+    const res = await service.match(
+      { targets: [{ skillId: 10 }] },
+      { priceMode: 'PAID', minHourlyRate: 150_000, maxHourlyRate: 250_000 },
+    );
+
+    expect(res.ranked.map((r) => r.instructor.id)).toEqual([2]);
+    expect(res.ranked[0].instructor.hourlyRate).toBe(200_000);
+    expect(res.meta.priceFilter?.excludedCount).toBe(2);
+  });
+
+  it('từ chối khoảng học phí có giá tối thiểu lớn hơn tối đa', async () => {
+    const { service } = makeService({ eligible: [ann] });
+
+    await expect(
+      service.match(
+        { targets: [{ skillId: 10 }] },
+        { priceMode: 'PAID', minHourlyRate: 300_000, maxHourlyRate: 100_000 },
+      ),
+    ).rejects.toBeInstanceOf(BadRequestException);
   });
 });

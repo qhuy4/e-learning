@@ -2,7 +2,7 @@ import { SkillExtractorService } from './skill-extractor.service';
 import { SkillSourceType } from '../../domain/enum/skill-source-type.enum';
 
 describe('SkillExtractorService MVP', () => {
-  it('loads only verified certificates and eligible reviews at runtime', async () => {
+  it('loads only verified certificates and completed-student reviews at runtime', async () => {
     const inserts: unknown[][] = [];
     const manager = {
       query: jest.fn((sql: string, params?: unknown[]) => {
@@ -20,6 +20,17 @@ describe('SkillExtractorService MVP', () => {
     const dataSource = {
       query: jest.fn((sql: string) => {
         if (sql.includes('FROM instructor_profiles')) return [{ user_id: 5 }];
+        if (sql.includes('FROM courses c')) {
+          return [
+            {
+              id: 34,
+              title: 'English Foundation',
+              published_at: new Date('2026-01-01'),
+              created_at: new Date('2026-01-01'),
+              categories: '',
+            },
+          ];
+        }
         if (sql.includes('SELECT DISTINCT ON')) {
           return [
             {
@@ -31,6 +42,7 @@ describe('SkillExtractorService MVP', () => {
             },
           ];
         }
+        if (sql.includes('FROM roadmap_reassessments')) return [];
         if (sql.includes('FROM instructor_certificates')) return [];
         throw new Error(`Unexpected loader: ${sql}`);
       }),
@@ -53,10 +65,75 @@ describe('SkillExtractorService MVP', () => {
       .join('\n');
     expect(loaderSql).toContain('SELECT DISTINCT ON (r.user_id, r.course_id)');
     expect(loaderSql).toContain('e.status IN (1, 2)');
+    expect(loaderSql).toContain('e.progress = 100');
+    expect(loaderSql).toContain("previousLevelSource' IN ('quiz', 'writing')");
     expect(loaderSql).toContain('ic.certificate_status = 2');
     expect(loaderSql).toContain('ic.expires_at >= CURRENT_DATE');
     expect(loaderSql).not.toContain('FROM lessons');
-    expect(loaderSql).not.toContain('progress');
+  });
+
+  it('turns a completed-stage CEFR gain into one independent student outcome', async () => {
+    const inserts: unknown[][] = [];
+    const manager = {
+      query: jest.fn((sql: string, params?: unknown[]) => {
+        if (sql.includes('FROM instructor_skills')) {
+          return [{ id: 12, code: 'student_engagement' }];
+        }
+        if (sql.includes('SELECT skill_id, source_type')) return [];
+        if (sql.includes('SELECT id, skill_id, source_type')) return [];
+        if (sql.includes('INSERT INTO instructor_skill_evidences')) {
+          inserts.push(params ?? []);
+        }
+        return [];
+      }),
+    };
+    const dataSource = {
+      query: jest.fn((sql: string) => {
+        if (sql.includes('FROM instructor_profiles')) return [{ user_id: 5 }];
+        if (sql.includes('FROM courses c')) {
+          return [
+            {
+              id: 34,
+              title: 'A1 to A2',
+              published_at: new Date('2026-01-01'),
+              created_at: new Date('2026-01-01'),
+              categories: '',
+            },
+          ];
+        }
+        if (sql.includes('SELECT DISTINCT ON')) return [];
+        if (sql.includes('FROM roadmap_reassessments')) {
+          return [
+            {
+              enrollment_id: 70,
+              reassessment_id: 80,
+              student_id: 9,
+              course_id: 34,
+              previous_level: 'A1',
+              assessed_level: 'A2',
+              reassessed_at: new Date('2026-10-10'),
+            },
+          ];
+        }
+        if (sql.includes('FROM instructor_certificates')) return [];
+        throw new Error(`Unexpected loader: ${sql}`);
+      }),
+      transaction: jest.fn((callback: (value: typeof manager) => unknown) =>
+        callback(manager),
+      ),
+    };
+
+    const result = await new SkillExtractorService(
+      dataSource as never,
+    ).refreshForInstructor(2);
+
+    expect(result.created).toBe(1);
+    expect(inserts[0][2]).toBe(SkillSourceType.STUDENT_OUTCOME);
+    expect(inserts[0][4]).toBe(0.65);
+    expect(inserts[0][9]).toMatchObject({
+      delta_bands: 1,
+      independence_key: 'outcome-student:9',
+    });
   });
 
   it('keeps certificate rows traceable but gives duplicate credentials one independence key', async () => {
@@ -93,7 +170,9 @@ describe('SkillExtractorService MVP', () => {
     const dataSource = {
       query: jest.fn((sql: string) => {
         if (sql.includes('FROM instructor_profiles')) return [{ user_id: 5 }];
+        if (sql.includes('FROM courses c')) return [];
         if (sql.includes('SELECT DISTINCT ON')) return [];
+        if (sql.includes('FROM roadmap_reassessments')) return [];
         if (sql.includes('FROM instructor_certificates')) {
           return [1, 2].map((id) => ({
             id,
@@ -155,7 +234,9 @@ describe('SkillExtractorService MVP', () => {
     const dataSource = {
       query: jest.fn((sql: string) => {
         if (sql.includes('FROM instructor_profiles')) return [{ user_id: 5 }];
+        if (sql.includes('FROM courses c')) return [];
         if (sql.includes('SELECT DISTINCT ON')) return [];
+        if (sql.includes('FROM roadmap_reassessments')) return [];
         if (sql.includes('FROM instructor_certificates')) {
           return [
             {
