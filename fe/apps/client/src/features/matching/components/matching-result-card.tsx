@@ -82,6 +82,15 @@ export function MatchingResultCard({ result, rank }: MatchingResultCardProps) {
                                     {t("match.card.reviews")})
                                 </span>
                             </div>
+                            <p className="mt-1 text-[13px] font-bold text-primary">
+                                {instructor.hourlyRate === 0
+                                    ? t("match.price.free")
+                                    : format(t("match.price.perHour"), {
+                                          n: new Intl.NumberFormat(
+                                              "vi-VN",
+                                          ).format(instructor.hourlyRate),
+                                      })}
+                            </p>
                         </div>
                     </div>
                     <Badge
@@ -183,7 +192,11 @@ export function MatchingResultCard({ result, rank }: MatchingResultCardProps) {
                                                 variant="outline"
                                                 className={`h-5 rounded-full px-1.5 text-[10px] ${verificationBadgeClass(skill.verifiedRatio)}`}
                                             >
-                                                {t(verificationLabelKey(skill.verifiedRatio))}
+                                                {t(
+                                                    verificationLabelKey(
+                                                        skill.verifiedRatio,
+                                                    ),
+                                                )}
                                             </Badge>
                                             <span className="text-xs font-bold text-foreground">
                                                 {Math.round(skill.score * 100)}%

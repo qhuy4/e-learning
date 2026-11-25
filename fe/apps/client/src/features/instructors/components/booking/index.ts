@@ -4,7 +4,6 @@ export * from "./BookingStates";
 export * from "./BookingSubmitSection";
 export * from "./DateSlotPicker";
 export * from "./DiagnosticShareCard";
-export * from "./FocusSelectionCard";
 export * from "./InstructorSummaryCard";
 export * from "./QuickNotesCard";
 export * from "./StepHeader";

@@ -32,7 +32,7 @@ export function QuizPanel({
     onAnswersChange: (next: Record<string, string>) => void;
     index: number;
     onIndexChange: (next: number) => void;
-    onDone: () => void;
+    onDone: (attempt: QuizAttempt) => void;
 }) {
     const { t } = useI18n();
     const form = useQuizForm();
@@ -190,7 +190,7 @@ export function QuizPanel({
                 <div className="flex flex-col sm:flex-row gap-3">
                     <Button
                         className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold cursor-pointer"
-                        onClick={onDone}
+                        onClick={() => onDone(result)}
                     >
                         {t("match.quiz.toProfile")}
                     </Button>

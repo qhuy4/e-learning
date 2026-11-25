@@ -2,6 +2,14 @@ import { Search } from "lucide-react";
 import { Badge } from "@fe/components/ui/badge";
 import { Button } from "@fe/components/ui/button";
 import { Checkbox } from "@fe/components/ui/checkbox";
+import { Input } from "@fe/components/ui/input";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@fe/components/ui/select";
 import { Skeleton } from "@fe/components/ui/skeleton";
 import { useI18n } from "@/i18n/use-i18n";
 import {
@@ -15,8 +23,14 @@ import {
 import { ErrorBanner } from "@/features/matching/components/error-banner";
 import type { LearnerProfile } from "@/features/matching/types/matching.type";
 
+const PRICE_MODE_LABEL_KEYS = {
+    ALL: "match.price.all",
+    FREE: "match.price.free",
+    PAID: "match.price.range",
+} as const;
+
 /**
- * Bước 3 — hồ sơ học viên hợp nhất: level (writing > quiz), tự đánh giá vs
+ * Bước 5 — hồ sơ học viên hợp nhất: level từ quiz, tự đánh giá vs
  * đo được, và trạng thái trung thực từng kỹ năng (assessed / insufficient /
  * not_assessed). Không bịa điểm: mọi badge đều từ dữ liệu backend trả về.
  */
@@ -30,6 +44,12 @@ export function LearnerProfilePanel({
     canFind,
     requireLevelMatch,
     onRequireLevelMatchChange,
+    priceMode,
+    onPriceModeChange,
+    minHourlyRate,
+    maxHourlyRate,
+    onMinHourlyRateChange,
+    onMaxHourlyRateChange,
 }: {
     profile: LearnerProfile | null;
     loading: boolean;
@@ -40,6 +60,12 @@ export function LearnerProfilePanel({
     canFind: boolean;
     requireLevelMatch: boolean;
     onRequireLevelMatchChange: (value: boolean) => void;
+    priceMode: "ALL" | "FREE" | "PAID";
+    onPriceModeChange: (value: "ALL" | "FREE" | "PAID") => void;
+    minHourlyRate: string;
+    maxHourlyRate: string;
+    onMinHourlyRateChange: (value: string) => void;
+    onMaxHourlyRateChange: (value: string) => void;
 }) {
     const { t } = useI18n();
 
@@ -159,6 +185,13 @@ export function LearnerProfilePanel({
                             })}
                         </span>
                     )}
+                    {profile.listening && (
+                        <span>
+                            {format(t("match.profile.listeningScore"), {
+                                n: profile.listening.scorePct,
+                            })}
+                        </span>
+                    )}
                 </div>
             </div>
 
@@ -206,6 +239,20 @@ export function LearnerProfilePanel({
                                         })}
                                     </span>
                                 )}
+                                {skill.scorePct != null && (
+                                    <span className="text-xs text-muted-foreground dark:text-slate-300">
+                                        {format(
+                                            t(
+                                                skill.source === "listening"
+                                                    ? "match.profile.listeningScore"
+                                                    : "match.profile.mvpScore",
+                                            ),
+                                            {
+                                                n: skill.scorePct,
+                                            },
+                                        )}
+                                    </span>
+                                )}
                             </div>
 
                             <p className="text-[12px] text-muted-foreground dark:text-slate-300 leading-relaxed">
@@ -218,6 +265,66 @@ export function LearnerProfilePanel({
 
             {/* CTA tìm giảng viên */}
             <div className="flex flex-col gap-3">
+                <div className="grid gap-3 sm:grid-cols-[220px_1fr] sm:items-end">
+                    <div className="space-y-1.5">
+                        <label
+                            className="text-xs font-bold text-foreground"
+                            htmlFor="price-mode-profile"
+                        >
+                            {t("match.price.label")}
+                        </label>
+                        <Select
+                            value={priceMode}
+                            onValueChange={onPriceModeChange}
+                        >
+                            <SelectTrigger
+                                id="price-mode-profile"
+                                className="w-full"
+                            >
+                                <SelectValue>
+                                    {t(PRICE_MODE_LABEL_KEYS[priceMode])}
+                                </SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="ALL">
+                                    {t("match.price.all")}
+                                </SelectItem>
+                                <SelectItem value="FREE">
+                                    {t("match.price.free")}
+                                </SelectItem>
+                                <SelectItem value="PAID">
+                                    {t("match.price.range")}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    {priceMode === "PAID" && (
+                        <div className="grid grid-cols-2 gap-2">
+                            <Input
+                                type="number"
+                                min={0}
+                                step={10000}
+                                value={minHourlyRate}
+                                onChange={(event) =>
+                                    onMinHourlyRateChange(event.target.value)
+                                }
+                                placeholder={t("match.price.min")}
+                                aria-label={t("match.price.min")}
+                            />
+                            <Input
+                                type="number"
+                                min={0}
+                                step={10000}
+                                value={maxHourlyRate}
+                                onChange={(event) =>
+                                    onMaxHourlyRateChange(event.target.value)
+                                }
+                                placeholder={t("match.price.max")}
+                                aria-label={t("match.price.max")}
+                            />
+                        </div>
+                    )}
+                </div>
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
                     <Button
                         className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold cursor-pointer"

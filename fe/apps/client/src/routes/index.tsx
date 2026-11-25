@@ -51,7 +51,6 @@ import { IeltsResultPage } from "../features/ielts/pages/IeltsResultPage";
 import { IeltsExamProvider } from "../features/ielts/contexts/ielts-exam-context";
 
 import { MeetingRoom } from "@/pages/meeting/meeting.tsx";
-import { MyBookingsPage } from "@/pages/meeting/MyBookingsPage";
 import { ProfilePage } from "@/pages/profile/ProfilePage";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import SkillMatchPage from "@/pages/matching/SkillMatchPage";
@@ -126,7 +125,8 @@ const router = createBrowserRouter([
             },
             {
                 path: "my-bookings",
-                element: <MyBookingsPage />,
+                // Gộp vào tab history của Profile (BookingHistoryTab) — chỉ còn 1 trang lịch sử.
+                element: <Navigate to="/profile?tab=history" replace />,
             },
             {
                 path: "profile",

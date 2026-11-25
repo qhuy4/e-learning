@@ -20,7 +20,7 @@ export function SelfAssessmentCard({
     onContinue,
 }: {
     saved: SelfAssessment | null;
-    onContinue: () => void;
+    onContinue: (band: string) => void;
 }) {
     const { t } = useI18n();
     const save = useSaveSelfAssessment();
@@ -83,8 +83,8 @@ export function SelfAssessmentCard({
                 <Button
                     variant="outline"
                     className="rounded-full font-semibold cursor-pointer"
-                    disabled={save.isPending}
-                    onClick={onContinue}
+                    disabled={save.isPending || !active}
+                    onClick={() => active && onContinue(active)}
                 >
                     {t("match.wizard.next")}
                 </Button>

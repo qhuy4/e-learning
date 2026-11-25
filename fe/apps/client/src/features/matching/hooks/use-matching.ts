@@ -5,6 +5,12 @@ import type {
     MatchingFromProfileResponse,
     MatchingLevelOptions,
     MatchingRequestTarget,
+    MatchFromProfilePayload,
+    ListeningAttempt,
+    ListeningForm,
+    ListeningScorePayload,
+    SpeakingAttempt,
+    SpeakingPrompt,
     QuizAttempt,
     QuizForm,
     QuizScorePayload,
@@ -46,6 +52,9 @@ export const useAnalyzeWriting = () => {
             // Bằng chứng writing mới → hồ sơ hợp nhất (Bước 3) cũng phải tải lại.
             void queryClient.invalidateQueries({
                 queryKey: ["learner-profile"],
+            });
+            void queryClient.invalidateQueries({
+                queryKey: ["learning-roadmap"],
             });
         },
     });
@@ -105,6 +114,44 @@ export const useScoreQuiz = () => {
             void queryClient.invalidateQueries({
                 queryKey: ["learner-profile"],
             });
+            void queryClient.invalidateQueries({
+                queryKey: ["learning-roadmap"],
+            });
+        },
+    });
+};
+
+export const useListeningForm = () =>
+    useQuery({
+        queryKey: ["learner-listening", "form"],
+        queryFn: (): Promise<ListeningForm> =>
+            matchingService.getListeningForm(),
+        staleTime: Infinity,
+    });
+
+export const useLatestListening = () =>
+    useQuery({
+        queryKey: ["learner-listening", "latest"],
+        queryFn: (): Promise<ListeningAttempt | null> =>
+            matchingService.getLatestListening(),
+    });
+
+export const useScoreListening = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (
+            payload: ListeningScorePayload,
+        ): Promise<ListeningAttempt> => matchingService.scoreListening(payload),
+        onSuccess: () => {
+            void queryClient.invalidateQueries({
+                queryKey: ["learner-listening", "latest"],
+            });
+            void queryClient.invalidateQueries({
+                queryKey: ["learner-profile"],
+            });
+            void queryClient.invalidateQueries({
+                queryKey: ["learning-roadmap"],
+            });
         },
     });
 };
@@ -117,6 +164,84 @@ export const useSaveSelfAssessment = () => {
         onSuccess: () => {
             void queryClient.invalidateQueries({
                 queryKey: ["learner-profile"],
+            });
+            void queryClient.invalidateQueries({
+                queryKey: ["learner-listening", "form"],
+            });
+            void queryClient.invalidateQueries({
+                queryKey: ["learner-speaking", "prompt"],
+            });
+        },
+    });
+};
+
+export const useSpeakingPrompt = () =>
+    useQuery({
+        queryKey: ["learner-speaking", "prompt"],
+        queryFn: (): Promise<SpeakingPrompt> =>
+            matchingService.getSpeakingPrompt(),
+        staleTime: Infinity,
+    });
+
+export const useLatestSpeaking = () =>
+    useQuery({
+        queryKey: ["learner-speaking", "latest"],
+        queryFn: (): Promise<SpeakingAttempt | null> =>
+            matchingService.getLatestSpeaking(),
+        refetchInterval: (query) => {
+            const attempt = query.state.data;
+            if (!attempt) return false;
+            const processing =
+                attempt.transcriptionStatus === "PROCESSING" ||
+                attempt.assessmentStatus === "PENDING" ||
+                attempt.assessmentStatus === "PROCESSING";
+            return processing ? 2_500 : false;
+        },
+    });
+
+export const useSubmitSpeaking = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (input: {
+            promptId: string;
+            durationSeconds: number;
+            blob: Blob;
+        }): Promise<SpeakingAttempt> =>
+            matchingService.submitSpeaking(
+                input.promptId,
+                input.durationSeconds,
+                input.blob,
+            ),
+        onSuccess: (attempt) => {
+            queryClient.setQueryData(["learner-speaking", "latest"], attempt);
+            void queryClient.invalidateQueries({
+                queryKey: ["learner-speaking", "latest"],
+            });
+            void queryClient.invalidateQueries({
+                queryKey: ["learner-profile"],
+            });
+            void queryClient.invalidateQueries({
+                queryKey: ["learning-roadmap"],
+            });
+        },
+    });
+};
+
+export const useRetrySpeaking = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (attemptId: number): Promise<SpeakingAttempt> =>
+            matchingService.retrySpeaking(attemptId),
+        onSuccess: (attempt) => {
+            queryClient.setQueryData(["learner-speaking", "latest"], attempt);
+            void queryClient.invalidateQueries({
+                queryKey: ["learner-speaking", "latest"],
+            });
+            void queryClient.invalidateQueries({
+                queryKey: ["learner-profile"],
+            });
+            void queryClient.invalidateQueries({
+                queryKey: ["learning-roadmap"],
             });
         },
     });
@@ -132,10 +257,43 @@ export const useLearnerProfile = (enabled = true) => {
 
 export const useMatchFromProfile = () => {
     return useMutation({
-        mutationFn: (payload: {
-            limit?: number;
-            requireLevelMatch?: boolean;
-        }): Promise<MatchingFromProfileResponse> =>
+        mutationFn: (
+            payload: MatchFromProfilePayload,
+        ): Promise<MatchingFromProfileResponse> =>
             matchingService.matchFromProfile(payload),
+    });
+};
+
+export const useCourseMatches = (enabled = true) =>
+    useQuery({
+        queryKey: ["course-matches"],
+        queryFn: matchingService.matchCourses,
+        enabled,
+    });
+
+export const useRoadmap = (enabled = true) =>
+    useQuery({
+        queryKey: ["learning-roadmap"],
+        queryFn: matchingService.getRoadmap,
+        enabled,
+    });
+
+export const useGenerateRoadmap = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: matchingService.generateRoadmap,
+        onSuccess: (roadmap) => {
+            queryClient.setQueryData(["learning-roadmap"], roadmap);
+        },
+    });
+};
+
+export const useReassessRoadmap = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: matchingService.reassessRoadmap,
+        onSuccess: (roadmap) => {
+            queryClient.setQueryData(["learning-roadmap"], roadmap);
+        },
     });
 };

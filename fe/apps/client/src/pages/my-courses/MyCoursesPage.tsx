@@ -47,11 +47,11 @@ export const MyCoursesPage = () => {
   if (!isAuthenticated) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-center">
-        <div className="mb-2 flex h-16 w-16 items-center justify-center rounded-full bg-piemind-pink/10 text-piemind-pink">
+        <div className="mb-2 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
           <BookOpen className="h-8 w-8" />
         </div>
-        <h2 className="text-xl font-bold text-slate-900">Bạn chưa đăng nhập</h2>
-        <p className="max-w-sm text-slate-500">
+        <h2 className="text-xl font-bold text-foreground">Bạn chưa đăng nhập</h2>
+        <p className="max-w-sm text-muted-foreground">
           Vui lòng đăng nhập tài khoản để xem toàn bộ danh sách khóa học của bạn.
         </p>
         <Link to="/login?redirect=/my-courses" className="pt-2">
@@ -66,8 +66,8 @@ export const MyCoursesPage = () => {
   if (isLoading) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
-        <Loader2 className="h-9 w-9 animate-spin text-piemind-pink" />
-        <p className="text-sm font-medium text-slate-400">
+        <Loader2 className="h-9 w-9 animate-spin text-primary" />
+        <p className="text-sm font-medium text-muted-foreground">
           Đang tải khóa học của bạn...
         </p>
       </div>
@@ -86,23 +86,23 @@ export const MyCoursesPage = () => {
   });
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 pt-5 pb-14">
+    <div className="min-h-[calc(100vh-4rem)] bg-background pt-5 pb-14">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Tiêu đề */}
         <div className="mb-5 flex flex-wrap items-center gap-3 lg:mb-6">
-          <h1 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl lg:text-3xl">
+          <h1 className="text-xl font-extrabold tracking-tight text-foreground sm:text-2xl lg:text-3xl">
             Khóa học của tôi
           </h1>
-          <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-bold text-slate-500">
+          <span className="rounded-full border border-border bg-card px-3 py-1 text-xs font-bold text-muted-foreground">
             {totalItems} khóa học
           </span>
         </div>
 
         {/* Toolbar: tabs + tìm kiếm + sắp xếp */}
-        <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-4">
+        <div className="mb-6 rounded-2xl border border-border bg-card p-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             {/* Tabs */}
-            <div className="inline-flex self-start rounded-xl bg-slate-100 p-1 text-xs font-semibold">
+            <div className="inline-flex self-start rounded-xl bg-muted p-1 text-xs font-semibold">
               {TABS.map((tab) => (
                 <button
                   key={tab.id}
@@ -113,8 +113,8 @@ export const MyCoursesPage = () => {
                   }}
                   className={`cursor-pointer rounded-lg px-4 py-2 transition-all ${
                     activeTab === tab.id
-                      ? "bg-piemind-pink text-white shadow-sm"
-                      : "text-slate-600 hover:text-slate-900"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {tab.label}
@@ -125,7 +125,7 @@ export const MyCoursesPage = () => {
             {/* Search + sort */}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <div className="relative w-full sm:w-60 lg:w-72">
-                <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   type="text"
                   placeholder="Tìm kiếm theo tên khóa học..."
@@ -134,7 +134,7 @@ export const MyCoursesPage = () => {
                     setSearchKeyword(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-9 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-piemind-pink focus:ring-2 focus:ring-piemind-pink/25"
+                  className="w-full rounded-xl border border-border bg-card py-2.5 pl-9 pr-9 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/25"
                 />
                 {searchKeyword && (
                   <button
@@ -144,7 +144,7 @@ export const MyCoursesPage = () => {
                       setSearchKeyword("");
                       setPage(1);
                     }}
-                    className="absolute right-3 top-1/2 flex h-5 w-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-slate-400 transition hover:text-slate-600"
+                    className="absolute right-3 top-1/2 flex h-5 w-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition hover:text-foreground"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
@@ -163,7 +163,7 @@ export const MyCoursesPage = () => {
                     setSortOrder(newSortOrder);
                     setPage(1);
                   }}
-                  className="w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white py-2.5 pl-4 pr-9 text-sm font-semibold text-slate-700 outline-none transition focus:border-piemind-pink focus:ring-2 focus:ring-piemind-pink/25 sm:w-auto"
+                  className="w-full cursor-pointer appearance-none rounded-xl border border-border bg-card py-2.5 pl-4 pr-9 text-sm font-semibold text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/25 sm:w-auto"
                 >
                   <option value="enrolledAt-desc">Mới đăng ký nhất</option>
                   <option value="enrolledAt-asc">Cũ nhất</option>
@@ -171,7 +171,7 @@ export const MyCoursesPage = () => {
                   <option value="progress-asc">Tiến độ thấp nhất</option>
                   <option value="title-asc">Tên khóa học (A-Z)</option>
                 </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               </div>
             </div>
           </div>
@@ -179,14 +179,14 @@ export const MyCoursesPage = () => {
 
         {/* Lưới khóa học / trạng thái rỗng */}
         {filteredEnrollments.length === 0 ? (
-          <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+          <div className="rounded-2xl border border-border bg-card p-12 text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted text-muted-foreground">
               <Compass className="h-8 w-8" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900">
+            <h3 className="text-lg font-bold text-foreground">
               Không tìm thấy khóa học nào
             </h3>
-            <p className="mx-auto mt-2 max-w-sm text-sm text-slate-500">
+            <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
               {searchKeyword
                 ? `Không tìm thấy kết quả nào phù hợp với từ khóa "${searchKeyword}".`
                 : activeTab === "all"
@@ -228,8 +228,8 @@ export const MyCoursesPage = () => {
                   onClick={() => setPage(p)}
                   className={`h-8 w-8 cursor-pointer rounded-xl text-xs font-bold transition-all ${
                     p === page
-                      ? "bg-piemind-pink text-white"
-                      : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                      ? "bg-primary text-primary-foreground"
+                      : "border border-border bg-card text-muted-foreground hover:bg-muted"
                   }`}
                 >
                   {p}
