@@ -86,6 +86,9 @@ export class InstructorCoursesController {
         dto.price,
         dto.parentId,
         dto.categories,
+        dto.cefrLevelStart,
+        dto.cefrLevelEnd,
+        dto.skillCodes,
       ),
     );
   }
@@ -99,7 +102,8 @@ export class InstructorCoursesController {
     @UploadedFile() thumbnail?: Express.Multer.File,
   ) {
     const rawStatus = (dto as any).status;
-    const status = dto.status ?? (rawStatus != null ? Number(rawStatus) : undefined);
+    const status =
+      dto.status ?? (rawStatus != null ? Number(rawStatus) : undefined);
 
     return this.commandBus.execute(
       new UpdateCourseCommand(id, {
@@ -111,6 +115,9 @@ export class InstructorCoursesController {
         status,
         parentId: dto.parentId,
         categories: dto.categories,
+        cefrLevelStart: dto.cefrLevelStart,
+        cefrLevelEnd: dto.cefrLevelEnd,
+        skillCodes: dto.skillCodes,
       }),
     );
   }

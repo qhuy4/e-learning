@@ -8,5 +8,8 @@ export class CreateCourseCommand {
     public readonly price?: number,
     public readonly parentId?: number,
     public readonly categories?: string[],
+    public readonly cefrLevelStart?: string,
+    public readonly cefrLevelEnd?: string,
+    public readonly skillCodes?: string[],
   ) {}
 }

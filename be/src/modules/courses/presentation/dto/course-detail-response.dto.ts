@@ -6,6 +6,9 @@ export class CourseDetailResponseDto {
   description: string | null;
   thumbnail: string | null;
   level: number;
+  cefrLevelStart: string | null;
+  cefrLevelEnd: string | null;
+  skillCodes: string[];
   price: number;
   publishedAt: Date | null;
   createdAt: Date | null;

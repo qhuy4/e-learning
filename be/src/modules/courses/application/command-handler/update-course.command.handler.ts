@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  BadRequestException,
   ForbiddenException,
   HttpStatus,
   Inject,
@@ -32,6 +33,7 @@ import { ApprovalStatus } from '@/modules/instructors/domain/enum/instructor-pro
 import { UserOrmEntity } from '@/modules/users/infrastructure/entity/user.orm.entity';
 import { UserRole } from '@/modules/users/domain/enum/user.role';
 import { CourseStatus } from '@/modules/courses/domain/enum/course-status.enum';
+import { cefrIndex } from '@/modules/student-assessment/domain/cefr';
 
 const PENDING_REVIEW_STATUS = CourseStatus.PENDING_REVIEW;
 
@@ -70,32 +72,74 @@ export class UpdateCourseHandler implements ICommandHandler<UpdateCourseCommand>
       throw new AppException(ErrorCode.COURSE_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
-    const newStatus = command.data.status != null ? command.data.status : undefined;
-    const owner = newStatus !== undefined
-      ? await this.userRepo.findOne({ where: { id: Number(course.instructorId) } })
-      : null;
-
-    if (owner?.role !== UserRole.ADMIN && newStatus !== undefined && ![1, PENDING_REVIEW_STATUS].includes(newStatus)) {
-      throw new ForbiddenException('Giảng viên chỉ có thể lưu bản nháp hoặc gửi khóa học xét duyệt.');
+    const cefrStart = command.data.cefrLevelStart ?? course.cefrLevelStart;
+    const cefrEnd = command.data.cefrLevelEnd ?? course.cefrLevelEnd;
+    if (cefrStart && cefrEnd && cefrIndex(cefrStart) > cefrIndex(cefrEnd)) {
+      throw new BadRequestException(
+        'CEFR đầu vào không được cao hơn CEFR đầu ra.',
+      );
     }
 
-    if (newStatus !== undefined && newStatus !== course.status && course.status === CourseStatus.ARCHIVED) {
+    const newStatus =
+      command.data.status != null ? Number(command.data.status) : undefined;
+    const owner =
+      newStatus !== undefined
+        ? await this.userRepo.findOne({
+            where: { id: Number(course.instructorId) },
+          })
+        : null;
+
+    if (
+      owner?.role !== UserRole.ADMIN &&
+      newStatus !== undefined &&
+      ![1, PENDING_REVIEW_STATUS].includes(newStatus)
+    ) {
+      throw new ForbiddenException(
+        'Giảng viên chỉ có thể lưu bản nháp hoặc gửi khóa học xét duyệt.',
+      );
+    }
+
+    if (
+      newStatus !== undefined &&
+      newStatus !== course.status &&
+      course.status === CourseStatus.ARCHIVED
+    ) {
       throw new ConflictException(
         'Version này đã bị thay thế bởi version mới hơn. Hãy sao chép thành version mới để chỉnh sửa.',
       );
     }
 
-    if (newStatus != null && !isNaN(newStatus) && newStatus === PENDING_REVIEW_STATUS) {
-      const profile = await this.profileRepo.findOne({ where: { userId: course.instructorId } });
-      if (owner?.role !== UserRole.ADMIN && profile?.approvalStatus !== ApprovalStatus.APPROVED) {
-        throw new ForbiddenException('Hồ sơ giảng viên cần được duyệt trước khi gửi khóa học xét duyệt.');
+    if (
+      newStatus != null &&
+      !isNaN(newStatus) &&
+      newStatus === PENDING_REVIEW_STATUS
+    ) {
+      const skillCodes = command.data.skillCodes ?? course.skillCodes;
+      if (!cefrStart || !cefrEnd || skillCodes.length === 0) {
+        throw new BadRequestException(
+          'Cần khai báo CEFR đầu vào, đầu ra và ít nhất một kỹ năng trọng tâm trước khi gửi duyệt.',
+        );
+      }
+      const profile = await this.profileRepo.findOne({
+        where: { userId: course.instructorId },
+      });
+      if (
+        owner?.role !== UserRole.ADMIN &&
+        profile?.approvalStatus !== ApprovalStatus.APPROVED
+      ) {
+        throw new ForbiddenException(
+          'Hồ sơ giảng viên cần được duyệt trước khi gửi khóa học xét duyệt.',
+        );
       }
       const sectionCount = await this.sectionRepo.count({
         where: { courseId: String(command.id) },
       });
 
       if (sectionCount === 0) {
-        throw new AppException(ErrorCode.COURSE_NO_SECTIONS, HttpStatus.BAD_REQUEST);
+        throw new AppException(
+          ErrorCode.COURSE_NO_SECTIONS,
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       const emptySectionCount = await this.sectionRepo
@@ -107,7 +151,10 @@ export class UpdateCourseHandler implements ICommandHandler<UpdateCourseCommand>
         .getCount();
 
       if (emptySectionCount > 0) {
-        throw new AppException(ErrorCode.COURSE_NO_LESSONS, HttpStatus.BAD_REQUEST);
+        throw new AppException(
+          ErrorCode.COURSE_NO_LESSONS,
+          HttpStatus.BAD_REQUEST,
+        );
       }
     }
 
@@ -144,6 +191,9 @@ export class UpdateCourseHandler implements ICommandHandler<UpdateCourseCommand>
         description: command.data.description,
         thumbnail,
         level: command.data.level,
+        cefrLevelStart: command.data.cefrLevelStart,
+        cefrLevelEnd: command.data.cefrLevelEnd,
+        skillCodes: command.data.skillCodes,
         price: command.data.price,
         status: command.data.status,
         parentId: command.data.parentId,
@@ -193,7 +243,12 @@ export class UpdateCourseHandler implements ICommandHandler<UpdateCourseCommand>
           );
       }
 
-      return AdminCourseDtoMapper.toDetailDto(updatedCourse, this.storage, this.categoryCourseRepo, this.categoryRepo);
+      return AdminCourseDtoMapper.toDetailDto(
+        updatedCourse,
+        this.storage,
+        this.categoryCourseRepo,
+        this.categoryRepo,
+      );
     } catch (error) {
       this.logger.error(
         `Failed to update course id=${command.id}: ${error.message}`,

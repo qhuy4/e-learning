@@ -88,6 +88,9 @@ export class BookingCheckoutService {
     }
 
     if (payment.status === BookingPaymentStatus.PAID) {
+      await this.dataSource.transaction((manager) =>
+        this.recordBookingRevenue(manager, payment.booking!),
+      );
       return { bookingId: payment.bookingId, success: true };
     }
 
@@ -114,6 +117,7 @@ export class BookingCheckoutService {
         status: BookingStatusEnum.CONFIRMED,
         payment_status: BookingPaymentStatus.PAID,
       });
+      await this.recordBookingRevenue(manager, payment.booking!);
       await this.meetingRooms.create(
         {
           bookingId: payment.bookingId,
@@ -133,5 +137,43 @@ export class BookingCheckoutService {
 
     const defaultUrl = this.config.get<string>('VNP_RETURN_URL');
     return defaultUrl?.replace('/payments/webhook/vnpay', '/bookings/payment/vnpay');
+  }
+
+  private async recordBookingRevenue(
+    manager: import('typeorm').EntityManager,
+    booking: BookingOrmEntity,
+  ): Promise<void> {
+    await manager.query(
+      `WITH profile AS (
+         SELECT user_id, revenue_share_pct
+         FROM instructor_profiles
+         WHERE user_id = $2
+         FOR UPDATE
+       ), inserted AS (
+         INSERT INTO revenue_splits (
+           booking_id, order_item_id, instructor_id, course_id,
+           gross_amount, platform_fee_pct, platform_fee_amount,
+           instructor_share_pct, instructor_amount, coupon_discount,
+           payout_status, created_at, updated_at
+         )
+         SELECT
+           $1, NULL, user_id, NULL, $3,
+           100 - revenue_share_pct,
+           ROUND($3 * (100 - revenue_share_pct) / 100),
+           revenue_share_pct,
+           $3 - ROUND($3 * (100 - revenue_share_pct) / 100),
+           0, 'pending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+         FROM profile
+         ON CONFLICT (booking_id) WHERE booking_id IS NOT NULL DO NOTHING
+         RETURNING instructor_id, instructor_amount
+       )
+       UPDATE instructor_profiles p
+       SET total_earned = p.total_earned + i.instructor_amount,
+           pending_payout = p.pending_payout + i.instructor_amount,
+           updated_at = CURRENT_TIMESTAMP
+       FROM inserted i
+       WHERE p.user_id = i.instructor_id`,
+      [booking.id, booking.instructor_id, Number(booking.total_amount)],
+    );
   }
 }

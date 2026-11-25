@@ -1,6 +1,7 @@
 import {
   IsArray,
   IsInt,
+  IsIn,
   IsNumber,
   IsOptional,
   IsString,
@@ -63,4 +64,39 @@ export class CreateCourseDto {
   @IsArray()
   @Type(() => String)
   categories?: string[];
+
+  @IsOptional()
+  @IsIn(['A1', 'A2', 'B1', 'B2', 'C1', 'C2'])
+  cefrLevelStart?: string;
+
+  @IsOptional()
+  @IsIn(['A1', 'A2', 'B1', 'B2', 'C1', 'C2'])
+  cefrLevelEnd?: string;
+
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value;
+    if (typeof value !== 'string') return [];
+    try {
+      const parsed: unknown = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return value ? value.split(',').map((item) => item.trim()) : [];
+    }
+  })
+  @IsArray()
+  @IsString({ each: true })
+  @IsIn(
+    [
+      'grammar',
+      'vocabulary',
+      'speaking',
+      'listening',
+      'writing',
+      'pronunciation',
+      'reading',
+    ],
+    { each: true },
+  )
+  skillCodes?: string[];
 }

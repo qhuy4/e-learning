@@ -9,6 +9,9 @@ export class Course {
     public description: string | null,
     public thumbnail: string | null,
     public level: number,
+    public cefrLevelStart: string | null,
+    public cefrLevelEnd: string | null,
+    public skillCodes: string[],
     public price: number,
     public status: CourseStatus,
     public reviewedBy: number | null,
@@ -30,6 +33,9 @@ export class Course {
     description?: string | null;
     thumbnail?: string | null;
     level?: number;
+    cefrLevelStart?: string | null;
+    cefrLevelEnd?: string | null;
+    skillCodes?: string[];
     price?: number;
     status?: number;
     parentId?: number | null;
@@ -43,6 +49,9 @@ export class Course {
       params.description ?? null,
       params.thumbnail ?? null,
       params.level ?? 1,
+      params.cefrLevelStart ?? null,
+      params.cefrLevelEnd ?? null,
+      params.skillCodes ?? [],
       params.price ?? 0,
       params.status ?? 1,
       null,
@@ -66,6 +75,9 @@ export class Course {
     description: string | null;
     thumbnail: string | null;
     level: number;
+    cefrLevelStart: string | null;
+    cefrLevelEnd: string | null;
+    skillCodes: string[];
     price: number;
     status: number;
     reviewedBy: number | null;
@@ -87,6 +99,9 @@ export class Course {
       params.description,
       params.thumbnail,
       params.level,
+      params.cefrLevelStart,
+      params.cefrLevelEnd,
+      params.skillCodes,
       params.price,
       params.status,
       params.reviewedBy,
@@ -108,6 +123,9 @@ export class Course {
     description?: string | null;
     thumbnail?: string | null;
     level?: number;
+    cefrLevelStart?: string | null;
+    cefrLevelEnd?: string | null;
+    skillCodes?: string[];
     price?: number;
     status?: number;
     parentId?: number | null;
@@ -131,6 +149,12 @@ export class Course {
     if (params.level !== undefined) {
       this.level = params.level;
     }
+
+    if (params.cefrLevelStart !== undefined)
+      this.cefrLevelStart = params.cefrLevelStart;
+    if (params.cefrLevelEnd !== undefined)
+      this.cefrLevelEnd = params.cefrLevelEnd;
+    if (params.skillCodes !== undefined) this.skillCodes = params.skillCodes;
 
     if (params.price !== undefined) {
       this.price = params.price;
@@ -165,6 +189,9 @@ export class Course {
       data.description,
       data.thumbnail,
       data.level,
+      this.cefrLevelStart,
+      this.cefrLevelEnd,
+      this.skillCodes,
       data.price,
       data.status,
       null,

@@ -16,6 +16,9 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enum/role.enum';
 import { GetAchievementsQuery } from '@/modules/achievements/application/query/get-achievements.query';
 import { GetAchievementByIdQuery } from '@/modules/achievements/application/query/get-achievement-by-id.query';
 import { CreateAchievementCommand } from '@/modules/achievements/application/command/create-achievement.command';
@@ -30,7 +33,8 @@ import {
 } from '@/common/storage/domain/interface/file-storage.interface';
 
 @Controller('admin/achievements')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
 export class AdminAchievementsController {
   constructor(
     private readonly commandBus: CommandBus,

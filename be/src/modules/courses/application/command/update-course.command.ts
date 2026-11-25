@@ -13,6 +13,9 @@ export class UpdateCourseCommand {
       status?: CourseStatus;
       parentId?: number | null;
       categories?: string[];
+      cefrLevelStart?: string | null;
+      cefrLevelEnd?: string | null;
+      skillCodes?: string[];
     },
   ) {}
 }

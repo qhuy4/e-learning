@@ -18,7 +18,8 @@ import {
 import { CategoryOrmEntity } from '@/modules/categories/infrastructure/entity/category.orm-entity';
 import { CategoryCourseOrmEntity } from '@/modules/categories/infrastructure/entity/category-course.orm-entity';
 
-import { Inject, ConflictException } from '@nestjs/common';
+import { BadRequestException, Inject, ConflictException } from '@nestjs/common';
+import { cefrIndex } from '@/modules/student-assessment/domain/cefr';
 
 @CommandHandler(CreateCourseCommand)
 export class CreateCourseHandler implements ICommandHandler<CreateCourseCommand> {
@@ -37,6 +38,15 @@ export class CreateCourseHandler implements ICommandHandler<CreateCourseCommand>
   ) {}
 
   async execute(command: CreateCourseCommand) {
+    if (
+      command.cefrLevelStart &&
+      command.cefrLevelEnd &&
+      cefrIndex(command.cefrLevelStart) > cefrIndex(command.cefrLevelEnd)
+    ) {
+      throw new BadRequestException(
+        'CEFR đầu vào không được cao hơn CEFR đầu ra.',
+      );
+    }
     const slug = SlugUtil.generate(command.title);
 
     const existingCourse = await this.courseRepository.findBySlug(slug);
@@ -67,6 +77,9 @@ export class CreateCourseHandler implements ICommandHandler<CreateCourseCommand>
         description: command.description,
         thumbnail: key,
         level: command.level,
+        cefrLevelStart: command.cefrLevelStart,
+        cefrLevelEnd: command.cefrLevelEnd,
+        skillCodes: command.skillCodes,
         price: command.price,
         parentId: command.parentId,
         version: 1,

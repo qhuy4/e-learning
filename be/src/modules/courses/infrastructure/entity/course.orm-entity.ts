@@ -45,6 +45,25 @@ export class CourseOrmEntity {
   @Column({ type: 'smallint', default: 1 })
   level: number;
 
+  @Column({
+    name: 'cefr_level_start',
+    type: 'varchar',
+    length: 8,
+    nullable: true,
+  })
+  cefrLevelStart: string | null;
+
+  @Column({
+    name: 'cefr_level_end',
+    type: 'varchar',
+    length: 8,
+    nullable: true,
+  })
+  cefrLevelEnd: string | null;
+
+  @Column({ name: 'skill_codes', type: 'jsonb', default: () => "'[]'::jsonb" })
+  skillCodes: string[];
+
   @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
   price: string;
 

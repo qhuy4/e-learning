@@ -8,6 +8,9 @@ export class AdminCourseDetailResponseDto {
   description: string | null;
   thumbnail: string | null;
   level: number;
+  cefrLevelStart: string | null;
+  cefrLevelEnd: string | null;
+  skillCodes: string[];
   price: number;
   status: CourseStatus;
   rejectReason: string | null;

@@ -8,8 +8,13 @@ import {
   Query,
   Body,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enum/role.enum';
+import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
 import { GetAdminCategoriesQuery } from '@/modules/categories/application/query/get-admin-categories.query';
 import { GetAdminCategoryByIdQuery } from '@/modules/categories/application/query/get-admin-category-by-id.query';
 import { CreateCategoryCommand } from '@/modules/categories/application/command/create-category.command';
@@ -23,6 +28,8 @@ import {
 } from '@/modules/categories/domain/repository/category.repository';
 
 @Controller('admin/categories')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
 export class AdminCategoriesController {
   constructor(
     private readonly commandBus: CommandBus,
