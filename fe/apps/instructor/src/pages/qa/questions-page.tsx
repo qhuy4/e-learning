@@ -40,18 +40,31 @@ export default function QuestionsPage() {
   return (
     <div className="space-y-6 mx-auto p-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Câu hỏi & Thảo luận</h1>
-        <p className="text-sm text-muted-foreground mt-1">Quản lý câu hỏi từ học viên trong các khóa học của bạn</p>
+        <h1 className="text-3xl font-bold tracking-tight">Câu hỏi khóa học</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Hỏi–đáp chung về khóa học; không bao gồm thảo luận trong từng bài học.
+        </p>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
-        <Select value={status} onValueChange={(v) => { setStatus(v ?? ""); setPage(1); }}>
+        <Select
+          value={status}
+          onValueChange={(v) => {
+            setStatus(v ?? "");
+            setPage(1);
+          }}
+        >
           <SelectTrigger className="h-9 min-w-[160px]">
-            {status !== "" ? STATUS_OPTIONS.find((o) => o.value === status)?.label ?? "Tất cả" : "Tất cả trạng thái"}
+            {status !== ""
+              ? (STATUS_OPTIONS.find((o) => o.value === status)?.label ??
+                "Tất cả")
+              : "Tất cả trạng thái"}
           </SelectTrigger>
           <SelectContent>
             {STATUS_OPTIONS.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -68,8 +81,14 @@ export default function QuestionsPage() {
         refetch={refetch}
         isFetching={isFetching}
         search={keyword}
-        onSearchChange={(v) => { setKeyword(v); setPage(1); }}
-        onPageSizeChange={(v) => { setPageSize(v); setPage(1); }}
+        onSearchChange={(v) => {
+          setKeyword(v);
+          setPage(1);
+        }}
+        onPageSizeChange={(v) => {
+          setPageSize(v);
+          setPage(1);
+        }}
         onRowClick={(row) => navigate(`/qa/${row.id}`)}
         text={{
           searchPlaceholder: "Tìm kiếm câu hỏi...",

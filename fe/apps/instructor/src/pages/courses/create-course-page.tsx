@@ -52,6 +52,9 @@ export default function CreateCoursePage() {
     description: "",
     price: 0,
     level: 1,
+    cefrLevelStart: "A1",
+    cefrLevelEnd: "A2",
+    skillCodes: [],
     thumbnail: undefined,
     sections: [],
   });
@@ -74,6 +77,9 @@ export default function CreateCoursePage() {
     formData.append("title", data.title);
     if (data.description) formData.append("description", data.description);
     if (data.level) formData.append("level", String(data.level));
+    if (data.cefrLevelStart) formData.append("cefrLevelStart", data.cefrLevelStart);
+    if (data.cefrLevelEnd) formData.append("cefrLevelEnd", data.cefrLevelEnd);
+    formData.append("skillCodes", JSON.stringify(data.skillCodes ?? []));
     if (data.price !== undefined) formData.append("price", String(data.price));
     if (status) formData.append("status", String(status));
     if (data.thumbnail instanceof File) {

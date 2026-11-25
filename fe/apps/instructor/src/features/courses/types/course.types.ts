@@ -25,6 +25,9 @@ export interface Course {
   thumbnail?: string | File;
   price?: number;
   level?: number;
+  cefrLevelStart?: string | null;
+  cefrLevelEnd?: string | null;
+  skillCodes?: string[];
   status?: number;
   parentId?: number;
   benefits?: string[];

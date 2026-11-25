@@ -37,15 +37,25 @@ export const navigation: Navigation = {
       ],
     },
     {
-      label: "Hồ sơ & AI",
+      label: "Hồ sơ & năng lực",
       items: [
         {
-          title: "Hồ sơ giảng dạy",
+          title: "Thông tin cá nhân",
+          url: "/profile",
+          icon: UserCircle,
+        },
+        {
+          title: "Thông tin giảng dạy",
           url: "/teaching-profile",
           icon: ClipboardList,
         },
         {
-          title: "Hồ sơ kỹ năng AI",
+          title: "Chứng chỉ (nguồn dữ liệu)",
+          url: "/certificates",
+          icon: Award,
+        },
+        {
+          title: "Kết quả đánh giá năng lực",
           url: "/skill-profile",
           icon: Sparkles,
         },
@@ -95,22 +105,17 @@ export const navigation: Navigation = {
           icon: Clock,
         },
         {
-          title: "Chứng chỉ",
-          url: "/certificates",
-          icon: Award,
-        },
-        {
           title: "Thành tựu",
           url: "/achievements",
           icon: Trophy,
         },
         {
-          title: "Câu hỏi",
+          title: "Câu hỏi khóa học",
           url: "/qa",
           icon: MessageCircleQuestion,
         },
         {
-          title: "Bình luận bài học",
+          title: "Thảo luận bài học",
           url: "/lesson-comments",
           icon: MessagesSquare,
         },
@@ -118,11 +123,6 @@ export const navigation: Navigation = {
     },
   ],
   secondary: [
-    {
-      title: "Hồ sơ",
-      url: "/profile",
-      icon: UserCircle,
-    },
     {
       title: "Đăng xuất",
       url: "/logout",

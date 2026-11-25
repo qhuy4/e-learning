@@ -5,7 +5,12 @@ import { toast } from "sonner";
 import { cn } from "@fe/lib/utils";
 import { Button } from "@fe/components/ui/button";
 import { Badge } from "@fe/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@fe/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@fe/components/ui/card";
 import { Input } from "@fe/components/ui/input";
 import { Label } from "@fe/components/ui/label";
 import { Skeleton } from "@fe/components/ui/skeleton";
@@ -83,7 +88,9 @@ export default function TeachingProfilePage() {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Hồ sơ giảng dạy</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          Thông tin giảng dạy
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Tự khai báo kinh nghiệm — hiển thị trên hồ sơ, không thay thế bằng
           chứng đã xác minh (chứng chỉ, đánh giá học viên).
@@ -275,10 +282,7 @@ export default function TeachingProfilePage() {
             </div>
 
             <div className="flex justify-end border-t pt-4">
-              <Button
-                onClick={handleSave}
-                disabled={updateMut.isPending}
-              >
+              <Button onClick={handleSave} disabled={updateMut.isPending}>
                 <Save className="mr-1.5 h-4 w-4" />
                 {updateMut.isPending ? "Đang lưu..." : "Lưu hồ sơ"}
               </Button>

@@ -20,6 +20,15 @@ export function CourseInfoStep({ data, updateData }: CourseInfoStepProps) {
   const { data: categoriesData } = useGetCategories();
   const selectedCategories = data.categories || [];
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
+  const skillOptions = [
+    ["grammar", "Ngữ pháp"],
+    ["vocabulary", "Từ vựng"],
+    ["speaking", "Nói"],
+    ["listening", "Nghe"],
+    ["reading", "Đọc"],
+    ["writing", "Viết"],
+    ["pronunciation", "Phát âm"],
+  ] as const;
 
   const allCategories: Category[] = categoriesData?.data?.data ?? [];
 
@@ -267,6 +276,58 @@ export function CourseInfoStep({ data, updateData }: CourseInfoStepProps) {
 
                 <option value={CourseLevel.ADVANCED}>Nâng cao</option>
               </select>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="cefr-start">CEFR đầu vào</Label>
+                <select
+                  id="cefr-start"
+                  value={data.cefrLevelStart ?? "A1"}
+                  onChange={(event) => updateData({ cefrLevelStart: event.target.value })}
+                  className="flex h-11 w-full rounded-sm border border-input bg-background px-3 text-sm"
+                >
+                  {['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].map((level) => (
+                    <option key={level} value={level}>{level}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="cefr-end">CEFR đầu ra</Label>
+                <select
+                  id="cefr-end"
+                  value={data.cefrLevelEnd ?? "A2"}
+                  onChange={(event) => updateData({ cefrLevelEnd: event.target.value })}
+                  className="flex h-11 w-full rounded-sm border border-input bg-background px-3 text-sm"
+                >
+                  {['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].map((level) => (
+                    <option key={level} value={level}>{level}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Kỹ năng trọng tâm</Label>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {skillOptions.map(([code, label]) => (
+                  <label key={code} className="flex items-center gap-2 rounded-sm border border-input px-3 py-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={(data.skillCodes ?? []).includes(code)}
+                      onChange={(event) => updateData({
+                        skillCodes: event.target.checked
+                          ? [...(data.skillCodes ?? []), code]
+                          : (data.skillCodes ?? []).filter((item) => item !== code),
+                      })}
+                    />
+                    {label}
+                  </label>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Dùng để đề xuất khóa học theo những kỹ năng học viên còn yếu.
+              </p>
             </div>
 
             <div className="space-y-2">

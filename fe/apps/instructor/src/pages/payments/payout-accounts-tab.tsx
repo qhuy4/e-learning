@@ -1,24 +1,24 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import {
-  CreditCard,
-  Plus,
-  Trash2,
-  Edit,
   Building,
-  Mail,
   CheckCircle,
-  Star,
+  CreditCard,
+  Edit,
+  Loader2,
+  Mail,
+  Plus,
   Shield,
   ShieldOff,
-  Loader2,
+  Star,
+  Trash2,
 } from "lucide-react";
 import {
-  usePayoutAccounts,
-  useCreatePayoutAccount,
-  useUpdatePayoutAccount,
-  useDeletePayoutAccount,
   useCreateGrantToken,
+  useCreatePayoutAccount,
+  useDeletePayoutAccount,
+  usePayoutAccounts,
+  useUpdatePayoutAccount,
   useVerifyAccount,
 } from "@/features/payments/hooks/use-payments";
 import { getErrorMessage } from "@/shared/utils/error";
@@ -29,6 +29,7 @@ import { Badge } from "@fe/components/ui/badge";
 import { Card, CardContent } from "@fe/components/ui/card";
 import { Skeleton } from "@fe/components/ui/skeleton";
 import { ConfirmDialog } from "@/components/confirm-dialog";
+import type { PayoutAccount } from "@/features/payments/types/payment.types";
 
 declare const BankHub: {
   useBankHubLink: (config: {
@@ -65,22 +66,29 @@ const EMPTY_FORM: AccountForm = {
   isPrimary: false,
 };
 
-const CAS_REDIRECT_URI = import.meta.env.VITE_CAS_REDIRECT_URI || "http://localhost:5175/payments/cas-callback";
+const CAS_REDIRECT_URI =
+  import.meta.env.VITE_CAS_REDIRECT_URI ||
+  "http://localhost:5175/payments/cas-callback";
 
 export function PayoutAccountsTab() {
   const { data, isLoading } = usePayoutAccounts();
-  const { mutateAsync: createAccount, isPending: isCreating } = useCreatePayoutAccount();
-  const { mutateAsync: updateAccount, isPending: isUpdating } = useUpdatePayoutAccount();
+  const { mutateAsync: createAccount, isPending: isCreating } =
+    useCreatePayoutAccount();
+  const { mutateAsync: updateAccount, isPending: isUpdating } =
+    useUpdatePayoutAccount();
   const { mutateAsync: deleteAccount } = useDeletePayoutAccount();
-  const { mutateAsync: createGrantToken, isPending: isLinking } = useCreateGrantToken();
-  const { mutateAsync: verifyAccount, isPending: isVerifying } = useVerifyAccount();
+  const { mutateAsync: createGrantToken, isPending: isLinking } =
+    useCreateGrantToken();
+  const { mutateAsync: verifyAccount } = useVerifyAccount();
 
-  const accounts = (data?.data ?? []) as any[];
+  const accounts = (data?.data ?? []) as PayoutAccount[];
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<AccountForm>(EMPTY_FORM);
   const [deletingId, setDeletingId] = useState<number | null>(null);
-  const [verifyingAccountId, setVerifyingAccountId] = useState<number | null>(null);
+  const [verifyingAccountId, setVerifyingAccountId] = useState<number | null>(
+    null,
+  );
 
   const isSaving = isCreating || isUpdating;
 
@@ -90,7 +98,7 @@ export function PayoutAccountsTab() {
     setShowForm(false);
   };
 
-  const handleEdit = (account: any) => {
+  const handleEdit = (account: PayoutAccount) => {
     setForm({
       accountType: account.accountType ?? "bank",
       accountHolderName: account.accountHolderName ?? "",
@@ -150,28 +158,52 @@ export function PayoutAccountsTab() {
 
   const handleVerify = useCallback(
     async (accountId: number) => {
+      const createBankHubLink =
+        typeof BankHub !== "undefined" ? BankHub.useBankHubLink : null;
+      const popup = createBankHubLink
+        ? null
+        : window.open(
+            "",
+            "cas-link",
+            "width=500,height=700,scrollbars=yes,resizable=yes",
+          );
+
+      if (!createBankHubLink && !popup) {
+        toast.error(
+          "Trình duyệt đã chặn cửa sổ xác minh. Vui lòng cho phép popup và thử lại.",
+        );
+        return;
+      }
+
       setVerifyingAccountId(accountId);
       try {
         const result = await createGrantToken(accountId);
         const { grantToken } = result;
         const state = `accountId=${accountId}`;
 
-        if (typeof BankHub !== "undefined" && BankHub.useBankHubLink) {
-          const { open } = BankHub.useBankHubLink({
+        if (createBankHubLink) {
+          const { open } = createBankHubLink({
             redirectUri: CAS_REDIRECT_URI,
             iframe: true,
             grantToken,
             state,
             onSuccess: async (publicToken: string, returnedState: string) => {
               const match = returnedState?.match(/^accountId=(\d+)$/);
-              const resolvedAccountId = match ? parseInt(match[1], 10) : accountId;
+              const resolvedAccountId = match
+                ? parseInt(match[1], 10)
+                : accountId;
               try {
-                const verifyResult = await verifyAccount({ accountId: resolvedAccountId, publicToken });
+                const verifyResult = await verifyAccount({
+                  accountId: resolvedAccountId,
+                  publicToken,
+                });
                 const { verified } = verifyResult;
                 if (verified) {
                   toast.success("Đã xác minh tài khoản thành công!");
                 } else {
-                  toast.error("Xác minh thất bại. Vui lòng kiểm tra lại tên chủ tài khoản.");
+                  toast.error(
+                    "Xác minh thất bại. Vui lòng kiểm tra lại tên chủ tài khoản.",
+                  );
                 }
               } catch (err) {
                 toast.error(getErrorMessage(err));
@@ -186,11 +218,7 @@ export function PayoutAccountsTab() {
           open();
         } else {
           const { casLinkUrl } = result;
-          const popup = window.open(
-            casLinkUrl,
-            "cas-link",
-            "width=500,height=700,scrollbars=yes,resizable=yes"
-          );
+          popup!.location.href = casLinkUrl;
 
           const handleMessage = async (event: MessageEvent) => {
             if (event.origin !== window.location.origin) return;
@@ -201,7 +229,9 @@ export function PayoutAccountsTab() {
 
             const { publicToken, state: returnedState } = event.data;
             const match = returnedState?.match(/^accountId=(\d+)$/);
-            const resolvedAccountId = match ? parseInt(match[1], 10) : accountId;
+            const resolvedAccountId = match
+              ? parseInt(match[1], 10)
+              : accountId;
 
             try {
               const verifyResult = await verifyAccount({
@@ -212,7 +242,9 @@ export function PayoutAccountsTab() {
               if (verified) {
                 toast.success("Đã xác minh tài khoản thành công!");
               } else {
-                toast.error("Xác minh thất bại. Vui lòng kiểm tra lại tên chủ tài khoản.");
+                toast.error(
+                  "Xác minh thất bại. Vui lòng kiểm tra lại tên chủ tài khoản.",
+                );
               }
             } catch (err) {
               toast.error(getErrorMessage(err));
@@ -232,11 +264,12 @@ export function PayoutAccountsTab() {
           }, 500);
         }
       } catch (err) {
+        popup?.close();
         toast.error(getErrorMessage(err));
         setVerifyingAccountId(null);
       }
     },
-    [createGrantToken, verifyAccount]
+    [createGrantToken, verifyAccount],
   );
 
   if (isLoading) {
@@ -279,7 +312,9 @@ export function PayoutAccountsTab() {
       {showForm && (
         <Card>
           <CardContent className="p-6 space-y-4">
-            <h4 className="font-medium">{editingId ? "Chỉnh sửa tài khoản" : "Thêm tài khoản mới"}</h4>
+            <h4 className="font-medium">
+              {editingId ? "Chỉnh sửa tài khoản" : "Thêm tài khoản mới"}
+            </h4>
 
             <div className="space-y-2">
               <Label className="font-medium">Loại tài khoản</Label>
@@ -295,7 +330,9 @@ export function PayoutAccountsTab() {
                 </Button>
                 <Button
                   type="button"
-                  variant={form.accountType === "paypal" ? "default" : "outline"}
+                  variant={
+                    form.accountType === "paypal" ? "default" : "outline"
+                  }
                   size="sm"
                   onClick={() => setForm({ ...form, accountType: "paypal" })}
                 >
@@ -309,7 +346,9 @@ export function PayoutAccountsTab() {
               <Label className="font-medium">Tên chủ tài khoản *</Label>
               <Input
                 value={form.accountHolderName}
-                onChange={(e) => setForm({ ...form, accountHolderName: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, accountHolderName: e.target.value })
+                }
                 placeholder="NGUYEN VAN A"
               />
             </div>
@@ -320,7 +359,9 @@ export function PayoutAccountsTab() {
                   <Label className="font-medium">Mã ngân hàng (BIN) *</Label>
                   <Input
                     value={form.routingCode}
-                    onChange={(e) => setForm({ ...form, routingCode: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, routingCode: e.target.value })
+                    }
                     placeholder="970416"
                   />
                 </div>
@@ -328,7 +369,9 @@ export function PayoutAccountsTab() {
                   <Label className="font-medium">Số tài khoản *</Label>
                   <Input
                     value={form.accountNumber}
-                    onChange={(e) => setForm({ ...form, accountNumber: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, accountNumber: e.target.value })
+                    }
                     placeholder="1234567890"
                   />
                 </div>
@@ -336,7 +379,9 @@ export function PayoutAccountsTab() {
                   <Label className="font-medium">Tên ngân hàng</Label>
                   <Input
                     value={form.bankName}
-                    onChange={(e) => setForm({ ...form, bankName: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, bankName: e.target.value })
+                    }
                     placeholder="Vietcombank"
                   />
                 </div>
@@ -344,7 +389,9 @@ export function PayoutAccountsTab() {
                   <Label className="font-medium">Chi nhánh</Label>
                   <Input
                     value={form.bankBranch}
-                    onChange={(e) => setForm({ ...form, bankBranch: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, bankBranch: e.target.value })
+                    }
                     placeholder="Chi nhánh Hà Nội"
                   />
                 </div>
@@ -357,7 +404,9 @@ export function PayoutAccountsTab() {
                 <Input
                   type="email"
                   value={form.paypalEmail}
-                  onChange={(e) => setForm({ ...form, paypalEmail: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, paypalEmail: e.target.value })
+                  }
                   placeholder="example@paypal.com"
                 />
               </div>
@@ -367,10 +416,14 @@ export function PayoutAccountsTab() {
               <input
                 type="checkbox"
                 checked={form.isPrimary}
-                onChange={(e) => setForm({ ...form, isPrimary: e.target.checked })}
+                onChange={(e) =>
+                  setForm({ ...form, isPrimary: e.target.checked })
+                }
                 className="accent-primary rounded"
               />
-              <span className="text-sm font-medium">Đặt làm tài khoản mặc định</span>
+              <span className="text-sm font-medium">
+                Đặt làm tài khoản mặc định
+              </span>
             </label>
 
             <div className="flex gap-2 pt-2">
@@ -394,13 +447,14 @@ export function PayoutAccountsTab() {
           <CardContent className="p-10 text-center">
             <CreditCard className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
             <p className="text-sm text-muted-foreground">
-              Chưa có tài khoản nhận tiền. Hãy thêm tài khoản để bắt đầu nhận thanh toán.
+              Chưa có tài khoản nhận tiền. Hãy thêm tài khoản để bắt đầu nhận
+              thanh toán.
             </p>
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-3">
-          {accounts.map((account: any) => (
+          {accounts.map((account) => (
             <Card key={account.id}>
               <CardContent className="p-4 flex items-center gap-4">
                 <div className="rounded-lg bg-muted p-2">
@@ -412,7 +466,9 @@ export function PayoutAccountsTab() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium truncate">{account.accountHolderName}</p>
+                    <p className="text-sm font-medium truncate">
+                      {account.accountHolderName}
+                    </p>
                     {account.isPrimary && (
                       <Badge className="bg-primary/10 text-primary text-[10px]">
                         <Star className="h-3 w-3 mr-0.5" />
@@ -425,7 +481,10 @@ export function PayoutAccountsTab() {
                         Đã xác minh
                       </Badge>
                     ) : account.accountType === "bank" ? (
-                      <Badge variant="outline" className="text-[10px] text-muted-foreground">
+                      <Badge
+                        variant="outline"
+                        className="text-[10px] text-muted-foreground"
+                      >
                         <ShieldOff className="h-3 w-3 mr-0.5" />
                         Chưa xác minh
                       </Badge>
