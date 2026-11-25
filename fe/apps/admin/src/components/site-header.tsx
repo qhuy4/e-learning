@@ -31,8 +31,6 @@ const PAGE_TITLES: Record<string, string> = {
   "/achievements": "Thành tựu",
   "/instructor-certificates": "Chứng chỉ giảng viên",
   "/notifications": "Thông báo",
-  "/premium-subscriptions": "Gói Premium",
-  "/wishlists": "Danh sách yêu thích",
   "/bookings": "Đặt lịch",
 };
 
@@ -70,8 +68,6 @@ export function SiteHeader() {
     if (location.pathname.startsWith("/achievements/")) return "Chi tiết thành tựu";
     if (location.pathname.startsWith("/instructor-certificates/")) return "Chi tiết chứng chỉ giảng viên";
     if (location.pathname.startsWith("/notifications/")) return "Chi tiết thông báo";
-    if (location.pathname.startsWith("/premium-subscriptions/")) return "Chi tiết gói Premium";
-    if (location.pathname.startsWith("/wishlists/")) return "Chi tiết danh sách yêu thích";
     if (location.pathname.startsWith("/bookings/")) return "Chi tiết buổi đặt lịch";
     if (location.pathname.startsWith("/earnings/payouts/")) return "Chi tiết thanh toán";
     if (location.pathname.startsWith("/payout-requests/")) return "Chi tiết yêu cầu rút tiền";

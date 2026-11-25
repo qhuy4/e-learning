@@ -12,7 +12,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@fe/components/ui/select"
-import {type Gender, genderLabel, UserRole, UserStatus} from "@/features/users/constants/users.constants.ts";
+import {type Gender, genderLabel, UserRole, userRoleLabel, UserStatus} from "@/features/users/constants/users.constants.ts";
 import {useUpdateUser, useUser} from "@/features/users/hook/use-user.ts";
 import {updateUserSchema} from "@/features/users/schema/user.schema.ts";
 import type {User} from "@/features/users/types/user.type.ts";
@@ -129,6 +129,8 @@ export function UserEditPage() {
 
     const [open, setOpen] = useState(false)
     useEffect(() => {
+        // Query data initializes this controlled form after the loading state.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         if (user) setForm(userToForm(user))
     }, [user])
     useEffect(() => {
@@ -139,6 +141,8 @@ export function UserEditPage() {
     }, [])
     useEffect(() => {
         if (!form?.country) {
+            // Clear stale city options when the selected country is removed.
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setCities([])
             return
         }
@@ -318,6 +322,7 @@ export function UserEditPage() {
                                     <div className="space-y-1.5">
                                         <label className="text-sm font-medium">Vai trò</label>
                                         <Select
+                                            disabled={user.role === UserRole.ADMIN}
                                             value={form.role}
                                             onValueChange={(val) => setField("role", val as UserRole)}
                                         >
@@ -325,9 +330,11 @@ export function UserEditPage() {
                                                 <SelectValue/>
                                             </SelectTrigger>
                                             <SelectContent>
-                                                {Object.values(UserRole).map((r) => (
+                                                {Object.values(UserRole)
+                                                    .filter((role) => role !== UserRole.ADMIN || user.role === UserRole.ADMIN)
+                                                    .map((r) => (
                                                     <SelectItem key={r} value={r}>
-                                                        {r}
+                                                        {userRoleLabel[r]}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>

@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router"
+import { useLocation, useNavigate } from "react-router"
 import { ArrowLeft } from "lucide-react"
 
 import { Button } from "@fe/components/ui/button"
@@ -11,7 +11,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@fe/components/ui/select"
-import {type Gender, type UserRole, UserRole as UserRoles, type UserStatus, UserStatus as UserStatuses} from "@/features/users/constants/users.constants.ts";
+import {type Gender, type UserRole, UserRole as UserRoles, userRoleLabel, type UserStatus, UserStatus as UserStatuses} from "@/features/users/constants/users.constants.ts";
 import {createUserSchema} from "@/features/users/schema/user.schema.ts";
 import {useCreateUser} from "@/features/users/hook/use-user.ts";
 import {useCreateForm} from "@/features/users/hook/use-create-form.ts";
@@ -23,13 +23,13 @@ interface UserCreateFormState {
     city: string; country: string; avatarUrl: string;
 }
 
-function emptyForm(): UserCreateFormState {
+function emptyForm(role: UserRole = UserRoles.STUDENT): UserCreateFormState {
     return {
         name: "",
         email: "",
         password: "",
         status: UserStatuses.PENDING,
-        role: UserRoles.STUDENT,
+        role,
         block_reason: "",
         firstName: "",
         lastName: "",
@@ -82,26 +82,30 @@ function buildWriteInput(form: ReturnType<typeof emptyForm>) {
 
 export function UserCreatePage() {
     const navigate = useNavigate()
+    const {pathname} = useLocation()
+    const isInstructorCreate = pathname.startsWith("/instructors/")
+    const listUrl = isInstructorCreate ? "/instructors" : "/users"
     const createUser = useCreateUser()
-
     const { form, errors, setField, handleSubmit } = useCreateForm({
-        emptyForm: emptyForm(),
+        emptyForm: emptyForm(isInstructorCreate ? UserRoles.INSTRUCTOR : UserRoles.STUDENT),
         validate,
         buildOutput: buildWriteInput,
         create: (data) => createUser.mutateAsync(data),
-        successMessage: "Tạo người dùng thành công",
-        redirectTo: "/users",
+        successMessage: isInstructorCreate ? "Tạo giảng viên thành công" : "Tạo người dùng thành công",
+        redirectTo: listUrl,
     })
     return (
         <div className="p-6  mx-auto space-y-6">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/users")} className="-ml-2">
+            <Button variant="ghost" size="sm" onClick={() => navigate(listUrl)} className="-ml-2">
                 <ArrowLeft className="size-4" />
                 Quay lại danh sách
             </Button>
 
             <div className="rounded-xl border bg-card">
                 <div className="px-6 py-4 border-b">
-                    <h1 className="text-xl font-bold">Tạo người dùng mới</h1>
+                    <h1 className="text-xl font-bold">
+                        {isInstructorCreate ? "Tạo giảng viên mới" : "Tạo người dùng mới"}
+                    </h1>
                     <p className="text-sm text-muted-foreground mt-1">
                         Nhập thông tin để tạo tài khoản người dùng mới.
                     </p>
@@ -191,6 +195,7 @@ export function UserCreatePage() {
                                     <div className="space-y-1.5">
                                         <label className="text-sm font-medium">Vai trò</label>
                                         <Select
+                                            disabled={isInstructorCreate}
                                             value={form.role}
                                             onValueChange={(val) => setField("role", val as UserRole)}
                                         >
@@ -198,9 +203,11 @@ export function UserCreatePage() {
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                {Object.values(UserRoles).map((r) => (
+                                                {Object.values(UserRoles)
+                                                    .filter((role) => role !== UserRoles.ADMIN)
+                                                    .map((r) => (
                                                     <SelectItem key={r} value={r}>
-                                                        {r}
+                                                        {userRoleLabel[r]}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
@@ -242,7 +249,7 @@ export function UserCreatePage() {
                         <Button
                             type="button"
                             variant="outline"
-                            onClick={() => navigate("/users")}
+                            onClick={() => navigate(listUrl)}
                             disabled={createUser.isPending}
                         >
                             Hủy

@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/site-header.tsx";
 import { Outlet } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@fe/components/ui/sonner";
+import { AppVersion } from "@fe/components/common/AppVersion";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,6 +36,7 @@ function App() {
         </SidebarInset>
       </SidebarProvider>
       <Toaster position="top-right" richColors />
+      <AppVersion version={import.meta.env.VITE_APP_VERSION} />
     </QueryClientProvider>
   );
 }
