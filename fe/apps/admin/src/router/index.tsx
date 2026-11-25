@@ -51,10 +51,6 @@ import {InstructorCertificatesPage} from "@/pages/instructor-certificates/instru
 import {InstructorCertificateDetailPage} from "@/pages/instructor-certificates/instructor-certificate-detail-page";
 import {NotificationsPage} from "@/pages/notifications/notifications-page";
 import {NotificationDetailPage} from "@/pages/notifications/notification-detail-page";
-import {PremiumSubscriptionsPage} from "@/pages/premium-subscriptions/premium-subscriptions-page";
-import {PremiumSubscriptionDetailPage} from "@/pages/premium-subscriptions/premium-subscription-detail-page";
-import {WishlistsPage} from "@/pages/wishlists/wishlists-page";
-import {WishlistDetailPage} from "@/pages/wishlists/wishlist-detail-page";
 import PaymentsPage from "@/pages/payments/payments-page";
 import PaymentDetailPage from "@/pages/payments/payment-detail-page";
 import PayoutRequestsPage from "@/pages/payout-requests/payout-requests-page";
@@ -377,32 +373,6 @@ export const router = createBrowserRouter([
                             {
                                 path: ":id",
                                 element: <NotificationDetailPage />,
-                            },
-                        ],
-                    },
-                    {
-                        path: "premium-subscriptions",
-                        children: [
-                            {
-                                index: true,
-                                element: <PremiumSubscriptionsPage />,
-                            },
-                            {
-                                path: ":id",
-                                element: <PremiumSubscriptionDetailPage />,
-                            },
-                        ],
-                    },
-                    {
-                        path: "wishlists",
-                        children: [
-                            {
-                                index: true,
-                                element: <WishlistsPage />,
-                            },
-                            {
-                                path: ":id",
-                                element: <WishlistDetailPage />,
                             },
                         ],
                     },

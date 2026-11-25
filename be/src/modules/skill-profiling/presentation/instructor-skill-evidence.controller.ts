@@ -97,16 +97,18 @@ export class InstructorSkillEvidenceController {
     @Param('id', ParseIntPipe) id: number,
   ) {
     const profileId = await this.queryService.resolveProfileId(userId);
-    const res: Array<{ skill_id: number }> = await this.dataSource.query(
-      `UPDATE instructor_skill_evidences
+    // TypeORM/Postgres trả [rows, affectedCount] cho UPDATE ... RETURNING.
+    const [updatedRows]: [{ skill_id: number }[], number] =
+      await this.dataSource.query(
+        `UPDATE instructor_skill_evidences
        SET status = 'SUPERSEDED'
        WHERE id = $1 AND instructor_id = $2 AND status = 'ACTIVE'
          AND (metadata ->> 'extracted') IS DISTINCT FROM 'true'
          AND source_type IN ('SELF_ASSESSMENT', 'EXPERIENCE')
        RETURNING skill_id`,
-      [id, profileId],
-    );
-    if (res.length === 0) {
+        [id, profileId],
+      );
+    if (updatedRows.length === 0) {
       throw new AppException(
         ErrorCode.SKILL_EVIDENCE_NOT_FOUND,
         HttpStatus.NOT_FOUND,

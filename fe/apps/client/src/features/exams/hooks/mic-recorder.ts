@@ -7,6 +7,8 @@ export interface MicStopResult {
   url: string;
   /** Số giây đã thu (làm tròn). */
   seconds: number;
+  /** File audio thật để upload; caller không cần fetch lại blob URL. */
+  blob: Blob;
 }
 
 const MIME_CANDIDATES = [
@@ -120,7 +122,7 @@ export function useMicRecorder() {
     chunksRef.current = [];
     setState("idle");
     if (blob.size === 0) return null;
-    return { url: URL.createObjectURL(blob), seconds };
+    return { url: URL.createObjectURL(blob), seconds, blob };
   }, [releaseStream]);
 
   return { state, unavailable, start, stop };

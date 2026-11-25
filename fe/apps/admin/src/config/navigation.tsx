@@ -5,7 +5,6 @@ import {
     ClipboardCheck,
     ClipboardList,
     CreditCard,
-    Crown,
     DollarSign,
     FileCheck,
     FileText,
@@ -13,12 +12,10 @@ import {
     FolderTree,
     GraduationCap,
     HandCoins,
-    Heart,
     LayoutDashboard,
     LayoutList,
     LogOut,
     MessageCircle,
-    Settings,
     ShoppingCart,
     Star,
     Tag,
@@ -49,7 +46,7 @@ export const navigation: Navigation = {
             label: "Quản lý",
             items: [
                 {
-                    title: "Users",
+                    title: "Tất cả tài khoản",
                     url: "/users",
                     icon: Users,
                 },
@@ -138,11 +135,6 @@ export const navigation: Navigation = {
                     url: "/instructor-certificates",
                     icon: FileCheck,
                 },
-                {
-                    title: "Thông báo",
-                    url: "/notifications",
-                    icon: Bell,
-                },
             ],
         },
         {
@@ -169,24 +161,9 @@ export const navigation: Navigation = {
                     icon: CreditCard,
                 },
                 {
-                    title: "Yêu cầu rút tiền",
+                    title: "Duyệt rút tiền",
                     url: "/payout-requests",
                     icon: HandCoins,
-                },
-            ],
-        },
-        {
-            label: "Khác",
-            items: [
-                {
-                    title: "Gói Premium",
-                    url: "/premium-subscriptions",
-                    icon: Crown,
-                },
-                {
-                    title: "Danh sách yêu thích",
-                    url: "/wishlists",
-                    icon: Heart,
                 },
             ],
         },
@@ -194,9 +171,9 @@ export const navigation: Navigation = {
 
     secondary: [
         {
-            title: "Cài đặt",
-            url: "/settings",
-            icon: Settings,
+            title: "Thông báo",
+            url: "/notifications",
+            icon: Bell,
         },
         {
             title: "Đăng xuất",

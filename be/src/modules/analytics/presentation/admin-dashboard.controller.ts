@@ -1,9 +1,13 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enum/role.enum';
 
 @Controller('admin/dashboard')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
 export class AdminDashboardController {
   constructor(private readonly ds: DataSource) {}
 

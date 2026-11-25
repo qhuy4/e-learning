@@ -34,8 +34,8 @@ import { SkillSourceType } from '../domain/enum/skill-source-type.enum';
  */
 export const SKILL_AGGREGATION_CONFIG = {
   // This is a deterministic heuristic algorithm version, not a trained model.
-  modelVersion: 'heuristic-mvp-v2',
-  extractorVersion: 'mvp-v2',
+  modelVersion: 'heuristic-mvp-v3',
+  extractorVersion: 'mvp-v3',
   /** Evidence older than this is worth half as much. */
   halfLifeDays: 180,
   /** nFactor = 1 − exp(−ΣW / nFactorDivisor). */

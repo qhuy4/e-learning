@@ -16,7 +16,7 @@ import {useDeleteUser} from "@/features/users/hook/use-user.ts";
 interface DeleteConfirmDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
-    user?: User | null
+    user?: Pick<User, "id" | "name" | "email"> | null
     onSuccess: () => void
 }
 

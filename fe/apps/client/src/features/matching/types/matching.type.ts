@@ -40,6 +40,7 @@ export interface RankedInstructor {
         headline: string | null;
         totalStudents: number;
         avgRating: number | null;
+        hourlyRate: number;
         /** Chỉ có khi match truyền studentLevel. null = chưa khai báo level. */
         teachesLevel?: boolean | null;
         /** 0 exact, 1 adjacent, >1 lệch xa, null = chưa khai báo. */
@@ -75,6 +76,12 @@ export interface MatchingResponse {
         levelFilter?: {
             enabled: boolean;
             studentLevel: string;
+            excludedCount: number;
+        };
+        priceFilter?: {
+            mode: "FREE" | "PAID";
+            minHourlyRate?: number;
+            maxHourlyRate?: number;
             excludedCount: number;
         };
     };
@@ -174,7 +181,7 @@ export interface MatchingFromAssessmentResponse extends MatchingResponse {
     };
 }
 
-// --- Quiz từ vựng + hồ sơ học viên (skill match 3 bước) --------------------
+// --- Quiz từ vựng + hồ sơ học viên (skill match 5 bước) --------------------
 
 /** Một câu cloze trong form quiz (đáp án không bao giờ được trả về). */
 export interface QuizFormItem {
@@ -220,6 +227,92 @@ export interface QuizAttempt {
     selfAssessment?: SelfAssessment | null;
 }
 
+export interface ListeningFormItem {
+    itemId: string;
+    question: string;
+    options: string[];
+}
+
+export interface ListeningForm {
+    version: string;
+    level: string;
+    selectionBasis: "self_assessment" | "quiz" | "default";
+    instructions: string;
+    source: {
+        title: string;
+        author: string;
+        contentOrigin: string;
+        frameworkTitle: string;
+        frameworkUrl: string;
+        alignmentNote: string;
+        license: string;
+    };
+    groups: Array<{
+        groupId: string;
+        kind: "word" | "passage";
+        title: string;
+        speechText: string;
+        audioUrl: string | null;
+        items: ListeningFormItem[];
+    }>;
+}
+
+export interface ListeningAttempt {
+    attemptId: number;
+    answered: number;
+    total: number;
+    rawScore: number;
+    scorePct: number;
+    complete: boolean;
+    formVersion: string;
+    level: string | null;
+    createdAt: string;
+}
+
+export interface ListeningScorePayload {
+    version: string;
+    responses: Array<{ itemId: string; optionIndex: number }>;
+}
+
+export interface SpeakingPrompt {
+    id: string;
+    level: string;
+    title: string;
+    prompt: string;
+    preparationSeconds: number;
+    responseSeconds: number;
+    guided: boolean;
+    selectionBasis: "self_assessment" | "quiz" | "default";
+}
+
+export interface SpeakingAttempt {
+    attemptId: number;
+    promptId: string;
+    level: string;
+    durationSeconds: number;
+    audioUrl: string | null;
+    transcript: string | null;
+    transcriptionStatus: "PROCESSING" | "COMPLETED" | "FAILED";
+    transcriptionModel: string | null;
+    assessmentStatus: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
+    grammarScore: number | null;
+    vocabularyScore: number | null;
+    fluencyScore: number | null;
+    overallScore: number | null;
+    assessmentFeedback: {
+        grammar?: string;
+        vocabulary?: string;
+        fluency?: string;
+        wordCount?: number;
+        wordsPerMinute?: number;
+        fillerCount?: number;
+    } | null;
+    assessmentModel: string | null;
+    canRetry: boolean;
+    createdAt: string;
+    updatedAt: string;
+}
+
 /** Bước 1 — ước lượng cá nhân, KHÔNG phải CEFR chứng nhận. */
 export interface SelfAssessment {
     band: string;
@@ -233,7 +326,8 @@ export interface LearnerSkillStatus {
     code: string;
     status: SkillAssessmentStatus;
     band: string | null;
-    source: "quiz" | "writing" | null;
+    source: "quiz" | "writing" | "listening" | "speaking" | null;
+    scorePct?: number | null;
     /** Grammar Quality Score heuristic 0–100 (null với kỹ năng khác). */
     qualityScore: number | null;
     note: string;
@@ -242,6 +336,20 @@ export interface LearnerSkillStatus {
 export interface LearnerProfile {
     selfAssessment: SelfAssessment | null;
     quiz: QuizAttempt | null;
+    listening: ListeningAttempt | null;
+    speaking: {
+        attemptId: number;
+        level: string;
+        transcript: string | null;
+        transcriptionStatus: "PROCESSING" | "COMPLETED" | "FAILED";
+        assessmentStatus: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
+        grammarScore: number | null;
+        vocabularyScore: number | null;
+        fluencyScore: number | null;
+        overallScore: number | null;
+        durationSeconds: number;
+        createdAt: string;
+    } | null;
     writing: {
         assessmentId: number;
         cefrBand: string | null;
@@ -253,7 +361,7 @@ export interface LearnerProfile {
         provisional: boolean;
         createdAt: string;
     } | null;
-    /** Writing band nếu có, ngược lại quiz band (chỉ khi quiz đủ bằng chứng). */
+    /** Quiz band khi đủ 15 câu; writing chỉ là fallback cho hồ sơ cũ. */
     levelBand: string | null;
     levelSource: "writing" | "quiz" | null;
     skills: LearnerSkillStatus[];
@@ -271,4 +379,69 @@ export interface MatchingFromProfileResponse extends MatchingResponse {
         weakestTarget: { code: string } | null;
         note: string;
     };
+}
+
+export interface MatchFromProfilePayload {
+    targets: MatchingRequestTarget[];
+    limit?: number;
+    requireLevelMatch?: boolean;
+    priceMode?: "ALL" | "FREE" | "PAID";
+    minHourlyRate?: number;
+    maxHourlyRate?: number;
+}
+
+export interface CourseMatchesResponse {
+    currentBand: string | null;
+    focusSkills: string[];
+    courses: Array<{
+        id: number;
+        title: string;
+        slug: string;
+        description: string | null;
+        thumbnail: string | null;
+        price: number;
+        cefrLevelStart: string;
+        cefrLevelEnd: string;
+        skillCodes: string[];
+        matchedSkills: string[];
+        matchScore: number;
+        instructor: { id: number; name: string };
+    }>;
+}
+
+export interface LearningRoadmap {
+    id: number;
+    currentLevel: string;
+    targetLevel: string;
+    status: "ACTIVE" | "SUPERSEDED" | "COMPLETED";
+    revision: number;
+    profileSnapshot: { focusSkills?: string[]; levelSource?: string | null };
+    createdAt: string;
+    canReassess: boolean;
+    reassessmentState: "LOCKED_STAGE" | "NEEDS_ASSESSMENT" | "READY";
+    lastReassessment: {
+        previousLevel: string;
+        assessedLevel: string;
+        preservedStages: number;
+        replacedStages: number;
+        generatedStages: number;
+        createdAt: string;
+    } | null;
+    stages: Array<{
+        id: number;
+        position: number;
+        fromLevel: string;
+        toLevel: string;
+        status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
+        startedAt: string | null;
+        completedAt: string | null;
+        rationale: { focusSkills?: string[]; matchedSkills?: string[] };
+        course: {
+            id: number;
+            title: string;
+            slug: string;
+            price: number;
+        } | null;
+        instructor: { id: number; name: string } | null;
+    }>;
 }

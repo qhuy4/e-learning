@@ -13,6 +13,9 @@ import {
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enum/role.enum';
 import { GetAdminCouponsQuery } from '@/modules/coupons/application/query/get-admin-coupons.query';
 import { GetAdminCouponByIdQuery } from '@/modules/coupons/application/query/get-admin-coupon-by-id.query';
 import { CreateCouponCommand } from '@/modules/coupons/application/command/create-coupon.command';
@@ -27,7 +30,8 @@ import { Coupon } from '@/modules/coupons/domain/entity/coupon.entity';
 import { AdminCouponsPage } from '@/modules/coupons/domain/repository/coupon.repository';
 
 @Controller('admin/coupons')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
 export class AdminCouponsController {
   constructor(
     private readonly commandBus: CommandBus,

@@ -79,7 +79,8 @@ export class SkillAggregationService {
       const mvpEvidence = evidence.filter(
         (row) =>
           row.source_type === SkillSourceType.CERTIFICATE ||
-          row.source_type === SkillSourceType.STUDENT_RATING,
+          row.source_type === SkillSourceType.STUDENT_RATING ||
+          row.source_type === SkillSourceType.STUDENT_OUTCOME,
       );
       const existingProfiles = await manager.find(
         InstructorSkillProfileOrmEntity,

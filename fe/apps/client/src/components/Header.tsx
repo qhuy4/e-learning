@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import {
     BookOpen,
-    CalendarDays,
     ChevronDown,
     History,
     LogOut,
@@ -161,14 +160,6 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
                                     >
                                         <BookOpen size={16} />
                                         {t("header.myCourses")}
-                                    </Link>
-                                    <Link
-                                        to="/my-bookings"
-                                        onClick={() => setIsDropdownOpen(false)}
-                                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-muted-foreground hover:bg-muted transition-colors"
-                                    >
-                                        <CalendarDays size={16} />
-                                        {t("header.myBookings")}
                                     </Link>
                                     <Link
                                         to="/profile"

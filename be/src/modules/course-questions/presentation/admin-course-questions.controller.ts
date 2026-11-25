@@ -11,6 +11,9 @@ import {
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enum/role.enum';
 import { GetAdminQuestionsQuery } from '@/modules/course-questions/application/query/get-admin-questions.query';
 import { GetAdminQuestionDetailQuery } from '@/modules/course-questions/application/query/get-admin-question-detail.query';
 import { UpdateQuestionStatusCommand } from '@/modules/course-questions/application/command/update-question-status.command';
@@ -23,7 +26,8 @@ import { AdminQuestionsPage } from '@/modules/course-questions/domain/repository
 import { CourseQuestion } from '@/modules/course-questions/domain/entity/course-question.entity';
 
 @Controller('admin/course-questions')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
 export class AdminCourseQuestionsController {
   constructor(
     private readonly commandBus: CommandBus,

@@ -7,8 +7,6 @@ import {
     User as UserIcon,
     Pencil,
     Trash2,
-    CheckCircle,
-    Ban,
     RefreshCw,
     Award,
     Star,
@@ -37,6 +35,8 @@ import {DeleteConfirmDialog} from "@/features/users/components/delete-confirm-di
 import {usePayoutAccounts, useDeletePayoutAccount} from "@/features/instructors/hooks/use-payout-accounts.ts";
 import {accountTypeLabel, accountTypeClassName, type AccountType, type PayoutAccount} from "@/features/instructors/types/payout-account.ts";
 import {toast} from "sonner";
+import {ConfirmDialog} from "@/components/confirm-dialog.tsx";
+import {useConfirmDialog} from "@/hooks/use-confirm-dialog.ts";
 
 function statusVariant(status: UserStatus) {
     if (status === UserStatus.ACTIVE) return "default" as const
@@ -102,8 +102,6 @@ export function InstructorDetailPage() {
     }
 
     const p = instructor.profile
-    const isBlocked = instructor.status === UserStatus.BLOCKED
-
     return (
         <div className="p-6 mx-auto space-y-6 relative">
             <ReloadingOverlay isFetching={isFetching}/>
@@ -162,25 +160,6 @@ export function InstructorDetailPage() {
                                 <Pencil className="size-3.5"/>
                                 Sửa
                             </Button>
-                            {isBlocked ? (
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    disabled
-                                >
-                                    <CheckCircle className="size-3.5"/>
-                                    Bỏ chặn
-                                </Button>
-                            ) : (
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    disabled
-                                >
-                                    <Ban className="size-3.5"/>
-                                    Chặn
-                                </Button>
-                            )}
                             <Button
                                 variant="destructive"
                                 size="sm"
@@ -261,7 +240,7 @@ export function InstructorDetailPage() {
             <DeleteConfirmDialog
                 open={deleteOpen}
                 onOpenChange={setDeleteOpen}
-                user={instructor as any}
+                user={instructor}
                 onSuccess={() => navigate("/instructors")}
             />
 
@@ -274,16 +253,25 @@ export function InstructorDetailPage() {
 function PayoutAccountsSection({instructorProfileId}: {instructorProfileId: string}) {
     const {data, isLoading} = usePayoutAccounts(instructorProfileId);
     const deleteMutation = useDeletePayoutAccount();
+    const {confirm, confirmState, handleConfirm, handleCancel} = useConfirmDialog();
     const accounts = data?.data ?? [];
 
-    const handleDelete = (account: PayoutAccount) => {
+    const handleDelete = async (account: PayoutAccount) => {
+        const confirmed = await confirm({
+            title: "Xóa tài khoản thanh toán",
+            description: `Tài khoản của ${account.accountHolderName} sẽ bị xóa và không thể dùng cho các đợt thanh toán mới.`,
+            confirmLabel: "Xóa tài khoản",
+            variant: "danger",
+        });
+        if (!confirmed) return;
+
         const loadingId = toast.loading("Đang xóa tài khoản...");
         deleteMutation.mutate(account.id, {
             onSuccess: () => {
                 toast.success("Đã xóa tài khoản thanh toán", {id: loadingId});
             },
-            onError: (error: any) => {
-                const msg = error?.response?.data?.message || error?.message || "Không thể xóa";
+            onError: (error: unknown) => {
+                const msg = error instanceof Error ? error.message : "Không thể xóa";
                 toast.error(msg, {id: loadingId});
             },
         });
@@ -348,7 +336,7 @@ function PayoutAccountsSection({instructorProfileId}: {instructorProfileId: stri
                                 variant="ghost"
                                 size="sm"
                                 className="text-destructive hover:text-destructive shrink-0"
-                                onClick={() => handleDelete(account)}
+                                onClick={() => void handleDelete(account)}
                                 disabled={deleteMutation.isPending}
                             >
                                 <Trash2 className="size-3.5"/>
@@ -357,6 +345,16 @@ function PayoutAccountsSection({instructorProfileId}: {instructorProfileId: stri
                     ))}
                 </div>
             )}
+            <ConfirmDialog
+                open={confirmState.open}
+                title={confirmState.title}
+                description={confirmState.description}
+                confirmLabel={confirmState.confirmLabel}
+                cancelLabel={confirmState.cancelLabel}
+                variant={confirmState.variant}
+                onConfirm={handleConfirm}
+                onCancel={handleCancel}
+            />
         </div>
     );
 }

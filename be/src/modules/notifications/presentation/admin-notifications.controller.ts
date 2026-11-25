@@ -8,12 +8,16 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enum/role.enum';
 import { NotificationRepository } from '@/modules/notifications/infrastructure/repository/notification.repository';
 import { AppException } from '@/common/exception/app.exception';
 import { ErrorCode } from '@/common/enum/error-code.enum';
 
 @Controller('admin/notifications')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
 export class AdminNotificationsController {
   constructor(private readonly notificationRepository: NotificationRepository) {}
 

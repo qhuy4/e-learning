@@ -9,7 +9,6 @@ export const en = {
 
     // Header
     "header.myCourses": "My Courses",
-    "header.myBookings": "My Bookings",
     "header.profile": "Profile",
     "header.bookingHistory": "Booking History",
     "header.logout": "Log out",
@@ -136,6 +135,13 @@ export const en = {
     "match.error.generic": "Couldn't rank right now. Please try again.",
     "match.error.retry": "Try again",
     "match.level.strict": "Only keep instructors teaching my exact level",
+    "match.price.label": "Tuition preference",
+    "match.price.all": "All prices",
+    "match.price.free": "Free",
+    "match.price.range": "Price range",
+    "match.price.min": "Minimum / hour",
+    "match.price.max": "Maximum / hour",
+    "match.price.perHour": "{n} VND/hour",
 
     // Skill Match — results
     "match.results.ranked": "{n} ranked",
@@ -145,7 +151,7 @@ export const en = {
     "match.results.levelExcluded":
         " — excluded {n} off-level instructors (kept matching and unlisted ones).",
     "match.results.levelNone": " — no filtering, level match is shown only.",
-    "match.results.targets": "Your learning priorities:",
+    "match.results.targets": "Skills identified for improvement:",
     "match.results.needFitTitle": "Instructor strength by skill",
     "match.results.mean": "avg score {n}",
     "match.results.noData": "no data yet",
@@ -158,26 +164,8 @@ export const en = {
     "match.results.footnote":
         "Percentages summarize the match and available profile evidence; low evidence does not mean low teaching ability.",
     "match.results.hintAuto":
-        "Analyze your writing, then press Analyze & Find instructors.",
+        "Your assessed weaknesses are ready for teacher matching.",
     "match.results.hintManual": "Pick skills, then hit Find instructors.",
-
-    // Skill Match — manual section
-    "match.manual.title": "Skills to improve",
-    "match.manual.skillsError": "Couldn't load the skill list.",
-    "match.manual.priorityShare": "Priority share",
-    "match.manual.levelTitle": "Your level (optional)",
-    "match.manual.submit": "Find instructors",
-    "match.manual.submitting": "Finding...",
-    "match.manual.validateEmpty": "Select at least one skill to improve.",
-    "match.manual.sectionArea": "Optional",
-    "match.manual.sectionTitle": "Or pick skills manually",
-    "match.manual.sectionSub":
-        "Skip the writing analysis and choose the skills you want to improve yourself.",
-
-    // Skill Match — skill picker
-    "match.picker.empty": "No skills in the catalog yet.",
-    "match.picker.weight": "Priority level",
-    "match.picker.scale": "Scale 1–5: 1 = low priority, 5 = top priority",
 
     // Skill Match — hero
     "match.hero.eyebrow": "Personalized learning profile",
@@ -195,7 +183,7 @@ export const en = {
         "Discover your real English level with multi-model AI and get matched precisely with instructors whose teaching methods fit your specific language barriers.",
 
     // Skill Match — section 01 (intake)
-    "match.s1.area": "Section 01",
+    "match.s1.area": "Step 01",
     "match.s1.title":
         "01 — Tell us about your English (Collect natural language samples)",
     "match.s1.pill": "Auto analysis • Recommended",
@@ -213,36 +201,15 @@ export const en = {
     "match.s1.scopeStrong": "AI Pipeline will analyze:",
     "match.s1.scopeRest":
         "CEFR Level · Lexical Diversity & Vocabulary · Syntactic Accuracy & Grammar Blindspots · Learning Needs & Skill Weights.",
-    "match.s1.cta": "Analyze my skills with AI & find my perfect instructor",
+    "match.s1.cta": "Analyze writing & continue",
     "match.s1.ctaAnalyzing": "Analyzing with AI…",
     "match.s1.ctaMatching": "Matching instructors…",
     "match.s1.clear": "Reset / Clear sample",
     "match.s1.latestError": "Couldn't load your latest assessment.",
     "match.s1.noAssessment": "No assessment yet — write and analyze to begin.",
 
-    // Skill Match — pipeline status
-    "match.pipe.title": "AI analysis status",
-    "match.pipe.analyzing": "Analyzing…",
-    "match.pipe.matching": "Matching…",
-    "match.pipe.done": "Analysis complete",
-    "match.pipe.ready": "Ready",
-    "match.pipe.vocabTitle": "Vocabulary range",
-    "match.pipe.grammarTitle": "Grammar signals",
-    "match.pipe.mappingTitle": "Learning priorities",
-    "match.pipe.vocabPrefix": "CEFR {band} · vocabulary range {n}/100.",
-    "match.pipe.vocabLow": "Low signal — needs more samples.",
-    "match.pipe.vocabOk": "Word-class diversity stable.",
-    "match.pipe.vocabIdle":
-        "No vocabulary extracted yet — run Analyze to start.",
-    "match.pipe.grammarReady":
-        "{label} · {m} confirmed correction(s) in this sample.",
-    "match.pipe.grammarIdle": "No grammar scan yet — run Analyze to start.",
-    "match.pipe.mappingReady": "{n} focus skills · top priority: {skill}.",
-    "match.pipe.mappingIdle":
-        "No skill priorities set yet — run Analyze to start.",
-
     // Skill Match — section 02 (insights)
-    "match.s2.area": "Section 02",
+    "match.s2.area": "Step 02",
     "match.s2.title": "02 — Your learning profile and analysis",
     "match.s2.pill": "Vocabulary, grammar, and learning priorities analyzed",
     "match.s2.cefrLabel": "Overall CEFR diagnosis",
@@ -303,12 +270,6 @@ export const en = {
         "Free-text CEFR is a reference estimate, not a certification.",
     "match.insights.focusLine": "{skill} ({n}% priority): {reason}",
 
-    // Skill Match — reliability labels
-    "match.rel.high": "High confidence",
-    "match.rel.medium": "Medium confidence",
-    "match.rel.low": "Low confidence",
-    "match.rel.unavailable": "No data",
-
     // Skill Match — skill code labels
     "match.skill.grammar": "Grammar",
     "match.skill.vocabulary": "Vocabulary",
@@ -323,8 +284,8 @@ export const en = {
     "match.source.selfAssessment": "Self-assessment",
 
     // Skill Match — section 03 (teacher matches)
-    "match.s3.area": "Section 03",
-    "match.s3.title": "03 — Your Explainable Teacher Matches",
+    "match.s3.area": "Step 06",
+    "match.s3.title": "06 — Your Explainable Teacher Matches",
     "match.s3.subtitle":
         "The system doesn't just filter by subject — AI computes how well each instructor's strengths match your weak points.",
 
@@ -356,36 +317,40 @@ export const en = {
     "match.card.insufficientDesc":
         "No target-skill data yet to rank this instructor.",
 
-    // Skill Match — 3-step wizard
+    // Skill Match — 5-step wizard
     "match.wizard.step1": "Self-assessment",
-    "match.wizard.step2": "Assessment",
-    "match.wizard.step3": "Teachers",
+    "match.wizard.step2": "Vocabulary quiz",
+    "match.wizard.step3": "Writing",
+    "match.wizard.step4": "Listening",
+    "match.wizard.step5": "Speaking",
+    "match.wizard.step6": "Learning goals",
+    "match.wizard.step7": "Teachers",
     "match.wizard.back": "Back",
     "match.wizard.next": "Continue",
     "match.wizard.skip": "Skip for now",
 
     // Skill Match — step 1 (self-assessment)
     "match.band.preA1": "Pre-A1 Beginner",
-    "match.self.area": "Section 01",
+    "match.self.area": "Step 01",
     "match.self.title": "01 — How well do you feel you know English?",
     "match.self.subtitle":
         "Pick the level that feels closest to you today. This is your own estimate — not a certified CEFR result.",
     "match.self.hint":
-        "You can change it any time. The measured level in step 3 stays based on real evidence.",
+        "You can change it any time. The vocabulary quiz in step 2 provides the measured estimate.",
     "match.self.save": "Save my self-assessment",
     "match.self.saving": "Saving…",
     "match.self.saved": "Saved: {band}",
     "match.self.error": "Couldn't save your self-assessment.",
-    "match.self.auto": "Auto — let the assessment decide",
+    "match.self.auto": "Not sure",
     "match.self.preA1": "Pre-A1 · just starting",
 
     // Skill Match — step 2 (quiz)
-    "match.quiz.area": "Section 02",
+    "match.quiz.area": "Step 02",
     "match.quiz.tabQuiz": "Vocabulary quiz",
     "match.quiz.tabWriting": "Writing sample",
-    "match.quiz.title": "02 — Assess your skills",
+    "match.quiz.title": "02 — Vocabulary quiz",
     "match.quiz.subtitle":
-        "Take the quick quiz or submit a writing sample — both feed your learner profile.",
+        "Answer all 15 questions. This step applies to every learner.",
     "match.quiz.quizTitle": "Quick vocabulary quiz (15 questions)",
     "match.quiz.quizSubtitle":
         "15 questions sampled across A1–C2. It usually takes about 5 minutes.",
@@ -415,19 +380,101 @@ export const en = {
         "This is an initial estimate; another sample will make it more reliable.",
     "match.quiz.writingTitle": "Analyze a short writing sample",
     "match.quiz.writingHelp":
-        "Write 3–5 English sentences. AI will show vocabulary range, grammar signals, and the skills to prioritize.",
+        "Write 3–5 English sentences. AI will show vocabulary range and grammar signals; your learning goals remain your choice.",
     "match.quiz.perBand": "Correct per level",
     "match.quiz.partialNote":
         "You answered {n} of {m} questions — the band reflects only what you answered.",
     "match.quiz.fullNote": "All {m} questions answered.",
-    "match.quiz.toProfile": "Continue to my profile",
+    "match.quiz.toProfile": "Continue to writing",
     "match.quiz.retake": "Retake (reset answers)",
 
-    // Skill Match — step 3 (learner profile)
+    // Skill Match — step 3 (optional writing)
+    "match.writing.area": "Step 03",
+    "match.writing.title": "03 — Writing sample (optional)",
+    "match.writing.recommended":
+        "Recommended for your current level so grammar and writing can be assessed more clearly.",
+    "match.writing.optional":
+        "You can skip this step. Your quiz result is enough to continue.",
+    "match.writing.hidden":
+        "Writing is hidden by default at this level. Open it only if you want a deeper assessment.",
+    "match.writing.expand": "Add a writing sample",
+    "match.writing.skip": "Skip writing",
+
+    // Skill Match — step 4 (learning goals)
+    "match.goals.area": "Step 06",
+    "match.goals.title": "06 — What do you want to improve?",
+    "match.goals.subtitle":
+        "Choose 1–3 skills. These choices directly drive teacher matching.",
+    "match.goals.count": "{n}/3 skills selected",
+    "match.goals.continue": "Find suitable teachers",
+
+    // Skill Match — step 4 (listening)
+    "match.listening.area": "Step 04",
+    "match.listening.title": "04 — Listening check (optional)",
+    "match.listening.subtitle":
+        "Listen to random words and a short passage at your selected level. Your browser reads them aloud; scoring does not use AI.",
+    "match.listening.playVoice": "Listen",
+    "match.listening.stopVoice": "Stop",
+    "match.listening.voiceHint":
+        "Use the Listen button. You may replay the voice when needed.",
+    "match.listening.level": "Selected level:",
+    "match.listening.source": "Content source",
+    "match.listening.original":
+        "Original PiEMind practice content; not copied from a standardized exam.",
+    "match.listening.framework": "Difficulty framework",
+    "match.listening.calibration":
+        "MVP alignment: educator review and learner-data calibration are still required before high-stakes use.",
+    "match.listening.result": "Your Listening result",
+    "match.listening.score": "{n}/{m} correct",
+    "match.listening.retake": "Retake Listening",
+    "match.listening.loadError": "Couldn't load the Listening check.",
+    "match.listening.submit": "Submit Listening",
+    "match.listening.scoring": "Scoring…",
+    "match.listening.skip": "Skip Listening",
+
+    // Skill Match — step 5 (speaking)
+    "match.speaking.area": "Step 05",
+    "match.speaking.titleOptional": "05 — Speaking sample (optional)",
+    "match.speaking.titleGuided": "05 — Guided speaking check",
+    "match.speaking.subtitleOptional":
+        "Optional from B2 upward. We estimate grammar, vocabulary and fluency; pronunciation is not scored yet.",
+    "match.speaking.subtitleGuided":
+        "For B1 and below, read the words first, then give a short guided self-introduction.",
+    "match.speaking.guidedNote":
+        "Read the three words aloud, then follow the self-introduction guide. Short, simple sentences are enough.",
+    "match.speaking.result": "Your Speaking recording",
+    "match.speaking.transcribed": "Transcript ready",
+    "match.speaking.assessed": "MVP estimate ready",
+    "match.speaking.analysisPending": "Processing in the background",
+    "match.speaking.failed": "Processing unavailable",
+    "match.speaking.transcript": "Transcript",
+    "match.speaking.audioKept":
+        "Your recording was saved safely. You can retry transcription without recording again.",
+    "match.speaking.retry": "Retry transcription",
+    "match.speaking.retryAnalysis": "Retry analysis",
+    "match.speaking.retake": "Record a new answer",
+    "match.speaking.transcribing": "Transcribing…",
+    "match.speaking.processing": "Uploading recording…",
+    "match.speaking.submit": "Upload recording",
+    "match.speaking.queuedNote":
+        "Your recording is saved and being processed in the background. You can continue now; the result will update automatically.",
+    "match.speaking.mvpEstimate": "MVP speaking estimate",
+    "match.speaking.estimateNote":
+        "Based on the transcript and speaking pace. It does not score pronunciation and is not an official CEFR result.",
+    "match.speaking.grammar": "Grammar",
+    "match.speaking.vocabulary": "Vocabulary",
+    "match.speaking.fluency": "Fluency",
+    "match.speaking.fluencyMetrics": "{words} words · {wpm} words/minute",
+    "match.speaking.analysisFailed":
+        "The transcript is ready, but AI analysis is temporarily unavailable. You can retry without recording again.",
+    "match.speaking.skip": "Skip Speaking",
+    "match.speaking.loadError": "Couldn't load the Speaking prompt.",
+
+    // Skill Match — step 5 (learner profile)
     "match.profile.area": "Overview",
     "match.profile.title": "Your learner profile",
     "match.profile.subtitle":
-        "Honest status per skill: assessed, not enough evidence, or not assessed yet — never a guessed score.",
+        "See which skills were assessed, need more information, or have not been assessed yet.",
     "match.profile.level": "Level",
     "match.profile.levelSourceWriting": "from writing",
     "match.profile.levelSourceQuiz": "from quiz",
@@ -442,12 +489,53 @@ export const en = {
     "match.profile.status.not_assessed": "Not assessed",
     "match.profile.source.quiz": "from quiz",
     "match.profile.source.writing": "from writing",
+    "match.profile.source.listening": "from Listening check",
+    "match.profile.source.speaking": "from Speaking recording",
+    "match.profile.listeningScore": "Listening score {n}%",
+    "match.profile.mvpScore": "MVP estimate {n}%",
     "match.profile.quality": "Quality {n}/100 (heuristic)",
     "match.profile.find": "Find my teachers",
     "match.profile.finding": "Finding teachers…",
     "match.profile.noEvidence":
-        "No usable evidence yet — take the quiz or submit a writing sample first.",
+        "Complete the 15-question vocabulary quiz so the system can identify a skill to improve.",
     "match.profile.loadError": "Couldn't load your learner profile.",
+    "match.courses.area": "Recommended courses",
+    "match.courses.title": "Courses matching your current level",
+    "match.courses.subtitle":
+        "Ranked by CEFR range and the weakest measured skills in your profile.",
+    "match.courses.free": "Free",
+    "match.courses.view": "View course",
+    "match.courses.empty":
+        "No published course has enough CEFR and skill metadata to recommend yet.",
+    "match.roadmap.area": "Learning roadmap",
+    "match.roadmap.title": "Your path to B2",
+    "match.roadmap.subtitle":
+        "See every milestone to B2 and the remaining courses from your current level.",
+    "match.roadmap.remainingSummary":
+        "Your result places you at {current}. You have {n} course stage(s) left to reach {target}; earlier levels do not need to be repeated.",
+    "match.roadmap.generate": "Create roadmap",
+    "match.roadmap.regenerate": "Recreate roadmap",
+    "match.roadmap.generating": "Creating…",
+    "match.roadmap.revision": "Revision",
+    "match.roadmap.missingCourse": "No suitable published course yet",
+    "match.roadmap.targetReached": "You have already reached the B2 target.",
+    "match.roadmap.empty":
+        "Create a roadmap after completing your level assessment.",
+    "match.roadmap.reassess": "Reassess and adapt",
+    "match.roadmap.reassessing": "Adapting…",
+    "match.roadmap.reassessLocked":
+        "Complete the current course stage to unlock reassessment.",
+    "match.roadmap.takeReassessment": "Take a new assessment",
+    "match.roadmap.assessmentRequired":
+        "Complete a new assessment after this course stage before adapting your roadmap.",
+    "match.roadmap.lastAdjustment": "Latest roadmap adjustment",
+    "match.roadmap.preserved": "kept",
+    "match.roadmap.replaced": "replaced",
+    "match.roadmap.generated": "added",
+    "match.roadmap.status.PENDING": "PENDING",
+    "match.roadmap.status.IN_PROGRESS": "IN PROGRESS",
+    "match.roadmap.status.COMPLETED": "COMPLETED",
+    "match.roadmap.status.SKIPPED": "REPLACED",
     "match.profile.writingStat": "Writing: {n} words",
     "match.profile.quizStat": "Quiz: {n} questions · {m} correct",
     "match.profile.vocabSummary":
@@ -471,7 +559,6 @@ export const vi: Record<TranslationKey, string> = {
 
     // Header
     "header.myCourses": "Khóa học của tôi",
-    "header.myBookings": "Lịch đặt của tôi",
     "header.profile": "Hồ sơ",
     "header.bookingHistory": "Lịch sử đặt lịch",
     "header.logout": "Đăng xuất",
@@ -597,6 +684,13 @@ export const vi: Record<TranslationKey, string> = {
     "match.error.generic": "Không thể xếp hạng lúc này. Vui lòng thử lại.",
     "match.error.retry": "Thử lại",
     "match.level.strict": "Chỉ giữ giảng viên dạy đúng trình độ của tôi",
+    "match.price.label": "Mức học phí",
+    "match.price.all": "Tất cả mức giá",
+    "match.price.free": "Miễn phí",
+    "match.price.range": "Theo khoảng giá",
+    "match.price.min": "Tối thiểu / giờ",
+    "match.price.max": "Tối đa / giờ",
+    "match.price.perHour": "{n} đ/giờ",
 
     // Skill Match — results
     "match.results.ranked": "{n} xếp hạng",
@@ -607,7 +701,7 @@ export const vi: Record<TranslationKey, string> = {
         " — loại {n} giảng viên chưa phù hợp trình độ (vẫn giữ giảng viên chưa khai báo).",
     "match.results.levelNone":
         " — không lọc, chỉ hiển thị mức độ phù hợp trình độ.",
-    "match.results.targets": "Ưu tiên học của bạn:",
+    "match.results.targets": "Kỹ năng hệ thống xác định cần cải thiện:",
     "match.results.needFitTitle": "Thế mạnh giảng viên theo từng kỹ năng",
     "match.results.mean": "điểm trung bình {n}",
     "match.results.noData": "chưa có dữ liệu",
@@ -620,26 +714,8 @@ export const vi: Record<TranslationKey, string> = {
     "match.results.footnote":
         "Các tỷ lệ tóm tắt mức phù hợp và lượng bằng chứng hồ sơ; ít bằng chứng không đồng nghĩa giảng dạy kém.",
     "match.results.hintAuto":
-        "Phân tích bài viết rồi bấm Phân tích & Tìm giảng viên.",
+        "Các kỹ năng yếu đã đánh giá sẵn sàng để tìm giảng viên.",
     "match.results.hintManual": "Chọn kỹ năng và bấm Tìm giảng viên.",
-
-    // Skill Match — manual section
-    "match.manual.title": "Kỹ năng bạn muốn cải thiện",
-    "match.manual.skillsError": "Không tải được danh sách kỹ năng.",
-    "match.manual.priorityShare": "Tỷ lệ ưu tiên",
-    "match.manual.levelTitle": "Trình độ của bạn (tuỳ chọn)",
-    "match.manual.submit": "Tìm giảng viên",
-    "match.manual.submitting": "Đang tìm...",
-    "match.manual.validateEmpty": "Chọn ít nhất một kỹ năng cần cải thiện.",
-    "match.manual.sectionArea": "Lựa chọn khác",
-    "match.manual.sectionTitle": "Tự chọn kỹ năng",
-    "match.manual.sectionSub":
-        "Chọn trực tiếp kỹ năng và mức độ ưu tiên nếu bạn chưa muốn làm bài đánh giá.",
-
-    // Skill Match — skill picker
-    "match.picker.empty": "Chưa có kỹ năng nào trong danh mục.",
-    "match.picker.weight": "Mức độ ưu tiên",
-    "match.picker.scale": "Thang 1–5: 1 = ít ưu tiên, 5 = rất ưu tiên",
 
     // Skill Match — hero
     "match.hero.eyebrow": "Hồ sơ học tập cá nhân hóa",
@@ -657,7 +733,7 @@ export const vi: Record<TranslationKey, string> = {
         "Đánh giá năng lực tiếng Anh và tìm giảng viên phù hợp với mục tiêu học của bạn.",
 
     // Skill Match — section 01 (intake)
-    "match.s1.area": "Khu vực 01",
+    "match.s1.area": "Bước 01",
     "match.s1.title": "01 — Chia sẻ về trình độ tiếng Anh của bạn",
     "match.s1.pill": "Tự động phân tích • Đề xuất",
     "match.s1.presetsLabel": "Chọn kịch bản mẫu nhanh để thử nghiệm:",
@@ -674,7 +750,7 @@ export const vi: Record<TranslationKey, string> = {
     "match.s1.scopeStrong": "Hệ thống sẽ phân tích:",
     "match.s1.scopeRest":
         "Trình độ CEFR · độ đa dạng từ vựng · ngữ pháp · kỹ năng cần ưu tiên.",
-    "match.s1.cta": "Phân tích năng lực bằng AI & Tìm Giảng viên phù hợp",
+    "match.s1.cta": "Phân tích bài viết & tiếp tục",
     "match.s1.ctaAnalyzing": "Đang phân tích bằng AI…",
     "match.s1.ctaMatching": "Đang ghép đôi giảng viên…",
     "match.s1.clear": "Nhập lại / Xóa mẫu",
@@ -682,29 +758,8 @@ export const vi: Record<TranslationKey, string> = {
     "match.s1.noAssessment":
         "Bạn chưa có bài đánh giá nào — viết và phân tích để bắt đầu.",
 
-    // Skill Match — pipeline status
-    "match.pipe.title": "Trạng thái phân tích AI",
-    "match.pipe.analyzing": "Đang phân tích…",
-    "match.pipe.matching": "Đang ghép đôi…",
-    "match.pipe.done": "Đã phân tích xong",
-    "match.pipe.ready": "Sẵn sàng",
-    "match.pipe.vocabTitle": "Phạm vi từ vựng",
-    "match.pipe.grammarTitle": "Tín hiệu ngữ pháp",
-    "match.pipe.mappingTitle": "Ưu tiên học tập",
-    "match.pipe.vocabPrefix": "CEFR {band} · độ đa dạng từ vựng {n}/100.",
-    "match.pipe.vocabLow": "Tín hiệu thấp — cần thêm mẫu.",
-    "match.pipe.vocabOk": "Đa dạng từ loại ổn định.",
-    "match.pipe.vocabIdle": "Chưa trích xuất từ vựng — bấm Phân tích để chạy.",
-    "match.pipe.grammarReady":
-        "{label} · {m} điểm cần sửa đã được xác nhận trong mẫu này.",
-    "match.pipe.grammarIdle": "Chưa quét ngữ pháp — bấm Phân tích để chạy.",
-    "match.pipe.mappingReady":
-        "{n} trọng tâm kỹ năng · ưu tiên cao nhất: {skill}.",
-    "match.pipe.mappingIdle":
-        "Chưa gán mức ưu tiên kỹ năng — bấm Phân tích để chạy.",
-
     // Skill Match — section 02 (insights)
-    "match.s2.area": "Khu vực 02",
+    "match.s2.area": "Bước 02",
     "match.s2.title": "02 — Hồ sơ năng lực và kết quả phân tích",
     "match.s2.pill": "Đã phân tích từ vựng, ngữ pháp và ưu tiên học",
     "match.s2.cefrLabel": "Chẩn đoán CEFR tổng thể",
@@ -765,12 +820,6 @@ export const vi: Record<TranslationKey, string> = {
         "CEFR free-text là đánh giá tham khảo, không phải chứng nhận.",
     "match.insights.focusLine": "{skill} ({n}% ưu tiên): {reason}",
 
-    // Skill Match — reliability labels
-    "match.rel.high": "Dữ liệu đầy đủ",
-    "match.rel.medium": "Dữ liệu vừa đủ",
-    "match.rel.low": "Dữ liệu còn ít",
-    "match.rel.unavailable": "Chưa có dữ liệu",
-
     // Skill Match — skill code labels
     "match.skill.grammar": "Ngữ pháp",
     "match.skill.vocabulary": "Từ vựng",
@@ -785,8 +834,8 @@ export const vi: Record<TranslationKey, string> = {
     "match.source.selfAssessment": "Tự đánh giá",
 
     // Skill Match — section 03 (teacher matches)
-    "match.s3.area": "Khu vực 03",
-    "match.s3.title": "03 — Giảng viên phù hợp với bạn",
+    "match.s3.area": "Bước 06",
+    "match.s3.title": "06 — Giảng viên phù hợp với bạn",
     "match.s3.subtitle":
         "Xem thế mạnh của từng giảng viên và mức độ phù hợp với kỹ năng bạn muốn cải thiện.",
 
@@ -818,36 +867,40 @@ export const vi: Record<TranslationKey, string> = {
     "match.card.insufficientDesc":
         "Chưa có dữ liệu kỹ năng cần cải thiện để xếp hạng giảng viên này.",
 
-    // Skill Match — 3-step wizard
+    // Skill Match — 5-step wizard
     "match.wizard.step1": "Tự đánh giá",
-    "match.wizard.step2": "Kiểm tra",
-    "match.wizard.step3": "Giảng viên",
+    "match.wizard.step2": "Quiz từ vựng",
+    "match.wizard.step3": "Bài viết",
+    "match.wizard.step4": "Listening",
+    "match.wizard.step5": "Speaking",
+    "match.wizard.step6": "Mục tiêu học",
+    "match.wizard.step7": "Giảng viên",
     "match.wizard.back": "Quay lại",
     "match.wizard.next": "Tiếp tục",
     "match.wizard.skip": "Bỏ qua, làm sau",
 
     // Skill Match — step 1 (self-assessment)
     "match.band.preA1": "Pre-A1 Mới bắt đầu",
-    "match.self.area": "Khu vực 01",
+    "match.self.area": "Bước 01",
     "match.self.title": "01 — Bạn cảm nhận mình ở mức tiếng Anh nào?",
     "match.self.subtitle":
         "Chọn mức gần với bạn nhất hôm nay. Đây là ước lượng cá nhân — không phải CEFR chứng nhận.",
     "match.self.hint":
-        "Bạn đổi bất cứ lúc nào. Mức đo ở Bước 3 vẫn dựa trên bằng chứng thực.",
+        "Bạn có thể đổi bất cứ lúc nào. Quiz từ vựng ở Bước 2 cung cấp mức ước lượng.",
     "match.self.save": "Lưu tự đánh giá",
     "match.self.saving": "Đang lưu…",
     "match.self.saved": "Đã lưu: {band}",
     "match.self.error": "Không lưu được tự đánh giá.",
-    "match.self.auto": "Tự động — để hệ thống tự chấm",
+    "match.self.auto": "Không chắc",
     "match.self.preA1": "Pre-A1 · vừa bắt đầu",
 
     // Skill Match — step 2 (quiz)
-    "match.quiz.area": "Khu vực 02",
+    "match.quiz.area": "Bước 02",
     "match.quiz.tabQuiz": "Trắc nghiệm từ vựng",
     "match.quiz.tabWriting": "Bài viết",
-    "match.quiz.title": "02 — Kiểm tra năng lực",
+    "match.quiz.title": "02 — Quiz Vocabulary",
     "match.quiz.subtitle":
-        "Làm quiz nhanh hoặc nộp bài viết — cả hai đều nạp vào hồ sơ học viên của bạn.",
+        "Hoàn thành đủ 15 câu. Bước này áp dụng cho tất cả học viên.",
     "match.quiz.quizTitle": "Quiz từ vựng nhanh (15 câu)",
     "match.quiz.quizSubtitle":
         "15 câu trải đều từ A1–C2, thường hoàn thành trong khoảng 5 phút.",
@@ -876,19 +929,101 @@ export const vi: Record<TranslationKey, string> = {
         "Đây là ước lượng ban đầu; thêm một mẫu khác sẽ giúp kết quả chắc chắn hơn.",
     "match.quiz.writingTitle": "Phân tích một đoạn viết ngắn",
     "match.quiz.writingHelp":
-        "Viết 3–5 câu tiếng Anh. AI sẽ chỉ ra độ đa dạng từ vựng, tín hiệu ngữ pháp và kỹ năng nên ưu tiên.",
+        "Viết 3–5 câu tiếng Anh. AI sẽ phân tích từ vựng và ngữ pháp; mục tiêu học tập vẫn do bạn chọn.",
     "match.quiz.perBand": "Đúng theo từng mức",
     "match.quiz.partialNote":
         "Bạn trả lời {n}/{m} câu — band chỉ phản ánh phần bạn đã làm.",
     "match.quiz.fullNote": "Đã trả lời toàn bộ {m} câu.",
-    "match.quiz.toProfile": "Tiếp tục tới hồ sơ của tôi",
+    "match.quiz.toProfile": "Tiếp tục tới bài viết",
     "match.quiz.retake": "Làm lại (xóa câu trả lời)",
 
-    // Skill Match — step 3 (learner profile)
+    // Skill Match — step 3 (optional writing)
+    "match.writing.area": "Bước 03",
+    "match.writing.title": "03 — Writing (tùy chọn)",
+    "match.writing.recommended":
+        "Khuyến nghị ở mức hiện tại để đánh giá rõ hơn ngữ pháp và kỹ năng viết.",
+    "match.writing.optional":
+        "Bạn có thể bỏ qua. Kết quả quiz đã đủ để tiếp tục.",
+    "match.writing.hidden":
+        "Bài viết được ẩn mặc định ở mức này. Chỉ mở khi bạn muốn đánh giá sâu hơn.",
+    "match.writing.expand": "Làm thêm bài viết",
+    "match.writing.skip": "Bỏ qua bài viết",
+
+    // Skill Match — step 4 (learning goals)
+    "match.goals.area": "Bước 06",
+    "match.goals.title": "06 — Bạn muốn cải thiện kỹ năng nào?",
+    "match.goals.subtitle":
+        "Chọn từ 1–3 kỹ năng. Các lựa chọn này được dùng trực tiếp để tìm giảng viên.",
+    "match.goals.count": "Đã chọn {n}/3 kỹ năng",
+    "match.goals.continue": "Tìm giảng viên phù hợp",
+
+    // Skill Match — step 4 (listening)
+    "match.listening.area": "Bước 04",
+    "match.listening.title": "04 — Kiểm tra Listening (tùy chọn)",
+    "match.listening.subtitle":
+        "Nghe các từ ngẫu nhiên và một đoạn ngắn theo level đã chọn. Trình duyệt đọc bằng giọng tiếng Anh; backend chấm đáp án và không dùng AI.",
+    "match.listening.playVoice": "Nghe giọng đọc",
+    "match.listening.stopVoice": "Dừng",
+    "match.listening.voiceHint":
+        "Bấm nghe và có thể phát lại khi cần. Nội dung thay đổi khi làm lại.",
+    "match.listening.level": "Mức được chọn:",
+    "match.listening.source": "Nguồn nội dung",
+    "match.listening.original":
+        "Bài luyện tập do PiEMind tự biên soạn, không sao chép từ bài thi chuẩn hóa.",
+    "match.listening.framework": "Khung căn chỉnh độ khó",
+    "match.listening.calibration":
+        "MVP: cần giáo viên thẩm định và hiệu chỉnh bằng dữ liệu người học trước khi dùng cho đánh giá quan trọng.",
+    "match.listening.result": "Kết quả Listening của bạn",
+    "match.listening.score": "Đúng {n}/{m} câu",
+    "match.listening.retake": "Làm lại Listening",
+    "match.listening.loadError": "Không tải được bài Listening.",
+    "match.listening.submit": "Nộp bài Listening",
+    "match.listening.scoring": "Đang chấm…",
+    "match.listening.skip": "Bỏ qua Listening",
+
+    // Skill Match — step 5 (speaking)
+    "match.speaking.area": "Bước 05",
+    "match.speaking.titleOptional": "05 — Bài nói (tùy chọn)",
+    "match.speaking.titleGuided": "05 — Bài nói có hướng dẫn",
+    "match.speaking.subtitleOptional":
+        "Từ B2 trở lên, bài nói là tùy chọn. Hệ thống ước lượng ngữ pháp, từ vựng và độ trôi chảy; chưa chấm phát âm.",
+    "match.speaking.subtitleGuided":
+        "Với trình độ B1 trở xuống, hãy đọc các từ trước rồi giới thiệu ngắn về bản thân theo gợi ý.",
+    "match.speaking.guidedNote":
+        "Đọc thành tiếng ba từ, sau đó làm theo gợi ý giới thiệu bản thân. Chỉ cần dùng câu ngắn và đơn giản.",
+    "match.speaking.result": "Bản ghi Speaking của bạn",
+    "match.speaking.transcribed": "Đã có transcript",
+    "match.speaking.assessed": "Đã có ước lượng MVP",
+    "match.speaking.analysisPending": "Đang xử lý nền",
+    "match.speaking.failed": "Tạm thời chưa xử lý được",
+    "match.speaking.transcript": "Nội dung nhận dạng",
+    "match.speaking.audioKept":
+        "Bản ghi đã được lưu an toàn. Bạn có thể thử transcription lại mà không cần ghi âm lại.",
+    "match.speaking.retry": "Thử transcription lại",
+    "match.speaking.retryAnalysis": "Thử phân tích lại",
+    "match.speaking.retake": "Ghi câu trả lời mới",
+    "match.speaking.transcribing": "Đang tạo transcript…",
+    "match.speaking.processing": "Đang tải bản ghi…",
+    "match.speaking.submit": "Tải bản ghi",
+    "match.speaking.queuedNote":
+        "Bản ghi đã được lưu và đang được xử lý nền. Bạn có thể tiếp tục ngay; kết quả sẽ tự động cập nhật.",
+    "match.speaking.mvpEstimate": "Ước lượng Speaking MVP",
+    "match.speaking.estimateNote":
+        "Dựa trên transcript và nhịp nói. Kết quả chưa chấm phát âm và không phải CEFR chính thức.",
+    "match.speaking.grammar": "Ngữ pháp",
+    "match.speaking.vocabulary": "Từ vựng",
+    "match.speaking.fluency": "Độ trôi chảy",
+    "match.speaking.fluencyMetrics": "{words} từ · {wpm} từ/phút",
+    "match.speaking.analysisFailed":
+        "Đã có transcript nhưng phân tích AI tạm thời chưa sẵn sàng. Bạn có thể thử lại mà không cần ghi âm lại.",
+    "match.speaking.skip": "Bỏ qua Speaking",
+    "match.speaking.loadError": "Không tải được đề Speaking.",
+
+    // Skill Match — step 5 (learner profile)
     "match.profile.area": "Tổng quan",
     "match.profile.title": "Hồ sơ học viên của bạn",
     "match.profile.subtitle":
-        "Trạng thái trung thực theo từng kỹ năng: đã đánh giá, thiếu bằng chứng, hoặc chưa đánh giá — không bao giờ gán điểm đoán.",
+        "Xem kỹ năng nào đã được đánh giá, cần thêm thông tin hoặc chưa được đánh giá.",
     "match.profile.level": "Trình độ",
     "match.profile.levelSourceWriting": "từ bài viết",
     "match.profile.levelSourceQuiz": "từ trắc nghiệm",
@@ -903,12 +1038,52 @@ export const vi: Record<TranslationKey, string> = {
     "match.profile.status.not_assessed": "Chưa đánh giá",
     "match.profile.source.quiz": "từ trắc nghiệm",
     "match.profile.source.writing": "từ bài viết",
+    "match.profile.source.listening": "từ bài Listening",
+    "match.profile.source.speaking": "từ bản ghi Speaking",
+    "match.profile.listeningScore": "Điểm Listening {n}%",
+    "match.profile.mvpScore": "Ước lượng MVP {n}%",
     "match.profile.quality": "Chất lượng ước tính {n}/100",
     "match.profile.find": "Tìm giảng viên của tôi",
     "match.profile.finding": "Đang tìm giảng viên…",
     "match.profile.noEvidence":
-        "Chưa có bằng chứng dùng được — hãy làm quiz hoặc nộp bài viết trước.",
+        "Hãy hoàn thành quiz từ vựng 15 câu để hệ thống xác định kỹ năng cần cải thiện.",
     "match.profile.loadError": "Không tải được hồ sơ học viên.",
+    "match.courses.area": "Khóa học đề xuất",
+    "match.courses.title": "Khóa học phù hợp trình độ hiện tại",
+    "match.courses.subtitle":
+        "Xếp hạng theo khoảng CEFR và những kỹ năng yếu nhất đã đo được trong hồ sơ.",
+    "match.courses.free": "Miễn phí",
+    "match.courses.view": "Xem khóa học",
+    "match.courses.empty":
+        "Chưa có khóa học đã xuất bản với đủ dữ liệu CEFR và kỹ năng để đề xuất.",
+    "match.roadmap.area": "Lộ trình học tập",
+    "match.roadmap.title": "Con đường của bạn tới B2",
+    "match.roadmap.subtitle":
+        "Xem đầy đủ các mốc tới B2 và những khóa còn cần học từ trình độ hiện tại.",
+    "match.roadmap.remainingSummary":
+        "Kết quả hiện tại của bạn là {current}. Bạn còn {n} chặng khóa học để đạt {target}; các mức thấp hơn không cần học lại.",
+    "match.roadmap.generate": "Tạo lộ trình",
+    "match.roadmap.regenerate": "Tạo lại lộ trình",
+    "match.roadmap.generating": "Đang tạo…",
+    "match.roadmap.revision": "Phiên bản",
+    "match.roadmap.missingCourse": "Chưa có khóa học đã xuất bản phù hợp",
+    "match.roadmap.targetReached": "Bạn đã đạt mục tiêu B2.",
+    "match.roadmap.empty": "Tạo lộ trình sau khi hoàn thành đánh giá trình độ.",
+    "match.roadmap.reassess": "Đánh giá lại và điều chỉnh",
+    "match.roadmap.reassessing": "Đang điều chỉnh…",
+    "match.roadmap.reassessLocked":
+        "Hoàn thành chặng khóa học hiện tại để mở reassessment.",
+    "match.roadmap.takeReassessment": "Làm bài đánh giá lại",
+    "match.roadmap.assessmentRequired":
+        "Hoàn thành một bài đánh giá mới sau chặng vừa học trước khi điều chỉnh lộ trình.",
+    "match.roadmap.lastAdjustment": "Lần điều chỉnh gần nhất",
+    "match.roadmap.preserved": "giữ lại",
+    "match.roadmap.replaced": "thay thế",
+    "match.roadmap.generated": "tạo mới",
+    "match.roadmap.status.PENDING": "CHƯA HỌC",
+    "match.roadmap.status.IN_PROGRESS": "ĐANG HỌC",
+    "match.roadmap.status.COMPLETED": "ĐÃ HOÀN THÀNH",
+    "match.roadmap.status.SKIPPED": "ĐÃ THAY THẾ",
     "match.profile.writingStat": "Bài viết: {n} từ",
     "match.profile.quizStat": "Trắc nghiệm: {n} câu · đúng {m}",
     "match.profile.vocabSummary":

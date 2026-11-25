@@ -60,14 +60,20 @@ export class CreateBookingHandler implements ICommandHandler<CreateBookingComman
       startMin < toMin(window.start) ||
       endMin > toMin(window.end)
     ) {
-      throw new AppException(ErrorCode.AVAILABILITY_CONFLICT, HttpStatus.CONFLICT);
+      throw new AppException(
+        ErrorCode.AVAILABILITY_CONFLICT,
+        HttpStatus.CONFLICT,
+      );
     }
 
     const blocked = window.busy.some((b) =>
       overlaps(startMin, endMin, toMin(b.start), toMin(b.end)),
     );
     if (blocked) {
-      throw new AppException(ErrorCode.AVAILABILITY_CONFLICT, HttpStatus.CONFLICT);
+      throw new AppException(
+        ErrorCode.AVAILABILITY_CONFLICT,
+        HttpStatus.CONFLICT,
+      );
     }
 
     const overlap = await this.bookingRepository.findOverlap(
@@ -77,15 +83,21 @@ export class CreateBookingHandler implements ICommandHandler<CreateBookingComman
       command.endTime,
     );
     if (overlap) {
-      throw new AppException(ErrorCode.BOOKING_TIME_CONFLICT, HttpStatus.CONFLICT);
+      throw new AppException(
+        ErrorCode.BOOKING_TIME_CONFLICT,
+        HttpStatus.CONFLICT,
+      );
     }
 
     const instructorProfile = await this.instructorProfiles.findOne({
       where: { userId: command.instructorId },
     });
     const hourlyRate = Number(instructorProfile?.hourlyRate ?? 0);
-    if (hourlyRate <= 0) {
-      throw new AppException(ErrorCode.VALIDATION_ERROR, HttpStatus.BAD_REQUEST);
+    if (!Number.isFinite(hourlyRate) || hourlyRate < 0) {
+      throw new AppException(
+        ErrorCode.VALIDATION_ERROR,
+        HttpStatus.BAD_REQUEST,
+      );
     }
     const totalAmount = Math.round((hourlyRate * (endMin - startMin)) / 60);
 

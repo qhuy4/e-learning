@@ -7,6 +7,7 @@ import {
   SkillCapability,
   SkillVerification,
 } from '@/modules/skill-profiling/domain/enum/skill-verification.enum';
+import { SKILL_AGGREGATION_CONFIG } from './skill-aggregation.config';
 
 const dayMs = 24 * 60 * 60 * 1000;
 const daysAgo = (n: number) => new Date(Date.now() - n * dayMs);
@@ -222,7 +223,9 @@ describe('SkillAggregationService.recompute', () => {
 
       expect(second).toEqual(first);
       expect(stores.profiles).toHaveLength(1);
-      expect(stores.profiles[0].model_version).toBe('heuristic-mvp-v2');
+      expect(stores.profiles[0].model_version).toBe(
+        SKILL_AGGREGATION_CONFIG.modelVersion,
+      );
       expect(stores.profiles[0].model_kind).toBe('heuristic');
       expect(stores.evidence).toHaveLength(2); // recompute never touches evidence
       expect(
@@ -586,7 +589,9 @@ describe('SkillAggregationService.recompute', () => {
 
     expect(results).toHaveLength(1);
     expect(stores.profiles[0].model_kind).toBe('heuristic');
-    expect(stores.profiles[0].model_version).toBe('heuristic-mvp-v2');
+    expect(stores.profiles[0].model_version).toBe(
+      SKILL_AGGREGATION_CONFIG.modelVersion,
+    );
     expect(stores.profiles[0].score_model).toBeNull();
   });
 });

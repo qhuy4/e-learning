@@ -12,6 +12,9 @@ import {
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enum/role.enum';
 import { GetBookingsQuery } from '@/modules/bookings/application/query/get-bookings.query';
 import { GetBookingByIdQuery } from '@/modules/bookings/application/query/get-booking-by-id.query';
 import { CreateBookingCommand } from '@/modules/bookings/application/command/create-booking.command';
@@ -21,7 +24,8 @@ import { CreateBookingDto } from '@/modules/bookings/presentation/dto/create-boo
 import { UpdateBookingStatusDto } from '@/modules/bookings/presentation/dto/update-booking-status.dto';
 
 @Controller('admin/bookings')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
 export class AdminBookingsController {
   constructor(
     private readonly commandBus: CommandBus,

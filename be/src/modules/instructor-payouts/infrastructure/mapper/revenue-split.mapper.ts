@@ -6,9 +6,10 @@ export class RevenueSplitMapper {
   static toDomain(entity: RevenueSplitOrmEntity): RevenueSplit {
     return RevenueSplit.restore({
       id: Number(entity.id),
-      orderItemId: Number(entity.orderItemId),
+      orderItemId: entity.orderItemId === null ? null : Number(entity.orderItemId),
+      bookingId: entity.bookingId === null ? null : Number(entity.bookingId),
       instructorId: Number(entity.instructorId),
-      courseId: Number(entity.courseId),
+      courseId: entity.courseId === null ? null : Number(entity.courseId),
       grossAmount: Number(entity.grossAmount),
       platformFeePct: Number(entity.platformFeePct),
       platformFeeAmount: Number(entity.platformFeeAmount),

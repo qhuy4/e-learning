@@ -1,11 +1,17 @@
-import { Controller, Get, Param, ParseIntPipe, Patch, Query } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Patch, Query, UseGuards } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enum/role.enum';
+import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
 import { GetAdminOrdersQuery } from '@/modules/orders/application/query/get-admin-orders.query';
 import { GetAdminOrderByIdQuery } from '@/modules/orders/application/query/get-admin-order-by-id.query';
 import { UpdateOrderStatusCommand } from '@/modules/orders/application/command/update-order-status.command';
 import { AdminOrderDtoMapper } from '@/modules/orders/presentation/mappers/admin-order-dto.mapper';
 
 @Controller('admin/orders')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
 export class AdminOrdersController {
   constructor(
     private readonly queryBus: QueryBus,

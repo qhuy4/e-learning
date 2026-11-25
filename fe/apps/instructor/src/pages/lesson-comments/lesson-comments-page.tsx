@@ -11,13 +11,21 @@ import {
   MessageSquare,
 } from "lucide-react";
 
-import { useGetCourses, useGetCourseDetail } from "@/features/courses/hook/use-courses";
+import {
+  useGetCourses,
+  useGetCourseDetail,
+} from "@/features/courses/hook/use-courses";
 import { useInstructorComments } from "@/features/lesson-comments/hooks/use-lesson-comments";
 import {
   formatRelativeTime,
   initialsOf,
 } from "@/features/lesson-comments/utils";
-import type { CommentStatusFilter, InstructorCommentItem, CommentListMeta, CommentStats } from "@/features/lesson-comments/types/lesson-comments";
+import type {
+  CommentStatusFilter,
+  InstructorCommentItem,
+  CommentListMeta,
+  CommentStats,
+} from "@/features/lesson-comments/types/lesson-comments";
 import { Button } from "@fe/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@fe/components/ui/tabs";
 import {
@@ -120,9 +128,8 @@ export default function LessonCommentsPage() {
 
   // Danh sách bài học của khóa đang chọn (cho bộ lọc bài học)
   const { data: courseDetail } = useGetCourseDetail(courseId || undefined);
-  const course = (
-    courseDetail as { data?: CourseDetailShape } | undefined
-  )?.data;
+  const course = (courseDetail as { data?: CourseDetailShape } | undefined)
+    ?.data;
   const lessonOptions = useMemo(
     () =>
       (course?.sections ?? []).flatMap((s) =>
@@ -160,18 +167,16 @@ export default function LessonCommentsPage() {
   return (
     <div className="space-y-6 p-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">
-          Bình luận bài học
-        </h1>
+        <h1 className="text-3xl font-bold tracking-tight">Thảo luận bài học</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Theo dõi câu hỏi của học viên trong từng bài học và trả lời trực tiếp
+          Theo dõi các luồng trao đổi gắn với từng bài học và trả lời trực tiếp
         </p>
       </div>
 
       {/* Thống kê — bấm vào để lọc theo trạng thái */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard
-          label="Tổng câu hỏi"
+          label="Tổng thảo luận"
           value={stats?.total ?? 0}
           icon={MessageSquare}
           tone="primary"

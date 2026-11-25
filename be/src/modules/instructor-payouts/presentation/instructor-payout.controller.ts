@@ -266,7 +266,7 @@ export class InstructorPayoutController {
     const { data: splits } = await this.revenueSplitRepo.findAll({
       page: 1,
       limit: 10000,
-      instructorId: instructorProfileId,
+      instructorId: userId,
       payoutStatus: 'pending',
     });
 

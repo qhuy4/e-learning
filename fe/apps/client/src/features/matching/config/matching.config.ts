@@ -21,14 +21,6 @@ export const SKILL_CODE_KEYS: Record<string, TranslationKey> = {
     pronunciation: "match.skill.pronunciation",
 };
 
-/** Reliability của tín hiệu ngữ pháp → i18n key. */
-export const RELIABILITY_KEYS: Record<string, TranslationKey> = {
-    high: "match.rel.high",
-    medium: "match.rel.medium",
-    low: "match.rel.low",
-    unavailable: "match.rel.unavailable",
-};
-
 /** CEFR band → i18n key. */
 export const BAND_KEYS: Record<string, TranslationKey> = {
     "pre-A1": "match.band.preA1",
@@ -68,13 +60,6 @@ const AMBER = "bg-accent/20 text-foreground border-accent/60";
 const RED = "bg-destructive/5 text-destructive border-destructive/30";
 const NEUTRAL = "bg-muted/50 text-foreground border-border";
 
-/** Badge màu theo coverage — thấp phải dễ nhận biết. */
-export const coverageBadgeClass = (coverage: number): string => {
-    if (coverage >= 0.75) return EMERALD;
-    if (coverage >= 0.4) return AMBER;
-    return RED;
-};
-
 export const verificationBadgeClass = (ratio: number): string => {
     if (ratio >= 0.999) return EMERALD;
     if (ratio > 0) return AMBER;
@@ -107,13 +92,6 @@ export const levelLabel = (distance: number | null | undefined): string => {
     return `Lệch ${distance} bậc`;
 };
 
-/** Badge màu theo tin cậy tín hiệu ngữ pháp (assessment). */
-export const reliabilityBadgeClass = (value: string): string => {
-    if (value === "high") return EMERALD;
-    if (value === "medium") return AMBER;
-    return NEUTRAL;
-};
-
 /**
  * Ngưỡng hiển thị Grammar Quality Score — HEURISTIC UI TẠM THỜI.
  *
@@ -140,6 +118,8 @@ export const SKILL_STATUS_KEYS: Record<string, TranslationKey> = {
 export const SKILL_SOURCE_KEYS: Record<string, TranslationKey> = {
     quiz: "match.profile.source.quiz",
     writing: "match.profile.source.writing",
+    listening: "match.profile.source.listening",
+    speaking: "match.profile.source.speaking",
 };
 
 /**

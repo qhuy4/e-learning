@@ -144,7 +144,9 @@ export default function SkillProfilePage() {
   return (
     <div className="space-y-6 p-4 sm:p-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Hồ sơ kỹ năng</h1>
+        <h1 className="text-2xl font-bold tracking-tight">
+          Kết quả đánh giá năng lực
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Kết quả được cập nhật tự động từ chứng chỉ đã được quản trị viên duyệt
           và đánh giá hợp lệ của học viên.

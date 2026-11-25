@@ -11,6 +11,9 @@ import {
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enum/role.enum';
 import { GetAdminReviewReportsQuery } from '@/modules/review-reports/application/query/get-admin-review-reports.query';
 import { GetAdminReviewReportDetailQuery } from '@/modules/review-reports/application/query/get-admin-review-report-detail.query';
 import { ResolveReviewReportCommand } from '@/modules/review-reports/application/command/resolve-review-report.command';
@@ -22,7 +25,8 @@ import { ReviewReport } from '@/modules/review-reports/domain/entity/review-repo
 import { AdminReviewReportsPage } from '@/modules/review-reports/domain/repository/review-report.repository';
 
 @Controller('admin/review-reports')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
 export class AdminReviewReportsController {
   constructor(
     private readonly commandBus: CommandBus,

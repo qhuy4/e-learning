@@ -1,20 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { RefreshCw, RotateCcw, Search } from "lucide-react";
+import { RotateCcw, Search } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
 import { Badge } from "@fe/components/ui/badge";
 import { Button } from "@fe/components/ui/button";
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from "@fe/components/ui/card";
-import { Checkbox } from "@fe/components/ui/checkbox";
+import { Pagination } from "@fe/components/common/Pagination";
 import { Skeleton } from "@fe/components/ui/skeleton";
 import { Textarea } from "@fe/components/ui/textarea";
 import { useI18n } from "@/i18n/use-i18n";
 import { AssessmentInsights } from "@/features/matching/components/assessment-insights";
 import { ErrorBanner } from "@/features/matching/components/error-banner";
 import { LearnerProfilePanel } from "@/features/matching/components/learner-profile-panel";
+import { ListeningPanel } from "@/features/matching/components/listening-panel";
+import { SpeakingPanel } from "@/features/matching/components/speaking-panel";
 import {
     InsufficientCard,
     MatchingResultCard,
@@ -22,25 +19,22 @@ import {
 import { QuizPanel } from "@/features/matching/components/quiz-panel";
 import { SelfAssessmentCard } from "@/features/matching/components/self-assessment-card";
 import {
-    DEFAULT_PRIORITY,
-    SkillTargetPicker,
-} from "@/features/matching/components/skill-target-picker";
-import {
     format,
     SKILL_CODE_KEYS,
 } from "@/features/matching/config/matching.config";
 import {
     useAnalyzeWriting,
-    useLatestAssessment,
     useLearnerProfile,
     useMatchFromProfile,
-    useMatching,
     useSkillCatalog,
+    useCourseMatches,
+    useGenerateRoadmap,
+    useRoadmap,
+    useReassessRoadmap,
 } from "@/features/matching/hooks/use-matching";
 import { apiErrorMessage } from "@/features/matching/lib/api-error";
 import { WRITING_PRESETS } from "@/features/matching/presets";
 import {
-    CEFR_OPTIONS,
     type MatchingFromAssessmentResponse,
     type MatchingResponse,
     type WritingAssessment,
@@ -48,6 +42,31 @@ import {
 
 const MIN_TEXT_LENGTH = 80;
 const MAX_TEXT_LENGTH = 4000;
+/** Hai hàng, mỗi hàng tối đa ba giảng viên trên desktop. */
+const MATCH_PAGE_SIZE = 6;
+type MatchStep = 1 | 2 | 3 | 4 | 5 | 6;
+
+function matchStepFromSearch(value: string | null): MatchStep {
+    const parsed = Number(value);
+    return Number.isInteger(parsed) && parsed >= 1 && parsed <= 6
+        ? (parsed as MatchStep)
+        : 1;
+}
+
+function positivePageFromSearch(value: string | null): number {
+    const parsed = Number(value);
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : 1;
+}
+const BAND_SCORE: Record<string, number> = {
+    "pre-A1": 5,
+    A1: 20,
+    A2: 35,
+    B1: 50,
+    B2: 65,
+    C1: 80,
+    C2: 95,
+};
+const ROADMAP_LEVELS = ["A1", "A2", "B1", "B2"] as const;
 
 function useSkillName() {
     const { t } = useI18n();
@@ -72,8 +91,32 @@ function MatchingResults({
 }) {
     const { t } = useI18n();
     const skillName = useSkillName();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const rankedPage = positivePageFromSearch(searchParams.get("teacherPage"));
+    const setRankedPage = (page: number) => {
+        setSearchParams(
+            (current) => {
+                const next = new URLSearchParams(current);
+                if (page <= 1) next.delete("teacherPage");
+                else next.set("teacherPage", String(page));
+                return next;
+            },
+            { replace: true },
+        );
+    };
     const targetWeightTotal =
         result?.targets.reduce((sum, target) => sum + target.weight, 0) ?? 0;
+    const rankedTotalPages = Math.max(
+        1,
+        Math.ceil((result?.ranked.length ?? 0) / MATCH_PAGE_SIZE),
+    );
+    // Clamp như BookingHistoryTab: kết quả mới ngắn hơn → tự lùi về trang hợp lệ.
+    const rankedCurrentPage = Math.min(rankedPage, rankedTotalPages);
+    const rankedStart = (rankedCurrentPage - 1) * MATCH_PAGE_SIZE;
+    const visibleRanked = (result?.ranked ?? []).slice(
+        rankedStart,
+        rankedStart + MATCH_PAGE_SIZE,
+    );
 
     return (
         <section className="flex flex-col gap-5 col-span-2" aria-live="polite">
@@ -198,15 +241,26 @@ function MatchingResults({
                         </div>
                     ) : (
                         <>
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-                                {result.ranked.map((item, index) => (
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-stretch">
+                                {visibleRanked.map((item, index) => (
                                     <MatchingResultCard
                                         key={item.instructor.id}
                                         result={item}
-                                        rank={index + 1}
+                                        rank={rankedStart + index + 1}
                                     />
                                 ))}
                             </div>
+
+                            {result.ranked.length > MATCH_PAGE_SIZE && (
+                                <Pagination
+                                    page={rankedCurrentPage}
+                                    onPageChange={setRankedPage}
+                                    totalPages={rankedTotalPages}
+                                    totalItems={result.ranked.length}
+                                    limit={MATCH_PAGE_SIZE}
+                                    itemLabel="giảng viên"
+                                />
+                            )}
 
                             {result.insufficient.length > 0 && (
                                 <div className="flex flex-col gap-3 mt-2">
@@ -220,7 +274,7 @@ function MatchingResults({
                                             },
                                         )}
                                     </p>
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                                         {result.insufficient.map((item) => (
                                             <InsufficientCard
                                                 key={item.instructor.id}
@@ -251,190 +305,6 @@ function MatchingResults({
     );
 }
 
-function ManualSection() {
-    const { t } = useI18n();
-    const { data: skills, isLoading, isError, refetch } = useSkillCatalog();
-    const matching = useMatching();
-
-    const [selected, setSelected] = useState<Record<number, number>>({});
-    const [studentLevel, setStudentLevel] = useState<string>("");
-    const [requireLevelMatch, setRequireLevelMatch] = useState(false);
-
-    const selectedIds = Object.keys(selected).map(Number);
-    const totalWeight = selectedIds.reduce(
-        (sum, id) => sum + (selected[id] ?? 0),
-        0,
-    );
-    const validationError =
-        selectedIds.length === 0 ? t("match.manual.validateEmpty") : undefined;
-
-    const handleToggle = (skillId: number, checked: boolean) => {
-        setSelected((prev) => {
-            const next = { ...prev };
-            if (checked) next[skillId] = DEFAULT_PRIORITY;
-            else delete next[skillId];
-            return next;
-        });
-    };
-
-    const handleWeightChange = (skillId: number, weight: number) => {
-        setSelected((prev) => ({ ...prev, [skillId]: weight }));
-    };
-
-    const handleSubmit = () => {
-        if (validationError) return;
-        matching.mutate({
-            targets: selectedIds.map((skillId) => ({
-                skillId,
-                weight: selected[skillId],
-            })),
-            level: studentLevel
-                ? { studentLevel, requireLevelMatch }
-                : undefined,
-        });
-    };
-
-    const weightChips = useMemo(
-        () =>
-            selectedIds
-                .map((id) => ({
-                    id,
-                    name: skills?.find((s) => s.id === id)?.name ?? `#${id}`,
-                    pct:
-                        totalWeight > 0
-                            ? ((selected[id] ?? 0) / totalWeight) * 100
-                            : 0,
-                }))
-                .sort((a, b) => b.pct - a.pct),
-        [selectedIds, selected, skills, totalWeight],
-    );
-
-    return (
-        <div>
-            <p className="text-sm leading-relaxed mb-2">
-                {" "}
-                {t("match.results.footnote")}{" "}
-            </p>
-            <div className="flex flex-row gap-6 grid grid-cols-3">
-                <Card className="border-border shadow-sm ">
-                    <CardHeader>
-                        <CardTitle className="text-base font-bold">
-                            {t("match.manual.title")}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex flex-col gap-4">
-                        {isError ? (
-                            <div className="rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-3 flex items-center justify-between gap-3">
-                                <p className="text-sm text-destructive">
-                                    {t("match.manual.skillsError")}
-                                </p>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => refetch()}
-                                    className="rounded-full cursor-pointer"
-                                >
-                                    <RefreshCw size={14} />
-                                    {t("match.error.retry")}
-                                </Button>
-                            </div>
-                        ) : (
-                            <SkillTargetPicker
-                                skills={skills ?? []}
-                                loading={isLoading}
-                                selected={selected}
-                                onToggle={handleToggle}
-                                onWeightChange={handleWeightChange}
-                            />
-                        )}
-
-                        {selectedIds.length > 0 && (
-                            <div className="flex flex-col gap-2">
-                                <p className="text-xs font-bold text-foreground uppercase tracking-wide">
-                                    {t("match.manual.priorityShare")}
-                                </p>
-                                <div className="flex flex-wrap gap-1.5">
-                                    {weightChips.map((chip) => (
-                                        <Badge
-                                            key={chip.id}
-                                            variant="outline"
-                                            className="rounded-full border-primary/40 text-primary"
-                                        >
-                                            {chip.name} · {chip.pct.toFixed(0)}%
-                                        </Badge>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Level sinh viên — optional */}
-                        <div className="flex flex-col gap-2 rounded-xl border border-border bg-muted px-4 py-3">
-                            <p className="text-xs font-bold text-foreground uppercase tracking-wide">
-                                {t("match.manual.levelTitle")}
-                            </p>
-                            <div className="flex flex-wrap gap-1.5">
-                                {CEFR_OPTIONS.map((band) => (
-                                    <button
-                                        key={band}
-                                        type="button"
-                                        onClick={() =>
-                                            setStudentLevel((prev) =>
-                                                prev === band ? "" : band,
-                                            )
-                                        }
-                                        className={`px-3 py-1 rounded-full text-xs font-bold border transition-colors cursor-pointer ${
-                                            studentLevel === band
-                                                ? "bg-primary text-primary-foreground border-primary"
-                                                : "bg-card text-muted-foreground border-border hover:border-input"
-                                        }`}
-                                        aria-pressed={studentLevel === band}
-                                    >
-                                        {band}
-                                    </button>
-                                ))}
-                            </div>
-                            {studentLevel && (
-                                <label className="flex items-center gap-2 mt-1 cursor-pointer">
-                                    <Checkbox
-                                        checked={requireLevelMatch}
-                                        onCheckedChange={(checked) =>
-                                            setRequireLevelMatch(
-                                                checked === true,
-                                            )
-                                        }
-                                    />
-                                    <span className="text-xs text-muted-foreground font-medium">
-                                        {t("match.level.strict")}
-                                    </span>
-                                </label>
-                            )}
-                        </div>
-
-                        <Button
-                            className="w-full rounded-full cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground font-bold"
-                            disabled={!!validationError || matching.isPending}
-                            onClick={handleSubmit}
-                        >
-                            <Search size={16} />
-                            {matching.isPending
-                                ? t("match.manual.submitting")
-                                : t("match.manual.submit")}
-                        </Button>
-                    </CardContent>
-                </Card>
-
-                <MatchingResults
-                    result={matching.data ?? null}
-                    pending={matching.isPending}
-                    errorMessage={apiErrorMessage(matching.error)}
-                    onRetry={handleSubmit}
-                    emptyHint={t("match.results.hintManual")}
-                />
-            </div>
-        </div>
-    );
-}
-
 const PIPELINE_STEPS = [
     {
         n: 1,
@@ -462,6 +332,9 @@ const WIZARD_STEPS = [
     { n: 1, key: "match.wizard.step1" },
     { n: 2, key: "match.wizard.step2" },
     { n: 3, key: "match.wizard.step3" },
+    { n: 4, key: "match.wizard.step4" },
+    { n: 5, key: "match.wizard.step5" },
+    { n: 6, key: "match.wizard.step7" },
 ] as const;
 
 function SectionHeader({
@@ -498,26 +371,57 @@ function SectionHeader({
 
 export default function SkillMatchPage() {
     const { t } = useI18n();
+    const courseSkillName = useSkillName();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [text, setText] = useState("");
-    const [requireLevelMatch, setRequireLevelMatch] = useState(true);
+    const [requireLevelMatch, setRequireLevelMatch] = useState(
+        () => searchParams.get("level") === "exact",
+    );
+    const [priceMode, setPriceMode] = useState<"ALL" | "FREE" | "PAID">(() => {
+        const value = searchParams.get("price");
+        return value === "FREE" || value === "PAID" ? value : "ALL";
+    });
+    const [minHourlyRate, setMinHourlyRate] = useState(
+        () => searchParams.get("minPrice") ?? "",
+    );
+    const [maxHourlyRate, setMaxHourlyRate] = useState(
+        () => searchParams.get("maxPrice") ?? "",
+    );
     const [assessment, setAssessment] = useState<WritingAssessment | null>(
         null,
     );
 
-    // --- Wizard 3 bước: Self-assessment → Assessment → Teachers --------------
-    const [step, setStep] = useState<1 | 2 | 3>(1);
-    const [tab, setTab] = useState<"quiz" | "writing">("quiz");
+    // self → quiz → writing → listening → speaking → teachers
+    const step = matchStepFromSearch(searchParams.get("step"));
+    const setStep = (nextStep: MatchStep) => {
+        setSearchParams(
+            (current) => {
+                const next = new URLSearchParams(current);
+                next.set("step", String(nextStep));
+                return next;
+            },
+            { replace: true },
+        );
+    };
+    const [selfBand, setSelfBand] = useState<string | null>(null);
+    const [sessionQuizBand, setSessionQuizBand] = useState<string | null>(null);
+    const [writingExpanded, setWritingExpanded] = useState(false);
     const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
     const [quizIndex, setQuizIndex] = useState(0);
     // Matching tự chạy tối đa 1 lần cho mỗi lần có bằng chứng mới (không loop).
     const autoMatched = useRef(false);
+    const initialResumeChecked = useRef(false);
 
     const analyze = useAnalyzeWriting();
-    const latest = useLatestAssessment();
     const profile = useLearnerProfile();
     const match = useMatchFromProfile();
+    const catalog = useSkillCatalog();
+    const courseMatches = useCourseMatches(step === 6);
+    const roadmap = useRoadmap(step === 6);
+    const generateRoadmap = useGenerateRoadmap();
+    const reassessRoadmap = useReassessRoadmap();
 
-    const shownAssessment = assessment ?? latest.data ?? null;
+    const shownAssessment = assessment;
     const textError =
         text.length > 0 && text.trim().length < MIN_TEXT_LENGTH
             ? format(t("match.s1.minError"), { n: MIN_TEXT_LENGTH })
@@ -526,21 +430,143 @@ export default function SkillMatchPage() {
               : undefined;
 
     const learnerProfile = profile.data ?? null;
-    const canFind = !!learnerProfile?.skills.some(
-        (s) => s.status === "assessed",
+    const selectedBand =
+        selfBand ?? learnerProfile?.selfAssessment?.band ?? null;
+    const quizBand = sessionQuizBand ?? learnerProfile?.quiz?.band ?? null;
+    const writingRecommended =
+        ["B2", "C1", "C2"].includes(selectedBand ?? "") ||
+        ["B2", "C1", "C2"].includes(quizBand ?? "");
+    const showWriting = writingExpanded || writingRecommended;
+    const speakingOptional = !["pre-A1", "A1", "A2", "B1"].includes(
+        selectedBand ?? "",
+    );
+    const goalTargets = useMemo(() => {
+        const skillIdByCode = new Map(
+            (catalog.data ?? []).map((skill) => [skill.code, skill.id]),
+        );
+        return (learnerProfile?.skills ?? [])
+            .filter((skill) => skill.status === "assessed")
+            .map((skill) => ({
+                skillId: skillIdByCode.get(skill.code),
+                score:
+                    skill.scorePct ??
+                    skill.qualityScore ??
+                    (skill.band ? BAND_SCORE[skill.band] : undefined),
+            }))
+            .filter(
+                (skill): skill is { skillId: number; score: number } =>
+                    skill.skillId != null && skill.score != null,
+            )
+            .sort((a, b) => a.score - b.score || a.skillId - b.skillId)
+            .slice(0, 3)
+            .map(({ skillId }) => ({ skillId, weight: 1 }));
+    }, [catalog.data, learnerProfile?.skills]);
+    const canFind =
+        !!learnerProfile?.quiz?.band &&
+        (learnerProfile.quiz.total ?? 0) >= 15 &&
+        goalTargets.length >= 1;
+    const hasSavedAssessment = Boolean(
+        learnerProfile?.quiz ||
+        learnerProfile?.writing ||
+        learnerProfile?.listening ||
+        learnerProfile?.speaking,
     );
 
     const busy = analyze.isPending || match.isPending;
-    // Bước 3: tự tìm giảng viên một lần khi đã có bằng chứng dùng được.
+    const priceFilter = useMemo(
+        () => ({
+            priceMode,
+            ...(priceMode === "PAID" && minHourlyRate !== ""
+                ? { minHourlyRate: Number(minHourlyRate) }
+                : {}),
+            ...(priceMode === "PAID" && maxHourlyRate !== ""
+                ? { maxHourlyRate: Number(maxHourlyRate) }
+                : {}),
+        }),
+        [maxHourlyRate, minHourlyRate, priceMode],
+    );
+
+    // URL là nguồn trạng thái điều hướng: mở hồ sơ/khóa học rồi Back vẫn giữ
+    // đúng bước kết quả và bộ lọc đã dùng để tạo danh sách.
     useEffect(() => {
-        if (step !== 3 || !canFind || autoMatched.current) return;
+        setSearchParams(
+            (current) => {
+                const next = new URLSearchParams(current);
+                if (requireLevelMatch) next.set("level", "exact");
+                else next.delete("level");
+                if (priceMode === "ALL") next.delete("price");
+                else next.set("price", priceMode);
+                if (minHourlyRate) next.set("minPrice", minHourlyRate);
+                else next.delete("minPrice");
+                if (maxHourlyRate) next.set("maxPrice", maxHourlyRate);
+                else next.delete("maxPrice");
+                return next;
+            },
+            { replace: true },
+        );
+    }, [
+        maxHourlyRate,
+        minHourlyRate,
+        priceMode,
+        requireLevelMatch,
+        setSearchParams,
+    ]);
+
+    // Khi route được mount lại ở bước mặc định, tiếp tục từ dữ liệu đã lưu thay
+    // vì bắt học viên làm lại. Sau lần khôi phục này, họ vẫn có thể chủ động
+    // bấm về Bước 1 trong cùng phiên để đánh giá lại.
+    useEffect(() => {
+        if (initialResumeChecked.current) {
+            return;
+        }
+        const requestedStep = matchStepFromSearch(searchParams.get("step"));
+        if (searchParams.has("step") && requestedStep !== 1) {
+            initialResumeChecked.current = true;
+            return;
+        }
+        if (profile.isLoading || catalog.isLoading) return;
+        initialResumeChecked.current = true;
+
+        const resumeStep: MatchStep = hasSavedAssessment
+            ? 6
+            : learnerProfile?.selfAssessment
+              ? 2
+              : 1;
+        if (resumeStep === 1) return;
+        setSearchParams(
+            (current) => {
+                const next = new URLSearchParams(current);
+                next.set("step", String(resumeStep));
+                return next;
+            },
+            { replace: true },
+        );
+    }, [
+        catalog.isLoading,
+        hasSavedAssessment,
+        learnerProfile?.selfAssessment,
+        profile.isLoading,
+        searchParams,
+        setSearchParams,
+    ]);
+    // Tự tìm giảng viên theo tối đa 3 kỹ năng yếu nhất đã đo được.
+    useEffect(() => {
+        if (step !== 6 || !canFind || autoMatched.current) return;
         autoMatched.current = true;
-        match.mutate({ requireLevelMatch });
-    }, [step, canFind, match, requireLevelMatch]);
+        match.mutate({
+            targets: goalTargets,
+            requireLevelMatch,
+            ...priceFilter,
+        });
+    }, [step, canFind, goalTargets, match, requireLevelMatch, priceFilter]);
 
     const handleFind = () => {
         if (!canFind || match.isPending) return;
-        match.mutate({ requireLevelMatch });
+        match.mutate({
+            targets: goalTargets,
+            requireLevelMatch,
+            ...priceFilter,
+        });
     };
 
     const handleAnalyze = async () => {
@@ -550,13 +576,14 @@ export default function SkillMatchPage() {
             setAssessment(data);
             // Bằng chứng mới → cho phép auto-match chạy lại ở Bước 3.
             autoMatched.current = false;
-            setStep(3);
+            setStep(4);
         } catch {
             /* errors surfaced via mutation state */
         }
     };
 
-    const handleQuizDone = () => {
+    const handleQuizDone = (attempt: { band: string | null }) => {
+        setSessionQuizBand(attempt.band);
         autoMatched.current = false;
         setStep(3);
     };
@@ -570,6 +597,14 @@ export default function SkillMatchPage() {
     const matchError = apiErrorMessage(match.error);
     const analyzeError = apiErrorMessage(analyze.error);
     const profileError = apiErrorMessage(profile.error);
+    const roadmapCurrentLevelIndex = ROADMAP_LEVELS.indexOf(
+        (roadmap.data?.currentLevel ?? "") as (typeof ROADMAP_LEVELS)[number],
+    );
+    const roadmapRemainingStages =
+        roadmap.data?.stages.filter(
+            (stage) =>
+                stage.status !== "COMPLETED" && stage.status !== "SKIPPED",
+        ).length ?? 0;
 
     return (
         <div className="min-h-screen bg-m3-surface">
@@ -632,10 +667,11 @@ export default function SkillMatchPage() {
                                     <button
                                         type="button"
                                         onClick={() => setStep(wizardStep.n)}
+                                        disabled={wizardStep.n > step}
                                         aria-current={
                                             active ? "step" : undefined
                                         }
-                                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-bold border transition-colors cursor-pointer ${
+                                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-bold border transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ${
                                             active
                                                 ? "bg-primary text-primary-foreground border-primary"
                                                 : done
@@ -654,7 +690,7 @@ export default function SkillMatchPage() {
                                         </span>
                                         {t(wizardStep.key)}
                                     </button>
-                                    {wizardStep.n < 3 && (
+                                    {wizardStep.n < 6 && (
                                         <span
                                             className="text-muted-foreground"
                                             aria-hidden
@@ -678,12 +714,15 @@ export default function SkillMatchPage() {
                         />
                         <SelfAssessmentCard
                             saved={learnerProfile?.selfAssessment ?? null}
-                            onContinue={() => setStep(2)}
+                            onContinue={(band) => {
+                                setSelfBand(band);
+                                setStep(2);
+                            }}
                         />
                     </section>
                 )}
 
-                {/* BƯỚC 2 — ASSESSMENT (quiz từ vựng | writing — giữ nguyên) */}
+                {/* BƯỚC 2 — QUIZ TỪ VỰNG (bắt buộc) */}
                 {step === 2 && (
                     <section className="w-full bg-card rounded-lg p-5 lg:p-6 shadow-sm border border-border">
                         <SectionHeader
@@ -692,42 +731,60 @@ export default function SkillMatchPage() {
                             subtitle={t("match.quiz.subtitle")}
                         />
 
-                        {/* Chọn path: Quiz (mặc định) | Writing (phân tích như cũ) */}
-                        <div className="flex flex-wrap gap-2 mb-5">
-                            <button
-                                type="button"
-                                onClick={() => setTab("quiz")}
-                                aria-pressed={tab === "quiz"}
-                                className={`px-4 py-2 rounded-full text-[13px] font-bold border transition-colors cursor-pointer ${
-                                    tab === "quiz"
-                                        ? "bg-primary text-primary-foreground border-primary"
-                                        : "bg-card text-muted-foreground border-border hover:border-input"
-                                }`}
-                            >
-                                {t("match.quiz.tabQuiz")}
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setTab("writing")}
-                                aria-pressed={tab === "writing"}
-                                className={`px-4 py-2 rounded-full text-[13px] font-bold border transition-colors cursor-pointer ${
-                                    tab === "writing"
-                                        ? "bg-primary text-primary-foreground border-primary"
-                                        : "bg-card text-muted-foreground border-border hover:border-input"
-                                }`}
-                            >
-                                {t("match.quiz.tabWriting")}
-                            </button>
-                        </div>
+                        <QuizPanel
+                            answers={quizAnswers}
+                            onAnswersChange={setQuizAnswers}
+                            index={quizIndex}
+                            onIndexChange={setQuizIndex}
+                            onDone={handleQuizDone}
+                        />
 
-                        {tab === "quiz" ? (
-                            <QuizPanel
-                                answers={quizAnswers}
-                                onAnswersChange={setQuizAnswers}
-                                index={quizIndex}
-                                onIndexChange={setQuizIndex}
-                                onDone={handleQuizDone}
-                            />
+                        <div className="flex flex-wrap gap-3 mt-5 pt-4 border-t border-border">
+                            <Button
+                                variant="outline"
+                                className="rounded-full font-semibold cursor-pointer"
+                                onClick={() => setStep(1)}
+                            >
+                                {t("match.wizard.back")}
+                            </Button>
+                        </div>
+                    </section>
+                )}
+
+                {/* BƯỚC 3 — WRITING (tuỳ chọn) */}
+                {step === 3 && (
+                    <section className="w-full bg-card rounded-lg p-5 lg:p-6 shadow-sm border border-border">
+                        <SectionHeader
+                            area={t("match.writing.area")}
+                            title={t("match.writing.title")}
+                            subtitle={
+                                writingRecommended
+                                    ? t("match.writing.recommended")
+                                    : t("match.writing.optional")
+                            }
+                        />
+
+                        {!showWriting ? (
+                            <div className="rounded-lg border border-border bg-muted px-5 py-4 flex flex-col gap-4">
+                                <p className="text-sm text-muted-foreground">
+                                    {t("match.writing.hidden")}
+                                </p>
+                                <div className="flex flex-wrap gap-3">
+                                    <Button
+                                        variant="outline"
+                                        className="rounded-full font-semibold cursor-pointer"
+                                        onClick={() => setWritingExpanded(true)}
+                                    >
+                                        {t("match.writing.expand")}
+                                    </Button>
+                                    <Button
+                                        className="rounded-full font-bold cursor-pointer"
+                                        onClick={() => setStep(4)}
+                                    >
+                                        {t("match.writing.skip")}
+                                    </Button>
+                                </div>
+                            </div>
                         ) : (
                             <div className="flex flex-col gap-4 rounded-lg border border-border bg-muted/40 p-4 md:p-5">
                                 <div>
@@ -795,7 +852,7 @@ export default function SkillMatchPage() {
                                     </p>
                                 </div>
 
-                                {/* CTA — phân tích writing rồi sang Bước 3 (tự match) */}
+                                {/* CTA — phân tích writing rồi sang chọn mục tiêu */}
                                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
                                     <Button
                                         className="w-full sm:w-auto h-auto px-6 py-3.5 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-base rounded-full cursor-pointer"
@@ -810,16 +867,14 @@ export default function SkillMatchPage() {
                                             ? t("match.s1.ctaAnalyzing")
                                             : t("match.s1.cta")}
                                     </Button>
-                                    {shownAssessment && (
-                                        <Button
-                                            variant="outline"
-                                            className="w-full sm:w-auto h-auto px-5 py-3.5 font-semibold text-base rounded-full cursor-pointer"
-                                            disabled={busy}
-                                            onClick={() => setStep(3)}
-                                        >
-                                            {t("match.wizard.next")}
-                                        </Button>
-                                    )}
+                                    <Button
+                                        variant="outline"
+                                        className="w-full sm:w-auto h-auto px-5 py-3.5 font-semibold text-base rounded-full cursor-pointer"
+                                        disabled={busy}
+                                        onClick={() => setStep(4)}
+                                    >
+                                        {t("match.writing.skip")}
+                                    </Button>
                                     <Button
                                         variant="outline"
                                         className="w-full sm:w-auto h-auto px-5 py-3.5 font-semibold text-base rounded-full cursor-pointer"
@@ -836,51 +891,82 @@ export default function SkillMatchPage() {
                                         {analyzeError}
                                     </p>
                                 )}
-                                {latest.isLoading && !assessment && (
-                                    <Skeleton className="h-16 rounded-xl" />
-                                )}
-                                {!shownAssessment &&
-                                    latest.isError &&
-                                    !latest.isLoading && (
-                                        <p className="text-sm text-destructive font-medium">
-                                            {t("match.s1.latestError")}
-                                        </p>
-                                    )}
-                                {!shownAssessment &&
-                                    latest.data === null &&
-                                    !latest.isLoading &&
-                                    !latest.isError && (
-                                        <p className="text-sm text-muted-foreground">
-                                            {t("match.s1.noAssessment")}
-                                        </p>
-                                    )}
                             </div>
                         )}
 
-                        {/* Điều hướng bước */}
                         <div className="flex flex-wrap gap-3 mt-5 pt-4 border-t border-border">
                             <Button
                                 variant="outline"
                                 className="rounded-full font-semibold cursor-pointer"
-                                onClick={() => setStep(1)}
+                                onClick={() => setStep(2)}
                             >
                                 {t("match.wizard.back")}
-                            </Button>
-                            <Button
-                                variant="outline"
-                                className="rounded-full font-semibold cursor-pointer"
-                                onClick={() => setStep(3)}
-                            >
-                                {t("match.wizard.next")}
                             </Button>
                         </div>
                     </section>
                 )}
 
-                {/* BƯỚC 3 — HỒ SƠ & MATCHING */}
-                {step === 3 && (
+                {/* BƯỚC 4 — LISTENING (tuỳ chọn) */}
+                {step === 4 && (
+                    <section className="w-full bg-card rounded-lg p-5 lg:p-6 shadow-sm border border-border">
+                        <SectionHeader
+                            area={t("match.listening.area")}
+                            title={t("match.listening.title")}
+                            subtitle={t("match.listening.subtitle")}
+                        />
+                        <ListeningPanel
+                            onDone={() => setStep(5)}
+                            onSkip={() => setStep(5)}
+                        />
+                        <div className="flex flex-wrap gap-3 mt-5 pt-4 border-t border-border">
+                            <Button
+                                variant="outline"
+                                className="rounded-full font-semibold cursor-pointer"
+                                onClick={() => setStep(3)}
+                            >
+                                {t("match.wizard.back")}
+                            </Button>
+                        </div>
+                    </section>
+                )}
+
+                {/* BƯỚC 5 — SPEAKING (tuỳ chọn) */}
+                {step === 5 && (
+                    <section className="w-full bg-card rounded-lg p-5 lg:p-6 shadow-sm border border-border">
+                        <SectionHeader
+                            area={t("match.speaking.area")}
+                            title={t(
+                                speakingOptional
+                                    ? "match.speaking.titleOptional"
+                                    : "match.speaking.titleGuided",
+                            )}
+                            subtitle={t(
+                                speakingOptional
+                                    ? "match.speaking.subtitleOptional"
+                                    : "match.speaking.subtitleGuided",
+                            )}
+                        />
+                        <SpeakingPanel
+                            onDone={() => setStep(6)}
+                            onSkip={() => setStep(6)}
+                            allowSkip={speakingOptional}
+                        />
+                        <div className="flex flex-wrap gap-3 mt-5 pt-4 border-t border-border">
+                            <Button
+                                variant="outline"
+                                className="rounded-full font-semibold cursor-pointer"
+                                onClick={() => setStep(4)}
+                            >
+                                {t("match.wizard.back")}
+                            </Button>
+                        </div>
+                    </section>
+                )}
+
+                {/* BƯỚC 6 — HỒ SƠ & MATCHING */}
+                {step === 6 && (
                     <>
-                        {/* Kết quả bài viết — hiển thị trước hồ sơ để giữ đúng thứ tự Khu vực 02 → 03. */}
+                        {/* Kết quả bài viết — hiển thị trước hồ sơ để giữ đúng thứ tự Bước 02 → 03. */}
                         {shownAssessment && (
                             <AssessmentInsights assessment={shownAssessment} />
                         )}
@@ -902,19 +988,343 @@ export default function SkillMatchPage() {
                                 canFind={canFind}
                                 requireLevelMatch={requireLevelMatch}
                                 onRequireLevelMatchChange={setRequireLevelMatch}
+                                priceMode={priceMode}
+                                onPriceModeChange={setPriceMode}
+                                minHourlyRate={minHourlyRate}
+                                maxHourlyRate={maxHourlyRate}
+                                onMinHourlyRateChange={setMinHourlyRate}
+                                onMaxHourlyRateChange={setMaxHourlyRate}
                             />
                             <div className="flex flex-wrap gap-3 mt-5 pt-4 border-t border-border">
                                 <Button
                                     variant="outline"
                                     className="rounded-full font-semibold cursor-pointer"
-                                    onClick={() => setStep(2)}
+                                    onClick={() => setStep(5)}
                                 >
                                     {t("match.wizard.back")}
                                 </Button>
+                                {roadmap.data &&
+                                    roadmap.data.status !== "COMPLETED" && (
+                                        <Button
+                                            disabled={
+                                                reassessRoadmap.isPending ||
+                                                roadmap.data
+                                                    .reassessmentState ===
+                                                    "LOCKED_STAGE"
+                                            }
+                                            onClick={() =>
+                                                roadmap.data
+                                                    ?.reassessmentState ===
+                                                "NEEDS_ASSESSMENT"
+                                                    ? setStep(2)
+                                                    : reassessRoadmap.mutate()
+                                            }
+                                        >
+                                            {reassessRoadmap.isPending
+                                                ? t("match.roadmap.reassessing")
+                                                : roadmap.data
+                                                        .reassessmentState ===
+                                                    "NEEDS_ASSESSMENT"
+                                                  ? t(
+                                                        "match.roadmap.takeReassessment",
+                                                    )
+                                                  : t("match.roadmap.reassess")}
+                                        </Button>
+                                    )}
                             </div>
                         </section>
 
-                        {/* 03 TEACHER MATCHES */}
+                        <section className="w-full bg-card rounded-lg p-5 lg:p-6 shadow-sm border border-border">
+                            <div className="flex flex-wrap items-start justify-between gap-3">
+                                <SectionHeader
+                                    area={t("match.roadmap.area")}
+                                    title={t("match.roadmap.title")}
+                                    subtitle={t("match.roadmap.subtitle")}
+                                    compact
+                                />
+                                {roadmap.data?.status !== "COMPLETED" && (
+                                    <Button
+                                        variant={
+                                            roadmap.data ? "outline" : "default"
+                                        }
+                                        disabled={generateRoadmap.isPending}
+                                        onClick={() => generateRoadmap.mutate()}
+                                    >
+                                        {generateRoadmap.isPending
+                                            ? t("match.roadmap.generating")
+                                            : roadmap.data
+                                              ? t("match.roadmap.regenerate")
+                                              : t("match.roadmap.generate")}
+                                    </Button>
+                                )}
+                            </div>
+                            {roadmap.data ? (
+                                <div className="flex flex-col gap-3">
+                                    <p className="text-sm font-semibold text-foreground">
+                                        {roadmap.data.currentLevel} →{" "}
+                                        {roadmap.data.targetLevel} ·{" "}
+                                        {t("match.roadmap.revision")}{" "}
+                                        {roadmap.data.revision}
+                                    </p>
+                                    <div className="rounded-xl border border-border bg-muted/30 p-4">
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            {ROADMAP_LEVELS.map(
+                                                (level, index) => (
+                                                    <div
+                                                        key={level}
+                                                        className="flex items-center gap-2"
+                                                    >
+                                                        <Badge
+                                                            variant={
+                                                                roadmapCurrentLevelIndex >=
+                                                                index
+                                                                    ? "default"
+                                                                    : "outline"
+                                                            }
+                                                        >
+                                                            {level}
+                                                        </Badge>
+                                                        {index <
+                                                            ROADMAP_LEVELS.length -
+                                                                1 && (
+                                                            <span
+                                                                className="text-muted-foreground"
+                                                                aria-hidden
+                                                            >
+                                                                →
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                ),
+                                            )}
+                                        </div>
+                                        <p className="mt-3 text-xs text-muted-foreground">
+                                            {format(
+                                                t(
+                                                    "match.roadmap.remainingSummary",
+                                                ),
+                                                {
+                                                    current:
+                                                        roadmap.data
+                                                            .currentLevel,
+                                                    target: roadmap.data
+                                                        .targetLevel,
+                                                    n: roadmapRemainingStages,
+                                                },
+                                            )}
+                                        </p>
+                                    </div>
+                                    {roadmap.data.lastReassessment && (
+                                        <div className="rounded-lg border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
+                                            <p className="font-semibold text-foreground">
+                                                {t(
+                                                    "match.roadmap.lastAdjustment",
+                                                )}
+                                            </p>
+                                            <p>
+                                                {
+                                                    roadmap.data
+                                                        .lastReassessment
+                                                        .previousLevel
+                                                }{" "}
+                                                →{" "}
+                                                {
+                                                    roadmap.data
+                                                        .lastReassessment
+                                                        .assessedLevel
+                                                }{" "}
+                                                · {t("match.roadmap.preserved")}{" "}
+                                                {
+                                                    roadmap.data
+                                                        .lastReassessment
+                                                        .preservedStages
+                                                }{" "}
+                                                · {t("match.roadmap.replaced")}{" "}
+                                                {
+                                                    roadmap.data
+                                                        .lastReassessment
+                                                        .replacedStages
+                                                }{" "}
+                                                · {t("match.roadmap.generated")}{" "}
+                                                {
+                                                    roadmap.data
+                                                        .lastReassessment
+                                                        .generatedStages
+                                                }
+                                            </p>
+                                        </div>
+                                    )}
+                                    {roadmap.data.status === "COMPLETED" && (
+                                        <p className="text-sm font-semibold text-emerald-600">
+                                            {t("match.roadmap.targetReached")}
+                                        </p>
+                                    )}
+                                    {roadmap.data.status === "ACTIVE" &&
+                                        roadmap.data.reassessmentState ===
+                                            "LOCKED_STAGE" && (
+                                            <p className="text-xs text-muted-foreground">
+                                                {t(
+                                                    "match.roadmap.reassessLocked",
+                                                )}
+                                            </p>
+                                        )}
+                                    {roadmap.data.reassessmentState ===
+                                        "NEEDS_ASSESSMENT" && (
+                                        <p className="text-xs text-muted-foreground">
+                                            {t(
+                                                "match.roadmap.assessmentRequired",
+                                            )}
+                                        </p>
+                                    )}
+                                    {roadmap.data.stages.length ? (
+                                        roadmap.data.stages.map((stage) => (
+                                            <div
+                                                key={stage.id}
+                                                className={`grid gap-3 rounded-xl border border-border p-4 sm:grid-cols-[auto_1fr_auto] sm:items-center ${stage.status === "SKIPPED" ? "opacity-50" : ""}`}
+                                            >
+                                                <div className="flex flex-col gap-1">
+                                                    <Badge variant="secondary">
+                                                        {stage.position}
+                                                    </Badge>
+                                                    <span className="text-[10px] font-bold text-muted-foreground">
+                                                        {t(
+                                                            `match.roadmap.status.${stage.status}`,
+                                                        )}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-foreground">
+                                                        {stage.fromLevel} →{" "}
+                                                        {stage.toLevel}
+                                                    </p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {stage.course
+                                                            ? stage.course.title
+                                                            : t(
+                                                                  "match.roadmap.missingCourse",
+                                                              )}
+                                                        {stage.instructor
+                                                            ? ` · ${stage.instructor.name}`
+                                                            : ""}
+                                                    </p>
+                                                </div>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {stage.course && (
+                                                        <Link
+                                                            to={`/courses/${stage.course.slug}`}
+                                                        >
+                                                            <Button
+                                                                size="sm"
+                                                                variant="outline"
+                                                            >
+                                                                {t(
+                                                                    "match.courses.view",
+                                                                )}
+                                                            </Button>
+                                                        </Link>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-sm text-muted-foreground">
+                                            {t("match.roadmap.targetReached")}
+                                        </p>
+                                    )}
+                                </div>
+                            ) : (
+                                <p className="text-sm text-muted-foreground">
+                                    {t("match.roadmap.empty")}
+                                </p>
+                            )}
+                        </section>
+
+                        <section className="w-full bg-card rounded-lg p-5 lg:p-6 shadow-sm border border-border">
+                            <SectionHeader
+                                area={t("match.courses.area")}
+                                title={t("match.courses.title")}
+                                subtitle={t("match.courses.subtitle")}
+                                compact
+                            />
+                            {courseMatches.isLoading ? (
+                                <Skeleton className="h-40 rounded-xl" />
+                            ) : courseMatches.data?.courses.length ? (
+                                <div className="grid gap-4 md:grid-cols-2">
+                                    {courseMatches.data.courses.map(
+                                        (course) => (
+                                            <article
+                                                key={course.id}
+                                                className="flex flex-col gap-3 rounded-xl border border-border bg-muted/30 p-4"
+                                            >
+                                                <div className="flex items-start justify-between gap-3">
+                                                    <div>
+                                                        <p className="font-bold text-foreground">
+                                                            {course.title}
+                                                        </p>
+                                                        <p className="mt-1 text-xs text-muted-foreground">
+                                                            {
+                                                                course
+                                                                    .instructor
+                                                                    .name
+                                                            }{" "}
+                                                            ·{" "}
+                                                            {
+                                                                course.cefrLevelStart
+                                                            }
+                                                            –
+                                                            {
+                                                                course.cefrLevelEnd
+                                                            }
+                                                        </p>
+                                                    </div>
+                                                    <Badge variant="secondary">
+                                                        {course.matchScore}%
+                                                    </Badge>
+                                                </div>
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {course.matchedSkills.map(
+                                                        (skill) => (
+                                                            <Badge
+                                                                key={skill}
+                                                                variant="outline"
+                                                            >
+                                                                {courseSkillName(
+                                                                    skill,
+                                                                )}
+                                                            </Badge>
+                                                        ),
+                                                    )}
+                                                </div>
+                                                <div className="mt-auto flex items-center justify-between gap-3">
+                                                    <span className="text-sm font-bold text-foreground">
+                                                        {course.price === 0
+                                                            ? t(
+                                                                  "match.courses.free",
+                                                              )
+                                                            : `${course.price.toLocaleString("vi-VN")}₫`}
+                                                    </span>
+                                                    <Link
+                                                        to={`/courses/${course.slug}`}
+                                                    >
+                                                        <Button size="sm">
+                                                            {t(
+                                                                "match.courses.view",
+                                                            )}
+                                                        </Button>
+                                                    </Link>
+                                                </div>
+                                            </article>
+                                        ),
+                                    )}
+                                </div>
+                            ) : (
+                                <p className="rounded-lg border border-dashed border-border p-5 text-sm text-muted-foreground">
+                                    {t("match.courses.empty")}
+                                </p>
+                            )}
+                        </section>
+
+                        {/* 06 TEACHER MATCHES */}
                         <section className="w-full">
                             <SectionHeader
                                 area={t("match.s3.area")}
@@ -941,16 +1351,6 @@ export default function SkillMatchPage() {
                         </section>
                     </>
                 )}
-
-                {/* 04 MANUAL (secondary) */}
-                <section className="w-full border-t border-border pt-8">
-                    <SectionHeader
-                        area={t("match.manual.sectionArea")}
-                        title={t("match.manual.sectionTitle")}
-                        subtitle={t("match.manual.sectionSub")}
-                    />
-                    <ManualSection />
-                </section>
             </div>
         </div>
     );

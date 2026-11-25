@@ -23,6 +23,9 @@ export class CourseDtoMapper {
       ? await resolveSignedUrl(courseOrEntity.thumbnail, storage)
       : courseOrEntity.thumbnail;
     dto.level = Number(courseOrEntity.level);
+    dto.cefrLevelStart = courseOrEntity.cefrLevelStart;
+    dto.cefrLevelEnd = courseOrEntity.cefrLevelEnd;
+    dto.skillCodes = courseOrEntity.skillCodes;
     dto.price = Number(courseOrEntity.price);
     dto.publishedAt = courseOrEntity.publishedAt;
     dto.createdAt = courseOrEntity.createdAt;

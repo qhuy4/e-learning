@@ -11,6 +11,7 @@ import {
 import { buildCertificateLanguageEvidence } from '@/modules/skill-profiling/domain/utils/certificate-language-evidence';
 import { SKILL_AGGREGATION_CONFIG } from '../skill-aggregation.config';
 import { matchTopicSkill } from './skill-keywords';
+import { studentOutcomeScore } from '../../domain/utils/student-outcome-score';
 
 interface DesiredEvidence {
   skillCode: string;
@@ -71,12 +72,14 @@ interface CertificateRow {
   ocr_extracted_data: CertificateOcrData | null;
 }
 
-interface EnrollmentRow {
-  id: string | number;
-  progress: number | string | null;
-  last_accessed_at: Date | null;
-  enrolled_at: Date;
+interface StudentOutcomeRow {
+  enrollment_id: string | number;
+  reassessment_id: string | number;
+  student_id: string | number;
   course_id: string | number;
+  previous_level: string;
+  assessed_level: string;
+  reassessed_at: Date;
 }
 
 interface SkillIdRow {
@@ -96,8 +99,6 @@ interface ExistingRow {
   source_id: string | null;
   metadata: { content_hash?: string } | null;
 }
-
-const MS_PER_YEAR = 365 * 24 * 60 * 60 * 1000;
 
 const clamp3 = (n: number): number =>
   Math.min(1, Math.max(0, Math.round(n * 1000) / 1000));
@@ -126,7 +127,8 @@ export class SkillExtractorService {
   constructor(private readonly dataSource: DataSource) {}
 
   /**
-   * MVP: chỉ thu thập chứng chỉ đã duyệt và review từ học viên hợp lệ.
+   * MVP: thu thập chứng chỉ đã duyệt, review đủ điều kiện và kết quả học tập
+   * pre/post đã được khóa bằng roadmap completion + reassessment mới.
    * vào instructor_skill_evidences theo kiểu supersede-on-write:
    *  - chỉ đụng tới hàng có metadata.extracted = true (hàng tự khai
    *    của giảng viên không bị extractor xóa/sửa),
@@ -142,12 +144,20 @@ export class SkillExtractorService {
     if (!userRows[0]) return { created: 0, superseded: 0, kept: 0 };
     const userId = Number(userRows[0].user_id);
 
-    const [reviews, certificates] = await Promise.all([
+    const [courses, reviews, outcomes, certificates] = await Promise.all([
+      this.loadCourses(userId),
       this.loadReviews(userId),
+      this.loadStudentOutcomes(userId),
       this.loadCertificates(userId),
     ]);
 
-    const desired = this.buildDesired([], reviews, [], certificates, []);
+    const desired = this.buildDesired(
+      courses,
+      reviews,
+      [],
+      certificates,
+      outcomes,
+    );
 
     return this.sync(profileId, desired);
   }
@@ -182,8 +192,50 @@ export class SkillExtractorService {
            SELECT 1 FROM enrollments e
            WHERE e.user_id = r.user_id AND e.course_id = r.course_id
              AND e.deleted_at IS NULL AND e.status IN (1, 2)
+             AND e.progress = 100 AND e.completed_at IS NOT NULL
          )
+         AND r.user_id <> c.instructor_id
        ORDER BY r.user_id, r.course_id, r.updated_at DESC, r.created_at DESC, r.id DESC`,
+      [userId],
+    );
+  }
+
+  /**
+   * One outcome belongs to the latest completed roadmap stage before a
+   * reassessment. Both levels must come from quiz/writing, never self-report.
+   */
+  private loadStudentOutcomes(userId: number) {
+    return this.dataSource.query<StudentOutcomeRow[]>(
+      `SELECT e.id AS enrollment_id, rr.id AS reassessment_id,
+              rr.user_id AS student_id, stage.course_id,
+              rr.previous_level, rr.assessed_level,
+              rr.created_at AS reassessed_at
+       FROM roadmap_reassessments rr
+       JOIN LATERAL (
+         SELECT s.course_id, s.instructor_id, s.completed_at
+         FROM learning_roadmap_stages s
+         WHERE s.roadmap_id = rr.roadmap_id
+           AND s.status = 'COMPLETED'
+           AND s.course_id IS NOT NULL
+           AND s.completed_at IS NOT NULL
+           AND s.completed_at < rr.created_at
+         ORDER BY s.completed_at DESC, s.id DESC
+         LIMIT 1
+       ) stage ON TRUE
+       JOIN enrollments e
+         ON e.user_id = rr.user_id AND e.course_id = stage.course_id
+       WHERE stage.instructor_id = $1
+         AND rr.user_id <> $1
+         AND rr.decision->>'previousLevelSource' IN ('quiz', 'writing')
+         AND rr.decision->>'assessedLevelSource' IN ('quiz', 'writing')
+         AND e.deleted_at IS NULL AND e.status IN (1, 2)
+         AND e.progress = 100 AND e.completed_at IS NOT NULL
+         AND NOT EXISTS (
+           SELECT 1 FROM roadmap_reassessments prior
+           WHERE prior.roadmap_id = rr.roadmap_id
+             AND prior.created_at >= stage.completed_at
+             AND prior.created_at < rr.created_at
+         )`,
       [userId],
     );
   }
@@ -227,16 +279,6 @@ export class SkillExtractorService {
     );
   }
 
-  private loadEnrollments(userId: number) {
-    return this.dataSource.query<EnrollmentRow[]>(
-      `SELECT e.id, e.progress, e.last_accessed_at, e.enrolled_at, e.course_id
-       FROM enrollments e
-       JOIN courses c ON c.id = e.course_id
-       WHERE c.instructor_id = $1 AND e.deleted_at IS NULL`,
-      [userId],
-    );
-  }
-
   // ------------------------------------------------------------------
   // Desired set
   // ------------------------------------------------------------------
@@ -246,7 +288,7 @@ export class SkillExtractorService {
     reviews: ReviewRow[],
     lessons: LessonRow[],
     certificates: CertificateRow[],
-    enrollments: EnrollmentRow[],
+    outcomes: StudentOutcomeRow[],
   ): DesiredEvidence[] {
     const courseById = new Map<number, { text: string; title: string }>();
     for (const c of courses) {
@@ -328,23 +370,32 @@ export class SkillExtractorService {
       );
     }
 
-    // 2. STUDENT_OUTCOME — mỗi enrollment; không khớp chủ đề -> student_engagement
-    for (const e of enrollments) {
-      const course = courseById.get(Number(e.course_id));
-      const progress = Number(e.progress ?? 0);
+    // 2. STUDENT_OUTCOME — chỉ pre/post đã xác minh; một học viên là một
+    // independence unit nên học lặp nhiều khóa không thể tự nhân trọng số.
+    for (const outcome of outcomes) {
+      const normalized = studentOutcomeScore(
+        outcome.previous_level,
+        outcome.assessed_level,
+      );
+      if (!normalized) continue;
+      const course = courseById.get(Number(outcome.course_id));
       push(
         'student_engagement',
         SkillSourceType.STUDENT_OUTCOME,
-        String(e.id),
-        progress / 100,
-        0.8,
-        e.last_accessed_at ?? e.enrolled_at,
-        `Học viên tiến độ ${progress}% khóa "${course?.title ?? ''}"`,
+        String(outcome.enrollment_id),
+        normalized.score,
+        0.85,
+        outcome.reassessed_at,
+        `Học viên ${normalized.previousLevel} → ${normalized.assessedLevel} sau khóa "${course?.title ?? ''}"`,
         {
           metadata: {
-            course_id: Number(e.course_id),
+            course_id: Number(outcome.course_id),
+            reassessment_id: Number(outcome.reassessment_id),
+            previous_level: normalized.previousLevel,
+            assessed_level: normalized.assessedLevel,
+            delta_bands: normalized.deltaBands,
             topic_skill: matchTopicSkill(course?.text),
-            independence_key: `outcome-course:${e.course_id}`,
+            independence_key: `outcome-student:${outcome.student_id}`,
           },
         },
       );
@@ -408,35 +459,6 @@ export class SkillExtractorService {
           },
         );
       }
-    }
-
-    // 5. EXPERIENCE — theo skill chủ đề, suy ra từ khóa học sớm nhất; source_id NULL
-    let earliestCourse: Date | null = null;
-    let courseCount = 0;
-    for (const c of courses) {
-      const ts = new Date(c.published_at ?? c.created_at).getTime();
-      if (!Number.isFinite(ts) || ts <= 0) continue;
-      if (!earliestCourse || ts < earliestCourse.getTime())
-        earliestCourse = new Date(ts);
-      courseCount += 1;
-    }
-    if (earliestCourse) {
-      const years = Math.max(
-        0,
-        Math.floor((Date.now() - earliestCourse.getTime()) / MS_PER_YEAR),
-      );
-      push(
-        'instructional_clarity',
-        SkillSourceType.EXPERIENCE,
-        null,
-        Math.min(years / 5, 1),
-        Math.min(0.5 + 0.09 * years, 0.95),
-        earliestCourse,
-        `${years} năm hoạt động giảng dạy (${courseCount} khóa học)`,
-        {
-          metadata: { independence_key: 'platform-teaching-experience' },
-        },
-      );
     }
 
     return [...desired.values()];

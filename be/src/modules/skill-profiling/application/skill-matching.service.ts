@@ -21,6 +21,10 @@ export interface MatchOptions {
    * khỏi kết quả khi bật lọc.
    */
   requireLevelMatch?: boolean;
+  /** ALL = không lọc; FREE = học phí 0; PAID = học phí > 0 và theo khoảng giá. */
+  priceMode?: 'ALL' | 'FREE' | 'PAID';
+  minHourlyRate?: number;
+  maxHourlyRate?: number;
 }
 
 /**
@@ -39,11 +43,13 @@ export interface MatchOptions {
  */
 interface EligibleRow {
   id: string | number;
+  user_id?: string | number;
   name: string;
   headline: string | null;
   total_students: number | string;
   avg_rating: number | string | null;
   teaching_levels?: string | string[] | null;
+  hourly_rate: number | string;
 }
 
 interface ProfileRow {
@@ -92,6 +98,7 @@ export interface MatchingResult {
       headline: string | null;
       totalStudents: number;
       avgRating: number | null;
+      hourlyRate: number;
       /** Chỉ có khi match truyền studentLevel. null = chưa khai báo level. */
       teachesLevel?: boolean | null;
       /** 0 exact, 1 adjacent, >1 lệch xa, null = chưa khai báo. */
@@ -118,6 +125,12 @@ export interface MatchingResult {
     levelFilter?: {
       enabled: boolean;
       studentLevel: string;
+      excludedCount: number;
+    };
+    priceFilter?: {
+      mode: 'FREE' | 'PAID';
+      minHourlyRate?: number;
+      maxHourlyRate?: number;
       excludedCount: number;
     };
   };
@@ -162,6 +175,17 @@ export class SkillMatchingService {
     const limit = dto.limit ?? 10;
     const studentLevel = opts?.studentLevel ?? null;
     const levelEnabled = Boolean(studentLevel);
+    const priceMode = opts?.priceMode ?? 'ALL';
+    if (
+      priceMode === 'PAID' &&
+      opts?.minHourlyRate != null &&
+      opts?.maxHourlyRate != null &&
+      opts.minHourlyRate > opts.maxHourlyRate
+    ) {
+      throw new BadRequestException(
+        'Học phí tối thiểu không được lớn hơn học phí tối đa',
+      );
+    }
 
     // Dedupe: skillId lặp → weight cuối thắng (tránh double-count).
     const weightBySkill = new Map<number, number>();
@@ -192,15 +216,26 @@ export class SkillMatchingService {
     const skillIds = targets.map((t) => t.skillId);
 
     // Eligibility — reuse đúng rule hiện có, không thêm điều kiện mới.
-    const eligible: EligibleRow[] = await this.dataSource.query(
-      `SELECT ip.id, u.name, ip.headline, ip.total_students, ip.avg_rating,
-              ip.teaching_levels
+    const allEligible: EligibleRow[] = await this.dataSource.query(
+      `SELECT ip.id, ip.user_id, u.name, ip.headline, ip.total_students, ip.avg_rating,
+              ip.teaching_levels, ip.hourly_rate
        FROM instructor_profiles ip
        JOIN users u ON u.id = ip.user_id
        WHERE ip.approval_status = $1 AND u.role = $2 AND u.status = $3
        ORDER BY ip.id`,
       [ApprovalStatus.APPROVED, UserRole.INSTRUCTOR, UserStatus.ACTIVE],
     );
+    const eligible = allEligible.filter((row) => {
+      const rate = Number(row.hourly_rate ?? 0);
+      if (priceMode === 'FREE') return rate === 0;
+      if (priceMode !== 'PAID' || rate <= 0) return priceMode === 'ALL';
+      if (opts?.minHourlyRate != null && rate < opts.minHourlyRate)
+        return false;
+      if (opts?.maxHourlyRate != null && rate > opts.maxHourlyRate)
+        return false;
+      return true;
+    });
+    const excludedByPrice = allEligible.length - eligible.length;
 
     const empty: MatchingResult = {
       targets: this.normalizedTargets(targets, totalWeight),
@@ -210,6 +245,20 @@ export class SkillMatchingService {
         eligible: eligible.length,
         rankedCount: 0,
         insufficientCount: 0,
+        ...(priceMode !== 'ALL'
+          ? {
+              priceFilter: {
+                mode: priceMode,
+                ...(priceMode === 'PAID' && opts?.minHourlyRate != null
+                  ? { minHourlyRate: opts.minHourlyRate }
+                  : {}),
+                ...(priceMode === 'PAID' && opts?.maxHourlyRate != null
+                  ? { maxHourlyRate: opts.maxHourlyRate }
+                  : {}),
+                excludedCount: excludedByPrice,
+              },
+            }
+          : {}),
       },
     };
     if (eligible.length === 0) return empty;
@@ -260,6 +309,7 @@ export class SkillMatchingService {
 
     for (const inst of eligible) {
       const iid = Number(inst.id);
+      const publicInstructorId = Number(inst.user_id ?? inst.id);
       const rows = profilesByInstructor.get(iid);
       const matchedSkills: MatchingMatchedSkill[] = [];
       const unknownSkills: MatchingResult['ranked'][number]['unknownSkills'] =
@@ -311,7 +361,7 @@ export class SkillMatchingService {
         // coverage = 0 → insufficient, không xếp hạng.
         insufficient.push({
           instructor: {
-            id: iid,
+            id: publicInstructorId,
             name: inst.name,
             headline: inst.headline,
           },
@@ -360,11 +410,12 @@ export class SkillMatchingService {
 
       ranked.push({
         instructor: {
-          id: iid,
+          id: publicInstructorId,
           name: inst.name,
           headline: inst.headline,
           totalStudents: Number(inst.total_students),
           avgRating: inst.avg_rating == null ? null : Number(inst.avg_rating),
+          hourlyRate: Number(inst.hourly_rate ?? 0),
           ...(levelEnabled
             ? {
                 teachesLevel: dist === null ? null : dist === 0,
@@ -435,6 +486,20 @@ export class SkillMatchingService {
         eligible: eligible.length,
         rankedCount: ranked.length,
         insufficientCount: insufficient.length,
+        ...(priceMode !== 'ALL'
+          ? {
+              priceFilter: {
+                mode: priceMode,
+                ...(priceMode === 'PAID' && opts?.minHourlyRate != null
+                  ? { minHourlyRate: opts.minHourlyRate }
+                  : {}),
+                ...(priceMode === 'PAID' && opts?.maxHourlyRate != null
+                  ? { maxHourlyRate: opts.maxHourlyRate }
+                  : {}),
+                excludedCount: excludedByPrice,
+              },
+            }
+          : {}),
         ...(levelEnabled
           ? {
               levelFilter: {

@@ -33,7 +33,9 @@ export default function CertificatesPage() {
   const allCertificates = data?.data ?? [];
 
   const filteredCertificates = statusFilter
-    ? allCertificates.filter((c: any) => c.certificateStatus === Number(statusFilter))
+    ? allCertificates.filter(
+        (certificate) => certificate.certificateStatus === Number(statusFilter),
+      )
     : allCertificates;
 
   const handleDelete = (id: number) => {
@@ -62,6 +64,10 @@ export default function CertificatesPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Chứng chỉ</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Nguồn dữ liệu đầu vào để quản trị viên duyệt và hệ thống đánh giá
+            năng lực.
+          </p>
           <p className="text-sm text-muted-foreground mt-1">
             Quản lý chứng chỉ và bằng cấp của bạn
           </p>
@@ -76,9 +82,19 @@ export default function CertificatesPage() {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
-        <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v ?? ""); setPage(1); }}>
+        <Select
+          value={statusFilter}
+          onValueChange={(v) => {
+            setStatusFilter(v ?? "");
+            setPage(1);
+          }}
+        >
           <SelectTrigger className="h-9 min-w-[160px]">
-            {statusFilter ? CERTIFICATE_STATUS[Number(statusFilter) as keyof typeof CERTIFICATE_STATUS]?.label : "Tất cả trạng thái"}
+            {statusFilter
+              ? CERTIFICATE_STATUS[
+                  Number(statusFilter) as keyof typeof CERTIFICATE_STATUS
+                ]?.label
+              : "Tất cả trạng thái"}
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="1">Đang chờ</SelectItem>
@@ -119,7 +135,9 @@ export default function CertificatesPage() {
 
       <ConfirmDialog
         open={!!deletingId}
-        onOpenChange={(open) => { if (!open) setDeletingId(null); }}
+        onOpenChange={(open) => {
+          if (!open) setDeletingId(null);
+        }}
         title="Xóa chứng chỉ?"
         description="Bạn có chắc chắn muốn xóa chứng chỉ này? Hành động này không thể hoàn tác."
         confirmLabel="Xóa"

@@ -1,4 +1,5 @@
 import { instructorApi } from "@/shared/lib/axios";
+import type { Certificate } from "../types/certificate";
 
 export interface CreateCertificateParams {
   certificateName: string;
@@ -9,7 +10,7 @@ export interface CreateCertificateParams {
 }
 
 export const certificateService = {
-  async getCertificates() {
+  async getCertificates(): Promise<{ data: Certificate[] }> {
     const response = await instructorApi.get("/certificates");
     return response.data;
   },

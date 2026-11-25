@@ -34,7 +34,8 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
 
   [ErrorCode.SECTION_NOT_FOUND]: 'Chương không tồn tại',
   [ErrorCode.LESSON_NOT_FOUND]: 'Bài học không tồn tại',
-  [ErrorCode.LESSON_LOCKED]: 'Vui lòng hoàn thành bài học trước để mở khóa bài này',
+  [ErrorCode.LESSON_LOCKED]:
+    'Vui lòng hoàn thành bài học trước để mở khóa bài này',
   [ErrorCode.LESSON_NOTE_NOT_FOUND]: 'Ghi chú không tồn tại',
   [ErrorCode.LESSON_COMMENT_NOT_FOUND]: 'Bình luận không tồn tại',
 
@@ -80,8 +81,7 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
     'Đơn đăng ký không thể chỉnh sửa ở trạng thái hiện tại',
   [ErrorCode.INSTRUCTOR_CERTIFICATE_REQUIRED]:
     'Vui lòng tải lên ít nhất một chứng chỉ',
-  [ErrorCode.INSTRUCTOR_CERTIFICATE_FILE_INVALID]:
-    'Tệp chứng chỉ không hợp lệ',
+  [ErrorCode.INSTRUCTOR_CERTIFICATE_FILE_INVALID]: 'Tệp chứng chỉ không hợp lệ',
 
   [ErrorCode.PAYOUT_NOT_FOUND]: 'Không tìm thấy yêu cầu rút tiền',
   [ErrorCode.PAYOUT_ALREADY_PROCESSED]: 'Yêu cầu rút tiền đã được xử lý',
@@ -106,11 +106,6 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
 
   [ErrorCode.NOTIFICATION_NOT_FOUND]: 'Không tìm thấy thông báo',
   [ErrorCode.NOTIFICATION_DELETE_FAILED]: 'Không thể xóa thông báo',
-
-  [ErrorCode.SUBSCRIPTION_NOT_FOUND]: 'Không tìm thấy gói đăng ký',
-  [ErrorCode.SUBSCRIPTION_UPDATE_FAILED]: 'Không thể cập nhật gói đăng ký',
-  [ErrorCode.WISHLIST_NOT_FOUND]: 'Không tìm thấy danh sách yêu thích',
-  [ErrorCode.WISHLIST_ITEM_NOT_FOUND]: 'Không tìm thấy mục trong danh sách',
 
   [ErrorCode.ACHIEVEMENT_NOT_FOUND]: 'Không tìm thấy huy hiệu',
   [ErrorCode.ACHIEVEMENT_NAME_EXISTS]: 'Tên huy hiệu đã tồn tại',

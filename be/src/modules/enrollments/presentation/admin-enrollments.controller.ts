@@ -1,11 +1,17 @@
-import { Controller, Get, Param, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Param, Query, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enum/role.enum';
+import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
 import { GetAdminEnrollmentsQuery } from '@/modules/enrollments/application/query/get-admin-enrollments.query';
 import { GetAdminEnrollmentByIdQuery } from '@/modules/enrollments/application/query/get-admin-enrollment-by-id.query';
 import { AdminEnrollmentsPage } from '@/modules/enrollments/application/query/get-admin-enrollments.query';
 import { AdminEnrollmentDetailResponseDto } from '@/modules/enrollments/presentation/dto/admin-enrollment-detail-response.dto';
 
 @Controller('admin/enrollments')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.ADMIN)
 export class AdminEnrollmentsController {
   constructor(private readonly queryBus: QueryBus) {}
 

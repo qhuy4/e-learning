@@ -157,7 +157,7 @@ export class SkillSourceValidator {
       case SkillSourceType.STUDENT_OUTCOME:
         return `SELECT 1 FROM enrollments
                 WHERE id = $1::bigint AND deleted_at IS NULL
-                  AND progress IS NOT NULL`;
+                  AND progress = 100 AND completed_at IS NOT NULL`;
       default:
         throw new AppException(
           ErrorCode.VALIDATION_ERROR,

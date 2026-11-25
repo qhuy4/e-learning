@@ -24,6 +24,9 @@ export class AdminCourseDtoMapper {
     dto.thumbnail = await resolveSignedUrl(course.thumbnail, storage);
 
     dto.level = Number(course.level);
+    dto.cefrLevelStart = course.cefrLevelStart;
+    dto.cefrLevelEnd = course.cefrLevelEnd;
+    dto.skillCodes = course.skillCodes;
     dto.price = Number(course.price);
     dto.status = course.status;
     dto.rejectReason = course.rejectReason;

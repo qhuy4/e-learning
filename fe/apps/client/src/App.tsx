@@ -4,6 +4,7 @@ import { AuthProvider } from "./features/auth/contexts/auth-context";
 import { I18nProvider } from "./i18n/i18n-provider";
 import { ThemeProvider } from "./components/theme-provider";
 import { AppRouter } from "./routes";
+import { AppVersion } from "@fe/components/common/AppVersion";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -22,6 +23,9 @@ export default function App() {
                     <AuthProvider>
                         <AppRouter />
                         <Toaster position="top-right" richColors />
+                        <AppVersion
+                            version={import.meta.env.VITE_APP_VERSION}
+                        />
                     </AuthProvider>
                 </QueryClientProvider>
             </I18nProvider>

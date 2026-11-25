@@ -30,7 +30,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </div>
               <div className="flex flex-col">
                 <span className="text-[15px] font-bold leading-none text-foreground">EduPro</span>
-                <span className="text-[11px] font-medium text-muted-foreground leading-none mt-1">Cổng giảng viên</span>
+                <span className="text-[11px] font-medium text-muted-foreground leading-none mt-1">Trang quản trị</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
