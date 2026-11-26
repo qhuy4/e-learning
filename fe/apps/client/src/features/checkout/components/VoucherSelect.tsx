@@ -22,7 +22,8 @@ import {
 } from "../services/checkout.service";
 
 interface VoucherSelectProps {
-  courseId: number;
+  courseId?: number;
+  bookingMinutes?: number;
   /** Giá trị đơn hàng (giá khóa học) để kiểm tra hạn mức tối thiểu. */
   amount: number;
   selected: CouponValidationResult | null;
@@ -45,6 +46,7 @@ const discountLabel = (c: {
 
 export const VoucherSelect = ({
   courseId,
+  bookingMinutes,
   amount,
   selected,
   onSelect,
@@ -54,9 +56,9 @@ export const VoucherSelect = ({
   const [error, setError] = useState<string | null>(null);
 
   const { data: coupons = [], isLoading } = useQuery({
-    queryKey: ["checkout-coupons", courseId],
-    queryFn: () => checkoutService.getActiveCoupons(courseId),
-    enabled: !!courseId && amount > 0,
+    queryKey: ["checkout-coupons", courseId, bookingMinutes],
+    queryFn: () => checkoutService.getActiveCoupons({ courseId, bookingMinutes }),
+    enabled: (!!courseId || !!bookingMinutes) && amount > 0,
   });
 
   const validateMutation = useMutation({
@@ -64,6 +66,7 @@ export const VoucherSelect = ({
       checkoutService.validateCoupon({
         ...payload,
         courseId,
+        bookingMinutes,
         amount,
       }),
     onSuccess: (result) => {
@@ -163,7 +166,7 @@ export const VoucherSelect = ({
               Chọn mã giảm giá
             </DialogTitle>
             <DialogDescription>
-              Chọn một mã có sẵn hoặc nhập mã bạn có để áp dụng cho đơn hàng.
+              Chọn một mã có sẵn hoặc nhập mã bạn có để áp dụng.
             </DialogDescription>
           </DialogHeader>
 
@@ -211,7 +214,7 @@ export const VoucherSelect = ({
               </div>
             ) : (
               <p className="py-2 text-center text-sm text-muted-foreground">
-                Hiện chưa có mã giảm giá khả dụng cho khóa học này.
+                Hiện chưa có mã giảm giá khả dụng.
               </p>
             )}
 

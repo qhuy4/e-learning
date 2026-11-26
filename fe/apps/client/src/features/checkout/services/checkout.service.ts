@@ -32,6 +32,7 @@ export interface CheckoutCoupon {
   description: string | null;
   validUntil: string | null;
   scope: string;
+  maxBookingMinutes: number | null;
 }
 
 /** Kết quả kiểm tra mã (POST /coupons/validate) — kèm số tiền giảm thực tế. */
@@ -46,9 +47,12 @@ export const checkoutService = {
   },
 
   /** Danh sách mã đang hiệu lực áp dụng cho khóa học. */
-  getActiveCoupons: async (courseId: number): Promise<CheckoutCoupon[]> => {
+  getActiveCoupons: async (params: {
+    courseId?: number;
+    bookingMinutes?: number;
+  }): Promise<CheckoutCoupon[]> => {
     const { data: res } = await api.get("/coupons/active", {
-      params: { courseId },
+      params,
     });
     return res?.data ?? res ?? [];
   },
@@ -57,7 +61,8 @@ export const checkoutService = {
   validateCoupon: async (payload: {
     code?: string;
     couponId?: number;
-    courseId: number;
+    courseId?: number;
+    bookingMinutes?: number;
     amount: number;
   }): Promise<CouponValidationResult> => {
     const { data: res } = await api.post("/coupons/validate", payload);
@@ -105,7 +110,10 @@ export const checkoutService = {
 
 /** Lấy thông báo lỗi tiếng Việt từ BE (GlobalExceptionFilter). */
 export const getApiErrorMessage = (e: unknown, fallback: string): string => {
-  const err = e as any;
+  const err = e as {
+    response?: { data?: { error?: { message?: string }; message?: string } };
+    message?: string;
+  };
   return (
     err?.response?.data?.error?.message ??
     err?.response?.data?.message ??

@@ -6,6 +6,7 @@ interface BookingSubmitSectionProps {
     isPending: boolean;
     disabled: boolean;
     amount: number;
+    isVoucherApplied?: boolean;
     userEmail?: string;
     onConfirm: () => void;
 }
@@ -15,6 +16,7 @@ export function BookingSubmitSection({
     isPending,
     disabled,
     amount,
+    isVoucherApplied = false,
     userEmail,
     onConfirm,
 }: BookingSubmitSectionProps) {
@@ -42,6 +44,8 @@ export function BookingSubmitSection({
                         ? "Đang chuyển đến VNPay..."
                         : amount > 0
                             ? `Thanh toán ${new Intl.NumberFormat("vi-VN").format(amount)} ₫`
+                            : isVoucherApplied
+                                ? "Xác nhận booking miễn phí"
                             : "Giảng viên chưa mở lịch trả phí"}
                 </span>
             </Button>
