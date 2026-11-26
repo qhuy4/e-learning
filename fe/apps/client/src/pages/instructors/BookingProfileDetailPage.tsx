@@ -29,6 +29,8 @@ import {
     formatSlotLabel,
     generateStartTimes,
 } from "@/features/instructors/config/slots";
+import { VoucherSelect } from "@/features/checkout/components/VoucherSelect";
+import type { CouponValidationResult } from "@/features/checkout/services/checkout.service";
 
 export const BookingProfileDetailPage = () => {
     const { instructorId } = useParams<{ instructorId: string }>();
@@ -41,6 +43,7 @@ export const BookingProfileDetailPage = () => {
     const [selectedTime, setSelectedTime] = useState("");
     const [duration, setDuration] = useState<DurationMinutes>(DURATIONS[2]);
     const [notes, setNotes] = useState("");
+    const [appliedCoupon, setAppliedCoupon] = useState<CouponValidationResult | null>(null);
     const [now, setNow] = useState(() => new Date());
 
     useEffect(() => {
@@ -100,6 +103,7 @@ export const BookingProfileDetailPage = () => {
                     ]
                         .filter(Boolean)
                         .join(" — ") || undefined,
+                couponId: appliedCoupon?.id,
             });
             return response.data?.data ?? response.data;
         },
@@ -144,6 +148,7 @@ export const BookingProfileDetailPage = () => {
                             onDurationChange={(d) => {
                                 setDuration(d);
                                 setSelectedTime("");
+                                setAppliedCoupon(null);
                             }}
                             startTimes={startTimes}
                             activeTime={activeTime}
@@ -156,11 +161,25 @@ export const BookingProfileDetailPage = () => {
                             onNotesChange={setNotes}
                         />
 
+                        <div className="rounded-xl border bg-card p-5">
+                            <VoucherSelect
+                                bookingMinutes={duration}
+                                amount={Math.round((instructor.hourlyRate * duration) / 60)}
+                                selected={appliedCoupon}
+                                onSelect={setAppliedCoupon}
+                            />
+                        </div>
+
                         <BookingSubmitSection
                             isError={booking.isError}
                             isPending={booking.isPending}
                             disabled={!activeTime || booking.isPending || instructor.hourlyRate <= 0}
-                            amount={Math.round((instructor.hourlyRate * duration) / 60)}
+                            amount={Math.max(
+                                0,
+                                Math.round((instructor.hourlyRate * duration) / 60) -
+                                    (appliedCoupon?.discountAmount ?? 0),
+                            )}
+                            isVoucherApplied={!!appliedCoupon}
                             userEmail={user?.email}
                             onConfirm={() => booking.mutate()}
                         />

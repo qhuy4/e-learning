@@ -13,10 +13,11 @@ describe('BookingCheckoutService revenue', () => {
       {} as never,
       {} as never,
       {} as never,
+      {} as never,
     );
 
     // Private money-path helper is exercised directly to keep this unit test small.
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
     const recordBookingRevenue = (
       service as unknown as {
         recordBookingRevenue: (
@@ -26,11 +27,9 @@ describe('BookingCheckoutService revenue', () => {
       }
     ).recordBookingRevenue.bind(service);
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await recordBookingRevenue(
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       { query } as unknown as EntityManager,
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+
       { id: 7, instructor_id: 71, total_amount: 160000 } as BookingOrmEntity,
     );
 
@@ -38,7 +37,7 @@ describe('BookingCheckoutService revenue', () => {
       expect.stringContaining(
         'ON CONFLICT (booking_id) WHERE booking_id IS NOT NULL DO NOTHING',
       ),
-      [7, 71, 160000],
+      [7, 71, 160000, 0],
     );
   });
 });

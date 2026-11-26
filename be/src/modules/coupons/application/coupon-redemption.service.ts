@@ -1,6 +1,6 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 
 import {
   COUPON_REPOSITORY,
@@ -10,6 +10,7 @@ import { Coupon } from '@/modules/coupons/domain/entity/coupon.entity';
 import { CouponUsageOrmEntity } from '@/modules/coupons/infrastructure/entity/coupon-usage.orm-entity';
 import { CouponType } from '@/modules/coupons/domain/enum/coupon-type.enum';
 import { CouponScope } from '@/modules/coupons/domain/enum/coupon-scope.enum';
+import { CouponOrmEntity } from '@/modules/coupons/infrastructure/entity/coupon.orm-entity';
 
 /** Dữ liệu mã giảm giá công khai (không lộ thông tin nội bộ). */
 export interface PublicCoupon {
@@ -22,6 +23,7 @@ export interface PublicCoupon {
   description: string | null;
   validUntil: string | null;
   scope: string;
+  maxBookingMinutes: number | null;
 }
 
 export interface CouponValidation {
@@ -51,17 +53,37 @@ export class CouponRedemptionService {
       minOrderAmount: coupon.minOrderAmount,
       maxDiscountAmount: coupon.maxDiscountAmount,
       description: coupon.description,
-      validUntil: coupon.validUntil ? new Date(coupon.validUntil).toISOString() : null,
+      validUntil: coupon.validUntil
+        ? new Date(coupon.validUntil).toISOString()
+        : null,
       scope: coupon.scope,
+      maxBookingMinutes: coupon.maxBookingMinutes,
     };
   }
 
   /** Danh sách mã đang hiệu lực (đã lọc theo scope khóa học + lượt của riêng user). */
-  async listActiveForUser(userId: number, courseId?: number): Promise<PublicCoupon[]> {
-    const coupons: Coupon[] = await this.couponRepository.findActiveApplicable(courseId);
+  async listActiveForUser(
+    userId: number,
+    courseId?: number,
+    bookingMinutes?: number,
+  ): Promise<PublicCoupon[]> {
+    const coupons: Coupon[] = await this.couponRepository.findActiveApplicable(
+      courseId,
+      userId,
+    );
 
     const result: PublicCoupon[] = [];
     for (const coupon of coupons) {
+      if (bookingMinutes !== undefined) {
+        if (
+          coupon.maxBookingMinutes === null ||
+          bookingMinutes > coupon.maxBookingMinutes
+        ) {
+          continue;
+        }
+      } else if (coupon.maxBookingMinutes !== null) {
+        continue;
+      }
       if (coupon.usageLimitPerUser > 0 && coupon.id != null) {
         const used = await this.usageRepository.count({
           where: {
@@ -86,8 +108,9 @@ export class CouponRedemptionService {
     couponId?: number;
     courseId?: number;
     amount: number;
+    bookingMinutes?: number;
   }): Promise<CouponValidation> {
-    const { userId, code, couponId, courseId, amount } = params;
+    const { userId, code, couponId, courseId, amount, bookingMinutes } = params;
 
     if (!code && !couponId) {
       throw new BadRequestException('Vui lòng chọn mã giảm giá');
@@ -102,6 +125,24 @@ export class CouponRedemptionService {
     }
     if (!coupon.isActive) {
       throw new BadRequestException('Mã giảm giá đã bị vô hiệu hóa');
+    }
+    if (coupon.recipientUserId !== null && coupon.recipientUserId !== userId) {
+      throw new BadRequestException('Mã giảm giá không dành cho tài khoản này');
+    }
+
+    if (bookingMinutes !== undefined) {
+      if (coupon.maxBookingMinutes === null) {
+        throw new BadRequestException(
+          'Mã giảm giá này không áp dụng cho booking',
+        );
+      }
+      if (bookingMinutes > coupon.maxBookingMinutes) {
+        throw new BadRequestException(
+          `Mã chỉ áp dụng cho booking tối đa ${coupon.maxBookingMinutes} phút`,
+        );
+      }
+    } else if (coupon.maxBookingMinutes !== null) {
+      throw new BadRequestException('Mã này chỉ áp dụng cho booking');
     }
 
     const now = new Date();
@@ -119,7 +160,9 @@ export class CouponRedemptionService {
     if (courseId != null && coupon.scope === CouponScope.SPECIFIC_COURSES) {
       const courseIds = (coupon.courses ?? []).map((c) => Number(c.id));
       if (!courseIds.includes(Number(courseId))) {
-        throw new BadRequestException('Mã giảm giá không áp dụng cho khóa học này');
+        throw new BadRequestException(
+          'Mã giảm giá không áp dụng cho khóa học này',
+        );
       }
     }
 
@@ -143,7 +186,9 @@ export class CouponRedemptionService {
 
     const discountAmount = this.computeDiscount(coupon, amount);
     if (discountAmount <= 0) {
-      throw new BadRequestException('Mã giảm giá không đủ điều kiện giảm cho đơn hàng này');
+      throw new BadRequestException(
+        'Mã giảm giá không đủ điều kiện giảm cho đơn hàng này',
+      );
     }
 
     return { coupon, discountAmount };
@@ -168,11 +213,15 @@ export class CouponRedemptionService {
     userId: number,
     orderId: number,
     discountAmount: number,
+    manager?: EntityManager,
   ): Promise<void> {
     if (coupon.id == null) return;
 
-    await this.usageRepository.save(
-      this.usageRepository.create({
+    const usageRepository = manager
+      ? manager.getRepository(CouponUsageOrmEntity)
+      : this.usageRepository;
+    await usageRepository.save(
+      usageRepository.create({
         couponId: coupon.id.toString(),
         userId: userId.toString(),
         orderId: orderId.toString(),
@@ -180,6 +229,12 @@ export class CouponRedemptionService {
         usedAt: new Date(),
       }),
     );
-    await this.couponRepository.incrementUsedCount(coupon.id);
+    if (manager) {
+      await manager
+        .getRepository(CouponOrmEntity)
+        .increment({ id: coupon.id.toString() }, 'usedCount', 1);
+    } else {
+      await this.couponRepository.incrementUsedCount(coupon.id);
+    }
   }
 }

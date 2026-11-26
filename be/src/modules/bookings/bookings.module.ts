@@ -22,16 +22,14 @@ import { GetInstructorWindowHandler } from '@/modules/bookings/application/query
 import { AvailabilityRepository } from '@/modules/bookings/infrastructure/repository/availability.repository';
 import { MeetingRoomRepositoryImpl } from '@/modules/meeting-room/infrastructure/repository/meeting-room.repository';
 import { AvailabilityController } from '@/modules/bookings/presentation/availability.controller';
-import {
-  InstructorAvailabilityRecurringOrmEntity,
-} from '@/modules/instructors/infrastructure/entity/instructor-availability-recurring.orm.entity';
-import {
-  InstructorAvailabilityExceptionOrmEntity,
-} from '@/modules/instructors/infrastructure/entity/instructor-availability-exception.orm.entity';
+import { InstructorAvailabilityRecurringOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-availability-recurring.orm.entity';
+import { InstructorAvailabilityExceptionOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-availability-exception.orm.entity';
 import { InstructorProfileTypeOrmEntity } from '@/modules/instructors/infrastructure/entity/instructor-profile.orm.entity';
 import { BookingPaymentOrmEntity } from './infrastructure/entity/booking-payment.orm-entity';
 import { BookingCheckoutService } from './application/booking-checkout.service';
 import { PaymentsModule } from '@/modules/payments/payments.module';
+import { CouponsModule } from '@/modules/coupons/coupons.module';
+import { AuthModule } from '@/modules/auth/auth.module';
 
 const QueryHandlers = [
   GetBookingsHandler,
@@ -59,6 +57,8 @@ const CommandHandlers = [
     ]),
     CqrsModule,
     PaymentsModule,
+    CouponsModule,
+    AuthModule,
   ],
   controllers: [
     AdminBookingsController,

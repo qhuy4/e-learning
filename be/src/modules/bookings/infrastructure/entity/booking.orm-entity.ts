@@ -39,17 +39,46 @@ export class BookingOrmEntity {
   @Column({ type: 'text', nullable: true })
   notes: string | null;
 
-  @Column({ name: 'hourly_rate', type: 'numeric', precision: 12, scale: 2, default: 0 })
+  @Column({
+    name: 'hourly_rate',
+    type: 'numeric',
+    precision: 12,
+    scale: 2,
+    default: 0,
+  })
   hourly_rate: number;
 
-  @Column({ name: 'total_amount', type: 'numeric', precision: 12, scale: 2, default: 0 })
+  @Column({
+    name: 'total_amount',
+    type: 'numeric',
+    precision: 12,
+    scale: 2,
+    default: 0,
+  })
   total_amount: number;
 
   @Column({ name: 'payment_status', type: 'smallint', default: 1 })
   payment_status: BookingPaymentStatus;
 
-  @Column({ name: 'payment_reference', type: 'varchar', length: 64, nullable: true })
+  @Column({
+    name: 'payment_reference',
+    type: 'varchar',
+    length: 64,
+    nullable: true,
+  })
   payment_reference: string | null;
+
+  @Column({ name: 'coupon_id', type: 'bigint', nullable: true })
+  coupon_id: string | null;
+
+  @Column({
+    name: 'coupon_discount',
+    type: 'numeric',
+    precision: 12,
+    scale: 2,
+    default: 0,
+  })
+  coupon_discount: number;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;

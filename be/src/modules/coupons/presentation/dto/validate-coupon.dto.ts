@@ -17,4 +17,8 @@ export class ValidateCouponDto {
   @IsOptional()
   @IsNumber()
   amount?: number;
+
+  @IsOptional()
+  @IsNumber()
+  bookingMinutes?: number;
 }
