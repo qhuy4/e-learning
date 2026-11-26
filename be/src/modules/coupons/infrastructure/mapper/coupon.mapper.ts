@@ -8,7 +8,12 @@ export class CouponMapper {
   static toDomain(entity: CouponOrmEntity): Coupon {
     const courses = entity.couponCourses?.map((cc) =>
       cc.course
-        ? { id: Number(cc.course.id), title: cc.course.title, thumbnail: cc.course.thumbnail, price: Number(cc.course.price) }
+        ? {
+            id: Number(cc.course.id),
+            title: cc.course.title,
+            thumbnail: cc.course.thumbnail,
+            price: Number(cc.course.price),
+          }
         : { id: Number(cc.courseId) },
     );
 
@@ -19,7 +24,9 @@ export class CouponMapper {
       discountType: entity.discountType as CouponType,
       discountValue: Number(entity.discountValue),
       minOrderAmount: Number(entity.minOrderAmount),
-      maxDiscountAmount: entity.maxDiscountAmount ? Number(entity.maxDiscountAmount) : null,
+      maxDiscountAmount: entity.maxDiscountAmount
+        ? Number(entity.maxDiscountAmount)
+        : null,
       usageLimit: entity.usageLimit,
       usageLimitPerUser: entity.usageLimitPerUser,
       usedCount: entity.usedCount,
@@ -31,6 +38,10 @@ export class CouponMapper {
       validUntil: entity.validUntil,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
+      recipientUserId: entity.recipientUserId
+        ? Number(entity.recipientUserId)
+        : null,
+      maxBookingMinutes: entity.maxBookingMinutes,
       courses,
       creator: entity.creator
         ? { id: entity.creator.id, name: entity.creator.name }

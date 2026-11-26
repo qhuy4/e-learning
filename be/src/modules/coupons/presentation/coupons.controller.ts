@@ -27,11 +27,16 @@ export class CouponsController {
   getActive(
     @CurrentUser('id') userId: number,
     @Query('courseId') courseId?: string,
+    @Query('bookingMinutes') bookingMinutes?: string,
   ) {
     const parsed = courseId ? Number(courseId) : undefined;
+    const parsedMinutes = bookingMinutes ? Number(bookingMinutes) : undefined;
     return this.redemption.listActiveForUser(
       userId,
       parsed !== undefined && !Number.isNaN(parsed) ? parsed : undefined,
+      parsedMinutes !== undefined && !Number.isNaN(parsedMinutes)
+        ? parsedMinutes
+        : undefined,
     );
   }
 
@@ -48,6 +53,7 @@ export class CouponsController {
         couponId: dto.couponId,
         courseId: dto.courseId,
         amount: dto.amount ?? 0,
+        bookingMinutes: dto.bookingMinutes,
       });
       return { ...this.redemption.toPublic(coupon), discountAmount };
     })();

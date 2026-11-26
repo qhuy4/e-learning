@@ -25,7 +25,8 @@ export class CouponRepository implements ICouponRepository {
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
   }) {
-    const { page, limit, keyword, scope, isActive, sortBy, sortOrder } = options;
+    const { page, limit, keyword, scope, isActive, sortBy, sortOrder } =
+      options;
 
     const query = this.repository
       .createQueryBuilder('coupon')
@@ -36,8 +37,11 @@ export class CouponRepository implements ICouponRepository {
     if (keyword) {
       query.andWhere(
         new Brackets((qb) => {
-          qb.where('coupon.code ILIKE :keyword', { keyword: `%${keyword}%` })
-            .orWhere('coupon.description ILIKE :keyword', { keyword: `%${keyword}%` });
+          qb.where('coupon.code ILIKE :keyword', {
+            keyword: `%${keyword}%`,
+          }).orWhere('coupon.description ILIKE :keyword', {
+            keyword: `%${keyword}%`,
+          });
         }),
       );
     }
@@ -58,8 +62,12 @@ export class CouponRepository implements ICouponRepository {
       validUntil: 'coupon.valid_until',
     };
 
-    const sortKey = sortBy && sortableColumns[sortBy] ? sortableColumns[sortBy] : 'coupon.created_at';
-    const sortDirection: 'ASC' | 'DESC' = sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+    const sortKey =
+      sortBy && sortableColumns[sortBy]
+        ? sortableColumns[sortBy]
+        : 'coupon.created_at';
+    const sortDirection: 'ASC' | 'DESC' =
+      sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
     query
       .orderBy(sortKey, sortDirection)
@@ -101,7 +109,10 @@ export class CouponRepository implements ICouponRepository {
 
     if (courseIds && courseIds.length > 0) {
       const couponCourses = courseIds.map((courseId) =>
-        this.couponCourseRepository.create({ couponId: saved.id, courseId: courseId.toString() }),
+        this.couponCourseRepository.create({
+          couponId: saved.id,
+          courseId: courseId.toString(),
+        }),
       );
       await this.couponCourseRepository.save(couponCourses);
     }
@@ -109,7 +120,10 @@ export class CouponRepository implements ICouponRepository {
     return this.findById(Number(saved.id));
   }
 
-  async update(id: number, data: Partial<CouponOrmEntity> & { courseIds?: number[] }) {
+  async update(
+    id: number,
+    data: Partial<CouponOrmEntity> & { courseIds?: number[] },
+  ) {
     const { courseIds, ...couponData } = data;
     await this.repository.update(id.toString(), couponData);
 
@@ -117,7 +131,10 @@ export class CouponRepository implements ICouponRepository {
       await this.couponCourseRepository.delete({ couponId: id.toString() });
       if (courseIds.length > 0) {
         const couponCourses = courseIds.map((courseId) =>
-          this.couponCourseRepository.create({ couponId: id.toString(), courseId: courseId.toString() }),
+          this.couponCourseRepository.create({
+            couponId: id.toString(),
+            courseId: courseId.toString(),
+          }),
         );
         await this.couponCourseRepository.save(couponCourses);
       }
@@ -131,7 +148,9 @@ export class CouponRepository implements ICouponRepository {
   }
 
   async toggleActive(id: number) {
-    const entity = await this.repository.findOne({ where: { id: id.toString() } });
+    const entity = await this.repository.findOne({
+      where: { id: id.toString() },
+    });
     if (!entity) return null;
     entity.isActive = !entity.isActive;
     await this.repository.save(entity);
@@ -142,13 +161,16 @@ export class CouponRepository implements ICouponRepository {
     await this.couponCourseRepository.delete({ couponId: id.toString() });
     if (courseIds.length > 0) {
       const couponCourses = courseIds.map((courseId) =>
-        this.couponCourseRepository.create({ couponId: id.toString(), courseId: courseId.toString() }),
+        this.couponCourseRepository.create({
+          couponId: id.toString(),
+          courseId: courseId.toString(),
+        }),
       );
       await this.couponCourseRepository.save(couponCourses);
     }
   }
 
-  async findActiveApplicable(courseId?: number) {
+  async findActiveApplicable(courseId?: number, userId?: number) {
     const now = new Date();
     const qb = this.repository
       .createQueryBuilder('coupon')
@@ -156,8 +178,16 @@ export class CouponRepository implements ICouponRepository {
       .leftJoinAndSelect('cc.course', 'course')
       .where('coupon.is_active = :isActive', { isActive: true })
       .andWhere('coupon.valid_from <= :now', { now })
-      .andWhere('(coupon.valid_until IS NULL OR coupon.valid_until >= :now)', { now })
-      .andWhere('(coupon.usage_limit IS NULL OR coupon.used_count < coupon.usage_limit)')
+      .andWhere('(coupon.valid_until IS NULL OR coupon.valid_until >= :now)', {
+        now,
+      })
+      .andWhere(
+        '(coupon.usage_limit IS NULL OR coupon.used_count < coupon.usage_limit)',
+      )
+      .andWhere(
+        '(coupon.recipient_user_id IS NULL OR coupon.recipient_user_id = :userId)',
+        { userId: userId?.toString() ?? null },
+      )
       .orderBy('coupon.created_at', 'DESC');
 
     if (courseId !== undefined && courseId !== null) {

@@ -36,6 +36,8 @@ export class Coupon {
     public readonly validUntil: Date | null,
     public readonly createdAt: Date | null,
     public readonly updatedAt: Date | null,
+    public readonly recipientUserId: number | null,
+    public readonly maxBookingMinutes: number | null,
     public courses?: CouponCourseInfo[],
     public creator?: CouponCreatorInfo,
   ) {}
@@ -59,6 +61,8 @@ export class Coupon {
     validUntil: Date | null;
     createdAt: Date | null;
     updatedAt: Date | null;
+    recipientUserId?: number | null;
+    maxBookingMinutes?: number | null;
     courses?: CouponCourseInfo[];
     creator?: CouponCreatorInfo;
   }): Coupon {
@@ -81,6 +85,8 @@ export class Coupon {
       params.validUntil,
       params.createdAt,
       params.updatedAt,
+      params.recipientUserId ?? null,
+      params.maxBookingMinutes ?? null,
       params.courses,
       params.creator,
     );

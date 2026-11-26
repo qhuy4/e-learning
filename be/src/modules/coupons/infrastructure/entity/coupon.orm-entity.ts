@@ -28,10 +28,22 @@ export class CouponOrmEntity {
   @Column({ name: 'discount_value', type: 'numeric', precision: 10, scale: 2 })
   discountValue: string;
 
-  @Column({ name: 'min_order_amount', type: 'numeric', precision: 10, scale: 2, default: 0 })
+  @Column({
+    name: 'min_order_amount',
+    type: 'numeric',
+    precision: 10,
+    scale: 2,
+    default: 0,
+  })
   minOrderAmount: string;
 
-  @Column({ name: 'max_discount_amount', type: 'numeric', precision: 10, scale: 2, nullable: true })
+  @Column({
+    name: 'max_discount_amount',
+    type: 'numeric',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+  })
   maxDiscountAmount: string | null;
 
   @Column({ name: 'usage_limit', type: 'int', nullable: true })
@@ -60,6 +72,12 @@ export class CouponOrmEntity {
 
   @Column({ name: 'description', type: 'text', nullable: true })
   description: string | null;
+
+  @Column({ name: 'recipient_user_id', type: 'bigint', nullable: true })
+  recipientUserId: string | null;
+
+  @Column({ name: 'max_booking_minutes', type: 'int', nullable: true })
+  maxBookingMinutes: number | null;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp', nullable: true })
   createdAt: Date | null;

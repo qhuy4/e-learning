@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 /** Student-facing DTO: the authenticated user is always the student. */
 export class CreateBookingCheckoutDto {
@@ -17,4 +17,12 @@ export class CreateBookingCheckoutDto {
   @IsOptional()
   @IsString()
   notes?: string;
+
+  @IsOptional()
+  @IsInt()
+  couponId?: number;
+
+  @IsOptional()
+  @IsString()
+  couponCode?: string;
 }

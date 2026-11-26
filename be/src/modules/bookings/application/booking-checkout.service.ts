@@ -11,6 +11,19 @@ import { BookingPaymentOrmEntity } from '@/modules/bookings/infrastructure/entit
 import { MeetingRoomRepositoryImpl } from '@/modules/meeting-room/infrastructure/repository/meeting-room.repository';
 import { MeetingRoomStatus } from '@/modules/bookings/domain/enum/meeting-room-status.enum';
 import { VnpayService } from '@/modules/payments/infrastructure/gateway/vnpay/vnpay.service';
+import {
+  CouponRedemptionService,
+  CouponValidation,
+} from '@/modules/coupons/application/coupon-redemption.service';
+import { Coupon } from '@/modules/coupons/domain/entity/coupon.entity';
+
+function durationMinutes(startTime: string, endTime: string): number {
+  const toMinutes = (value: string) => {
+    const [hours, minutes] = value.split(':').map(Number);
+    return hours * 60 + minutes;
+  };
+  return toMinutes(endTime) - toMinutes(startTime);
+}
 
 @Injectable()
 export class BookingCheckoutService {
@@ -22,6 +35,7 @@ export class BookingCheckoutService {
     private readonly dataSource: DataSource,
     private readonly vnpay: VnpayService,
     private readonly meetingRooms: MeetingRoomRepositoryImpl,
+    private readonly couponRedemption: CouponRedemptionService,
     @InjectRepository(BookingOrmEntity)
     private readonly bookings: Repository<BookingOrmEntity>,
     @InjectRepository(BookingPaymentOrmEntity)
@@ -35,6 +49,8 @@ export class BookingCheckoutService {
     startTime: string;
     endTime: string;
     notes?: string;
+    couponId?: number;
+    couponCode?: string;
   }) {
     const booking = await this.commandBus.execute(
       new CreateBookingCommand(
@@ -47,10 +63,92 @@ export class BookingCheckoutService {
       ),
     );
 
+    const minutes = durationMinutes(input.startTime, input.endTime);
+    let payableAmount = Number(booking.totalAmount);
+    let couponDiscount = 0;
+    let coupon: Coupon | null = null;
+
+    if (input.couponId || input.couponCode) {
+      let validation: CouponValidation;
+      try {
+        validation = await this.couponRedemption.validate({
+          userId: input.studentId,
+          couponId: input.couponId,
+          code: input.couponCode,
+          amount: payableAmount,
+          bookingMinutes: minutes,
+        });
+      } catch (error) {
+        await this.bookings.delete(booking.id);
+        throw error;
+      }
+      coupon = validation.coupon;
+      couponDiscount = validation.discountAmount;
+      payableAmount = Math.max(0, payableAmount - couponDiscount);
+
+      await this.bookings.update(booking.id, {
+        coupon_id: coupon.id?.toString() ?? null,
+        coupon_discount: couponDiscount,
+      });
+    }
+
+    if (coupon && payableAmount === 0) {
+      const payment = await this.dataSource.transaction(async (manager) => {
+        const paymentRepo = manager.getRepository(BookingPaymentOrmEntity);
+        const bookingRepo = manager.getRepository(BookingOrmEntity);
+        const freePayment = await paymentRepo.save(
+          paymentRepo.create({
+            bookingId: booking.id,
+            amount: 0,
+            currency: 'VND',
+            status: BookingPaymentStatus.PAID,
+          }),
+        );
+
+        await bookingRepo.update(booking.id, {
+          status: BookingStatusEnum.CONFIRMED,
+          payment_status: BookingPaymentStatus.PAID,
+          payment_reference: String(freePayment.id),
+        });
+        await this.recordBookingRevenue(
+          manager,
+          {
+            id: booking.id,
+            instructor_id: booking.instructorId,
+            total_amount: booking.totalAmount,
+          } as BookingOrmEntity,
+          couponDiscount,
+        );
+        await this.meetingRooms.create(
+          {
+            bookingId: booking.id,
+            roomId: `booking-${booking.id}`,
+            status: MeetingRoomStatus.WAITING,
+          },
+          manager,
+        );
+        await this.couponRedemption.recordUsage(
+          coupon,
+          input.studentId,
+          booking.id,
+          couponDiscount,
+          manager,
+        );
+        return freePayment;
+      });
+
+      return {
+        bookingId: booking.id,
+        paymentId: payment.id,
+        amount: 0,
+        paymentUrl: this.getFreeBookingResultUrl(booking.id),
+      };
+    }
+
     const payment = await this.payments.save(
       this.payments.create({
         bookingId: booking.id,
-        amount: booking.totalAmount,
+        amount: payableAmount,
         currency: 'VND',
         status: BookingPaymentStatus.PENDING,
       }),
@@ -58,14 +156,18 @@ export class BookingCheckoutService {
 
     const paymentUrl = await this.vnpay.createPaymentUrl({
       orderId: payment.id,
-      amount: Number(payment.amount),
+      amount: payableAmount,
       currency: payment.currency,
       description: `Thanh toan buoi hoc #${booking.id}`,
       returnUrl: this.getReturnUrl(),
     });
 
-    await this.payments.update(payment.id, { transactionId: paymentUrl.transactionId });
-    await this.bookings.update(booking.id, { payment_reference: String(payment.id) });
+    await this.payments.update(payment.id, {
+      transactionId: paymentUrl.transactionId,
+    });
+    await this.bookings.update(booking.id, {
+      payment_reference: String(payment.id),
+    });
 
     return {
       bookingId: booking.id,
@@ -82,8 +184,14 @@ export class BookingCheckoutService {
       relations: { booking: true },
     });
 
-    if (!payment || !payment.booking || Number(payment.amount) !== verification.amount) {
-      this.logger.warn(`Rejected booking payment callback ${verification.orderId}`);
+    if (
+      !payment ||
+      !payment.booking ||
+      Number(payment.amount) !== verification.amount
+    ) {
+      this.logger.warn(
+        `Rejected booking payment callback ${verification.orderId}`,
+      );
       return { bookingId: undefined, success: false };
     }
 
@@ -100,7 +208,9 @@ export class BookingCheckoutService {
       const bookingRepo = manager.getRepository(BookingOrmEntity);
 
       await paymentRepo.update(payment.id, {
-        status: success ? BookingPaymentStatus.PAID : BookingPaymentStatus.FAILED,
+        status: success
+          ? BookingPaymentStatus.PAID
+          : BookingPaymentStatus.FAILED,
         transactionId: verification.transactionId || payment.transactionId,
         gatewayResponse: verification.rawResponse,
       });
@@ -136,12 +246,24 @@ export class BookingCheckoutService {
     if (explicit) return explicit;
 
     const defaultUrl = this.config.get<string>('VNP_RETURN_URL');
-    return defaultUrl?.replace('/payments/webhook/vnpay', '/bookings/payment/vnpay');
+    return defaultUrl?.replace(
+      '/payments/webhook/vnpay',
+      '/bookings/payment/vnpay',
+    );
+  }
+
+  private getFreeBookingResultUrl(bookingId: number): string {
+    const clientUrl = this.config.get<string>(
+      'CLIENT_URL',
+      'http://localhost:5173',
+    );
+    return `${clientUrl.replace(/\/$/, '')}/payment/result?type=booking&bookingId=${bookingId}&status=success`;
   }
 
   private async recordBookingRevenue(
     manager: import('typeorm').EntityManager,
     booking: BookingOrmEntity,
+    couponDiscount = 0,
   ): Promise<void> {
     await manager.query(
       `WITH profile AS (
@@ -162,7 +284,7 @@ export class BookingCheckoutService {
            ROUND($3 * (100 - revenue_share_pct) / 100),
            revenue_share_pct,
            $3 - ROUND($3 * (100 - revenue_share_pct) / 100),
-           0, 'pending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+           $4, 'pending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
          FROM profile
          ON CONFLICT (booking_id) WHERE booking_id IS NOT NULL DO NOTHING
          RETURNING instructor_id, instructor_amount
@@ -173,7 +295,12 @@ export class BookingCheckoutService {
            updated_at = CURRENT_TIMESTAMP
        FROM inserted i
        WHERE p.user_id = i.instructor_id`,
-      [booking.id, booking.instructor_id, Number(booking.total_amount)],
+      [
+        booking.id,
+        booking.instructor_id,
+        Number(booking.total_amount),
+        couponDiscount,
+      ],
     );
   }
 }

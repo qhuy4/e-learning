@@ -59,7 +59,7 @@ export class InstructorBookingsController {
     @Param('id', ParseIntPipe) id: number,
   ) {
     await this.assertOwnership(id, instructorId);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
     return this.queryBus.execute(new GetBookingByIdQuery(id));
   }
 
@@ -71,7 +71,7 @@ export class InstructorBookingsController {
   ) {
     await this.assertOwnership(id, instructorId);
     return this.commandBus.execute(
-      new UpdateBookingStatusCommand(id, dto.status),
+      new UpdateBookingStatusCommand(id, dto.status, true),
     );
   }
 
