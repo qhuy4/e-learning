@@ -17,6 +17,7 @@ import {
   Timer,
 } from 'lucide-react';
 import { Button } from '@fe/components/ui/button';
+import { AlertDialog, AlertDialogPopup, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter } from '@fe/components/ui/alert-dialog';
 import { cn } from '@fe/lib/utils';
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useUpdateLessonProgress } from '@/features/learning/hooks/use-learning';
@@ -87,6 +88,7 @@ export const QuizLesson = ({ lessonId, initialQuizId, courseId, onNextLesson, cl
   const [remaining, setRemaining] = useState<number | null>(null);
   const [result, setResult] = useState<QuizAttemptResult | null>(null);
   const [timedOut, setTimedOut] = useState(false);
+  const [confirmSubmit, setConfirmSubmit] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
   const startMutation = useStartQuiz();
@@ -178,15 +180,7 @@ export const QuizLesson = ({ lessonId, initialQuizId, courseId, onNextLesson, cl
 
   const doSubmit = (auto = false) => {
     if (!attemptId || submitMutation.isPending) return;
-    if (!auto) {
-      const unanswered = questions.filter((q) => !isAnsweredQuestion(q, sel, txt)).length;
-      if (
-        unanswered > 0 &&
-        !window.confirm(`Còn ${unanswered} câu chưa trả lời. Bạn chắc chắn muốn nộp bài?`)
-      ) {
-        return;
-      }
-    }
+    setConfirmSubmit(false);
     setFormError(null);
     setTimedOut(auto);
     submitMutation.mutate(
@@ -496,6 +490,20 @@ export const QuizLesson = ({ lessonId, initialQuizId, courseId, onNextLesson, cl
     const question = questions[current];
     return (
       <div className={shell}>
+        <AlertDialog open={confirmSubmit} onOpenChange={setConfirmSubmit}>
+          <AlertDialogPopup>
+            <AlertDialogTitle>Xác nhận nộp bài</AlertDialogTitle>
+            <AlertDialogDescription>
+              {questions.length - answeredCount > 0
+                ? `Bạn còn ${questions.length - answeredCount} câu chưa trả lời. Bạn có muốn nộp bài không?`
+                : 'Bạn đã trả lời tất cả câu hỏi. Bạn có muốn nộp bài không?'}
+            </AlertDialogDescription>
+            <AlertDialogFooter>
+              <Button variant="outline" onClick={() => setConfirmSubmit(false)}>Tiếp tục làm bài</Button>
+              <Button onClick={() => doSubmit()} disabled={submitMutation.isPending}>Nộp bài</Button>
+            </AlertDialogFooter>
+          </AlertDialogPopup>
+        </AlertDialog>
         <div className={cn('overflow-hidden rounded-2xl border border-slate-200 bg-white', CARD_SHADOW)}>
           {/* Header */}
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/70 px-4 py-3.5 md:px-6">
@@ -527,7 +535,7 @@ export const QuizLesson = ({ lessonId, initialQuizId, courseId, onNextLesson, cl
               <Button
                 className="h-9 rounded-xl px-4 text-sm font-bold"
                 disabled={submitMutation.isPending}
-                onClick={() => doSubmit()}
+                onClick={() => setConfirmSubmit(true)}
               >
                 {submitMutation.isPending ? (
                   <Loader2 className="animate-spin" />
