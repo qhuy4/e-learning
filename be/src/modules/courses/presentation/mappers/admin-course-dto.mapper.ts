@@ -27,6 +27,7 @@ export class AdminCourseDtoMapper {
     dto.cefrLevelStart = course.cefrLevelStart;
     dto.cefrLevelEnd = course.cefrLevelEnd;
     dto.skillCodes = course.skillCodes;
+    dto.benefits = course.benefits ?? [];
     dto.price = Number(course.price);
     dto.status = course.status;
     dto.rejectReason = course.rejectReason;

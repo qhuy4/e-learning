@@ -26,6 +26,7 @@ export class CourseDtoMapper {
     dto.cefrLevelStart = courseOrEntity.cefrLevelStart;
     dto.cefrLevelEnd = courseOrEntity.cefrLevelEnd;
     dto.skillCodes = courseOrEntity.skillCodes;
+    dto.benefits = courseOrEntity.benefits ?? [];
     dto.price = Number(courseOrEntity.price);
     dto.publishedAt = courseOrEntity.publishedAt;
     dto.createdAt = courseOrEntity.createdAt;

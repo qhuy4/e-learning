@@ -17,6 +17,7 @@ export class CourseMapper {
       cefrLevelStart: entity.cefrLevelStart,
       cefrLevelEnd: entity.cefrLevelEnd,
       skillCodes: entity.skillCodes ?? [],
+      benefits: entity.benefits ?? [],
       price: Number(entity.price),
       status: entity.status,
       reviewedBy: entity.reviewedBy ? Number(entity.reviewedBy) : null,

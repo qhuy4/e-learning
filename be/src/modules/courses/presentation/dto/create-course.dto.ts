@@ -99,4 +99,14 @@ export class CreateCourseDto {
     { each: true },
   )
   skillCodes?: string[];
+
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value.map((v: unknown) => typeof v === 'string' ? v.trim() : v).filter((v: unknown) => v !== '');
+    if (typeof value !== 'string') return value;
+    try { const parsed: unknown = JSON.parse(value); return Array.isArray(parsed) ? parsed.map((v: unknown) => typeof v === 'string' ? v.trim() : v).filter((v: unknown) => v !== '') : parsed; } catch { return value; }
+  })
+  @IsArray()
+  @IsString({ each: true })
+  benefits?: string[];
 }

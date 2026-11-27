@@ -16,6 +16,7 @@ export class UpdateCourseCommand {
       cefrLevelStart?: string | null;
       cefrLevelEnd?: string | null;
       skillCodes?: string[];
+      benefits?: string[];
     },
   ) {}
 }

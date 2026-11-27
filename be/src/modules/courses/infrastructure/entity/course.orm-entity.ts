@@ -64,6 +64,9 @@ export class CourseOrmEntity {
   @Column({ name: 'skill_codes', type: 'jsonb', default: () => "'[]'::jsonb" })
   skillCodes: string[];
 
+  @Column({ type: 'jsonb', default: () => "'[]'::jsonb" })
+  benefits: string[];
+
   @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
   price: string;
 

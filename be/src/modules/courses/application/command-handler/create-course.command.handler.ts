@@ -80,6 +80,7 @@ export class CreateCourseHandler implements ICommandHandler<CreateCourseCommand>
         cefrLevelStart: command.cefrLevelStart,
         cefrLevelEnd: command.cefrLevelEnd,
         skillCodes: command.skillCodes,
+        benefits: command.benefits,
         price: command.price,
         parentId: command.parentId,
         version: 1,

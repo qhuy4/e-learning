@@ -11,6 +11,7 @@ export class AdminCourseDetailResponseDto {
   cefrLevelStart: string | null;
   cefrLevelEnd: string | null;
   skillCodes: string[];
+  benefits: string[];
   price: number;
   status: CourseStatus;
   rejectReason: string | null;

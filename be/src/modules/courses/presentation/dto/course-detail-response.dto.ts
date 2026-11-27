@@ -9,6 +9,7 @@ export class CourseDetailResponseDto {
   cefrLevelStart: string | null;
   cefrLevelEnd: string | null;
   skillCodes: string[];
+  benefits: string[];
   price: number;
   publishedAt: Date | null;
   createdAt: Date | null;

@@ -80,6 +80,7 @@ export default function CreateCoursePage() {
     if (data.cefrLevelStart) formData.append("cefrLevelStart", data.cefrLevelStart);
     if (data.cefrLevelEnd) formData.append("cefrLevelEnd", data.cefrLevelEnd);
     formData.append("skillCodes", JSON.stringify(data.skillCodes ?? []));
+    formData.append("benefits", JSON.stringify((data.benefits ?? []).map(item => item.trim()).filter(Boolean)));
     if (data.price !== undefined) formData.append("price", String(data.price));
     if (status) formData.append("status", String(status));
     if (data.thumbnail instanceof File) {

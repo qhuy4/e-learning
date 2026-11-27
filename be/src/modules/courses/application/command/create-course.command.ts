@@ -11,5 +11,6 @@ export class CreateCourseCommand {
     public readonly cefrLevelStart?: string,
     public readonly cefrLevelEnd?: string,
     public readonly skillCodes?: string[],
+    public readonly benefits?: string[],
   ) {}
 }

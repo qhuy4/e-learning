@@ -194,6 +194,7 @@ export class UpdateCourseHandler implements ICommandHandler<UpdateCourseCommand>
         cefrLevelStart: command.data.cefrLevelStart,
         cefrLevelEnd: command.data.cefrLevelEnd,
         skillCodes: command.data.skillCodes,
+        benefits: command.data.benefits,
         price: command.data.price,
         status: command.data.status,
         parentId: command.data.parentId,

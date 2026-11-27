@@ -9,6 +9,7 @@ export interface Course {
   slug: string;
 
   description: string | null;
+  benefits?: string[];
   thumbnail: string | null;
 
   level: CourseLevel;
@@ -63,6 +64,7 @@ export interface CourseSection {
   title: string;
   slug: string;
   description: string | null;
+  benefits?: string[];
   position: number;
   lessons: CourseLesson[];
 }

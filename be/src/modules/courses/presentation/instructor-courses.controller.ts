@@ -89,6 +89,7 @@ export class InstructorCoursesController {
         dto.cefrLevelStart,
         dto.cefrLevelEnd,
         dto.skillCodes,
+        dto.benefits,
       ),
     );
   }
@@ -118,6 +119,7 @@ export class InstructorCoursesController {
         cefrLevelStart: dto.cefrLevelStart,
         cefrLevelEnd: dto.cefrLevelEnd,
         skillCodes: dto.skillCodes,
+        benefits: dto.benefits,
       }),
     );
   }

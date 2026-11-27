@@ -2,6 +2,7 @@ import { ChevronRight, Eye, ExternalLink, School } from "lucide-react";
 import { Link, useParams } from "react-router";
 import { CourseHeader } from "@/features/courses/components/CourseDetail/CourseHeader";
 import { CourseContent } from "@/features/courses/components/CourseDetail/CourseContent";
+import { CourseLearningOutcomes } from "@/features/courses/components/CourseDetail/CourseLearningOutcomes";
 import { CourseSidebar } from "@/features/courses/components/CourseDetail/CourseSidebar";
 import { usePreviewCourse } from "@/features/courses/hooks/use-courses";
 
@@ -49,6 +50,8 @@ export const CoursePreviewPage = () => {
 
       {/* Course Header Hero */}
       <CourseHeader course={courseData} />
+
+      <CourseLearningOutcomes course={courseData} />
 
       {/* Two-Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">

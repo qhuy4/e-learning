@@ -6,17 +6,7 @@ interface CourseLearningOutcomesProps {
 }
 
 export const CourseLearningOutcomes = ({ course }: CourseLearningOutcomesProps) => {
-  const sections = course?.sections || [];
-  const totalLessons = sections.reduce((acc, s) => acc + (s.lessons?.length || 0), 0);
-
-  const outcomes = [
-    course?.level && `Thành thạo kỹ năng tiếng Anh cấp độ ${course.level}`,
-    totalLessons > 0 && `Hoàn thành ${totalLessons} bài học có cấu trúc qua ${sections.length} chương`,
-    course?.instructor?.name && `Học cùng ${course.instructor.name}`,
-    "Phát triển độ trôi chảy trong giao tiếp thực tế",
-    "Cải thiện phát âm và nhịp điệu tự nhiên",
-    "Tự tin hơn trong môi trường chuyên nghiệp",
-  ].filter(Boolean) as string[];
+  const outcomes = course?.benefits ?? [];
 
   if (outcomes.length === 0) return null;
 
