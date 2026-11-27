@@ -23,3 +23,11 @@ export function useStudentProgress(enrollmentId: number) {
     enabled: !!enrollmentId,
   });
 }
+
+export function useStudentQuizAttempts(enrollmentId: number) {
+  return useQuery({ queryKey: ["instructor-enrollment-quiz-attempts", enrollmentId], queryFn: () => studentService.getQuizAttempts(enrollmentId), enabled: !!enrollmentId });
+}
+
+export function useStudentQuizAttemptDetail(enrollmentId: number, attemptId: string | null) {
+  return useQuery({ queryKey: ["instructor-quiz-attempt-detail", enrollmentId, attemptId], queryFn: () => studentService.getQuizAttemptDetail(enrollmentId, attemptId!), enabled: !!enrollmentId && !!attemptId });
+}

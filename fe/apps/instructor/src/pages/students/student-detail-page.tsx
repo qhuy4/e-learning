@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router";
 import {
   ArrowLeft,
@@ -11,7 +12,7 @@ import {
   HelpCircle,
   Radio,
 } from "lucide-react";
-import { useStudentDetail, useStudentProgress } from "@/features/students/hook/use-students";
+import { useStudentDetail, useStudentProgress, useStudentQuizAttempts, useStudentQuizAttemptDetail } from "@/features/students/hook/use-students";
 import {
   ENROLLMENT_STATUS_LABELS,
   ENROLLMENT_STATUS_CLASSES,
@@ -20,6 +21,7 @@ import { LESSON_TYPE_LABELS } from "@/features/lessons/types/lesson.types";
 import { Button } from "@fe/components/ui/button";
 import { Badge } from "@fe/components/ui/badge";
 import { Card, CardContent } from "@fe/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@fe/components/ui/dialog";
 import { Skeleton } from "@fe/components/ui/skeleton";
 
 const LESSON_TYPE_ICONS: Record<string, typeof Play> = {
@@ -44,10 +46,15 @@ export default function StudentDetailPage() {
   const { enrollmentId } = useParams<{ enrollmentId: string }>();
   const navigate = useNavigate();
   const id = Number(enrollmentId);
+  const [selectedAttempt, setSelectedAttempt] = useState<string | null>(null);
+  const { data: reviewData, isLoading: reviewLoading, isError: reviewError } = useStudentQuizAttemptDetail(id, selectedAttempt);
+  const review = reviewData?.data ?? reviewData;
 
   const { data: detailData, isLoading: detailLoading } = useStudentDetail(id);
   const { data: progressData, isLoading: progressLoading } = useStudentProgress(id);
 
+  const { data: quizData, isLoading: quizLoading, isError: quizError } = useStudentQuizAttempts(id);
+  const quizAttempts = quizData?.data ?? quizData ?? [];
   const detail = detailData?.data ?? detailData;
   const progress = progressData?.data ?? progressData;
 
@@ -211,6 +218,48 @@ export default function StudentDetailPage() {
           </Card>
         </div>
       )}
+
+      <Card>
+        <CardContent className="p-5 space-y-4">
+          <h3 className="font-semibold">Lịch sử làm bài kiểm tra</h3>
+          {quizLoading ? <Skeleton className="h-20 w-full" /> : quizError ? (
+            <p className="text-sm text-destructive">Không thể tải lịch sử làm bài. Vui lòng thử lại sau.</p>
+          ) : quizAttempts.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Học viên chưa nộp bài kiểm tra nào trong khóa học này.</p>
+          ) : (
+            <div className="overflow-x-auto"><table className="w-full text-sm text-left">
+              <thead className="text-muted-foreground"><tr><th className="p-2">Bài kiểm tra</th><th className="p-2">Bài học</th><th className="p-2">Điểm</th><th className="p-2">Số câu đúng</th><th className="p-2">Kết quả</th><th className="p-2">Ngày nộp</th><th className="p-2">Chi tiết</th></tr></thead>
+              <tbody>{quizAttempts.map((attempt: { id: string; quizTitle: string; lessonTitle: string; sectionTitle: string; score: string; correctCount: number; totalQuestions: number; passingScore: number; submittedAt: string }, index: number) => (
+                <tr key={`${attempt.id}-${index}`} className="border-t"><td className="p-2 font-medium">{attempt.quizTitle}</td><td className="p-2">{attempt.lessonTitle}<div className="text-xs text-muted-foreground">{attempt.sectionTitle}</div></td><td className="p-2">{Number(attempt.score)}</td><td className="p-2">{attempt.correctCount}/{attempt.totalQuestions}</td><td className="p-2">{Number(attempt.score) >= Number(attempt.passingScore) ? "Đạt" : "Chưa đạt"}</td><td className="p-2 whitespace-nowrap">{attempt.submittedAt ? new Date(attempt.submittedAt).toLocaleString("vi-VN") : "—"}</td><td className="p-2"><Button variant="outline" size="sm" onClick={() => setSelectedAttempt(String(attempt.id))}>Xem bài làm</Button></td></tr>
+              ))}</tbody>
+            </table></div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Dialog open={selectedAttempt !== null} onOpenChange={(open) => { if (!open) setSelectedAttempt(null); }}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Chi tiết bài làm{review?.quizTitle ? `: ${review.quizTitle}` : ""}</DialogTitle>
+            <DialogDescription>Xem câu trả lời của học viên và đáp án đúng.</DialogDescription>
+          </DialogHeader>
+          {reviewLoading ? <Skeleton className="h-32 w-full" /> : reviewError ? <p className="text-sm text-destructive">Không thể tải chi tiết bài làm.</p> : review && (
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground">{review.correctCount}/{review.totalQuestions} câu đúng · {Number(review.score)} điểm</p>
+              {review.questions.length === 0 && <p className="text-sm text-muted-foreground">Không còn dữ liệu câu trả lời để hiển thị.</p>}
+              {review.questions.map((q: { id: string; question: string; isCorrect: boolean; selectedAnswer: string | null; correctAnswer: string | null; earnedPoints: number; points: number; explanation: string | null }, index: number) => (
+                <div key={q.id} className="rounded-lg border p-4 space-y-2 text-sm">
+                  <div className="flex items-start justify-between gap-3"><p className="font-semibold">Câu {index + 1}. {q.question}</p><Badge variant={q.isCorrect ? "default" : "destructive"}>{q.isCorrect ? "Đúng" : "Sai"}</Badge></div>
+                  <p>Học viên trả lời: <span className="font-medium">{q.selectedAnswer || "Chưa trả lời"}</span></p>
+                  <p>Đáp án đúng: <span className="font-medium">{q.correctAnswer || "Không có dữ liệu"}</span></p>
+                  <p className="text-muted-foreground">Điểm: {q.earnedPoints}/{q.points}</p>
+                  {q.explanation && <p className="text-muted-foreground">Giải thích: {q.explanation}</p>}
+                </div>
+              ))}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Lesson Progress by Section */}
       {progressLoading ? (

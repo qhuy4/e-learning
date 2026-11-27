@@ -19,6 +19,16 @@ export const studentService = {
     return response.data;
   },
 
+  async getQuizAttemptDetail(enrollmentId: number, attemptId: string) {
+    const response = await instructorApi.get(`/enrollments/${enrollmentId}/quiz-attempts/${attemptId}`);
+    return response.data;
+  },
+
+  async getQuizAttempts(enrollmentId: number) {
+    const response = await instructorApi.get(`/enrollments/${enrollmentId}/quiz-attempts`);
+    return response.data;
+  },
+
   async getStudentProgress(enrollmentId: number) {
     const response = await instructorApi.get(`/enrollments/${enrollmentId}/progress`);
     return response.data;
